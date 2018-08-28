@@ -37,7 +37,7 @@ class MainFrameBaseClass : public wxFrame
 {
 public:
     enum {
-        ID_SCROLL = 10001,
+        ID_OPEN_FOLDER = 10001,
     };
 
 protected:
@@ -45,14 +45,15 @@ protected:
     wxStyledTextCtrl* m_stc15;
     wxMenuBar* m_menuBar;
     wxMenu* m_name6;
-    wxMenuItem* m_menuItem7;
     wxMenuItem* m_menuItem13;
+    wxMenuItem* m_menuItem17;
+    wxMenuItem* m_menuItem7;
     wxMenu* m_name8;
     wxMenuItem* m_menuItem9;
 
 protected:
+    virtual void OnOpenFolder(wxCommandEvent& event) { event.Skip(); }
     virtual void OnExit(wxCommandEvent& event) { event.Skip(); }
-    virtual void OnScroll(wxCommandEvent& event) { event.Skip(); }
     virtual void OnAbout(wxCommandEvent& event) { event.Skip(); }
 
 public:

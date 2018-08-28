@@ -88,11 +88,13 @@ MainFrameBaseClass::MainFrameBaseClass(
     m_name6 = new wxMenu();
     m_menuBar->Append(m_name6, _("File"));
 
+    m_menuItem13 = new wxMenuItem(m_name6, ID_OPEN_FOLDER, _("Open folder..."), wxT(""), wxITEM_NORMAL);
+    m_name6->Append(m_menuItem13);
+
+    m_name6->AppendSeparator();
+
     m_menuItem7 = new wxMenuItem(m_name6, wxID_EXIT, _("Exit\tAlt-X"), _("Quit"), wxITEM_NORMAL);
     m_name6->Append(m_menuItem7);
-
-    m_menuItem13 = new wxMenuItem(m_name6, ID_SCROLL, _("Scroll Window"), wxT(""), wxITEM_NORMAL);
-    m_name6->Append(m_menuItem13);
 
     m_name8 = new wxMenu();
     m_menuBar->Append(m_name8, _("Help"));
@@ -101,7 +103,7 @@ MainFrameBaseClass::MainFrameBaseClass(
     m_name8->Append(m_menuItem9);
 
     SetName(wxT("MainFrameBaseClass"));
-    SetSize(500, 300);
+    SetSize(wxDLG_UNIT(this, wxSize(500, 300)));
     if(GetSizer()) { GetSizer()->Fit(this); }
     if(GetParent()) {
         CentreOnParent(wxBOTH);
@@ -116,20 +118,20 @@ MainFrameBaseClass::MainFrameBaseClass(
     }
 #endif
     // Connect events
+    this->Connect(m_menuItem13->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+        wxCommandEventHandler(MainFrameBaseClass::OnOpenFolder), NULL, this);
     this->Connect(m_menuItem7->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBaseClass::OnExit),
         NULL, this);
-    this->Connect(m_menuItem13->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-        wxCommandEventHandler(MainFrameBaseClass::OnScroll), NULL, this);
     this->Connect(m_menuItem9->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBaseClass::OnAbout),
         NULL, this);
 }
 
 MainFrameBaseClass::~MainFrameBaseClass()
 {
+    this->Disconnect(m_menuItem13->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+        wxCommandEventHandler(MainFrameBaseClass::OnOpenFolder), NULL, this);
     this->Disconnect(m_menuItem7->GetId(), wxEVT_COMMAND_MENU_SELECTED,
         wxCommandEventHandler(MainFrameBaseClass::OnExit), NULL, this);
-    this->Disconnect(m_menuItem13->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-        wxCommandEventHandler(MainFrameBaseClass::OnScroll), NULL, this);
     this->Disconnect(m_menuItem9->GetId(), wxEVT_COMMAND_MENU_SELECTED,
         wxCommandEventHandler(MainFrameBaseClass::OnAbout), NULL, this);
 }

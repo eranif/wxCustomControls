@@ -21,6 +21,9 @@ struct clTreeCtrlColours {
     wxColour selItemBgColour;
     wxColour buttonColour;
 };
+struct clTreeItemIdValue {
+    int nextItem = 0;
+};
 
 class clTreeCtrlNode
 {
@@ -88,6 +91,7 @@ public:
     void SetBitmapIndex(int bitmapIndex) { this->m_bitmapIndex = bitmapIndex; }
     int GetBitmapIndex() const { return m_bitmapIndex; }
     const std::vector<clTreeCtrlNode::Ptr_t>& GetChildren() const { return m_children; }
+    std::vector<clTreeCtrlNode::Ptr_t>& GetChildren() { return m_children; }
     wxTreeItemData* GetClientObject() const { return m_clientData; }
     void SetParent(clTreeCtrlNode* parent);
     clTreeCtrlNode* GetParent() const { return m_parent; }
@@ -95,7 +99,7 @@ public:
     void SetClientData(wxTreeItemData* clientData) { this->m_clientData = clientData; }
     void SetLabel(const wxString& label) { this->m_label = label; }
     const wxString& GetLabel() const { return m_label; }
-
+    size_t GetChildrenCount(bool recurse) const;
     int GetExpandedLines() const;
     void GetItemsFromIndex(int start, int count, std::vector<clTreeCtrlNode*>& items);
     void SetIndentsCount(int count) { this->m_indentsCount = count; }
@@ -116,7 +120,7 @@ public:
 class clTreeCtrlModel
 {
     clTreeCtrl* m_tree = nullptr;
-    clTreeCtrlNode m_root;
+    clTreeCtrlNode::Ptr_t m_root;
     int m_nVisibleLines = wxNOT_FOUND;
     std::vector<clTreeCtrlNode*> m_selectedItems;
     std::vector<clTreeCtrlNode*> m_visibleItems;
@@ -134,7 +138,7 @@ public:
 
     void SetIndentSize(int indentSize) { this->m_indentSize = indentSize; }
     int GetIndentSize() const { return m_indentSize; }
-    
+
     int GetExpandedLines();
 
     /**
@@ -160,6 +164,11 @@ public:
     bool ExpandToItem(const wxTreeItemId& item);
 
     int GetItemIndex(const wxTreeItemId& item, bool visibleItemsOnly = true) const;
+    
+    /**
+     * @brief do we have items in this tree? (root included)
+     */
+    bool IsEmpty() const { return m_root == nullptr; }
 };
 
 #endif // CLTREECTRLMODEL_H

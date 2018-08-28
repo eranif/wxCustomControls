@@ -1,40 +1,28 @@
 #include "MainFrame.h"
 #include "clTreeCtrl.h"
 #include <wx/aboutdlg.h>
+#include <wx/dir.h>
+#include <wx/dirdlg.h>
 
-static clTreeCtrl* ctrl = nullptr;
 MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
 {
-    ctrl = new clTreeCtrl(m_mainPanel);
-    m_mainPanel->GetSizer()->Insert(0, ctrl, 1, wxEXPAND);
-    wxTreeItemId root = ctrl->AddRoot("Root Item");
-    wxTreeItemId p = root;
-    wxTreeItemId showMe;
-    for(size_t i = 0; i < 1000; ++i) {
-        wxTreeItemId child = ctrl->AppendItem(p, wxString() << "Child Item " << i);
-        if(i == 51) { showMe = child; }
-    }
+    m_tree = new clTreeCtrl(m_mainPanel);
+    m_mainPanel->GetSizer()->Insert(0, m_tree, 1, wxEXPAND);
 
-    ctrl->Bind(wxEVT_TREE_ITEM_EXPANDING, [&](wxTreeEvent& evt) {
-        clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(evt.GetItem().GetID());
-        LogMessage(wxString() << node->GetLabel() << " is expanding");
-    });
-    ctrl->Bind(wxEVT_TREE_ITEM_EXPANDED, [&](wxTreeEvent& evt) {
+    m_tree->Bind(wxEVT_TREE_ITEM_EXPANDING, &MainFrame::OnItemExpanding, this);
+    m_tree->Bind(wxEVT_TREE_ITEM_EXPANDED, [&](wxTreeEvent& evt) {
         clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(evt.GetItem().GetID());
         LogMessage(wxString() << node->GetLabel() << " expanded");
     });
-    ctrl->Bind(wxEVT_TREE_ITEM_COLLAPSING, [&](wxTreeEvent& evt) {
+    m_tree->Bind(wxEVT_TREE_ITEM_COLLAPSING, [&](wxTreeEvent& evt) {
         clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(evt.GetItem().GetID());
         LogMessage(wxString() << node->GetLabel() << " is collapsing");
     });
-    ctrl->Bind(wxEVT_TREE_ITEM_COLLAPSED, [&](wxTreeEvent& evt) {
+    m_tree->Bind(wxEVT_TREE_ITEM_COLLAPSED, [&](wxTreeEvent& evt) {
         clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(evt.GetItem().GetID());
         LogMessage(wxString() << node->GetLabel() << " collapsed");
     });
-
-    ctrl->EnsureVisible(showMe);
-    ctrl->SelectItem(showMe);
 }
 
 MainFrame::~MainFrame() {}
@@ -55,14 +43,58 @@ void MainFrame::OnAbout(wxCommandEvent& event)
     ::wxAboutBox(info);
 }
 
-void MainFrame::OnScroll(wxCommandEvent& event)
-{
-    // Scroll to the 100th element
-    ctrl->Scroll(0, 100);
-}
+// void MainFrame::OnScroll(wxCommandEvent& event)
+//{
+//    // Scroll to the 100th element
+//    ctrl->Scroll(0, 100);
+//}
 
 void MainFrame::LogMessage(const wxString& message)
 {
     m_stc15->AddText(message + "\n");
     m_stc15->ScrollToEnd();
+}
+void MainFrame::OnOpenFolder(wxCommandEvent& event)
+{
+    wxString path = wxDirSelector();
+    if(path.IsEmpty()) { return; }
+    if(!m_tree->IsEmpty()) { return; }
+    m_path = path;
+    wxTreeItemId root = m_tree->AddRoot(path, -1, -1, new MyItemData(m_path));
+    m_tree->AppendItem(root, "dummy-node");
+    m_tree->SelectItem(root);
+}
+
+void MainFrame::OnItemExpanding(wxTreeEvent& event)
+{
+    event.Skip();
+    wxTreeItemId item = event.GetItem();
+    clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
+    LogMessage(wxString() << node->GetLabel() << " is expanding");
+
+    clTreeItemIdValue cookie;
+    if(m_tree->ItemHasChildren(item)) {
+        wxTreeItemId child = m_tree->GetFirstChild(item, cookie);
+        if(m_tree->GetItemText(child) == "dummy-node") {
+            m_tree->DeleteChildren(item);
+            // load the folders
+            MyItemData* cd = dynamic_cast<MyItemData*>(m_tree->GetItemData(item));
+            wxString filename;
+            wxDir dir(cd->GetPath());
+            bool cont = dir.GetFirst(&filename);
+            while(cont) {
+                wxFileName fn(cd->GetPath(), filename);
+                if(wxDirExists(fn.GetFullPath())) {
+                    // A directory
+                    wxTreeItemId folderItem
+                        = m_tree->AppendItem(item, filename, -1, -1, new MyItemData(fn.GetFullPath()));
+                    m_tree->AppendItem(folderItem, "dummy-node");
+                } else {
+                    // A file
+                    m_tree->AppendItem(item, filename, -1, -1, new MyItemData(fn.GetFullPath()));
+                }
+                cont = dir.GetNext(&filename);
+            }
+        }
+    }
 }

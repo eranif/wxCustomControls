@@ -1,7 +1,7 @@
 #include "clTreeCtrl.h"
 #include "clTreeCtrlModel.h"
 #include <algorithm>
-#include <queue>
+#include <stack> // for DFS search
 #include <wx/dc.h>
 #include <wx/settings.h>
 #include <wx/treebase.h>
@@ -47,13 +47,13 @@ void clTreeCtrlNode::RemoveChild(clTreeCtrlNode* child)
 
 int clTreeCtrlNode::GetExpandedLines() const
 {
-    std::queue<const clTreeCtrlNode*> Q;
+    std::stack<const clTreeCtrlNode*> Q;
     Q.push(this);
     int count = 0;
 
     // Now count all the visible children, i.e. the non collapsed ones
     while(!Q.empty()) {
-        const clTreeCtrlNode* p = Q.front();
+        const clTreeCtrlNode* p = Q.top();
         Q.pop();
         ++count;
         if(p->HasChildren() && p->IsExpanded()) {
@@ -69,19 +69,19 @@ void clTreeCtrlNode::GetItemsFromIndex(int start, int count, std::vector<clTreeC
     clTreeCtrlNode* startItem = GetVisibleItem(start);
     if(!startItem) return;
 
-    std::queue<clTreeCtrlNode*> Q;
-    Q.push(startItem);
+    std::stack<clTreeCtrlNode*> S;
+    S.push(startItem);
 
     // Now count all the visible children, i.e. the non collapsed ones
-    while(!Q.empty()) {
-        clTreeCtrlNode* p = Q.front();
-        Q.pop();
+    while(!S.empty()) {
+        clTreeCtrlNode* p = S.top();
+        S.pop();
         items.push_back(p);
         if((int)items.size() == count) { return; }
 
         // Add the children
         if(p->HasChildren() && p->IsExpanded()) {
-            for(size_t i = 0; i < p->GetChildren().size(); ++i) { Q.push(p->GetChildren()[i].get()); }
+            for(size_t i = 0; i < p->GetChildren().size(); ++i) { S.push(p->GetChildren()[i].get()); }
         }
 
         bool foundSelf = false;
@@ -90,7 +90,7 @@ void clTreeCtrlNode::GetItemsFromIndex(int start, int count, std::vector<clTreeC
             const std::vector<clTreeCtrlNode::Ptr_t>& siblings = p->GetParent()->GetChildren();
             std::for_each(siblings.begin(), siblings.end(), [&](clTreeCtrlNode::Ptr_t brother) {
                 if(foundSelf) {
-                    Q.push(brother.get());
+                    S.push(brother.get());
                 } else if(brother.get() == p) {
                     // from the next iteration, start collecting
                     foundSelf = true;
@@ -102,13 +102,13 @@ void clTreeCtrlNode::GetItemsFromIndex(int start, int count, std::vector<clTreeC
 
 clTreeCtrlNode* clTreeCtrlNode::GetVisibleItem(int index)
 {
-    std::queue<clTreeCtrlNode*> Q;
+    std::stack<clTreeCtrlNode*> Q;
     Q.push(this);
     int counter = -1;
 
     // Now count all the visible children, i.e. the non collapsed ones
     while(!Q.empty()) {
-        clTreeCtrlNode* p = Q.front();
+        clTreeCtrlNode* p = Q.top();
         Q.pop();
         ++counter;
 
@@ -122,12 +122,12 @@ clTreeCtrlNode* clTreeCtrlNode::GetVisibleItem(int index)
 
 void clTreeCtrlNode::UnselectAll()
 {
-    std::queue<clTreeCtrlNode*> Q;
+    std::stack<clTreeCtrlNode*> Q;
     Q.push(this);
 
     // Now count all the visible children, i.e. the non collapsed ones
     while(!Q.empty()) {
-        clTreeCtrlNode* p = Q.front();
+        clTreeCtrlNode* p = Q.top();
         Q.pop();
         p->SetSelected(false);
         if(p->HasChildren()) {
@@ -138,13 +138,13 @@ void clTreeCtrlNode::UnselectAll()
 
 int clTreeCtrlNode::GetItemIndex(clTreeCtrlNode* item, bool onlyExpandedItems) const
 {
-    std::queue<const clTreeCtrlNode*> Q;
+    std::stack<const clTreeCtrlNode*> Q;
     Q.push(this);
 
     int index = 0;
     // Now count all the visible children, i.e. the non collapsed ones
     while(!Q.empty()) {
-        const clTreeCtrlNode* p = Q.front();
+        const clTreeCtrlNode* p = Q.top();
         Q.pop();
         if(p == item) { return index; }
         ++index;
@@ -217,9 +217,20 @@ void clTreeCtrlNode::Render(wxDC& dc, const clTreeCtrlColours& colours)
             dc.DrawPolygon(3, pts);
         }
     }
-    
+
     dc.SetTextForeground(IsSelected() ? colours.selItemTextColour : colours.textColour);
     dc.DrawText(GetLabel(), (GetIndentsCount() * m_tree->GetIndent()) + textXOffset, textY);
+}
+
+size_t clTreeCtrlNode::GetChildrenCount(bool recurse) const
+{
+    if(!recurse) {
+        return m_children.size();
+    } else {
+        size_t count = m_children.size();
+        for(size_t i = 0; i < count; ++i) { count += m_children[i]->GetChildrenCount(recurse); }
+        return count;
+    }
 }
 
 //------------------------------------------------
@@ -229,31 +240,38 @@ void clTreeCtrlNode::Render(wxDC& dc, const clTreeCtrlColours& colours)
 
 clTreeCtrlModel::clTreeCtrlModel(clTreeCtrl* tree)
     : m_tree(tree)
-    , m_root(tree)
 {
 }
 
-clTreeCtrlModel::~clTreeCtrlModel() {}
+clTreeCtrlModel::~clTreeCtrlModel() { m_root.reset(nullptr); }
 
 void clTreeCtrlModel::GetItemsFromIndex(int start, int count, std::vector<clTreeCtrlNode*>& items)
 {
-    m_root.GetItemsFromIndex(start, count, items);
+    if(!m_root) return;
+    m_root->GetItemsFromIndex(start, count, items);
 }
 
 wxTreeItemId clTreeCtrlModel::AddRoot(const wxString& text, int image, int selImage, wxTreeItemData* data)
 {
+    if(m_root) { return wxTreeItemId(m_root.get()); }
+    m_root.reset(new clTreeCtrlNode(m_tree));
     wxUnusedVar(selImage);
-    m_root.SetLabel(text);
-    m_root.SetBitmapIndex(image);
-    m_root.SetClientData(data);
-    return wxTreeItemId(&m_root);
+    m_root->SetLabel(text);
+    m_root->SetBitmapIndex(image);
+    m_root->SetClientData(data);
+    return wxTreeItemId(m_root.get());
 }
 
-wxTreeItemId clTreeCtrlModel::GetRootItem() const { return wxTreeItemId(const_cast<clTreeCtrlNode*>(&m_root)); }
+wxTreeItemId clTreeCtrlModel::GetRootItem() const
+{
+    if(!m_root) { return wxTreeItemId(); }
+    return wxTreeItemId(const_cast<clTreeCtrlNode*>(m_root.get()));
+}
 
 int clTreeCtrlModel::GetExpandedLines()
 {
-    if(m_nVisibleLines == wxNOT_FOUND) { m_nVisibleLines = m_root.GetExpandedLines(); }
+    if(!m_root) { return 0; }
+    if(m_nVisibleLines == wxNOT_FOUND) { m_nVisibleLines = m_root->GetExpandedLines(); }
     return m_nVisibleLines;
 }
 
@@ -315,9 +333,10 @@ bool clTreeCtrlModel::ExpandToItem(const wxTreeItemId& item)
 
 int clTreeCtrlModel::GetItemIndex(const wxTreeItemId& item, bool visibleItemsOnly) const
 {
+    if(!m_root) { return wxNOT_FOUND; }
     clTreeCtrlNode* child = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
     if(!child) return wxNOT_FOUND;
-    return m_root.GetItemIndex(child, visibleItemsOnly);
+    return m_root->GetItemIndex(child, visibleItemsOnly);
 }
 
 wxTreeItemId clTreeCtrlModel::AppendItem(

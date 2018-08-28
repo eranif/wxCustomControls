@@ -80,23 +80,54 @@ public:
      * @brief Returns true if the item has children.
      */
     bool ItemHasChildren(const wxTreeItemId& item) const;
-    
+
     /**
      * @brief set the item's indent size
      */
     void SetIndent(int size);
-    
+
     /**
      * @brief return the current indent size
      */
     int GetIndent() const;
-    
+
+    /**
+     * @brief is the tree has items? (root included)
+     */
+    bool IsEmpty() const;
+
+    /**
+     * @brief return the children count of this item
+     */
+    size_t GetChildrenCount(const wxTreeItemId& item, bool recursively = true) const;
+
+    /**
+     * @brief Delete all the item's children. No events are fired
+     */
+    void DeleteChildren(const wxTreeItemId& item);
+    /**
+     * @brief Returns the first child; call GetNextChild() for the next child.
+     */
+    wxTreeItemId GetFirstChild(const wxTreeItemId& item, clTreeItemIdValue& cookie) const;
+    wxTreeItemId GetNextChild(const wxTreeItemId& item, clTreeItemIdValue& cookie) const;
+
+    /**
+     * @brief return the item label
+     */
+    wxString GetItemText(const wxTreeItemId& item) const;
+
+    /**
+     * @brief return the associated item data
+     */
+    wxTreeItemData* GetItemData(const wxTreeItemId& item) const;
+
 protected:
     void DoEnsureVisible(const wxTreeItemId& item);
     void OnPaint(wxPaintEvent& event);
     void OnSize(wxSizeEvent& event);
     void OnMouseLeftDown(wxMouseEvent& event);
     void OnMouseLeftDClick(wxMouseEvent& event);
+    void OnScroll(wxScrollWinEvent& event);
 };
 
 #endif // CLTREECTRL_H

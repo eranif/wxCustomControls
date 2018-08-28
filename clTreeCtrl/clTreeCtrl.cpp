@@ -25,6 +25,16 @@ clTreeCtrl::clTreeCtrl(wxWindow* parent)
     Bind(wxEVT_ERASE_BACKGROUND, [&](wxEraseEvent& event) { wxUnusedVar(event); });
     Bind(wxEVT_LEFT_DOWN, &clTreeCtrl::OnMouseLeftDown, this);
     Bind(wxEVT_LEFT_DCLICK, &clTreeCtrl::OnMouseLeftDClick, this);
+    
+    // Handle scrolling
+    Bind(wxEVT_SCROLLWIN_TOP, &clTreeCtrl::OnScroll, this);
+    Bind(wxEVT_SCROLLWIN_BOTTOM, &clTreeCtrl::OnScroll, this);
+    Bind(wxEVT_SCROLLWIN_LINEUP, &clTreeCtrl::OnScroll, this);
+    Bind(wxEVT_SCROLLWIN_LINEDOWN, &clTreeCtrl::OnScroll, this);
+    Bind(wxEVT_SCROLLWIN_PAGEUP, &clTreeCtrl::OnScroll, this);
+    Bind(wxEVT_SCROLLWIN_PAGEDOWN, &clTreeCtrl::OnScroll, this);
+    Bind(wxEVT_SCROLLWIN_THUMBTRACK, &clTreeCtrl::OnScroll, this);
+    Bind(wxEVT_SCROLLWIN_THUMBRELEASE, &clTreeCtrl::OnScroll, this);
     DoAdjustScrollbars();
 }
 
@@ -66,7 +76,9 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
         clTreeCtrlNode* curitem = items[i];
         wxRect itemRect = wxRect(0, y, clientRect.GetWidth(), m_lineHeight);
         wxRect buttonRect;
-        if(curitem->HasChildren()) { buttonRect = wxRect(0, y, m_lineHeight, m_lineHeight); }
+        if(curitem->HasChildren()) {
+            buttonRect = wxRect((curitem->GetIndentsCount() * GetIndent()), y, m_lineHeight, m_lineHeight);
+        }
         curitem->SetRects(itemRect, buttonRect);
         curitem->Render(dc, colours);
         y += m_lineHeight;
@@ -109,6 +121,7 @@ void clTreeCtrl::DoAdjustScrollbars()
     // Calculate how many lines can be draw onto the page
     SetScrollbars(10, m_lineHeight, noUnitsX, visibleLines);
     Scroll(0, cury);
+    Refresh();
 }
 
 wxTreeItemId clTreeCtrl::AppendItem(
@@ -164,11 +177,12 @@ void clTreeCtrl::OnMouseLeftDown(wxMouseEvent& event)
             } else {
                 Expand(where);
             }
+            DoAdjustScrollbars();
         } else {
             UnselectAll();
             SelectItem(where, true);
+            Refresh();
         }
-        Refresh();
     }
 }
 
@@ -261,3 +275,61 @@ void clTreeCtrl::SetIndent(int size)
 }
 
 int clTreeCtrl::GetIndent() const { return m_model.GetIndentSize(); }
+
+bool clTreeCtrl::IsEmpty() const { return m_model.IsEmpty(); }
+
+size_t clTreeCtrl::GetChildrenCount(const wxTreeItemId& item, bool recursively) const
+{
+    if(!item.GetID()) return 0;
+    clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
+    return node->GetChildrenCount(recursively);
+}
+
+void clTreeCtrl::DeleteChildren(const wxTreeItemId& item)
+{
+    if(!item.GetID()) return;
+    clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
+    node->GetChildren().clear();
+    m_model.StateModified();
+}
+
+wxTreeItemId clTreeCtrl::GetFirstChild(const wxTreeItemId& item, clTreeItemIdValue& cookie) const
+{
+    if(!item.GetID()) return wxTreeItemId();
+    clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
+    const std::vector<clTreeCtrlNode::Ptr_t>& children = node->GetChildren();
+    if(children.empty()) return wxTreeItemId(); // No children
+    cookie.nextItem = 1;                        // the next item
+    return wxTreeItemId(children.at(0).get());
+}
+
+wxTreeItemId clTreeCtrl::GetNextChild(const wxTreeItemId& item, clTreeItemIdValue& cookie) const
+{
+    if(!item.GetID()) return wxTreeItemId();
+    clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
+    const std::vector<clTreeCtrlNode::Ptr_t>& children = node->GetChildren();
+    if((int)children.size() >= cookie.nextItem) return wxTreeItemId();
+    wxTreeItemId child(children[cookie.nextItem].get());
+    cookie.nextItem++;
+    return child;
+}
+
+wxString clTreeCtrl::GetItemText(const wxTreeItemId& item) const
+{
+    if(!item.GetID()) return "";
+    clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
+    return node->GetLabel();
+}
+
+wxTreeItemData* clTreeCtrl::GetItemData(const wxTreeItemId& item) const
+{
+    if(!item.GetID()) return nullptr;
+    clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
+    return node->GetClientObject();
+}
+
+void clTreeCtrl::OnScroll(wxScrollWinEvent& event)
+{
+    event.Skip();
+    DoAdjustScrollbars();
+}
