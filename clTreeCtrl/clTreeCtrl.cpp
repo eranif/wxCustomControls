@@ -8,8 +8,6 @@
 #include <wx/settings.h>
 #include <wx/wupdlock.h>
 
-#define Y_SPACER 2
-
 clTreeCtrl::clTreeCtrl(wxWindow* parent)
     : wxScrolled<wxWindow>(parent)
     , m_model(this)
@@ -19,7 +17,8 @@ clTreeCtrl::clTreeCtrl(wxWindow* parent)
     wxFont font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
     memDC.SetFont(font);
     wxSize textSize = memDC.GetTextExtent("Tp");
-    m_lineHeight = Y_SPACER + textSize.GetHeight() + Y_SPACER;
+    m_lineHeight = clTreeCtrlNode::Y_SPACER + textSize.GetHeight() + clTreeCtrlNode::Y_SPACER;
+    SetIndent(m_lineHeight);
     SetScrollRate(10, m_lineHeight);
     Bind(wxEVT_PAINT, &clTreeCtrl::OnPaint, this);
     Bind(wxEVT_SIZE, &clTreeCtrl::OnSize, this);
@@ -57,22 +56,19 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
     m_model.GetItemsFromIndex(startLine, lastLine - startLine, items);
 
     // Colours
-    wxColour itemTextColour = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT);
-    wxColour selItemTextColour = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT);
-    wxColour selItemBgColour = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
+    clTreeCtrlColours colours;
+    colours.textColour = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT);
+    colours.selItemTextColour = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT);
+    colours.selItemBgColour = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
+    colours.buttonColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW);
 
     for(size_t i = 0; i < items.size(); ++i) {
         clTreeCtrlNode* curitem = items[i];
-        int textY = y + Y_SPACER;
         wxRect itemRect = wxRect(0, y, clientRect.GetWidth(), m_lineHeight);
-        curitem->SetRect(itemRect);
-        if(curitem->IsSelected()) {
-            dc.SetBrush(selItemBgColour);
-            dc.SetPen(selItemBgColour);
-            dc.DrawRoundedRectangle(itemRect, 1.5);
-        }
-        dc.SetTextForeground(curitem->IsSelected() ? selItemTextColour : itemTextColour);
-        dc.DrawText(curitem->GetLabel(), curitem->GetIndent(), textY);
+        wxRect buttonRect;
+        if(curitem->HasChildren()) { buttonRect = wxRect(0, y, m_lineHeight, m_lineHeight); }
+        curitem->SetRects(itemRect, buttonRect);
+        curitem->Render(dc, colours);
         y += m_lineHeight;
     }
     m_model.SetVisibleItems(items); // Keep track of the visible items
@@ -162,17 +158,30 @@ void clTreeCtrl::OnMouseLeftDown(wxMouseEvent& event)
     wxPoint pt = DoFixPoint(event.GetPosition());
     wxTreeItemId where = HitTest(pt, flags);
     if(where.IsOk()) {
-        UnselectAll();
-        SelectItem(where, true);
+        if(flags & wxTREE_HITTEST_ONITEMBUTTON) {
+            if(IsExpanded(where)) {
+                Collapse(where);
+            } else {
+                Expand(where);
+            }
+        } else {
+            UnselectAll();
+            SelectItem(where, true);
+        }
         Refresh();
     }
 }
 
 wxTreeItemId clTreeCtrl::HitTest(const wxPoint& point, int& flags) const
 {
+    flags = 0;
     for(size_t i = 0; i < m_model.GetVisibleItems().size(); ++i) {
         const clTreeCtrlNode* item = m_model.GetVisibleItems()[i];
-        if(item->GetRect().Contains(point)) { return wxTreeItemId(const_cast<clTreeCtrlNode*>(item)); }
+        if(item->GetButtonRect().Contains(point)) {
+            flags |= wxTREE_HITTEST_ONITEMBUTTON;
+            return wxTreeItemId(const_cast<clTreeCtrlNode*>(item));
+        }
+        if(item->GetItemRect().Contains(point)) { return wxTreeItemId(const_cast<clTreeCtrlNode*>(item)); }
     }
     return wxTreeItemId();
 }
@@ -244,3 +253,11 @@ bool clTreeCtrl::ItemHasChildren(const wxTreeItemId& item) const
     if(!child) return false;
     return child->HasChildren();
 }
+
+void clTreeCtrl::SetIndent(int size)
+{
+    m_model.SetIndentSize(size);
+    Refresh();
+}
+
+int clTreeCtrl::GetIndent() const { return m_model.GetIndentSize(); }

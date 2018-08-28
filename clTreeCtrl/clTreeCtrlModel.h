@@ -1,6 +1,7 @@
 #ifndef CLTREECTRLMODEL_H
 #define CLTREECTRLMODEL_H
 
+#include <wx/colour.h>
 #include <wx/sharedptr.h>
 #include <wx/string.h>
 #include <wx/treebase.h>
@@ -14,13 +15,21 @@ enum clTreeCtrlNodeFlags {
     kSelected = (1 << 4),
 };
 
+struct clTreeCtrlColours {
+    wxColour textColour;
+    wxColour selItemTextColour;
+    wxColour selItemBgColour;
+    wxColour buttonColour;
+};
+
 class clTreeCtrlNode
 {
 public:
     typedef wxSharedPtr<clTreeCtrlNode> Ptr_t;
+    static const int Y_SPACER = 2;
 
 protected:
-    wxEvtHandler* m_sink = nullptr;
+    clTreeCtrl* m_tree = nullptr;
     wxString m_label;
     int m_bitmapIndex = wxNOT_FOUND;
     size_t m_flags = 0;
@@ -28,8 +37,9 @@ protected:
     wxTreeItemData* m_clientData = nullptr;
     clTreeCtrlNode* m_parent = nullptr;
     std::vector<clTreeCtrlNode::Ptr_t> m_children;
-    int m_indent = 0;
-    wxRect m_rect;
+    int m_indentsCount = 0;
+    wxRect m_itemRect;
+    wxRect m_buttonRect;
 
 protected:
     void SetFlag(clTreeCtrlNodeFlags flag, bool b)
@@ -49,12 +59,20 @@ protected:
     clTreeCtrlNode* GetVisibleItem(int index);
 
 public:
-    clTreeCtrlNode(wxEvtHandler* sink);
-    clTreeCtrlNode(wxEvtHandler* sink, const wxString& label, int bitmapIndex = wxNOT_FOUND);
+    clTreeCtrlNode(clTreeCtrl* tree);
+    clTreeCtrlNode(clTreeCtrl* tree, const wxString& label, int bitmapIndex = wxNOT_FOUND);
     ~clTreeCtrlNode();
 
-    void SetRect(const wxRect& rect) { m_rect = rect; }
-    const wxRect& GetRect() const { return m_rect; }
+    void Render(wxDC& dc, const clTreeCtrlColours& colours);
+
+    void ClearRects();
+    void SetRects(const wxRect& rect, const wxRect& buttonRect)
+    {
+        m_itemRect = rect;
+        m_buttonRect = buttonRect;
+    }
+    const wxRect& GetItemRect() const { return m_itemRect; }
+    const wxRect& GetButtonRect() const { return m_buttonRect; }
 
     void AddChild(clTreeCtrlNode::Ptr_t child);
 
@@ -80,8 +98,8 @@ public:
 
     int GetExpandedLines() const;
     void GetItemsFromIndex(int start, int count, std::vector<clTreeCtrlNode*>& items);
-    void SetIndent(int indent) { this->m_indent = indent; }
-    int GetIndent() const { return m_indent; }
+    void SetIndentsCount(int count) { this->m_indentsCount = count; }
+    int GetIndentsCount() const { return m_indentsCount; }
 
     bool IsSelected() const { return HasFlag(kSelected); }
     void SetSelected(bool b) { SetFlag(kSelected, b); }
@@ -102,6 +120,7 @@ class clTreeCtrlModel
     int m_nVisibleLines = wxNOT_FOUND;
     std::vector<clTreeCtrlNode*> m_selectedItems;
     std::vector<clTreeCtrlNode*> m_visibleItems;
+    int m_indentSize = 16;
 
 public:
     clTreeCtrlModel(clTreeCtrl* tree);
@@ -113,6 +132,9 @@ public:
         const wxTreeItemId& parent, const wxString& text, int image, int selImage, wxTreeItemData* data);
     wxTreeItemId GetRootItem() const;
 
+    void SetIndentSize(int indentSize) { this->m_indentSize = indentSize; }
+    int GetIndentSize() const { return m_indentSize; }
+    
     int GetExpandedLines();
 
     /**

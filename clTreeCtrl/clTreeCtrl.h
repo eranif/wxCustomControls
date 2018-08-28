@@ -80,7 +80,17 @@ public:
      * @brief Returns true if the item has children.
      */
     bool ItemHasChildren(const wxTreeItemId& item) const;
-
+    
+    /**
+     * @brief set the item's indent size
+     */
+    void SetIndent(int size);
+    
+    /**
+     * @brief return the current indent size
+     */
+    int GetIndent() const;
+    
 protected:
     void DoEnsureVisible(const wxTreeItemId& item);
     void OnPaint(wxPaintEvent& event);

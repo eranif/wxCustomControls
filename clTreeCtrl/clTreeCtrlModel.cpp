@@ -2,17 +2,19 @@
 #include "clTreeCtrlModel.h"
 #include <algorithm>
 #include <queue>
+#include <wx/dc.h>
+#include <wx/settings.h>
 #include <wx/treebase.h>
 
 #define INDENT_SIZE 16
 
-clTreeCtrlNode::clTreeCtrlNode(wxEvtHandler* sink)
-    : m_sink(sink)
+clTreeCtrlNode::clTreeCtrlNode(clTreeCtrl* tree)
+    : m_tree(tree)
 {
 }
 
-clTreeCtrlNode::clTreeCtrlNode(wxEvtHandler* sink, const wxString& label, int bitmapIndex)
-    : m_sink(sink)
+clTreeCtrlNode::clTreeCtrlNode(clTreeCtrl* tree, const wxString& label, int bitmapIndex)
+    : m_tree(tree)
     , m_label(label)
     , m_bitmapIndex(bitmapIndex)
 {
@@ -23,7 +25,7 @@ clTreeCtrlNode::~clTreeCtrlNode() {}
 void clTreeCtrlNode::AddChild(clTreeCtrlNode::Ptr_t child)
 {
     child->SetParent(this);
-    child->SetIndent(GetIndent() + INDENT_SIZE);
+    child->SetIndentsCount(GetIndentsCount() + 1);
     m_children.push_back(child);
     if(HasFlag(kSortItems)) {
         // Sort the items
@@ -161,19 +163,63 @@ bool clTreeCtrlNode::SetExpanded(bool b)
     if(b && IsExpanded()) { return true; }
     // Already collapsed?
     if(!b && !IsExpanded()) { return true; }
-    
+
     wxTreeEvent before(b ? wxEVT_TREE_ITEM_EXPANDING : wxEVT_TREE_ITEM_COLLAPSING);
     before.SetItem(wxTreeItemId(this));
-    before.SetEventObject(m_sink);
-    m_sink->ProcessEvent(before);
+    before.SetEventObject(m_tree);
+    m_tree->GetEventHandler()->ProcessEvent(before);
     if(!before.IsAllowed()) { return false; }
 
     SetFlag(kExpanded, b);
     wxTreeEvent after(b ? wxEVT_TREE_ITEM_EXPANDED : wxEVT_TREE_ITEM_COLLAPSED);
     after.SetItem(wxTreeItemId(this));
-    after.SetEventObject(m_sink);
-    m_sink->ProcessEvent(after);
+    after.SetEventObject(m_tree);
+    m_tree->GetEventHandler()->ProcessEvent(after);
     return true;
+}
+
+void clTreeCtrlNode::ClearRects()
+{
+    m_buttonRect = wxRect();
+    m_itemRect = wxRect();
+}
+
+void clTreeCtrlNode::Render(wxDC& dc, const clTreeCtrlColours& colours)
+{
+    wxRect itemRect = GetItemRect();
+    if(IsSelected()) {
+        dc.SetBrush(colours.selItemBgColour);
+        dc.SetPen(colours.selItemBgColour);
+        dc.DrawRoundedRectangle(itemRect, 1.5);
+    }
+    int textY = itemRect.GetY() + clTreeCtrlNode::Y_SPACER;
+    // Draw the button
+    int textXOffset = 0;
+    if(HasChildren()) {
+        wxPoint pts[3];
+        wxRect buttonRect = GetButtonRect();
+        textXOffset += buttonRect.GetWidth();
+        buttonRect.Deflate((buttonRect.GetWidth() / 3), (buttonRect.GetHeight() / 3));
+        if(IsExpanded()) {
+            pts[0] = buttonRect.GetTopRight();
+            pts[1] = buttonRect.GetBottomRight();
+            pts[2] = buttonRect.GetBottomLeft();
+            dc.SetBrush(colours.buttonColour);
+            dc.SetPen(colours.buttonColour);
+            dc.DrawPolygon(3, pts);
+        } else {
+            pts[0] = buttonRect.GetTopLeft();
+            pts[1] = buttonRect.GetBottomLeft();
+            pts[2].x = buttonRect.GetRight();
+            pts[2].y = (buttonRect.GetY() + (buttonRect.GetHeight() / 2));
+            dc.SetBrush(*wxTRANSPARENT_BRUSH);
+            dc.SetPen(colours.buttonColour);
+            dc.DrawPolygon(3, pts);
+        }
+    }
+    
+    dc.SetTextForeground(IsSelected() ? colours.selItemTextColour : colours.textColour);
+    dc.DrawText(GetLabel(), (GetIndentsCount() * m_tree->GetIndent()) + textXOffset, textY);
 }
 
 //------------------------------------------------
@@ -237,7 +283,7 @@ void clTreeCtrlModel::Clear()
 {
     m_selectedItems.clear();
     m_nVisibleLines = wxNOT_FOUND;
-    for(size_t i = 0; i < m_visibleItems.size(); ++i) { m_visibleItems[i]->SetRect(wxRect()); }
+    for(size_t i = 0; i < m_visibleItems.size(); ++i) { m_visibleItems[i]->ClearRects(); }
     m_visibleItems.clear();
 }
 
@@ -248,7 +294,7 @@ void clTreeCtrlModel::SetVisibleItems(const std::vector<clTreeCtrlNode*>& items)
         clTreeCtrlNode* visibleItem = m_visibleItems[i];
         std::vector<clTreeCtrlNode*>::const_iterator iter
             = std::find_if(items.begin(), items.end(), [&](clTreeCtrlNode* item) { return item == visibleItem; });
-        if(iter == items.end()) { m_visibleItems[i]->SetRect(wxRect()); }
+        if(iter == items.end()) { m_visibleItems[i]->ClearRects(); }
     }
     m_visibleItems = items;
 }
