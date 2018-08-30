@@ -9,7 +9,7 @@
 #include <wx/wupdlock.h>
 
 clTreeCtrl::clTreeCtrl(wxWindow* parent)
-    : wxScrolled<wxWindow>(parent)
+    : wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxWANTS_CHARS | wxTAB_TRAVERSAL)
     , m_model(this)
 {
     wxBitmap bmp(1, 1);
@@ -19,23 +19,12 @@ clTreeCtrl::clTreeCtrl(wxWindow* parent)
     wxSize textSize = memDC.GetTextExtent("Tp");
     m_lineHeight = clTreeCtrlNode::Y_SPACER + textSize.GetHeight() + clTreeCtrlNode::Y_SPACER;
     SetIndent(m_lineHeight);
-    SetScrollRate(10, m_lineHeight);
     Bind(wxEVT_PAINT, &clTreeCtrl::OnPaint, this);
     Bind(wxEVT_SIZE, &clTreeCtrl::OnSize, this);
     Bind(wxEVT_ERASE_BACKGROUND, [&](wxEraseEvent& event) { wxUnusedVar(event); });
     Bind(wxEVT_LEFT_DOWN, &clTreeCtrl::OnMouseLeftDown, this);
     Bind(wxEVT_LEFT_DCLICK, &clTreeCtrl::OnMouseLeftDClick, this);
-    
-    // Handle scrolling
-    Bind(wxEVT_SCROLLWIN_TOP, &clTreeCtrl::OnScroll, this);
-    Bind(wxEVT_SCROLLWIN_BOTTOM, &clTreeCtrl::OnScroll, this);
-    Bind(wxEVT_SCROLLWIN_LINEUP, &clTreeCtrl::OnScroll, this);
-    Bind(wxEVT_SCROLLWIN_LINEDOWN, &clTreeCtrl::OnScroll, this);
-    Bind(wxEVT_SCROLLWIN_PAGEUP, &clTreeCtrl::OnScroll, this);
-    Bind(wxEVT_SCROLLWIN_PAGEDOWN, &clTreeCtrl::OnScroll, this);
-    Bind(wxEVT_SCROLLWIN_THUMBTRACK, &clTreeCtrl::OnScroll, this);
-    Bind(wxEVT_SCROLLWIN_THUMBRELEASE, &clTreeCtrl::OnScroll, this);
-    DoAdjustScrollbars();
+    Bind(wxEVT_MOUSEWHEEL, &clTreeCtrl::OnMouseScroll, this);
 }
 
 clTreeCtrl::~clTreeCtrl() {}
@@ -43,20 +32,14 @@ clTreeCtrl::~clTreeCtrl() {}
 void clTreeCtrl::OnPaint(wxPaintEvent& event)
 {
     wxBufferedPaintDC pdc(this);
-    DoPrepareDC(pdc);
-
     wxGCDC dc(pdc);
 
-    int realX, realY;
-    CalcScrolledPosition(0, 0, &realX, &realY);
     wxRect clientRect = GetClientRect();
-    clientRect.SetX(abs(realX));
-    clientRect.SetY(abs(realY));
     dc.SetPen(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE));
     dc.SetBrush(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE));
     dc.DrawRectangle(clientRect);
 
-    int startLine = abs(realY / m_lineHeight);
+    int startLine = m_firstVisibleLine;
     int lastLine = ceil((double)clientRect.GetHeight() / (double)m_lineHeight) + startLine;
     int totalVisibleLines = GetExpandedLines();
     if(lastLine > totalVisibleLines) { lastLine = totalVisibleLines; }
@@ -90,38 +73,6 @@ void clTreeCtrl::OnSize(wxSizeEvent& event)
 {
     Refresh();
     event.Skip();
-}
-
-void clTreeCtrl::DoAdjustScrollbars()
-{
-#ifdef __WXMSW__
-    wxWindowUpdateLocker locker(this);
-#endif
-
-    int curx, cury;
-    GetViewStart(&curx, &cury);
-    wxUnusedVar(curx);
-
-    wxRect clientRect = GetClientRect();
-    int realX, realY;
-    CalcScrolledPosition(0, 0, &realX, &realY);
-    int startLine = abs(realY / m_lineHeight);
-    int lastLine = ceil((double)clientRect.GetHeight() / (double)m_lineHeight) + startLine;
-    int visibleLines = GetExpandedLines();
-    if(lastLine > visibleLines) { lastLine = visibleLines; }
-
-    wxBitmap bmp(1, 1);
-    wxMemoryDC memDC(bmp);
-    memDC.SetFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
-    int textWidth = 150;
-
-    // The number of horizontal units is the textwidth / 10
-    int noUnitsX = ceil((double)textWidth / 10.0);
-
-    // Calculate how many lines can be draw onto the page
-    SetScrollbars(10, m_lineHeight, noUnitsX, visibleLines);
-    Scroll(0, cury);
-    Refresh();
 }
 
 wxTreeItemId clTreeCtrl::AppendItem(
@@ -167,6 +118,7 @@ void clTreeCtrl::SelectItem(const wxTreeItemId& item, bool select)
 
 void clTreeCtrl::OnMouseLeftDown(wxMouseEvent& event)
 {
+    event.Skip();
     int flags = 0;
     wxPoint pt = DoFixPoint(event.GetPosition());
     wxTreeItemId where = HitTest(pt, flags);
@@ -177,12 +129,11 @@ void clTreeCtrl::OnMouseLeftDown(wxMouseEvent& event)
             } else {
                 Expand(where);
             }
-            DoAdjustScrollbars();
         } else {
             UnselectAll();
             SelectItem(where, true);
-            Refresh();
         }
+        Refresh();
     }
 }
 
@@ -209,10 +160,6 @@ void clTreeCtrl::UnselectAll()
 wxPoint clTreeCtrl::DoFixPoint(const wxPoint& pt)
 {
     wxPoint point = pt;
-    int realX, realY;
-    CalcScrolledPosition(0, 0, &realX, &realY);
-    point.x += (realX);
-    point.y += abs(realY);
     return point;
 }
 
@@ -220,7 +167,6 @@ void clTreeCtrl::EnsureVisible(const wxTreeItemId& item)
 {
     // Make sure that all parents of ítem are expanded
     if(!m_model.ExpandToItem(item)) { return; }
-    DoAdjustScrollbars();
     Refresh();
     CallAfter(&clTreeCtrl::DoEnsureVisible, item);
 }
@@ -229,7 +175,10 @@ void clTreeCtrl::DoEnsureVisible(const wxTreeItemId& item)
 {
     // scroll to it
     int index = m_model.GetItemIndex(item, true);
-    if(index != wxNOT_FOUND) { Scroll(0, index); }
+    if(index != wxNOT_FOUND) {
+        m_firstVisibleLine = index;
+        Refresh();
+    }
 }
 
 void clTreeCtrl::OnMouseLeftDClick(wxMouseEvent& event)
@@ -247,7 +196,6 @@ void clTreeCtrl::OnMouseLeftDClick(wxMouseEvent& event)
             } else {
                 Expand(where);
             }
-            DoAdjustScrollbars();
         }
     }
 }
@@ -328,8 +276,14 @@ wxTreeItemData* clTreeCtrl::GetItemData(const wxTreeItemId& item) const
     return node->GetClientObject();
 }
 
-void clTreeCtrl::OnScroll(wxScrollWinEvent& event)
+void clTreeCtrl::OnMouseScroll(wxMouseEvent& event)
 {
-    event.Skip();
-    DoAdjustScrollbars();
+    if(event.GetWheelRotation() > 0) { // Scrolling up
+        m_firstVisibleLine -= m_scrollTick;
+        if(m_firstVisibleLine < 0) { m_firstVisibleLine = 0; }
+    } else {
+        m_firstVisibleLine += m_scrollTick;
+        if(m_firstVisibleLine > GetExpandedLines()) { m_firstVisibleLine = GetExpandedLines(); }
+    }
+    Refresh();
 }

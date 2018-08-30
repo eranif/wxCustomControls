@@ -6,13 +6,14 @@
 #include <wx/panel.h>
 #include <wx/scrolwin.h>
 
-class clTreeCtrl : public wxScrolled<wxWindow>
+class clTreeCtrl : public wxPanel
 {
     int m_lineHeight = 0;
     clTreeCtrlModel m_model;
-
+    int m_firstVisibleLine = 0;
+    int m_scrollTick = 3;
+    
 private:
-    void DoAdjustScrollbars();
     int GetExpandedLines();
     wxPoint DoFixPoint(const wxPoint& pt);
 
@@ -127,7 +128,7 @@ protected:
     void OnSize(wxSizeEvent& event);
     void OnMouseLeftDown(wxMouseEvent& event);
     void OnMouseLeftDClick(wxMouseEvent& event);
-    void OnScroll(wxScrollWinEvent& event);
+    void OnMouseScroll(wxMouseEvent& event);
 };
 
 #endif // CLTREECTRL_H

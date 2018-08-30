@@ -1,7 +1,7 @@
 #include "clTreeCtrl.h"
 #include "clTreeCtrlModel.h"
+#include "clTreeNodeVisitor.h"
 #include <algorithm>
-#include <stack> // for DFS search
 #include <wx/dc.h>
 #include <wx/settings.h>
 #include <wx/treebase.h>
@@ -47,20 +47,14 @@ void clTreeCtrlNode::RemoveChild(clTreeCtrlNode* child)
 
 int clTreeCtrlNode::GetExpandedLines() const
 {
-    std::stack<const clTreeCtrlNode*> Q;
-    Q.push(this);
-    int count = 0;
-
-    // Now count all the visible children, i.e. the non collapsed ones
-    while(!Q.empty()) {
-        const clTreeCtrlNode* p = Q.top();
-        Q.pop();
-        ++count;
-        if(p->HasChildren() && p->IsExpanded()) {
-            for(size_t i = 0; i < p->GetChildren().size(); ++i) { Q.push(p->GetChildren()[i].get()); }
-        }
-    }
-    return count;
+    int counter = 0;
+    std::function<bool(clTreeCtrlNode*)> pCounterFunc = [&](clTreeCtrlNode* item) {
+        counter++;
+        return true;
+    };
+    clTreeNodeVisitor V;
+    V.Visit(const_cast<clTreeCtrlNode*>(this), true, pCounterFunc);
+    return counter;
 }
 
 void clTreeCtrlNode::GetItemsFromIndex(int start, int count, std::vector<clTreeCtrlNode*>& items)
@@ -69,92 +63,57 @@ void clTreeCtrlNode::GetItemsFromIndex(int start, int count, std::vector<clTreeC
     clTreeCtrlNode* startItem = GetVisibleItem(start);
     if(!startItem) return;
 
-    std::stack<clTreeCtrlNode*> S;
-    S.push(startItem);
-
-    // Now count all the visible children, i.e. the non collapsed ones
-    while(!S.empty()) {
-        clTreeCtrlNode* p = S.top();
-        S.pop();
-        items.push_back(p);
-        if((int)items.size() == count) { return; }
-
-        // Add the children
-        if(p->HasChildren() && p->IsExpanded()) {
-            for(size_t i = 0; i < p->GetChildren().size(); ++i) { S.push(p->GetChildren()[i].get()); }
-        }
-
-        bool foundSelf = false;
-        if((p == startItem) && p->GetParent()) {
-            // Add the top level item siblings
-            const std::vector<clTreeCtrlNode::Ptr_t>& siblings = p->GetParent()->GetChildren();
-            std::for_each(siblings.begin(), siblings.end(), [&](clTreeCtrlNode::Ptr_t brother) {
-                if(foundSelf) {
-                    S.push(brother.get());
-                } else if(brother.get() == p) {
-                    // from the next iteration, start collecting
-                    foundSelf = true;
-                }
-            });
-        }
-    }
+    std::function<bool(clTreeCtrlNode*)> pFuncStopCond = [&](clTreeCtrlNode* item) {
+        items.push_back(item);
+        if((int)items.size() == count) return false;
+        return true;
+    };
+    clTreeNodeVisitor V;
+    V.Visit(startItem, true, pFuncStopCond);
 }
 
 clTreeCtrlNode* clTreeCtrlNode::GetVisibleItem(int index)
 {
-    std::stack<clTreeCtrlNode*> Q;
-    Q.push(this);
     int counter = -1;
-
-    // Now count all the visible children, i.e. the non collapsed ones
-    while(!Q.empty()) {
-        clTreeCtrlNode* p = Q.top();
-        Q.pop();
+    clTreeCtrlNode* pMatch = nullptr;
+    std::function<bool(clTreeCtrlNode*)> pFuncStopCond = [&](clTreeCtrlNode* item) {
         ++counter;
-
-        if(counter == index) { return p; }
-        if(p->HasChildren() && p->IsExpanded()) {
-            for(size_t i = 0; i < p->GetChildren().size(); ++i) { Q.push(p->GetChildren()[i].get()); }
+        if(counter == index) {
+            pMatch = item;
+            return false;
         }
-    }
-    return nullptr;
+        return true;
+    };
+    clTreeNodeVisitor V;
+    V.Visit(this, true, pFuncStopCond);
+    return pMatch;
 }
 
 void clTreeCtrlNode::UnselectAll()
 {
-    std::stack<clTreeCtrlNode*> Q;
-    Q.push(this);
-
-    // Now count all the visible children, i.e. the non collapsed ones
-    while(!Q.empty()) {
-        clTreeCtrlNode* p = Q.top();
-        Q.pop();
-        p->SetSelected(false);
-        if(p->HasChildren()) {
-            for(size_t i = 0; i < p->GetChildren().size(); ++i) { Q.push(p->GetChildren()[i].get()); }
-        }
-    }
+    std::function<bool(clTreeCtrlNode*)> pUnselectItem = [&](clTreeCtrlNode* item) {
+        item->SetSelected(false);
+        return true;
+    };
+    clTreeNodeVisitor V;
+    V.Visit(this, false, pUnselectItem);
 }
 
 int clTreeCtrlNode::GetItemIndex(clTreeCtrlNode* item, bool onlyExpandedItems) const
 {
-    std::stack<const clTreeCtrlNode*> Q;
-    Q.push(this);
-
-    int index = 0;
-    // Now count all the visible children, i.e. the non collapsed ones
-    while(!Q.empty()) {
-        const clTreeCtrlNode* p = Q.top();
-        Q.pop();
-        if(p == item) { return index; }
+    int index = wxNOT_FOUND;
+    int where = wxNOT_FOUND;
+    std::function<bool(clTreeCtrlNode*)> pCounterFunc = [&](clTreeCtrlNode* p) {
         ++index;
-        if(p->HasChildren()) {
-            if((onlyExpandedItems && p->IsExpanded()) || !onlyExpandedItems) {
-                for(size_t i = 0; i < p->GetChildren().size(); ++i) { Q.push(p->GetChildren()[i].get()); }
-            }
+        if(p == item) {
+            where = index;
+            return false;
         }
-    }
-    return wxNOT_FOUND;
+        return true;
+    };
+    clTreeNodeVisitor V;
+    V.Visit(const_cast<clTreeCtrlNode*>(this), onlyExpandedItems, pCounterFunc);
+    return where;
 }
 
 bool clTreeCtrlNode::SetExpanded(bool b)

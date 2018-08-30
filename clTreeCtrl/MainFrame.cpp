@@ -52,8 +52,9 @@ void MainFrame::OnAbout(wxCommandEvent& event)
 void MainFrame::LogMessage(const wxString& message)
 {
     m_stc15->AddText(message + "\n");
-    m_stc15->ScrollToEnd();
+    //m_stc15->ScrollToEnd();
 }
+
 void MainFrame::OnOpenFolder(wxCommandEvent& event)
 {
     wxString path = wxDirSelector();

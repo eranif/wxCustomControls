@@ -8,6 +8,8 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="clTreeNodeVisitor.cpp"/>
+    <File Name="clTreeNodeVisitor.h"/>
     <File Name="clTreeCtrlModel.cpp"/>
     <File Name="clTreeCtrlModel.h"/>
     <File Name="clTreeCtrl.cpp"/>
