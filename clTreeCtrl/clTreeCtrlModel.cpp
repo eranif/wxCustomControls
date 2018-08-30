@@ -175,8 +175,9 @@ void clTreeCtrlNode::Render(wxDC& dc, const clTreeCtrlColours& colours)
             dc.SetPen(colours.buttonColour);
             dc.DrawPolygon(3, pts);
         }
+    } else {
+        textXOffset += itemRect.GetHeight();
     }
-
     dc.SetTextForeground(IsSelected() ? colours.selItemTextColour : colours.textColour);
     dc.DrawText(GetLabel(), (GetIndentsCount() * m_tree->GetIndent()) + textXOffset, textY);
 }
