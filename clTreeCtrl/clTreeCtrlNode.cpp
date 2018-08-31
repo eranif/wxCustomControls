@@ -143,11 +143,12 @@ void clTreeCtrlNode::ClearRects()
 void clTreeCtrlNode::Render(wxDC& dc, const clTreeCtrlColours& colours)
 {
     wxRect itemRect = GetItemRect();
-    if(IsSelected()) {
-        dc.SetBrush(colours.selItemBgColour);
-        dc.SetPen(colours.selItemBgColour);
+    if(IsSelected() || IsHovered()) {
+        dc.SetBrush(IsSelected() ? colours.selItemBgColour : colours.hoverBgColour);
+        dc.SetPen(IsSelected() ? colours.selItemBgColour : colours.hoverBgColour);
         dc.DrawRoundedRectangle(itemRect, 1.5);
     }
+
     wxSize textSize = dc.GetTextExtent(GetLabel());
     int textY = itemRect.GetY() + (m_tree->GetLineHeight() - textSize.GetHeight()) / 2;
     // Draw the button

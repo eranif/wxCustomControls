@@ -14,9 +14,11 @@ enum clTreeCtrlNodeFlags {
     kSortItems = (1 << 2),
     kExpanded = (1 << 3),
     kSelected = (1 << 4),
+    kHovered = (1 << 5),
 };
 
 struct clTreeCtrlColours {
+    wxColour hoverBgColour;
     wxColour textColour;
     wxColour selItemTextColour;
     wxColour selItemBgColour;
@@ -68,7 +70,9 @@ public:
     ~clTreeCtrlNode();
 
     void Render(wxDC& dc, const clTreeCtrlColours& colours);
-
+    void SetHovered(bool b) { SetFlag(kHovered, b); }
+    bool IsHovered() const { return m_flags & kHovered; }
+    
     void ClearRects();
     void SetRects(const wxRect& rect, const wxRect& buttonRect)
     {

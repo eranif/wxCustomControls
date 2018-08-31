@@ -57,6 +57,7 @@ public:
     void SetOnScreenItems(const std::vector<clTreeCtrlNode*>& items);
 
     const std::vector<clTreeCtrlNode*>& GetOnScreenItems() const { return m_onScreenItems; }
+    std::vector<clTreeCtrlNode*>& GetOnScreenItems() { return m_onScreenItems; }
     bool ExpandToItem(const wxTreeItemId& item);
 
     int GetItemIndex(const wxTreeItemId& item, bool visibleItemsOnly = true) const;

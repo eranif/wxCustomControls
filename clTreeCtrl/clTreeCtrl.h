@@ -13,6 +13,7 @@ class clTreeCtrl : public wxPanel
     int m_firstVisibleLine = 0;
     int m_scrollTick = 2;
     std::vector<wxBitmap> m_bitmaps;
+    clTreeCtrlColours m_colours;
 
 private:
     int GetExpandedLines();
@@ -26,10 +27,19 @@ public:
     const std::vector<wxBitmap>& GetBitmaps() const { return m_bitmaps; }
     
     /**
+     * @brief set the colours used for drawing items
+     */
+    void SetColours(const clTreeCtrlColours& colours);
+    /**
+     * @brief get the colours used for drawing items
+     */
+    const clTreeCtrlColours& GetColours() const { return m_colours; }
+    
+    /**
      * @brief return line height
      */
     int GetLineHeight() const { return m_lineHeight; }
-    
+
     /**
      * @brief return bitmap at give index, return wxNullBitmap on error
      */
@@ -142,6 +152,8 @@ protected:
     void OnMouseLeftDown(wxMouseEvent& event);
     void OnMouseLeftDClick(wxMouseEvent& event);
     void OnMouseScroll(wxMouseEvent& event);
+    void OnIdle(wxIdleEvent& event);
+    void OnLeaveWindow(wxMouseEvent& event);
 };
 
 #endif // CLTREECTRL_H

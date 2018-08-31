@@ -25,6 +25,15 @@ clTreeCtrl::clTreeCtrl(wxWindow* parent)
     Bind(wxEVT_LEFT_DOWN, &clTreeCtrl::OnMouseLeftDown, this);
     Bind(wxEVT_LEFT_DCLICK, &clTreeCtrl::OnMouseLeftDClick, this);
     Bind(wxEVT_MOUSEWHEEL, &clTreeCtrl::OnMouseScroll, this);
+    Bind(wxEVT_IDLE, &clTreeCtrl::OnIdle, this);
+    Bind(wxEVT_LEAVE_WINDOW, &clTreeCtrl::OnLeaveWindow, this);
+
+    // Initialise default colours
+    m_colours.textColour = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT);
+    m_colours.selItemTextColour = m_colours.textColour;
+    m_colours.selItemBgColour = wxColour("rgb(199,203,209)");
+    m_colours.buttonColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW);
+    m_colours.hoverBgColour = wxColour("rgb(219,221,224)");
 }
 
 clTreeCtrl::~clTreeCtrl() {}
@@ -33,7 +42,7 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
 {
     wxBufferedPaintDC pdc(this);
     wxGCDC dc(pdc);
-    
+
     wxRect clientRect = GetClientRect();
     dc.SetPen(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE));
     dc.SetBrush(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE));
@@ -41,19 +50,12 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
 
     int startLine = m_firstVisibleLine;
     int lastLine = ceil((double)clientRect.GetHeight() / (double)m_lineHeight) + startLine;
-    //int totalVisibleLines = GetExpandedLines();
-    //if(lastLine > totalVisibleLines) { lastLine = totalVisibleLines; }
+    // int totalVisibleLines = GetExpandedLines();
+    // if(lastLine > totalVisibleLines) { lastLine = totalVisibleLines; }
 
     int y = clientRect.GetY();
     std::vector<clTreeCtrlNode*> items;
     m_model.GetItemsFromIndex(startLine, lastLine - startLine, items);
-
-    // Colours
-    clTreeCtrlColours colours;
-    colours.textColour = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT);
-    colours.selItemTextColour = colours.textColour;
-    colours.selItemBgColour = wxColour("rgb(199,203,209)");
-    colours.buttonColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW);
 
     for(size_t i = 0; i < items.size(); ++i) {
         clTreeCtrlNode* curitem = items[i];
@@ -63,7 +65,7 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
             buttonRect = wxRect((curitem->GetIndentsCount() * GetIndent()), y, m_lineHeight, m_lineHeight);
         }
         curitem->SetRects(itemRect, buttonRect);
-        curitem->Render(dc, colours);
+        curitem->Render(dc, m_colours);
         y += m_lineHeight;
     }
     m_model.SetOnScreenItems(items); // Keep track of the visible items
@@ -311,5 +313,38 @@ void clTreeCtrl::SetBitmaps(const std::vector<wxBitmap>& bitmaps)
     heighestBitmap += 2 * clTreeCtrlNode::Y_SPACER;
     m_lineHeight = wxMax(heighestBitmap, m_lineHeight);
     SetIndent(m_lineHeight);
+    Refresh();
+}
+
+void clTreeCtrl::OnIdle(wxIdleEvent& event)
+{
+    int flags = 0;
+    wxPoint pt = ScreenToClient(::wxGetMousePosition());
+    wxTreeItemId item = HitTest(pt, flags);
+    if(item.IsOk()) {
+        std::vector<clTreeCtrlNode*>& items = m_model.GetOnScreenItems();
+        clTreeCtrlNode* hoveredNode = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
+        bool refreshNeeded = false;
+        for(size_t i = 0; i < items.size(); ++i) {
+            bool new_state = hoveredNode == items[i];
+            bool old_state = items[i]->IsHovered();
+            if(!refreshNeeded) { refreshNeeded = (new_state != old_state); }
+            items[i]->SetHovered(hoveredNode == items[i]);
+        }
+        if(refreshNeeded) { Refresh(); }
+    }
+}
+
+void clTreeCtrl::OnLeaveWindow(wxMouseEvent& event)
+{
+    event.Skip();
+    std::vector<clTreeCtrlNode*>& items = m_model.GetOnScreenItems();
+    for(size_t i = 0; i < items.size(); ++i) { items[i]->SetHovered(false); }
+    Refresh();
+}
+
+void clTreeCtrl::SetColours(const clTreeCtrlColours& colours)
+{
+    m_colours = colours;
     Refresh();
 }
