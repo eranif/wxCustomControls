@@ -78,12 +78,16 @@ void clTreeCtrl::OnSize(wxSizeEvent& event)
 wxTreeItemId clTreeCtrl::AppendItem(
     const wxTreeItemId& parent, const wxString& text, int image, int selImage, wxTreeItemData* data)
 {
-    return m_model.AppendItem(parent, text, image, selImage, data);
+    wxTreeItemId item = m_model.AppendItem(parent, text, image, selImage, data);
+    m_model.StateModified();
+    return item;
 }
 
 wxTreeItemId clTreeCtrl::AddRoot(const wxString& text, int image, int selImage, wxTreeItemData* data)
 {
-    return m_model.AddRoot(text, image, selImage, data);
+    wxTreeItemId root = m_model.AddRoot(text, image, selImage, data);
+    m_model.StateModified();
+    return root;
 }
 
 wxTreeItemId clTreeCtrl::GetRootItem() const { return m_model.GetRootItem(); }
