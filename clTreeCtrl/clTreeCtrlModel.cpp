@@ -261,20 +261,20 @@ void clTreeCtrlModel::Clear()
 {
     m_selectedItems.clear();
     m_nVisibleLines = wxNOT_FOUND;
-    for(size_t i = 0; i < m_visibleItems.size(); ++i) { m_visibleItems[i]->ClearRects(); }
-    m_visibleItems.clear();
+    for(size_t i = 0; i < m_onScreenItems.size(); ++i) { m_onScreenItems[i]->ClearRects(); }
+    m_onScreenItems.clear();
 }
 
-void clTreeCtrlModel::SetVisibleItems(const std::vector<clTreeCtrlNode*>& items)
+void clTreeCtrlModel::SetOnScreenItems(const std::vector<clTreeCtrlNode*>& items)
 {
     // Clear the old visible items. But only, if the item does not appear in both lists
-    for(size_t i = 0; i < m_visibleItems.size(); ++i) {
-        clTreeCtrlNode* visibleItem = m_visibleItems[i];
+    for(size_t i = 0; i < m_onScreenItems.size(); ++i) {
+        clTreeCtrlNode* visibleItem = m_onScreenItems[i];
         std::vector<clTreeCtrlNode*>::const_iterator iter
             = std::find_if(items.begin(), items.end(), [&](clTreeCtrlNode* item) { return item == visibleItem; });
-        if(iter == items.end()) { m_visibleItems[i]->ClearRects(); }
+        if(iter == items.end()) { m_onScreenItems[i]->ClearRects(); }
     }
-    m_visibleItems = items;
+    m_onScreenItems = items;
 }
 
 bool clTreeCtrlModel::ExpandToItem(const wxTreeItemId& item)

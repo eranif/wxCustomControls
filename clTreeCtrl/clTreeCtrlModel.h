@@ -123,7 +123,7 @@ class clTreeCtrlModel
     clTreeCtrlNode::Ptr_t m_root;
     int m_nVisibleLines = wxNOT_FOUND;
     std::vector<clTreeCtrlNode*> m_selectedItems;
-    std::vector<clTreeCtrlNode*> m_visibleItems;
+    std::vector<clTreeCtrlNode*> m_onScreenItems;
     int m_indentSize = 16;
 
 public:
@@ -158,9 +158,9 @@ public:
 
     void Clear();
 
-    void SetVisibleItems(const std::vector<clTreeCtrlNode*>& items);
+    void SetOnScreenItems(const std::vector<clTreeCtrlNode*>& items);
 
-    const std::vector<clTreeCtrlNode*>& GetVisibleItems() const { return m_visibleItems; }
+    const std::vector<clTreeCtrlNode*>& GetOnScreenItems() const { return m_onScreenItems; }
     bool ExpandToItem(const wxTreeItemId& item);
 
     int GetItemIndex(const wxTreeItemId& item, bool visibleItemsOnly = true) const;
