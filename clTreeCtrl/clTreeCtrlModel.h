@@ -22,10 +22,16 @@ class clTreeCtrlModel
     std::vector<clTreeCtrlNode*> m_onScreenItems;
     int m_indentSize = 16;
 
+protected:
+    void DoExpandAllChildren(const wxTreeItemId& item, bool expand);
+
 public:
     clTreeCtrlModel(clTreeCtrl* tree);
     ~clTreeCtrlModel();
 
+    void ExpandAllChildren(const wxTreeItemId& item);
+    void CollapseAllChildren(const wxTreeItemId& item);
+    
     void GetItemsFromIndex(int start, int count, std::vector<clTreeCtrlNode*>& items);
     wxTreeItemId AddRoot(const wxString& text, int image, int selImage, wxTreeItemData* data);
     wxTreeItemId AppendItem(

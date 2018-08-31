@@ -41,7 +41,8 @@ class MainFrameBaseClass : public wxFrame
 {
 public:
     enum {
-        ID_OPEN_FOLDER = 10001,
+        ID_EXPAND_ALL = 10001,
+        ID_OPEN_FOLDER = 10002,
     };
 
 protected:
@@ -50,13 +51,18 @@ protected:
     wxMenuBar* m_menuBar;
     wxMenu* m_name6;
     wxMenuItem* m_menuItem13;
-    wxMenuItem* m_menuItem17;
+    wxMenuItem* m_separator1;
+    wxMenuItem* m_menuItemExpandAll;
+    wxMenuItem* m_menuItemCollapseAll;
+    wxMenuItem* m_separator2;
     wxMenuItem* m_menuItem7;
     wxMenu* m_name8;
     wxMenuItem* m_menuItem9;
 
 protected:
     virtual void OnOpenFolder(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnExpandAll(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnCollapseAll(wxCommandEvent& event) { event.Skip(); }
     virtual void OnExit(wxCommandEvent& event) { event.Skip(); }
     virtual void OnAbout(wxCommandEvent& event) { event.Skip(); }
 

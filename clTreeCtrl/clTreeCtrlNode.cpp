@@ -45,7 +45,8 @@ void clTreeCtrlNode::RemoveChild(clTreeCtrlNode* child)
 int clTreeCtrlNode::GetExpandedLines() const
 {
     int counter = 0;
-    std::function<bool(clTreeCtrlNode*)> pCounterFunc = [&](clTreeCtrlNode* item) {
+    std::function<bool(clTreeCtrlNode*, bool)> pCounterFunc = [&](clTreeCtrlNode* item, bool visible) {
+        wxUnusedVar(visible);
         counter++;
         return true;
     };
@@ -60,7 +61,8 @@ void clTreeCtrlNode::GetItemsFromIndex(int start, int count, std::vector<clTreeC
     clTreeCtrlNode* startItem = GetVisibleItem(start);
     if(!startItem) return;
 
-    std::function<bool(clTreeCtrlNode*)> pFuncStopCond = [&](clTreeCtrlNode* item) {
+    std::function<bool(clTreeCtrlNode*, bool)> pFuncStopCond = [&](clTreeCtrlNode* item, bool visible) {
+        wxUnusedVar(visible);
         items.push_back(item);
         if((int)items.size() == count) return false;
         return true;
@@ -73,7 +75,8 @@ clTreeCtrlNode* clTreeCtrlNode::GetVisibleItem(int index)
 {
     int counter = -1;
     clTreeCtrlNode* pMatch = nullptr;
-    std::function<bool(clTreeCtrlNode*)> pFuncStopCond = [&](clTreeCtrlNode* item) {
+    std::function<bool(clTreeCtrlNode*, bool)> pFuncStopCond = [&](clTreeCtrlNode* item, bool visible) {
+        wxUnusedVar(visible);
         ++counter;
         if(counter == index) {
             pMatch = item;
@@ -88,7 +91,8 @@ clTreeCtrlNode* clTreeCtrlNode::GetVisibleItem(int index)
 
 void clTreeCtrlNode::UnselectAll()
 {
-    std::function<bool(clTreeCtrlNode*)> pUnselectItem = [&](clTreeCtrlNode* item) {
+    std::function<bool(clTreeCtrlNode*, bool)> pUnselectItem = [&](clTreeCtrlNode* item, bool visible) {
+        wxUnusedVar(visible);
         item->SetSelected(false);
         return true;
     };
@@ -100,7 +104,7 @@ int clTreeCtrlNode::GetItemIndex(clTreeCtrlNode* item, bool onlyExpandedItems) c
 {
     int index = wxNOT_FOUND;
     int where = wxNOT_FOUND;
-    std::function<bool(clTreeCtrlNode*)> pCounterFunc = [&](clTreeCtrlNode* p) {
+    std::function<bool(clTreeCtrlNode*, bool)> pCounterFunc = [&](clTreeCtrlNode* p, bool visible) {
         ++index;
         if(p == item) {
             where = index;

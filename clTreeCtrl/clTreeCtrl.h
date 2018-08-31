@@ -144,7 +144,27 @@ public:
      * @brief return the associated item data
      */
     wxTreeItemData* GetItemData(const wxTreeItemId& item) const;
-
+    
+    /**
+     * @brief expand this item and all its children
+     */
+    void ExpandAllChildren(const wxTreeItemId& item);
+    
+    /**
+     * @brief expand the entire tree
+     */
+    void ExpandAll() { ExpandAllChildren(GetRootItem()); }
+    
+    /**
+     * @brief expand this item and all its children
+     */
+    void CollapseAllChildren(const wxTreeItemId& item);
+    
+    /**
+     * @brief expand the entire tree
+     */
+    void CollapAll() { CollapseAllChildren(GetRootItem()); }
+    
 protected:
     void DoEnsureVisible(const wxTreeItemId& item);
     void OnPaint(wxPaintEvent& event);

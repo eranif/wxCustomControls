@@ -128,3 +128,32 @@ wxTreeItemId clTreeCtrlModel::AppendItem(
     }
     return wxTreeItemId(nullptr);
 }
+
+void clTreeCtrlModel::ExpandAllChildren(const wxTreeItemId& item)
+{
+    DoExpandAllChildren(item, true);
+}
+
+void clTreeCtrlModel::CollapseAllChildren(const wxTreeItemId& item)
+{
+    DoExpandAllChildren(item, false);
+}
+
+void clTreeCtrlModel::DoExpandAllChildren(const wxTreeItemId& item, bool expand)
+{
+    clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
+    std::function<bool(clTreeCtrlNode*, bool)> foo = [&](clTreeCtrlNode* p, bool visible) {
+        wxUnusedVar(visible);
+        if(p->HasChildren()) {
+            if(expand && !p->IsExpanded()) {
+                p->SetExpanded(true);
+            } else if(!expand && p->IsExpanded()) {
+                p->SetExpanded(false);
+            }
+        }
+        return true;
+    };
+    clTreeNodeVisitor visitor;
+    visitor.VisitChildren(node, false, foo);
+    StateModified();
+}

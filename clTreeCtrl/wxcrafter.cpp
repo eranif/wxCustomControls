@@ -93,6 +93,14 @@ MainFrameBaseClass::MainFrameBaseClass(
 
     m_name6->AppendSeparator();
 
+    m_menuItemExpandAll = new wxMenuItem(m_name6, wxID_ANY, _("Expand All"), wxT(""), wxITEM_NORMAL);
+    m_name6->Append(m_menuItemExpandAll);
+
+    m_menuItemCollapseAll = new wxMenuItem(m_name6, wxID_ANY, _("Collapse All"), wxT(""), wxITEM_NORMAL);
+    m_name6->Append(m_menuItemCollapseAll);
+
+    m_name6->AppendSeparator();
+
     m_menuItem7 = new wxMenuItem(m_name6, wxID_EXIT, _("Exit\tAlt-X"), _("Quit"), wxITEM_NORMAL);
     m_name6->Append(m_menuItem7);
 
@@ -120,6 +128,10 @@ MainFrameBaseClass::MainFrameBaseClass(
     // Connect events
     this->Connect(m_menuItem13->GetId(), wxEVT_COMMAND_MENU_SELECTED,
         wxCommandEventHandler(MainFrameBaseClass::OnOpenFolder), NULL, this);
+    this->Connect(m_menuItemExpandAll->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+        wxCommandEventHandler(MainFrameBaseClass::OnExpandAll), NULL, this);
+    this->Connect(m_menuItemCollapseAll->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+        wxCommandEventHandler(MainFrameBaseClass::OnCollapseAll), NULL, this);
     this->Connect(m_menuItem7->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBaseClass::OnExit),
         NULL, this);
     this->Connect(m_menuItem9->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBaseClass::OnAbout),
@@ -130,6 +142,10 @@ MainFrameBaseClass::~MainFrameBaseClass()
 {
     this->Disconnect(m_menuItem13->GetId(), wxEVT_COMMAND_MENU_SELECTED,
         wxCommandEventHandler(MainFrameBaseClass::OnOpenFolder), NULL, this);
+    this->Disconnect(m_menuItemExpandAll->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+        wxCommandEventHandler(MainFrameBaseClass::OnExpandAll), NULL, this);
+    this->Disconnect(m_menuItemCollapseAll->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+        wxCommandEventHandler(MainFrameBaseClass::OnCollapseAll), NULL, this);
     this->Disconnect(m_menuItem7->GetId(), wxEVT_COMMAND_MENU_SELECTED,
         wxCommandEventHandler(MainFrameBaseClass::OnExit), NULL, this);
     this->Disconnect(m_menuItem9->GetId(), wxEVT_COMMAND_MENU_SELECTED,
@@ -160,6 +176,18 @@ MyImages::MyImages()
             m_bitmaps.insert(std::make_pair(wxT("folder"), bmp));
         }
     }
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("folder@2x"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())) {
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("folder@2x"), bmp));
+        }
+    }
 
     {
         wxBitmap bmp;
@@ -173,6 +201,18 @@ MyImages::MyImages()
             m_bitmaps.insert(std::make_pair(wxT("folder_open"), bmp));
         }
     }
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("folder_open@2x"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())) {
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("folder_open@2x"), bmp));
+        }
+    }
 
     {
         wxBitmap bmp;
@@ -184,6 +224,18 @@ MyImages::MyImages()
                 this->Add(icn);
             }
             m_bitmaps.insert(std::make_pair(wxT("file"), bmp));
+        }
+    }
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("file@2x"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())) {
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("file@2x"), bmp));
         }
     }
 }

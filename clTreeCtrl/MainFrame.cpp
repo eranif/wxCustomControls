@@ -58,7 +58,7 @@ void MainFrame::OnAbout(wxCommandEvent& event)
 void MainFrame::LogMessage(const wxString& message)
 {
     m_stc15->AddText(message + "\n");
-    //m_stc15->ScrollToEnd();
+    // m_stc15->ScrollToEnd();
 }
 
 void MainFrame::OnOpenFolder(wxCommandEvent& event)
@@ -105,3 +105,5 @@ void MainFrame::OnItemExpanding(wxTreeEvent& event)
         }
     }
 }
+void MainFrame::OnExpandAll(wxCommandEvent& event) { m_tree->ExpandAll(); }
+void MainFrame::OnCollapseAll(wxCommandEvent& event) { m_tree->CollapAll(); }

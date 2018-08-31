@@ -7,6 +7,7 @@
 #include <wx/renderer.h>
 #include <wx/settings.h>
 #include <wx/wupdlock.h>
+#include <wx/utils.h>
 
 clTreeCtrl::clTreeCtrl(wxWindow* parent)
     : wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxWANTS_CHARS | wxTAB_TRAVERSAL)
@@ -346,5 +347,19 @@ void clTreeCtrl::OnLeaveWindow(wxMouseEvent& event)
 void clTreeCtrl::SetColours(const clTreeCtrlColours& colours)
 {
     m_colours = colours;
+    Refresh();
+}
+
+void clTreeCtrl::ExpandAllChildren(const wxTreeItemId& item)
+{
+    wxBusyCursor bc;
+    m_model.ExpandAllChildren(item);
+    Refresh();
+}
+
+void clTreeCtrl::CollapseAllChildren(const wxTreeItemId& item)
+{
+    wxBusyCursor bc;
+    m_model.CollapseAllChildren(item);
     Refresh();
 }
