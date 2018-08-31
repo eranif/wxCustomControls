@@ -6,8 +6,8 @@
 #include <wx/dcmemory.h>
 #include <wx/renderer.h>
 #include <wx/settings.h>
-#include <wx/wupdlock.h>
 #include <wx/utils.h>
+#include <wx/wupdlock.h>
 
 clTreeCtrl::clTreeCtrl(wxWindow* parent)
     : wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxWANTS_CHARS | wxTAB_TRAVERSAL)
@@ -35,6 +35,7 @@ clTreeCtrl::clTreeCtrl(wxWindow* parent)
     m_colours.selItemBgColour = wxColour("rgb(199,203,209)");
     m_colours.buttonColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW);
     m_colours.hoverBgColour = wxColour("rgb(219,221,224)");
+    m_colours.bgColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE);
 }
 
 clTreeCtrl::~clTreeCtrl() {}
@@ -45,8 +46,8 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
     wxGCDC dc(pdc);
 
     wxRect clientRect = GetClientRect();
-    dc.SetPen(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE));
-    dc.SetBrush(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE));
+    dc.SetPen(m_colours.bgColour);
+    dc.SetBrush(m_colours.bgColour);
     dc.DrawRectangle(clientRect);
 
     int startLine = m_firstVisibleLine;

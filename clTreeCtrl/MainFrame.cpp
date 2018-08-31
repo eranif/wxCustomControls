@@ -8,6 +8,14 @@ MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
 {
     m_tree = new clTreeCtrl(m_mainPanel);
+    clTreeCtrlColours colours = m_tree->GetColours();
+    //colours.bgColour = *wxWHITE;
+    //colours.buttonColour = *wxBLACK;
+    //colours.selItemTextColour = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT);
+    //colours.selItemBgColour = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
+    //colours.hoverBgColour = *wxCYAN;
+    m_tree->SetColours(colours);
+    
     std::vector<wxBitmap> bitmaps;
     MyImages images;
     bitmaps.push_back(images.Bitmap("folder"));

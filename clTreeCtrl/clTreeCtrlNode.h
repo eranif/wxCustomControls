@@ -2,10 +2,10 @@
 #define CLTREECTRLNODE_H
 
 #include <wx/colour.h>
+#include <wx/gdicmn.h>
 #include <wx/sharedptr.h>
 #include <wx/string.h>
 #include <wx/treebase.h>
-#include <wx/gdicmn.h>
 
 class clTreeCtrl;
 enum clTreeCtrlNodeFlags {
@@ -18,11 +18,12 @@ enum clTreeCtrlNodeFlags {
 };
 
 struct clTreeCtrlColours {
-    wxColour hoverBgColour;
-    wxColour textColour;
-    wxColour selItemTextColour;
-    wxColour selItemBgColour;
-    wxColour buttonColour;
+    wxColour hoverBgColour;     // Background colour of an hovered item
+    wxColour textColour;        // item text colour
+    wxColour selItemTextColour; // text colour for the selected item
+    wxColour selItemBgColour;   // selected item background colour
+    wxColour buttonColour;      // expand/collapse button colour
+    wxColour bgColour;          // background colour for the control
 };
 
 class clTreeCtrlNode
@@ -72,7 +73,7 @@ public:
     void Render(wxDC& dc, const clTreeCtrlColours& colours);
     void SetHovered(bool b) { SetFlag(kHovered, b); }
     bool IsHovered() const { return m_flags & kHovered; }
-    
+
     void ClearRects();
     void SetRects(const wxRect& rect, const wxRect& buttonRect)
     {
