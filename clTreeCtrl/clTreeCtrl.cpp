@@ -33,7 +33,7 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
 {
     wxBufferedPaintDC pdc(this);
     wxGCDC dc(pdc);
-
+    
     wxRect clientRect = GetClientRect();
     dc.SetPen(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE));
     dc.SetBrush(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE));
@@ -41,8 +41,8 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
 
     int startLine = m_firstVisibleLine;
     int lastLine = ceil((double)clientRect.GetHeight() / (double)m_lineHeight) + startLine;
-    int totalVisibleLines = GetExpandedLines();
-    if(lastLine > totalVisibleLines) { lastLine = totalVisibleLines; }
+    //int totalVisibleLines = GetExpandedLines();
+    //if(lastLine > totalVisibleLines) { lastLine = totalVisibleLines; }
 
     int y = clientRect.GetY();
     std::vector<clTreeCtrlNode*> items;
@@ -51,8 +51,8 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
     // Colours
     clTreeCtrlColours colours;
     colours.textColour = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT);
-    colours.selItemTextColour = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT);
-    colours.selItemBgColour = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
+    colours.selItemTextColour = colours.textColour;
+    colours.selItemBgColour = wxColour("rgb(199,203,209)");
     colours.buttonColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW);
 
     for(size_t i = 0; i < items.size(); ++i) {
@@ -289,5 +289,27 @@ void clTreeCtrl::OnMouseScroll(wxMouseEvent& event)
         m_firstVisibleLine += m_scrollTick;
         if(m_firstVisibleLine > GetExpandedLines()) { m_firstVisibleLine = GetExpandedLines(); }
     }
+    Refresh();
+}
+
+const wxBitmap& clTreeCtrl::GetBitmap(size_t index) const
+{
+    if(index >= m_bitmaps.size()) {
+        static wxBitmap emptyBitmap;
+        return emptyBitmap;
+    }
+    return m_bitmaps[index];
+}
+
+void clTreeCtrl::SetBitmaps(const std::vector<wxBitmap>& bitmaps)
+{
+    m_bitmaps = bitmaps;
+    int heighestBitmap = 0;
+    for(size_t i = 0; i < m_bitmaps.size(); ++i) {
+        heighestBitmap = wxMax(heighestBitmap, m_bitmaps[i].GetScaledHeight());
+    }
+    heighestBitmap += 2 * clTreeCtrlNode::Y_SPACER;
+    m_lineHeight = wxMax(heighestBitmap, m_lineHeight);
+    SetIndent(m_lineHeight);
     Refresh();
 }

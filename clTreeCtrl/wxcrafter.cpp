@@ -25,7 +25,7 @@ MainFrameBaseClass::MainFrameBaseClass(
     wxBoxSizer* boxSizer1 = new wxBoxSizer(wxVERTICAL);
     this->SetSizer(boxSizer1);
 
-    m_mainPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(500, 300)), wxTAB_TRAVERSAL);
+    m_mainPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, -1)), wxTAB_TRAVERSAL);
 
     boxSizer1->Add(m_mainPanel, 1, wxEXPAND, WXC_FROM_DIP(5));
 
@@ -33,7 +33,7 @@ MainFrameBaseClass::MainFrameBaseClass(
     m_mainPanel->SetSizer(boxSizer11);
 
     m_stc15
-        = new wxStyledTextCtrl(m_mainPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainPanel, wxSize(-1, -1)), 0);
+        = new wxStyledTextCtrl(m_mainPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainPanel, wxSize(-1, 50)), 0);
 #ifdef __WXMSW__
     // To get the newer version of the font on MSW, we use font wxSYS_DEFAULT_GUI_FONT with family set to
     // wxFONTFAMILY_TELETYPE
@@ -80,7 +80,7 @@ MainFrameBaseClass::MainFrameBaseClass(
     m_stc15->SetKeyWords(3, wxT(""));
     m_stc15->SetKeyWords(4, wxT(""));
 
-    boxSizer11->Add(m_stc15, 1, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+    boxSizer11->Add(m_stc15, 0, wxALL | wxEXPAND | wxALIGN_BOTTOM, WXC_FROM_DIP(5));
 
     m_menuBar = new wxMenuBar(0);
     this->SetMenuBar(m_menuBar);
@@ -103,7 +103,7 @@ MainFrameBaseClass::MainFrameBaseClass(
     m_name8->Append(m_menuItem9);
 
     SetName(wxT("MainFrameBaseClass"));
-    SetSize(wxDLG_UNIT(this, wxSize(500, 300)));
+    SetSize(wxDLG_UNIT(this, wxSize(-1, -1)));
     if(GetSizer()) { GetSizer()->Fit(this); }
     if(GetParent()) {
         CentreOnParent(wxBOTH);
@@ -135,3 +135,57 @@ MainFrameBaseClass::~MainFrameBaseClass()
     this->Disconnect(m_menuItem9->GetId(), wxEVT_COMMAND_MENU_SELECTED,
         wxCommandEventHandler(MainFrameBaseClass::OnAbout), NULL, this);
 }
+
+MyImages::MyImages()
+    : wxImageList(16, 16, true)
+    , m_imagesWidth(16)
+    , m_imagesHeight(16)
+{
+    if(!bBitmapLoaded) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC9ED9InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("folder"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())) {
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("folder"), bmp));
+        }
+    }
+
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("folder_open"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())) {
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("folder_open"), bmp));
+        }
+    }
+
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("file"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())) {
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("file"), bmp));
+        }
+    }
+}
+
+MyImages::~MyImages() {}

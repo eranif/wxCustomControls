@@ -8,6 +8,12 @@ MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
 {
     m_tree = new clTreeCtrl(m_mainPanel);
+    std::vector<wxBitmap> bitmaps;
+    MyImages images;
+    bitmaps.push_back(images.Bitmap("folder"));
+    bitmaps.push_back(images.Bitmap("folder_open"));
+    bitmaps.push_back(images.Bitmap("file"));
+    m_tree->SetBitmaps(bitmaps);
     m_mainPanel->GetSizer()->Insert(0, m_tree, 1, wxEXPAND);
 
     m_tree->Bind(wxEVT_TREE_ITEM_EXPANDING, &MainFrame::OnItemExpanding, this);
@@ -61,7 +67,7 @@ void MainFrame::OnOpenFolder(wxCommandEvent& event)
     if(path.IsEmpty()) { return; }
     if(!m_tree->IsEmpty()) { return; }
     m_path = path;
-    wxTreeItemId root = m_tree->AddRoot(path, -1, -1, new MyItemData(m_path));
+    wxTreeItemId root = m_tree->AddRoot(path, 0, 1, new MyItemData(m_path));
     m_tree->AppendItem(root, "dummy-node");
     m_tree->SelectItem(root);
 }
@@ -88,11 +94,11 @@ void MainFrame::OnItemExpanding(wxTreeEvent& event)
                 if(wxDirExists(fn.GetFullPath())) {
                     // A directory
                     wxTreeItemId folderItem
-                        = m_tree->AppendItem(item, filename, -1, -1, new MyItemData(fn.GetFullPath()));
+                        = m_tree->AppendItem(item, filename, 0, 1, new MyItemData(fn.GetFullPath()));
                     m_tree->AppendItem(folderItem, "dummy-node");
                 } else {
                     // A file
-                    m_tree->AppendItem(item, filename, -1, -1, new MyItemData(fn.GetFullPath()));
+                    m_tree->AppendItem(item, filename, 2, 2, new MyItemData(fn.GetFullPath()));
                 }
                 cont = dir.GetNext(&filename);
             }

@@ -1,7 +1,7 @@
 {
  "metadata": {
   "m_generatedFilesDir": ".",
-  "m_objCounter": 21,
+  "m_objCounter": 23,
   "m_includeFiles": [],
   "m_bitmapFunction": "wxC9ED9InitBitmapResources",
   "m_bitmapsFile": "wxcrafter_bitmaps.cpp",
@@ -24,7 +24,7 @@
    "m_properties": [{
      "type": "string",
      "m_label": "Size:",
-     "m_value": "500,300"
+     "m_value": "-1,-1"
     }, {
      "type": "string",
      "m_label": "Minimum Size:",
@@ -171,7 +171,7 @@
         }, {
          "type": "string",
          "m_label": "Size:",
-         "m_value": "500,300"
+         "m_value": "-1,-1"
         }, {
          "type": "string",
          "m_label": "Minimum Size:",
@@ -251,12 +251,12 @@
          "m_events": [],
          "m_children": [{
            "m_type": 4466,
-           "proportion": 1,
+           "proportion": 0,
            "border": 5,
            "gbSpan": "1,1",
            "gbPosition": "0,0",
            "m_styles": [],
-           "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
+           "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND", "wxALIGN_BOTTOM"],
            "m_properties": [{
              "type": "winid",
              "m_label": "ID:",
@@ -264,7 +264,7 @@
             }, {
              "type": "string",
              "m_label": "Size:",
-             "m_value": "-1,-1"
+             "m_value": "-1,50"
             }, {
              "type": "string",
              "m_label": "Minimum Size:",
@@ -719,11 +719,11 @@
      "m_properties": [{
        "type": "string",
        "m_label": "Name:",
-       "m_value": "m_bmp19"
+       "m_value": "folder"
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": ""
+       "m_path": "../bitmaps/16-folder-regular@2x.png"
       }],
      "m_events": [],
      "m_children": []
@@ -738,11 +738,30 @@
      "m_properties": [{
        "type": "string",
        "m_label": "Name:",
-       "m_value": "m_bmp21"
+       "m_value": "folder_open"
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": ""
+       "m_path": "../bitmaps/16-folder-open-regular@2x.png"
+      }],
+     "m_events": [],
+     "m_children": []
+    }, {
+     "m_type": 4482,
+     "proportion": 0,
+     "border": 5,
+     "gbSpan": "1,1",
+     "gbPosition": "0,0",
+     "m_styles": [],
+     "m_sizerFlags": [],
+     "m_properties": [{
+       "type": "string",
+       "m_label": "Name:",
+       "m_value": "file"
+      }, {
+       "type": "filePicker",
+       "m_label": "Bitmap File:",
+       "m_path": "../bitmaps/16-file-regular@2x.png"
       }],
      "m_events": [],
      "m_children": []

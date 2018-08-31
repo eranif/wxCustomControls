@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resource xmlns="http://www.wxwidgets.org/wxxrc">
   <!-- Handler Generation is ON -->
+  <object class="wxBitmap" name="file">D:\src\clTreeCtrl\bitmaps\16-file-regular@2x.png</object>
+  <object class="wxBitmap" name="folder">D:\src\clTreeCtrl\bitmaps\16-folder-regular@2x.png</object>
+  <object class="wxBitmap" name="folder_open">D:\src\clTreeCtrl\bitmaps\16-folder-open-regular@2x.png</object>
 </resource>

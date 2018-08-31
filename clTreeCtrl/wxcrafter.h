@@ -7,9 +7,13 @@
 #ifndef _CLTREECTRL_CLTREECTRL_WXCRAFTER_BASE_CLASSES_H
 #define _CLTREECTRL_CLTREECTRL_WXCRAFTER_BASE_CLASSES_H
 
+#include <map>
 #include <wx/artprov.h>
+#include <wx/bitmap.h>
 #include <wx/frame.h>
+#include <wx/icon.h>
 #include <wx/iconbndl.h>
+#include <wx/imaglist.h>
 #include <wx/menu.h>
 #include <wx/panel.h>
 #include <wx/settings.h>
@@ -61,9 +65,33 @@ public:
     wxPanel* GetMainPanel() { return m_mainPanel; }
     wxMenuBar* GetMenuBar() { return m_menuBar; }
     MainFrameBaseClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("My Frame"),
-        const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500, 300),
+        const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1, -1),
         long style = wxCAPTION | wxRESIZE_BORDER | wxMAXIMIZE_BOX | wxMINIMIZE_BOX | wxSYSTEM_MENU | wxCLOSE_BOX);
     virtual ~MainFrameBaseClass();
+};
+
+class MyImages : public wxImageList
+{
+protected:
+    // Maintain a map of all bitmaps representd by their name
+    std::map<wxString, wxBitmap> m_bitmaps;
+    // The requested image resolution (can be one of @2x, @1.5x, @1.25x or an empty string (the default)
+    wxString m_resolution;
+    int m_imagesWidth;
+    int m_imagesHeight;
+
+protected:
+public:
+    MyImages();
+    const wxBitmap& Bitmap(const wxString& name) const
+    {
+        if(!m_bitmaps.count(name + m_resolution)) return wxNullBitmap;
+        return m_bitmaps.find(name + m_resolution)->second;
+    }
+
+    void SetBitmapResolution(const wxString& res = wxEmptyString) { m_resolution = res; }
+
+    virtual ~MyImages();
 };
 
 #endif

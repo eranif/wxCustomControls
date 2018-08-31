@@ -11,8 +11,9 @@ class clTreeCtrl : public wxPanel
     int m_lineHeight = 0;
     clTreeCtrlModel m_model;
     int m_firstVisibleLine = 0;
-    int m_scrollTick = 3;
-    
+    int m_scrollTick = 2;
+    std::vector<wxBitmap> m_bitmaps;
+
 private:
     int GetExpandedLines();
     wxPoint DoFixPoint(const wxPoint& pt);
@@ -21,6 +22,18 @@ public:
     clTreeCtrl(wxWindow* parent);
     virtual ~clTreeCtrl();
 
+    void SetBitmaps(const std::vector<wxBitmap>& bitmaps);
+    const std::vector<wxBitmap>& GetBitmaps() const { return m_bitmaps; }
+    
+    /**
+     * @brief return line height
+     */
+    int GetLineHeight() const { return m_lineHeight; }
+    
+    /**
+     * @brief return bitmap at give index, return wxNullBitmap on error
+     */
+    const wxBitmap& GetBitmap(size_t index) const;
     /**
      * @brief Calculates which (if any) item is under the given point, returning the tree item id at this point plus
      *  extra information flags.
