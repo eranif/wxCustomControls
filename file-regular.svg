@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   aria-hidden="true"
+   data-prefix="far"
+   data-icon="file"
+   class="svg-inline--fa fa-file fa-w-12"
+   role="img"
+   viewBox="0 0 512 512"
+   version="1.1"
+   id="svg4"
+   sodipodi:docname="file-regular.svg"
+   width="512"
+   height="512"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <metadata
+     id="metadata10">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs8" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1640"
+     inkscape:window-height="1155"
+     id="namedview6"
+     showgrid="false"
+     inkscape:zoom="0.4609375"
+     inkscape:cx="-187.66102"
+     inkscape:cy="256"
+     inkscape:window-x="126"
+     inkscape:window-y="100"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg4" />
+  <path
+     d="M 415.19486,127.35612 339.60487,55.035378 C 331.49629,47.277492 320.50466,42.881356 309.06254,42.881356 H 125.17797 C 101.3027,42.967556 81.932203,61.500283 81.932203,84.342953 V 442.92968 c 0,22.84268 19.370497,41.3754 43.245767,41.3754 h 259.47457 c 23.87526,0 43.24576,-18.53272 43.24576,-41.3754 V 156.66369 c 0,-10.94724 -4.59486,-21.54969 -12.70344,-29.30757 z m -34.05604,25.94581 H 312.57627 V 87.704703 Z M 125.17797,442.92968 V 84.342953 H 269.3305 v 89.646677 c 0,11.46443 9.6402,20.68769 21.62288,20.68769 h 93.69916 v 248.25236 z"
+     id="path2"
+     inkscape:connector-curvature="0"
+     style="fill:#8c8c8c;fill-opacity:1;stroke-width:0.88125503" />
+</svg>
