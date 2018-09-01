@@ -35,16 +35,16 @@ void clTreeCtrlNode::AddChild(clTreeCtrlNode* child)
 
     // Conect the list
     if(!lastChild) { lastChild = this; }
-    
+
     clTreeCtrlNode* prevNode = lastChild;
     clTreeCtrlNode* newNode = child;
     clTreeCtrlNode* nextNode = prevNode->m_next;
-    
+
     prevNode->m_next = newNode;
     newNode->m_prev = prevNode;
     newNode->m_next = nextNode;
     if(nextNode) { nextNode->m_prev = newNode; }
-    
+
     if(HasFlag(kSortItems)) {
         // Sort the items
     }
@@ -59,8 +59,12 @@ void clTreeCtrlNode::SetParent(clTreeCtrlNode* parent)
 void clTreeCtrlNode::RemoveChild(clTreeCtrlNode* child)
 {
     // first remove all of its children
-    std::for_each(
-        child->m_children.begin(), child->m_children.end(), [&](clTreeCtrlNode* c) { child->RemoveChild(c); });
+    // do this in a while loop since 'child->RemoveChild(c);' will alter 
+    // the array and will invalidate all iterators
+    while(!child->m_children.empty()) {
+        clTreeCtrlNode* c = child->m_children[0];
+        child->RemoveChild(c);
+    }
 
     // Now disconnect this child from this node
     clTreeCtrlNode::Vec_t::iterator iter
