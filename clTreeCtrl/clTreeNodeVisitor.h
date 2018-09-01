@@ -1,6 +1,7 @@
 #ifndef CLTREENODEVISITOR_H
 #define CLTREENODEVISITOR_H
 
+#if 0
 #include "clTreeCtrlModel.h"
 #include <functional>
 #include <vector>
@@ -29,5 +30,5 @@ public:
      */
     void VisitChildren(clTreeCtrlNode* item, bool expandedItemsOnly, std::function<bool(clTreeCtrlNode*, bool)>& func);
 };
-
+#endif
 #endif // CLTREENODEVISITOR_H

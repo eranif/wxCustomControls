@@ -36,7 +36,9 @@ MainFrame::MainFrame(wxWindow* parent)
     });
 }
 
-MainFrame::~MainFrame() {}
+MainFrame::~MainFrame()
+{
+}
 
 void MainFrame::OnExit(wxCommandEvent& event)
 {
@@ -117,11 +119,11 @@ void MainFrame::OnNextVisible(wxCommandEvent& event)
     wxTreeItemId item = m_tree->GetNextVisible(m_tree->GetFocusedItem());
     if(item.IsOk()) { wxMessageBox("Next visible item (from selection): " + m_tree->GetItemText(item)); }
 }
-void MainFrame::OnEnsureItemVisible(wxCommandEvent& event) 
-{ 
-    long index = wxGetNumberFromUser("Item index:", "Item index:", "clTreeCtrl");
-    wxTreeItemId item = m_tree->RowToItem(index);
-    if(item.IsOk()) { wxMessageBox("Item is: " + m_tree->GetItemText(item)); }
-    m_tree->SelectItem(item);
-    m_tree->EnsureVisible(item);
+void MainFrame::OnEnsureItemVisible(wxCommandEvent& event)
+{
+    // long index = wxGetNumberFromUser("Item index:", "Item index:", "clTreeCtrl");
+    // wxTreeItemId item = m_tree->RowToItem(index);
+    // if(item.IsOk()) { wxMessageBox("Item is: " + m_tree->GetItemText(item)); }
+    // m_tree->SelectItem(item);
+    // m_tree->EnsureVisible(item);
 }

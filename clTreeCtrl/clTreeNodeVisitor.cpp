@@ -1,5 +1,5 @@
 #include "clTreeNodeVisitor.h"
-
+#if 0
 clTreeNodeVisitor::clTreeNodeVisitor() {}
 
 clTreeNodeVisitor::~clTreeNodeVisitor() {}
@@ -68,3 +68,4 @@ void clTreeNodeVisitor::VisitChildren(
         }
     }
 }
+#endif

@@ -1,6 +1,5 @@
 #include "clTreeCtrl.h"
 #include "clTreeCtrlModel.h"
-#include "clTreeNodeVisitor.h"
 #include <algorithm>
 #include <wx/dc.h>
 #include <wx/settings.h>
@@ -18,29 +17,33 @@ clTreeCtrlModel::clTreeCtrlModel(clTreeCtrl* tree)
 {
 }
 
-clTreeCtrlModel::~clTreeCtrlModel() { m_root.reset(nullptr); }
+clTreeCtrlModel::~clTreeCtrlModel() { wxDELETE(m_root); }
 
-void clTreeCtrlModel::GetItemsFromIndex(int start, int count, clTreeCtrlNode::Vec_t& items)
+void clTreeCtrlModel::GetNextItems(clTreeCtrlNode* from, int count, clTreeCtrlNode::Vec_t& items) const
 {
-    if(!m_root) return;
-    m_root->GetItemsFromIndex(start, count, items);
+    return from->GetNextItems(count, items);
+}
+
+void clTreeCtrlModel::GetPrevItems(clTreeCtrlNode* from, int count, clTreeCtrlNode::Vec_t& items) const
+{
+    return from->GetPrevItems(count, items);
 }
 
 wxTreeItemId clTreeCtrlModel::AddRoot(const wxString& text, int image, int selImage, wxTreeItemData* data)
 {
-    if(m_root) { return wxTreeItemId(m_root.get()); }
-    m_root.reset(new clTreeCtrlNode(m_tree));
+    if(m_root) { return wxTreeItemId(m_root); }
+    m_root = new clTreeCtrlNode(m_tree);
     m_root->SetLabel(text);
     m_root->SetBitmapIndex(image);
     m_root->SetBitmapSelectedIndex(selImage);
     m_root->SetClientData(data);
-    return wxTreeItemId(m_root.get());
+    return wxTreeItemId(m_root);
 }
 
 wxTreeItemId clTreeCtrlModel::GetRootItem() const
 {
     if(!m_root) { return wxTreeItemId(); }
-    return wxTreeItemId(const_cast<clTreeCtrlNode*>(m_root.get()));
+    return wxTreeItemId(const_cast<clTreeCtrlNode*>(m_root));
 }
 
 int clTreeCtrlModel::GetExpandedLines()
@@ -109,14 +112,6 @@ bool clTreeCtrlModel::ExpandToItem(const wxTreeItemId& item)
     return true;
 }
 
-int clTreeCtrlModel::GetItemIndex(const wxTreeItemId& item, bool visibleItemsOnly) const
-{
-    if(!m_root) { return wxNOT_FOUND; }
-    clTreeCtrlNode* child = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
-    if(!child) return wxNOT_FOUND;
-    return m_root->GetItemIndex(child, visibleItemsOnly);
-}
-
 wxTreeItemId clTreeCtrlModel::AppendItem(
     const wxTreeItemId& parent, const wxString& text, int image, int selImage, wxTreeItemData* data)
 {
@@ -124,10 +119,10 @@ wxTreeItemId clTreeCtrlModel::AppendItem(
     if(parent.IsOk()) { parentNode = reinterpret_cast<clTreeCtrlNode*>(parent.GetID()); }
 
     if(parentNode) {
-        clTreeCtrlNode::Ptr_t child(new clTreeCtrlNode(m_tree, text, image, selImage));
+        clTreeCtrlNode* child = new clTreeCtrlNode(m_tree, text, image, selImage);
         child->SetClientData(data);
         parentNode->AddChild(child);
-        return wxTreeItemId(child.get());
+        return wxTreeItemId(child);
     }
     return wxTreeItemId(nullptr);
 }
@@ -138,9 +133,9 @@ void clTreeCtrlModel::CollapseAllChildren(const wxTreeItemId& item) { DoExpandAl
 
 void clTreeCtrlModel::DoExpandAllChildren(const wxTreeItemId& item, bool expand)
 {
-    clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
-    std::function<bool(clTreeCtrlNode*, bool)> foo = [&](clTreeCtrlNode* p, bool visible) {
-        wxUnusedVar(visible);
+    clTreeCtrlNode* p = ToPtr(item);
+    if(!p) { return; }
+    while(p) {
         if(p->HasChildren()) {
             if(expand && !p->IsExpanded()) {
                 p->SetExpanded(true);
@@ -148,27 +143,35 @@ void clTreeCtrlModel::DoExpandAllChildren(const wxTreeItemId& item, bool expand)
                 p->SetExpanded(false);
             }
         }
-        return true;
-    };
-    clTreeNodeVisitor visitor;
-    visitor.VisitChildren(node, false, foo);
+        p = p->GetNext();
+    }
     StateModified();
 }
 
-wxTreeItemId clTreeCtrlModel::GetItemFromIndex(int index) const
+wxTreeItemId clTreeCtrlModel::GetItemBefore(const wxTreeItemId& item, bool visibleItem) const
 {
-    int counter = 0;
-    clTreeCtrlNode* pmatch = nullptr;
-    std::function<bool(clTreeCtrlNode*, bool)> foo = [&](clTreeCtrlNode* p, bool visible) {
-        wxUnusedVar(visible);
-        if(index == counter) {
-            pmatch = p;
-            return false;
-        }
-        ++counter;
-        return true;
-    };
-    clTreeNodeVisitor visitor;
-    visitor.VisitChildren(m_root.get(), true, foo);
-    return wxTreeItemId(pmatch);
+    clTreeCtrlNode* p = ToPtr(item);
+    if(!p) { return wxTreeItemId(); }
+    if(visibleItem) {
+        clTreeCtrlNode::Vec_t items;
+        GetPrevItems(p, 2, items);
+        if(items.size() != 2) { return wxTreeItemId(); }
+        return wxTreeItemId(items[0]);
+    } else {
+        return wxTreeItemId(p->GetPrev());
+    }
+}
+
+wxTreeItemId clTreeCtrlModel::GetItemAfter(const wxTreeItemId& item, bool visibleItem) const
+{
+    clTreeCtrlNode* p = ToPtr(item);
+    if(!p) { return wxTreeItemId(); }
+    if(visibleItem) {
+        clTreeCtrlNode::Vec_t items;
+        GetNextItems(p, 2, items);
+        if(items.size() != 2) { return wxTreeItemId(); }
+        return wxTreeItemId(items[1]);
+    } else {
+        return wxTreeItemId(p->GetNext());
+    }
 }

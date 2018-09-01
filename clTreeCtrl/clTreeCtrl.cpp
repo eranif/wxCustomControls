@@ -22,13 +22,13 @@ clTreeCtrl::clTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
     wxSize textSize = memDC.GetTextExtent("Tp");
     m_lineHeight = clTreeCtrlNode::Y_SPACER + textSize.GetHeight() + clTreeCtrlNode::Y_SPACER;
     SetIndent(m_lineHeight);
+    Bind(wxEVT_IDLE, &clTreeCtrl::OnIdle, this);
     Bind(wxEVT_PAINT, &clTreeCtrl::OnPaint, this);
     Bind(wxEVT_SIZE, &clTreeCtrl::OnSize, this);
     Bind(wxEVT_ERASE_BACKGROUND, [&](wxEraseEvent& event) { wxUnusedVar(event); });
     Bind(wxEVT_LEFT_DOWN, &clTreeCtrl::OnMouseLeftDown, this);
     Bind(wxEVT_LEFT_DCLICK, &clTreeCtrl::OnMouseLeftDClick, this);
     Bind(wxEVT_MOUSEWHEEL, &clTreeCtrl::OnMouseScroll, this);
-    Bind(wxEVT_IDLE, &clTreeCtrl::OnIdle, this);
     Bind(wxEVT_LEAVE_WINDOW, &clTreeCtrl::OnLeaveWindow, this);
     Bind(wxEVT_KEY_DOWN, &clTreeCtrl::OnKeyDown, this);
 
@@ -41,7 +41,18 @@ clTreeCtrl::clTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
     m_colours.bgColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE);
 }
 
-clTreeCtrl::~clTreeCtrl() {}
+clTreeCtrl::~clTreeCtrl()
+{
+    Unbind(wxEVT_IDLE, &clTreeCtrl::OnIdle, this);
+    Unbind(wxEVT_PAINT, &clTreeCtrl::OnPaint, this);
+    Unbind(wxEVT_SIZE, &clTreeCtrl::OnSize, this);
+    Unbind(wxEVT_ERASE_BACKGROUND, [&](wxEraseEvent& event) { wxUnusedVar(event); });
+    Unbind(wxEVT_LEFT_DOWN, &clTreeCtrl::OnMouseLeftDown, this);
+    Unbind(wxEVT_LEFT_DCLICK, &clTreeCtrl::OnMouseLeftDClick, this);
+    Unbind(wxEVT_MOUSEWHEEL, &clTreeCtrl::OnMouseScroll, this);
+    Unbind(wxEVT_LEAVE_WINDOW, &clTreeCtrl::OnLeaveWindow, this);
+    Unbind(wxEVT_KEY_DOWN, &clTreeCtrl::OnKeyDown, this);
+}
 
 void clTreeCtrl::OnPaint(wxPaintEvent& event)
 {
@@ -53,14 +64,13 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
     dc.SetBrush(m_colours.bgColour);
     dc.DrawRectangle(clientRect);
 
-    int startLine = m_firstVisibleLine;
-    int lastLine = ceil((double)clientRect.GetHeight() / (double)m_lineHeight) + startLine;
-    // int totalVisibleLines = GetExpandedLines();
-    // if(lastLine > totalVisibleLines) { lastLine = totalVisibleLines; }
-
+    int maxItems = GetNumLineCanFitOnScreen();
+    if(!m_firstOnScreenItem) { m_firstOnScreenItem = m_model.GetRoot(); }
+    clTreeCtrlNode* firstItem = m_firstOnScreenItem;
+    if(!firstItem) { return; }
     int y = clientRect.GetY();
     clTreeCtrlNode::Vec_t items;
-    m_model.GetItemsFromIndex(startLine, lastLine - startLine, items);
+    m_model.GetNextItems(firstItem, maxItems, items);
 
     for(size_t i = 0; i < items.size(); ++i) {
         clTreeCtrlNode* curitem = items[i];
@@ -186,12 +196,11 @@ void clTreeCtrl::EnsureVisible(const wxTreeItemId& item)
 void clTreeCtrl::DoEnsureVisible(const wxTreeItemId& item)
 {
     // scroll to the item
-    int index = m_model.GetItemIndex(item, true);
-    if(index != wxNOT_FOUND) {
-        if(IsRowVisible(index)) { return; }
-        EnsureRowVisible(index, false); // make it visible at the bottom
-        Refresh();
-    }
+    if(!item.IsOk()) { return; }
+    clTreeCtrlNode* pNode = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
+    if(IsItemVisible(pNode)) { return; }
+    EnsureItemVisible(pNode, false); // make it visible at the bottom
+    Refresh();
 }
 
 void clTreeCtrl::OnMouseLeftDClick(wxMouseEvent& event)
@@ -250,7 +259,7 @@ void clTreeCtrl::DeleteChildren(const wxTreeItemId& item)
 {
     if(!item.GetID()) return;
     clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
-    node->GetChildren().clear();
+    node->RemoveAllChildren();
     m_model.StateModified();
 }
 
@@ -258,19 +267,19 @@ wxTreeItemId clTreeCtrl::GetFirstChild(const wxTreeItemId& item, clTreeItemIdVal
 {
     if(!item.GetID()) return wxTreeItemId();
     clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
-    const std::vector<clTreeCtrlNode::Ptr_t>& children = node->GetChildren();
+    const clTreeCtrlNode::Vec_t& children = node->GetChildren();
     if(children.empty()) return wxTreeItemId(); // No children
     cookie.nextItem = 1;                        // the next item
-    return wxTreeItemId(children.at(0).get());
+    return wxTreeItemId(children[0]);
 }
 
 wxTreeItemId clTreeCtrl::GetNextChild(const wxTreeItemId& item, clTreeItemIdValue& cookie) const
 {
     if(!item.GetID()) return wxTreeItemId();
     clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
-    const std::vector<clTreeCtrlNode::Ptr_t>& children = node->GetChildren();
+    const clTreeCtrlNode::Vec_t& children = node->GetChildren();
     if((int)children.size() >= cookie.nextItem) return wxTreeItemId();
-    wxTreeItemId child(children[cookie.nextItem].get());
+    wxTreeItemId child(children[cookie.nextItem]);
     cookie.nextItem++;
     return child;
 }
@@ -291,12 +300,14 @@ wxTreeItemData* clTreeCtrl::GetItemData(const wxTreeItemId& item) const
 
 void clTreeCtrl::OnMouseScroll(wxMouseEvent& event)
 {
+    if(!m_firstOnScreenItem) { return; }
+    clTreeCtrlNode::Vec_t items;
     if(event.GetWheelRotation() > 0) { // Scrolling up
-        m_firstVisibleLine -= m_scrollTick;
-        if(m_firstVisibleLine < 0) { m_firstVisibleLine = 0; }
+        m_model.GetPrevItems(m_firstOnScreenItem, m_scrollTick, items);
+        m_firstOnScreenItem = items.front(); // first item
     } else {
-        m_firstVisibleLine += m_scrollTick;
-        if(m_firstVisibleLine > GetExpandedLines()) { m_firstVisibleLine = GetExpandedLines(); }
+        m_model.GetNextItems(m_firstOnScreenItem, m_scrollTick, items);
+        m_firstOnScreenItem = items.back(); // the last item
     }
     Refresh();
 }
@@ -417,57 +428,52 @@ size_t clTreeCtrl::GetSelections(wxArrayTreeItemIds& selections) const
     return selections.size();
 }
 
-wxTreeItemId clTreeCtrl::RowToItem(int row) const { return m_model.GetItemFromIndex(row); }
-
 void clTreeCtrl::OnKeyDown(wxKeyEvent& event)
 {
     event.Skip();
     if(event.GetKeyCode() == WXK_UP) {
         wxTreeItemId selectedItem = GetSelection();
-        if(!selectedItem.IsOk()) { return; }
-        int itemIndex = m_model.GetItemIndex(selectedItem);
-        --itemIndex;
-        if(itemIndex < 0) return;
-        wxTreeItemId nextSelection = m_model.GetItemFromIndex(itemIndex);
-        if(nextSelection.IsOk()) {
+        selectedItem = m_model.GetItemBefore(selectedItem, true);
+        if(selectedItem.IsOk()) {
             m_model.UnselectAll();
-            SelectItem(nextSelection);
-            EnsureRowVisible(itemIndex, true);
+            SelectItem(selectedItem);
+            EnsureItemVisible(m_model.ToPtr(selectedItem), true);
         }
     } else if(event.GetKeyCode() == WXK_DOWN) {
         wxTreeItemId selectedItem = GetSelection();
-        if(!selectedItem.IsOk()) { return; }
-        int itemIndex = m_model.GetItemIndex(selectedItem);
-        ++itemIndex;
-        wxTreeItemId nextSelection = m_model.GetItemFromIndex(itemIndex);
-        if(nextSelection.IsOk()) {
+        selectedItem = m_model.GetItemAfter(selectedItem, true);
+        if(selectedItem.IsOk()) {
             m_model.UnselectAll();
-            SelectItem(nextSelection);
-            EnsureRowVisible(itemIndex, false);
+            SelectItem(selectedItem);
+            EnsureItemVisible(m_model.ToPtr(selectedItem), false);
         }
     }
 }
 
-bool clTreeCtrl::IsRowVisible(int row) const
+bool clTreeCtrl::IsItemVisible(clTreeCtrlNode* item) const
 {
-    wxRect clientRect = GetClientRect();
-    int max_lines_on_screen = ceil(clientRect.GetHeight() / m_lineHeight);
-    if(row >= m_firstVisibleLine && (row - m_firstVisibleLine) < max_lines_on_screen) {
-        // already visible
-        return true;
-    }
-    return false;
+    const clTreeCtrlNode::Vec_t& onScreenItems = m_model.GetOnScreenItems();
+    return (std::find_if(onScreenItems.begin(), onScreenItems.end(), [&](clTreeCtrlNode* p) { return p == item; })
+        != onScreenItems.end());
 }
 
-void clTreeCtrl::EnsureRowVisible(int row, bool fromTop)
+void clTreeCtrl::EnsureItemVisible(clTreeCtrlNode* item, bool fromTop)
+{
+    if(IsItemVisible(item)) { return; }
+    if(fromTop) {
+        m_firstOnScreenItem = item;
+    } else {
+        int max_lines_on_screen = GetNumLineCanFitOnScreen();
+        clTreeCtrlNode::Vec_t items;
+        m_model.GetPrevItems(item, max_lines_on_screen, items);
+        if(items.empty()) { return; }
+        m_firstOnScreenItem = items[0];
+    }
+}
+
+int clTreeCtrl::GetNumLineCanFitOnScreen() const
 {
     wxRect clientRect = GetClientRect();
-    if(IsRowVisible(row)) { return; }
     int max_lines_on_screen = ceil(clientRect.GetHeight() / m_lineHeight);
-    if(fromTop) {
-        m_firstVisibleLine = row;
-    } else {
-        m_firstVisibleLine = row - max_lines_on_screen;
-        if(m_firstVisibleLine < 0) { m_firstVisibleLine = 0; }
-    }
+    return max_lines_on_screen;
 }

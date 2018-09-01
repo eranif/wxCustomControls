@@ -10,8 +10,8 @@ class clTreeCtrl : public wxPanel
 {
     int m_lineHeight = 0;
     clTreeCtrlModel m_model;
-    int m_firstVisibleLine = 0;
-    int m_scrollTick = 2;
+    clTreeCtrlNode* m_firstOnScreenItem = nullptr;
+    int m_scrollTick = 3;
     std::vector<wxBitmap> m_bitmaps;
     clTreeCtrlColours m_colours;
     long m_treeStyle = 0;
@@ -20,8 +20,9 @@ private:
     int GetExpandedLines();
     wxPoint DoFixPoint(const wxPoint& pt);
     wxTreeItemId DoGetSiblingVisibleItem(const wxTreeItemId& item, bool next) const;
-    bool IsRowVisible(int row) const;
-    void EnsureRowVisible(int row, bool fromTop);
+    bool IsItemVisible(clTreeCtrlNode* item) const;
+    void EnsureItemVisible(clTreeCtrlNode* item, bool fromTop);
+    int GetNumLineCanFitOnScreen() const;
     
 public:
     clTreeCtrl(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
@@ -194,13 +195,6 @@ public:
      * @brief expand the entire tree
      */
     void CollapAll() { CollapseAllChildren(GetRootItem()); }
-
-    /**
-     * @brief convert row to item
-     * row can only be expanded line (and all of its parent)
-     * i.e. the item is visible on screen OR if we scroll we can see it
-     */
-    wxTreeItemId RowToItem(int row) const;
 
 protected:
     void DoEnsureVisible(const wxTreeItemId& item);

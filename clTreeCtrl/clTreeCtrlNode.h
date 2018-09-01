@@ -1,12 +1,12 @@
 #ifndef CLTREECTRLNODE_H
 #define CLTREECTRLNODE_H
 
+#include <vector>
 #include <wx/colour.h>
 #include <wx/gdicmn.h>
 #include <wx/sharedptr.h>
 #include <wx/string.h>
 #include <wx/treebase.h>
-#include <vector>
 
 class clTreeCtrl;
 enum clTreeCtrlNodeFlags {
@@ -30,9 +30,7 @@ struct clTreeCtrlColours {
 class clTreeCtrlNode
 {
 public:
-    typedef wxSharedPtr<clTreeCtrlNode> Ptr_t;
     typedef std::vector<clTreeCtrlNode*> Vec_t;
-    
     static const int Y_SPACER = 2;
     static const int X_SPACER = 2;
 
@@ -45,7 +43,9 @@ protected:
     wxString m_colour;
     wxTreeItemData* m_clientData = nullptr;
     clTreeCtrlNode* m_parent = nullptr;
-    std::vector<clTreeCtrlNode::Ptr_t> m_children;
+    clTreeCtrlNode::Vec_t m_children;
+    clTreeCtrlNode* m_next = nullptr;
+    clTreeCtrlNode* m_prev = nullptr;
     int m_indentsCount = 0;
     wxRect m_itemRect;
     wxRect m_buttonRect;
@@ -62,17 +62,24 @@ protected:
 
     bool HasFlag(clTreeCtrlNodeFlags flag) const { return m_flags & flag; }
     void RemoveChild(clTreeCtrlNode* child);
+    bool IsVisible() const;
+    
     /**
      * @brief return the nth visible item
      */
     clTreeCtrlNode* GetVisibleItem(int index);
-
+    clTreeCtrlNode* GetLastChild() const;
+    
 public:
     clTreeCtrlNode(clTreeCtrl* tree);
     clTreeCtrlNode(
         clTreeCtrl* tree, const wxString& label, int bitmapIndex = wxNOT_FOUND, int bitmapSelectedIndex = wxNOT_FOUND);
     ~clTreeCtrlNode();
 
+    clTreeCtrlNode* GetNext() const { return m_next; }
+    clTreeCtrlNode* GetPrev() const { return m_prev; }
+
+    void RemoveAllChildren();
     void Render(wxDC& dc, const clTreeCtrlColours& colours);
     void SetHovered(bool b) { SetFlag(kHovered, b); }
     bool IsHovered() const { return m_flags & kHovered; }
@@ -86,7 +93,7 @@ public:
     const wxRect& GetItemRect() const { return m_itemRect; }
     const wxRect& GetButtonRect() const { return m_buttonRect; }
 
-    void AddChild(clTreeCtrlNode::Ptr_t child);
+    void AddChild(clTreeCtrlNode* child);
 
     bool IsBold() const { return HasFlag(kFontBold); }
     void SetBold(bool b) { SetFlag(kFontBold, b); }
@@ -102,8 +109,7 @@ public:
     void SetBitmapSelectedIndex(int bitmapIndex) { this->m_bitmapSelectedIndex = bitmapIndex; }
     int GetBitmapSelectedIndex() const { return m_bitmapSelectedIndex; }
 
-    const std::vector<clTreeCtrlNode::Ptr_t>& GetChildren() const { return m_children; }
-    std::vector<clTreeCtrlNode::Ptr_t>& GetChildren() { return m_children; }
+    const std::vector<clTreeCtrlNode*>& GetChildren() const { return m_children; }
     wxTreeItemData* GetClientObject() const { return m_clientData; }
     void SetParent(clTreeCtrlNode* parent);
     clTreeCtrlNode* GetParent() const { return m_parent; }
@@ -113,20 +119,14 @@ public:
     const wxString& GetLabel() const { return m_label; }
     size_t GetChildrenCount(bool recurse) const;
     int GetExpandedLines() const;
-    void GetItemsFromIndex(int start, int count, clTreeCtrlNode::Vec_t& items);
+    void GetNextItems(int count, clTreeCtrlNode::Vec_t& items);
+    void GetPrevItems(int count, clTreeCtrlNode::Vec_t& items);
     void SetIndentsCount(int count) { this->m_indentsCount = count; }
     int GetIndentsCount() const { return m_indentsCount; }
 
     bool IsSelected() const { return HasFlag(kSelected); }
     void SetSelected(bool b) { SetFlag(kSelected, b); }
-
     void UnselectAll();
-    /**
-     * @brief find the index of an item.
-     * @param item the item to search for
-     * @param onlyEpandedItems search in the expanded items only
-     */
-    int GetItemIndex(clTreeCtrlNode* item, bool onlyExpandedItems = true) const;
 };
 
 #endif // CLTREECTRLNODE_H
