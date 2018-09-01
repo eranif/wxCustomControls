@@ -30,6 +30,7 @@ clTreeCtrl::clTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
     Bind(wxEVT_MOUSEWHEEL, &clTreeCtrl::OnMouseScroll, this);
     Bind(wxEVT_IDLE, &clTreeCtrl::OnIdle, this);
     Bind(wxEVT_LEAVE_WINDOW, &clTreeCtrl::OnLeaveWindow, this);
+    Bind(wxEVT_KEY_DOWN, &clTreeCtrl::OnKeyDown, this);
 
     // Initialise default colours
     m_colours.textColour = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT);
@@ -187,17 +188,8 @@ void clTreeCtrl::DoEnsureVisible(const wxTreeItemId& item)
     // scroll to the item
     int index = m_model.GetItemIndex(item, true);
     if(index != wxNOT_FOUND) {
-        // we want to put the item as the *last* one
-        wxRect clientRect = GetClientRect();
-
-        // Calculate the number of items we can display on the view
-        int max_lines_on_screen = ceil(clientRect.GetHeight() / m_lineHeight);
-        if(index >= m_firstVisibleLine && (index - m_firstVisibleLine) < max_lines_on_screen) {
-            // already visible
-            return;
-        }
-        m_firstVisibleLine = index - max_lines_on_screen;
-        if(m_firstVisibleLine < 0) { m_firstVisibleLine = 0; }
+        if(IsRowVisible(index)) { return; }
+        EnsureRowVisible(index, false); // make it visible at the bottom
         Refresh();
     }
 }
@@ -385,7 +377,10 @@ wxTreeItemId clTreeCtrl::GetFirstVisibleItem() const
     return wxTreeItemId(items[0]);
 }
 
-wxTreeItemId clTreeCtrl::GetNextVisible(const wxTreeItemId& item) const
+wxTreeItemId clTreeCtrl::GetNextVisible(const wxTreeItemId& item) const { return DoGetSiblingVisibleItem(item, true); }
+wxTreeItemId clTreeCtrl::GetPrevVisible(const wxTreeItemId& item) const { return DoGetSiblingVisibleItem(item, false); }
+
+wxTreeItemId clTreeCtrl::DoGetSiblingVisibleItem(const wxTreeItemId& item, bool next) const
 {
     if(!item.IsOk()) { return wxTreeItemId(); }
     const clTreeCtrlNode::Vec_t& items = m_model.GetOnScreenItems();
@@ -393,7 +388,15 @@ wxTreeItemId clTreeCtrl::GetNextVisible(const wxTreeItemId& item) const
     clTreeCtrlNode* from = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
     clTreeCtrlNode::Vec_t::const_iterator iter
         = std::find_if(items.begin(), items.end(), [&](clTreeCtrlNode* p) { return p == from; });
-    if(iter == items.end() || (++iter) == items.end()) { return wxTreeItemId(); }
+    if(next && (iter == items.end())) { return wxTreeItemId(); }
+    if(!next && (iter == items.begin())) { return wxTreeItemId(); }
+    if(next) {
+        ++iter;
+        if(iter == items.end()) { return wxTreeItemId(); }
+    } else {
+        --iter;
+        if(iter == items.begin()) { return wxTreeItemId(); }
+    }
     return wxTreeItemId(*iter);
 }
 
@@ -415,3 +418,56 @@ size_t clTreeCtrl::GetSelections(wxArrayTreeItemIds& selections) const
 }
 
 wxTreeItemId clTreeCtrl::RowToItem(int row) const { return m_model.GetItemFromIndex(row); }
+
+void clTreeCtrl::OnKeyDown(wxKeyEvent& event)
+{
+    event.Skip();
+    if(event.GetKeyCode() == WXK_UP) {
+        wxTreeItemId selectedItem = GetSelection();
+        if(!selectedItem.IsOk()) { return; }
+        int itemIndex = m_model.GetItemIndex(selectedItem);
+        --itemIndex;
+        if(itemIndex < 0) return;
+        wxTreeItemId nextSelection = m_model.GetItemFromIndex(itemIndex);
+        if(nextSelection.IsOk()) {
+            m_model.UnselectAll();
+            SelectItem(nextSelection);
+            EnsureRowVisible(itemIndex, true);
+        }
+    } else if(event.GetKeyCode() == WXK_DOWN) {
+        wxTreeItemId selectedItem = GetSelection();
+        if(!selectedItem.IsOk()) { return; }
+        int itemIndex = m_model.GetItemIndex(selectedItem);
+        ++itemIndex;
+        wxTreeItemId nextSelection = m_model.GetItemFromIndex(itemIndex);
+        if(nextSelection.IsOk()) {
+            m_model.UnselectAll();
+            SelectItem(nextSelection);
+            EnsureRowVisible(itemIndex, false);
+        }
+    }
+}
+
+bool clTreeCtrl::IsRowVisible(int row) const
+{
+    wxRect clientRect = GetClientRect();
+    int max_lines_on_screen = ceil(clientRect.GetHeight() / m_lineHeight);
+    if(row >= m_firstVisibleLine && (row - m_firstVisibleLine) < max_lines_on_screen) {
+        // already visible
+        return true;
+    }
+    return false;
+}
+
+void clTreeCtrl::EnsureRowVisible(int row, bool fromTop)
+{
+    wxRect clientRect = GetClientRect();
+    if(IsRowVisible(row)) { return; }
+    int max_lines_on_screen = ceil(clientRect.GetHeight() / m_lineHeight);
+    if(fromTop) {
+        m_firstVisibleLine = row;
+    } else {
+        m_firstVisibleLine = row - max_lines_on_screen;
+        if(m_firstVisibleLine < 0) { m_firstVisibleLine = 0; }
+    }
+}

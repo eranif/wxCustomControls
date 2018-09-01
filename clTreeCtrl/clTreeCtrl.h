@@ -19,7 +19,10 @@ class clTreeCtrl : public wxPanel
 private:
     int GetExpandedLines();
     wxPoint DoFixPoint(const wxPoint& pt);
-
+    wxTreeItemId DoGetSiblingVisibleItem(const wxTreeItemId& item, bool next) const;
+    bool IsRowVisible(int row) const;
+    void EnsureRowVisible(int row, bool fromTop);
+    
 public:
     clTreeCtrl(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
         const wxSize& size = wxDefaultSize, long style = 0);
@@ -158,6 +161,11 @@ public:
     wxTreeItemId GetNextVisible(const wxTreeItemId& item) const;
 
     /**
+     * @brief Returns the prev visible item or an invalid item if this item is the first visible one
+     */
+    wxTreeItemId GetPrevVisible(const wxTreeItemId& item) const;
+
+    /**
      * @brief return the item label
      */
     wxString GetItemText(const wxTreeItemId& item) const;
@@ -203,6 +211,7 @@ protected:
     void OnMouseScroll(wxMouseEvent& event);
     void OnIdle(wxIdleEvent& event);
     void OnLeaveWindow(wxMouseEvent& event);
+    void OnKeyDown(wxKeyEvent& event);
 };
 
 #endif // CLTREECTRL_H
