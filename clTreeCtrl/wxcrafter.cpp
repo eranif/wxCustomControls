@@ -99,6 +99,15 @@ MainFrameBaseClass::MainFrameBaseClass(
     m_menuItemCollapseAll = new wxMenuItem(m_name6, wxID_ANY, _("Collapse All"), wxT(""), wxITEM_NORMAL);
     m_name6->Append(m_menuItemCollapseAll);
 
+    m_menuItemFirstVisible = new wxMenuItem(m_name6, wxID_ANY, _("First Visible Item"), wxT(""), wxITEM_NORMAL);
+    m_name6->Append(m_menuItemFirstVisible);
+
+    m_menuItemNextVisibleItem = new wxMenuItem(m_name6, wxID_ANY, _("Next Visible Item"), wxT(""), wxITEM_NORMAL);
+    m_name6->Append(m_menuItemNextVisibleItem);
+
+    m_menuItemEnsureVisible = new wxMenuItem(m_name6, wxID_ANY, _("Ensure Item Visible"), wxT(""), wxITEM_NORMAL);
+    m_name6->Append(m_menuItemEnsureVisible);
+
     m_name6->AppendSeparator();
 
     m_menuItem7 = new wxMenuItem(m_name6, wxID_EXIT, _("Exit\tAlt-X"), _("Quit"), wxITEM_NORMAL);
@@ -132,6 +141,12 @@ MainFrameBaseClass::MainFrameBaseClass(
         wxCommandEventHandler(MainFrameBaseClass::OnExpandAll), NULL, this);
     this->Connect(m_menuItemCollapseAll->GetId(), wxEVT_COMMAND_MENU_SELECTED,
         wxCommandEventHandler(MainFrameBaseClass::OnCollapseAll), NULL, this);
+    this->Connect(m_menuItemFirstVisible->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+        wxCommandEventHandler(MainFrameBaseClass::OnFirstVisible), NULL, this);
+    this->Connect(m_menuItemNextVisibleItem->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+        wxCommandEventHandler(MainFrameBaseClass::OnNextVisible), NULL, this);
+    this->Connect(m_menuItemEnsureVisible->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+        wxCommandEventHandler(MainFrameBaseClass::OnEnsureItemVisible), NULL, this);
     this->Connect(m_menuItem7->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBaseClass::OnExit),
         NULL, this);
     this->Connect(m_menuItem9->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBaseClass::OnAbout),
@@ -146,6 +161,12 @@ MainFrameBaseClass::~MainFrameBaseClass()
         wxCommandEventHandler(MainFrameBaseClass::OnExpandAll), NULL, this);
     this->Disconnect(m_menuItemCollapseAll->GetId(), wxEVT_COMMAND_MENU_SELECTED,
         wxCommandEventHandler(MainFrameBaseClass::OnCollapseAll), NULL, this);
+    this->Disconnect(m_menuItemFirstVisible->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+        wxCommandEventHandler(MainFrameBaseClass::OnFirstVisible), NULL, this);
+    this->Disconnect(m_menuItemNextVisibleItem->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+        wxCommandEventHandler(MainFrameBaseClass::OnNextVisible), NULL, this);
+    this->Disconnect(m_menuItemEnsureVisible->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+        wxCommandEventHandler(MainFrameBaseClass::OnEnsureItemVisible), NULL, this);
     this->Disconnect(m_menuItem7->GetId(), wxEVT_COMMAND_MENU_SELECTED,
         wxCommandEventHandler(MainFrameBaseClass::OnExit), NULL, this);
     this->Disconnect(m_menuItem9->GetId(), wxEVT_COMMAND_MENU_SELECTED,

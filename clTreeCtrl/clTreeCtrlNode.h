@@ -6,6 +6,7 @@
 #include <wx/sharedptr.h>
 #include <wx/string.h>
 #include <wx/treebase.h>
+#include <vector>
 
 class clTreeCtrl;
 enum clTreeCtrlNodeFlags {
@@ -30,6 +31,8 @@ class clTreeCtrlNode
 {
 public:
     typedef wxSharedPtr<clTreeCtrlNode> Ptr_t;
+    typedef std::vector<clTreeCtrlNode*> Vec_t;
+    
     static const int Y_SPACER = 2;
     static const int X_SPACER = 2;
 
@@ -110,7 +113,7 @@ public:
     const wxString& GetLabel() const { return m_label; }
     size_t GetChildrenCount(bool recurse) const;
     int GetExpandedLines() const;
-    void GetItemsFromIndex(int start, int count, std::vector<clTreeCtrlNode*>& items);
+    void GetItemsFromIndex(int start, int count, clTreeCtrlNode::Vec_t& items);
     void SetIndentsCount(int count) { this->m_indentsCount = count; }
     int GetIndentsCount() const { return m_indentsCount; }
 

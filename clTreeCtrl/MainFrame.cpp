@@ -3,19 +3,16 @@
 #include <wx/aboutdlg.h>
 #include <wx/dir.h>
 #include <wx/dirdlg.h>
+#include <wx/msgdlg.h>
+#include <wx/numdlg.h>
 
 MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
 {
     m_tree = new clTreeCtrl(m_mainPanel);
     clTreeCtrlColours colours = m_tree->GetColours();
-    //colours.bgColour = *wxWHITE;
-    //colours.buttonColour = *wxBLACK;
-    //colours.selItemTextColour = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT);
-    //colours.selItemBgColour = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
-    //colours.hoverBgColour = *wxCYAN;
     m_tree->SetColours(colours);
-    
+
     std::vector<wxBitmap> bitmaps;
     MyImages images;
     bitmaps.push_back(images.Bitmap("folder"));
@@ -56,12 +53,6 @@ void MainFrame::OnAbout(wxCommandEvent& event)
     info.SetDescription(_("Short description goes here"));
     ::wxAboutBox(info);
 }
-
-// void MainFrame::OnScroll(wxCommandEvent& event)
-//{
-//    // Scroll to the 100th element
-//    ctrl->Scroll(0, 100);
-//}
 
 void MainFrame::LogMessage(const wxString& message)
 {
@@ -115,3 +106,22 @@ void MainFrame::OnItemExpanding(wxTreeEvent& event)
 }
 void MainFrame::OnExpandAll(wxCommandEvent& event) { m_tree->ExpandAll(); }
 void MainFrame::OnCollapseAll(wxCommandEvent& event) { m_tree->CollapAll(); }
+void MainFrame::OnFirstVisible(wxCommandEvent& event)
+{
+    wxTreeItemId item = m_tree->GetFirstVisibleItem();
+    if(item.IsOk()) { wxMessageBox("First visible item: " + m_tree->GetItemText(item)); }
+}
+
+void MainFrame::OnNextVisible(wxCommandEvent& event)
+{
+    wxTreeItemId item = m_tree->GetNextVisible(m_tree->GetFocusedItem());
+    if(item.IsOk()) { wxMessageBox("Next visible item (from selection): " + m_tree->GetItemText(item)); }
+}
+void MainFrame::OnEnsureItemVisible(wxCommandEvent& event) 
+{ 
+    long index = wxGetNumberFromUser("Item index:", "Item index:", "clTreeCtrl");
+    wxTreeItemId item = m_tree->RowToItem(index);
+    if(item.IsOk()) { wxMessageBox("Item is: " + m_tree->GetItemText(item)); }
+    m_tree->SelectItem(item);
+    m_tree->EnsureVisible(item);
+}

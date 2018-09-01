@@ -55,7 +55,7 @@ int clTreeCtrlNode::GetExpandedLines() const
     return counter;
 }
 
-void clTreeCtrlNode::GetItemsFromIndex(int start, int count, std::vector<clTreeCtrlNode*>& items)
+void clTreeCtrlNode::GetItemsFromIndex(int start, int count, clTreeCtrlNode::Vec_t& items)
 {
     // find the first entry
     clTreeCtrlNode* startItem = GetVisibleItem(start);

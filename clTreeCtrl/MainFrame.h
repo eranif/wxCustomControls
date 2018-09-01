@@ -26,6 +26,9 @@ private:
     void LogMessage(const wxString& message);
 
 protected:
+    virtual void OnEnsureItemVisible(wxCommandEvent& event);
+    virtual void OnFirstVisible(wxCommandEvent& event);
+    virtual void OnNextVisible(wxCommandEvent& event);
     virtual void OnCollapseAll(wxCommandEvent& event);
     virtual void OnExpandAll(wxCommandEvent& event);
     virtual void OnOpenFolder(wxCommandEvent& event);

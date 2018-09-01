@@ -20,7 +20,7 @@ clTreeCtrlModel::clTreeCtrlModel(clTreeCtrl* tree)
 
 clTreeCtrlModel::~clTreeCtrlModel() { m_root.reset(nullptr); }
 
-void clTreeCtrlModel::GetItemsFromIndex(int start, int count, std::vector<clTreeCtrlNode*>& items)
+void clTreeCtrlModel::GetItemsFromIndex(int start, int count, clTreeCtrlNode::Vec_t& items)
 {
     if(!m_root) return;
     m_root->GetItemsFromIndex(start, count, items);
@@ -62,13 +62,16 @@ void clTreeCtrlModel::SelectItem(const wxTreeItemId& item, bool select)
 {
     clTreeCtrlNode* child = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
     if(!child) return;
+
+    if(m_tree->GetTreeStyle() & wxTR_MULTIPLE) {
+        // If we are unselecting it, remove it from the array
+        clTreeCtrlNode::Vec_t::iterator iter = std::find_if(
+            m_selectedItems.begin(), m_selectedItems.end(), [&](clTreeCtrlNode* p) { return (p == child); });
+        if(iter != m_selectedItems.end() && !select) { m_selectedItems.erase(iter); }
+    } else {
+        UnselectAll();
+    }
     child->SetSelected(select);
-
-    // If we are unselecting it, remove it from the array
-    std::vector<clTreeCtrlNode*>::iterator iter
-        = std::find_if(m_selectedItems.begin(), m_selectedItems.end(), [&](clTreeCtrlNode* p) { return (p == child); });
-    if(iter != m_selectedItems.end() && !select) { m_selectedItems.erase(iter); }
-
     if(select) { m_selectedItems.push_back(child); }
 }
 
@@ -80,12 +83,12 @@ void clTreeCtrlModel::Clear()
     m_onScreenItems.clear();
 }
 
-void clTreeCtrlModel::SetOnScreenItems(const std::vector<clTreeCtrlNode*>& items)
+void clTreeCtrlModel::SetOnScreenItems(const clTreeCtrlNode::Vec_t& items)
 {
     // Clear the old visible items. But only, if the item does not appear in both lists
     for(size_t i = 0; i < m_onScreenItems.size(); ++i) {
         clTreeCtrlNode* visibleItem = m_onScreenItems[i];
-        std::vector<clTreeCtrlNode*>::const_iterator iter
+        clTreeCtrlNode::Vec_t::const_iterator iter
             = std::find_if(items.begin(), items.end(), [&](clTreeCtrlNode* item) { return item == visibleItem; });
         if(iter == items.end()) { m_onScreenItems[i]->ClearRects(); }
     }
@@ -129,15 +132,9 @@ wxTreeItemId clTreeCtrlModel::AppendItem(
     return wxTreeItemId(nullptr);
 }
 
-void clTreeCtrlModel::ExpandAllChildren(const wxTreeItemId& item)
-{
-    DoExpandAllChildren(item, true);
-}
+void clTreeCtrlModel::ExpandAllChildren(const wxTreeItemId& item) { DoExpandAllChildren(item, true); }
 
-void clTreeCtrlModel::CollapseAllChildren(const wxTreeItemId& item)
-{
-    DoExpandAllChildren(item, false);
-}
+void clTreeCtrlModel::CollapseAllChildren(const wxTreeItemId& item) { DoExpandAllChildren(item, false); }
 
 void clTreeCtrlModel::DoExpandAllChildren(const wxTreeItemId& item, bool expand)
 {
@@ -156,4 +153,22 @@ void clTreeCtrlModel::DoExpandAllChildren(const wxTreeItemId& item, bool expand)
     clTreeNodeVisitor visitor;
     visitor.VisitChildren(node, false, foo);
     StateModified();
+}
+
+wxTreeItemId clTreeCtrlModel::GetItemFromIndex(int index) const
+{
+    int counter = 0;
+    clTreeCtrlNode* pmatch = nullptr;
+    std::function<bool(clTreeCtrlNode*, bool)> foo = [&](clTreeCtrlNode* p, bool visible) {
+        wxUnusedVar(visible);
+        if(index == counter) {
+            pmatch = p;
+            return false;
+        }
+        ++counter;
+        return true;
+    };
+    clTreeNodeVisitor visitor;
+    visitor.VisitChildren(m_root.get(), true, foo);
+    return wxTreeItemId(pmatch);
 }

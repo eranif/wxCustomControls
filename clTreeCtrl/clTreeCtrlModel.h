@@ -18,8 +18,8 @@ class clTreeCtrlModel
     clTreeCtrl* m_tree = nullptr;
     clTreeCtrlNode::Ptr_t m_root;
     int m_nVisibleLines = wxNOT_FOUND;
-    std::vector<clTreeCtrlNode*> m_selectedItems;
-    std::vector<clTreeCtrlNode*> m_onScreenItems;
+    clTreeCtrlNode::Vec_t m_selectedItems;
+    clTreeCtrlNode::Vec_t m_onScreenItems;
     int m_indentSize = 16;
 
 protected:
@@ -32,7 +32,11 @@ public:
     void ExpandAllChildren(const wxTreeItemId& item);
     void CollapseAllChildren(const wxTreeItemId& item);
     
-    void GetItemsFromIndex(int start, int count, std::vector<clTreeCtrlNode*>& items);
+    void GetItemsFromIndex(int start, int count, clTreeCtrlNode::Vec_t& items);
+    /**
+     * @brief return item from index. The item must be expanded (and all its parent)
+     */
+    wxTreeItemId GetItemFromIndex(int index) const;
     wxTreeItemId AddRoot(const wxString& text, int image, int selImage, wxTreeItemData* data);
     wxTreeItemId AppendItem(
         const wxTreeItemId& parent, const wxString& text, int image, int selImage, wxTreeItemData* data);
@@ -60,10 +64,12 @@ public:
 
     void Clear();
 
-    void SetOnScreenItems(const std::vector<clTreeCtrlNode*>& items);
+    void SetOnScreenItems(const clTreeCtrlNode::Vec_t& items);
 
-    const std::vector<clTreeCtrlNode*>& GetOnScreenItems() const { return m_onScreenItems; }
-    std::vector<clTreeCtrlNode*>& GetOnScreenItems() { return m_onScreenItems; }
+    const clTreeCtrlNode::Vec_t& GetOnScreenItems() const { return m_onScreenItems; }
+    clTreeCtrlNode::Vec_t& GetOnScreenItems() { return m_onScreenItems; }
+    const clTreeCtrlNode::Vec_t& GetSelections() const { return m_selectedItems; }
+    clTreeCtrlNode::Vec_t& GetSelections() { return m_selectedItems; }
     bool ExpandToItem(const wxTreeItemId& item);
 
     int GetItemIndex(const wxTreeItemId& item, bool visibleItemsOnly = true) const;
