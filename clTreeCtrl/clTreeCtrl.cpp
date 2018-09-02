@@ -67,7 +67,15 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
     dc.SetPen(m_colours.bgColour);
     dc.SetBrush(m_colours.bgColour);
     dc.DrawRectangle(clientRect);
-
+    
+    if(!m_model.GetRoot()) { 
+        // Reset the various items
+        SetFirstItemOnScreen(nullptr);
+        clTreeCtrlNode::Vec_t items;
+        m_model.SetOnScreenItems(items);
+        return; 
+    }
+    
     int maxItems = GetNumLineCanFitOnScreen();
     if(!GetFirstItemOnScreen()) { SetFirstItemOnScreen(m_model.GetRoot()); }
     clTreeCtrlNode* firstItem = GetFirstItemOnScreen();
@@ -145,6 +153,8 @@ void clTreeCtrl::SelectItem(const wxTreeItemId& item, bool select)
 void clTreeCtrl::OnMouseLeftDown(wxMouseEvent& event)
 {
     event.Skip();
+    if(!m_model.GetRoot()) { return; }
+    
     int flags = 0;
     wxPoint pt = DoFixPoint(event.GetPosition());
     wxTreeItemId where = HitTest(pt, flags);
@@ -187,6 +197,8 @@ void clTreeCtrl::OnMouseLeftDown(wxMouseEvent& event)
 
 wxTreeItemId clTreeCtrl::HitTest(const wxPoint& point, int& flags) const
 {
+    if(!m_model.GetRoot()) { return wxTreeItemId(); }
+    
     flags = 0;
     for(size_t i = 0; i < m_model.GetOnScreenItems().size(); ++i) {
         const clTreeCtrlNode* item = m_model.GetOnScreenItems()[i];
@@ -201,6 +213,7 @@ wxTreeItemId clTreeCtrl::HitTest(const wxPoint& point, int& flags) const
 
 void clTreeCtrl::UnselectAll()
 {
+    if(!m_model.GetRoot()) { return; }
     m_model.UnselectAll();
     Refresh();
 }
@@ -233,6 +246,8 @@ void clTreeCtrl::DoEnsureVisible(const wxTreeItemId& item)
 void clTreeCtrl::OnMouseLeftDClick(wxMouseEvent& event)
 {
     event.Skip();
+    if(!m_model.GetRoot()) { return; }
+    
     int flags = 0;
     wxPoint pt = DoFixPoint(event.GetPosition());
     wxTreeItemId where = HitTest(pt, flags);
@@ -460,9 +475,10 @@ size_t clTreeCtrl::GetSelections(wxArrayTreeItemIds& selections) const
 
 void clTreeCtrl::OnKeyDown(wxKeyEvent& event)
 {
+    if(!m_model.GetRoot()) { return; }
     wxTreeItemId selectedItem = GetSelection();
     if(!selectedItem.IsOk()) { return; }
-
+    
     // Let the user chance to process this first
     wxTreeEvent evt(wxEVT_TREE_KEY_DOWN);
     evt.SetEventObject(this);

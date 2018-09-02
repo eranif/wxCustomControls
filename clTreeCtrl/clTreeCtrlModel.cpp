@@ -252,6 +252,11 @@ void clTreeCtrlModel::NodeDeleted(clTreeCtrlNode* node)
             m_firstItemOnScreen = nullptr;
         }
     }
+    {
+        if(m_root == node) {
+            m_root = nullptr;
+        }
+    }
 }
 
 bool clTreeCtrlModel::NodeExpanding(clTreeCtrlNode* node, bool expanding)
