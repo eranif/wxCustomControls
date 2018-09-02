@@ -220,6 +220,7 @@ protected:
     void OnPaint(wxPaintEvent& event);
     void OnSize(wxSizeEvent& event);
     void OnMouseLeftDown(wxMouseEvent& event);
+    void OnRightDown(wxMouseEvent& event);
     void OnMouseLeftDClick(wxMouseEvent& event);
     void OnMouseScroll(wxMouseEvent& event);
     void OnIdle(wxIdleEvent& event);

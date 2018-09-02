@@ -37,6 +37,7 @@ clTreeCtrl::clTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
     Bind(wxEVT_LEAVE_WINDOW, &clTreeCtrl::OnLeaveWindow, this);
     Bind(wxEVT_KEY_DOWN, &clTreeCtrl::OnKeyDown, this);
     Bind(wxEVT_CONTEXT_MENU, &clTreeCtrl::OnContextMenu, this);
+    Bind(wxEVT_RIGHT_DOWN, &clTreeCtrl::OnRightDown, this);
 
     // Initialise default colours
     m_colours.InitDefaults();
@@ -54,6 +55,7 @@ clTreeCtrl::~clTreeCtrl()
     Unbind(wxEVT_LEAVE_WINDOW, &clTreeCtrl::OnLeaveWindow, this);
     Unbind(wxEVT_KEY_DOWN, &clTreeCtrl::OnKeyDown, this);
     Unbind(wxEVT_CONTEXT_MENU, &clTreeCtrl::OnContextMenu, this);
+    Unbind(wxEVT_RIGHT_DOWN, &clTreeCtrl::OnRightDown, this);
 }
 
 void clTreeCtrl::OnPaint(wxPaintEvent& event)
@@ -625,5 +627,21 @@ void clTreeCtrl::OnContextMenu(wxContextMenuEvent& event)
         evt.SetItem(item);
         evt.SetEventObject(this);
         GetEventHandler()->ProcessEvent(evt);
+    }
+}
+
+void clTreeCtrl::OnRightDown(wxMouseEvent& event)
+{
+    event.Skip();
+    int flags = 0;
+    wxPoint pt = DoFixPoint(event.GetPosition());
+    wxTreeItemId where = HitTest(pt, flags);
+    if(where.IsOk()) {
+        wxTreeEvent evt(wxEVT_TREE_ITEM_RIGHT_CLICK);
+        evt.SetEventObject(this);
+        evt.SetItem(where);
+        event.Skip(false);
+        if(GetEventHandler()->ProcessEvent(evt)) { return; }
+        event.Skip();
     }
 }

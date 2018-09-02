@@ -37,9 +37,14 @@ MainFrame::MainFrame(wxWindow* parent)
         LogMessage(wxString() << "Selection changed. selection is: " << m_tree->GetItemText(evt.GetItem()));
     });
     m_tree->Bind(wxEVT_TREE_KEY_DOWN, [&](wxTreeEvent& evt) {
-        evt.Skip(); // Must call this for the default actions process
         LogMessage(wxString() << "Key event: " << m_tree->GetItemText(evt.GetItem()));
     });
+    
+    m_tree->Bind(wxEVT_TREE_ITEM_RIGHT_CLICK, [&](wxTreeEvent& evt) {
+        //evt.Skip(); // Must call this for the default actions process
+        LogMessage(wxString() << "Tree right click: " << m_tree->GetItemText(evt.GetItem()));
+    });
+    
     m_tree->Bind(wxEVT_TREE_ITEM_ACTIVATED, [&](wxTreeEvent& evt) {
         evt.Skip();
         wxArrayTreeItemIds items;
@@ -49,7 +54,7 @@ MainFrame::MainFrame(wxWindow* parent)
             LogMessage(wxString() << "Acticated item: " << m_tree->GetItemText(items[i]));
         }
     });
-    
+
     m_tree->Bind(wxEVT_TREE_ITEM_MENU, [&](wxTreeEvent& evt) {
         evt.Skip(); // Let the default action take place
         LogMessage(wxString() << "Context menu for item: " << m_tree->GetItemText(evt.GetItem()));

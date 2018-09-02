@@ -60,7 +60,7 @@ void clTreeCtrlModel::SelectItem(const wxTreeItemId& item, bool select, bool add
 {
     clTreeCtrlNode* child = ToPtr(item);
     if(!child) return;
-    
+
     if(clear_old_selection) { UnselectAll(); }
     if(select) {
         clTreeCtrlNode::Vec_t::iterator iter = std::find_if(
@@ -72,7 +72,7 @@ void clTreeCtrlModel::SelectItem(const wxTreeItemId& item, bool select, bool add
     if(select && !m_selectedItems.empty()) {
         wxTreeEvent evt(wxEVT_TREE_SEL_CHANGING);
         evt.SetEventObject(m_tree);
-        evt.SetOldItem(IsSingleSelection() ? GetSingleSelection() : wxTreeItemId(nullptr));
+        evt.SetOldItem(GetSingleSelection());
         SendEvent(evt);
         if(!evt.IsAllowed()) { return; }
     }
@@ -268,7 +268,7 @@ void clTreeCtrlModel::SelectItems(const std::vector<std::pair<wxTreeItemId, bool
         if(selectIt && !m_selectedItems.empty()) {
             wxTreeEvent evt(wxEVT_TREE_SEL_CHANGING);
             evt.SetEventObject(m_tree);
-            evt.SetOldItem(IsSingleSelection() ?GetSingleSelection() : wxTreeItemId(nullptr));
+            evt.SetOldItem(GetSingleSelection());
             SendEvent(evt);
             if(!evt.IsAllowed()) { return; }
         }
