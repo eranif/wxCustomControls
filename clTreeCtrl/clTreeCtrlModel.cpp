@@ -128,7 +128,7 @@ wxTreeItemId clTreeCtrlModel::AppendItem(
     const wxTreeItemId& parent, const wxString& text, int image, int selImage, wxTreeItemData* data)
 {
     clTreeCtrlNode* parentNode = nullptr;
-    if(parent.IsOk()) { parentNode = reinterpret_cast<clTreeCtrlNode*>(parent.GetID()); }
+    if(parent.IsOk()) { parentNode = ToPtr(parent); }
 
     if(parentNode) {
         clTreeCtrlNode* child = new clTreeCtrlNode(m_tree, text, image, selImage);

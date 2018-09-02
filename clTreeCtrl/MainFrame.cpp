@@ -23,18 +23,12 @@ MainFrame::MainFrame(wxWindow* parent)
 
     m_tree->Bind(wxEVT_TREE_ITEM_EXPANDING, &MainFrame::OnItemExpanding, this);
     m_tree->Bind(wxEVT_TREE_DELETE_ITEM, &MainFrame::OnItemDeleted, this);
-    m_tree->Bind(wxEVT_TREE_ITEM_EXPANDED, [&](wxTreeEvent& evt) {
-        clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(evt.GetItem().GetID());
-        LogMessage(wxString() << node->GetLabel() << " expanded");
-    });
-    m_tree->Bind(wxEVT_TREE_ITEM_COLLAPSING, [&](wxTreeEvent& evt) {
-        clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(evt.GetItem().GetID());
-        LogMessage(wxString() << node->GetLabel() << " is collapsing");
-    });
-    m_tree->Bind(wxEVT_TREE_ITEM_COLLAPSED, [&](wxTreeEvent& evt) {
-        clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(evt.GetItem().GetID());
-        LogMessage(wxString() << node->GetLabel() << " collapsed");
-    });
+    m_tree->Bind(wxEVT_TREE_ITEM_EXPANDED,
+        [&](wxTreeEvent& evt) { LogMessage(wxString() << m_tree->GetItemText(evt.GetItem()) << " expanded"); });
+    m_tree->Bind(wxEVT_TREE_ITEM_COLLAPSING,
+        [&](wxTreeEvent& evt) { LogMessage(wxString() << m_tree->GetItemText(evt.GetItem()) << " is collapsing"); });
+    m_tree->Bind(wxEVT_TREE_ITEM_COLLAPSED,
+        [&](wxTreeEvent& evt) { LogMessage(wxString() << m_tree->GetItemText(evt.GetItem()) << " collapsed"); });
     m_tree->Bind(wxEVT_TREE_SEL_CHANGING, [&](wxTreeEvent& evt) {
         LogMessage(wxString() << "Selection changing from:" << m_tree->GetItemText(evt.GetOldItem()));
     });
