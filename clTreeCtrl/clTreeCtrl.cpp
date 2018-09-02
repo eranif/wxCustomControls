@@ -96,6 +96,13 @@ void clTreeCtrl::OnSize(wxSizeEvent& event)
     event.Skip();
 }
 
+wxTreeItemId clTreeCtrl::InsertItem(const wxTreeItemId& parent, const wxTreeItemId& previous, const wxString& text,
+    int image, int selImage, wxTreeItemData* data)
+{
+    wxTreeItemId item = m_model.InsertItem(parent, previous, text, image, selImage, data);
+    return item;
+}
+
 wxTreeItemId clTreeCtrl::AppendItem(
     const wxTreeItemId& parent, const wxString& text, int image, int selImage, wxTreeItemData* data)
 {

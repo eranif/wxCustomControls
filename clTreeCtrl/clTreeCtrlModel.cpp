@@ -142,6 +142,22 @@ wxTreeItemId clTreeCtrlModel::AppendItem(
     return wxTreeItemId(nullptr);
 }
 
+wxTreeItemId clTreeCtrlModel::InsertItem(const wxTreeItemId& parent, const wxTreeItemId& previous, const wxString& text,
+    int image, int selImage, wxTreeItemData* data)
+{
+    if(!parent.IsOk()) { return wxTreeItemId(); }
+    if(!previous.IsOk()) { return wxTreeItemId(); }
+
+    clTreeCtrlNode* pPrev = ToPtr(previous);
+    clTreeCtrlNode* parentNode = ToPtr(parent);
+    if(pPrev->GetParent() != parentNode) { return wxTreeItemId(); }
+    
+    clTreeCtrlNode* child = new clTreeCtrlNode(m_tree, text, image, selImage);
+    child->SetClientData(data);
+    parentNode->InsertChild(child, pPrev);
+    return wxTreeItemId(child);
+}
+
 void clTreeCtrlModel::ExpandAllChildren(const wxTreeItemId& item) { DoExpandAllChildren(item, true); }
 
 void clTreeCtrlModel::CollapseAllChildren(const wxTreeItemId& item) { DoExpandAllChildren(item, false); }

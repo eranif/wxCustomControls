@@ -116,7 +116,18 @@ public:
     const wxRect& GetButtonRect() const { return m_buttonRect; }
 
     void AddChild(clTreeCtrlNode* child);
-
+    
+    /**
+     * @brief insert item at 'where'. The new item is placed after where
+     * If where is nullptr, append the item
+     */
+    void InsertChild(clTreeCtrlNode* child, clTreeCtrlNode* where);
+    
+    /**
+     * @brief insert this node between first and second
+     */
+    void InsertBetween(clTreeCtrlNode* first, clTreeCtrlNode* second);
+    
     bool IsBold() const { return HasFlag(kFontBold); }
     void SetBold(bool b) { SetFlag(kFontBold, b); }
 

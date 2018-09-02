@@ -80,6 +80,11 @@ public:
     wxTreeItemId AddRoot(const wxString& text, int image = -1, int selImage = -1, wxTreeItemData* data = NULL);
 
     /**
+     * @brief insert item after 'previous'
+     */
+    wxTreeItemId InsertItem(const wxTreeItemId& parent, const wxTreeItemId& previous, const wxString& text,
+        int image = -1, int selImage = -1, wxTreeItemData* data = NULL);
+    /**
      * @brief return the root item
      */
     wxTreeItemId GetRootItem() const;

@@ -45,6 +45,8 @@ public:
     wxTreeItemId AddRoot(const wxString& text, int image, int selImage, wxTreeItemData* data);
     wxTreeItemId AppendItem(
         const wxTreeItemId& parent, const wxString& text, int image, int selImage, wxTreeItemData* data);
+    wxTreeItemId InsertItem(const wxTreeItemId& parent, const wxTreeItemId& previous, const wxString& text, int image,
+        int selImage, wxTreeItemData* data);
     wxTreeItemId GetRootItem() const;
 
     void SetIndentSize(int indentSize) { this->m_indentSize = indentSize; }
@@ -83,7 +85,7 @@ public:
     bool ExpandToItem(const wxTreeItemId& item);
     wxTreeItemId GetSingleSelection() const;
     size_t GetSelectionsCount() const { return m_selectedItems.size(); }
-    
+
     /**
      * @brief do we have items in this tree? (root included)
      */
@@ -98,7 +100,7 @@ public:
      */
     void DeleteItem(const wxTreeItemId& item);
     int GetItemIndex(clTreeCtrlNode* item) const;
-    
+
     /**
      * @brief get range of items from -> to
      * Or from: to->from (incase 'to' has a lower index)

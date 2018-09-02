@@ -37,7 +37,8 @@ MainFrame::MainFrame(wxWindow* parent)
         LogMessage(wxString() << "Selection changed. selection is: " << m_tree->GetItemText(evt.GetItem()));
     });
     m_tree->Bind(wxEVT_TREE_KEY_DOWN, [&](wxTreeEvent& evt) {
-        LogMessage(wxString() << "Key event: " << m_tree->GetItemText(evt.GetItem()));
+        evt.Skip();
+        //LogMessage(wxString() << "Key event: " << m_tree->GetItemText(evt.GetItem()));
     });
     
     m_tree->Bind(wxEVT_TREE_ITEM_RIGHT_CLICK, [&](wxTreeEvent& evt) {
