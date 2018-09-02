@@ -17,18 +17,21 @@ class clTreeCtrl : public wxPanel
     long m_treeStyle = 0;
 
 private:
-    int GetExpandedLines();
     wxPoint DoFixPoint(const wxPoint& pt);
     wxTreeItemId DoGetSiblingVisibleItem(const wxTreeItemId& item, bool next) const;
     bool IsItemVisible(clTreeCtrlNode* item) const;
     void EnsureItemVisible(clTreeCtrlNode* item, bool fromTop);
     int GetNumLineCanFitOnScreen() const;
-    
+
 public:
     clTreeCtrl(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
         const wxSize& size = wxDefaultSize, long style = 0);
     virtual ~clTreeCtrl();
 
+    // For internal use, dont use these two methods
+    const clTreeCtrlModel& GetModel() const { return m_model; }
+    clTreeCtrlModel& GetModel() { return m_model; }
+    
     void SetBitmaps(const std::vector<wxBitmap>& bitmaps);
     const std::vector<wxBitmap>& GetBitmaps() const { return m_bitmaps; }
 
@@ -195,6 +198,12 @@ public:
      * @brief expand the entire tree
      */
     void CollapAll() { CollapseAllChildren(GetRootItem()); }
+
+    /**
+     * @brief Deletes the specified item.
+     * A EVT_TREE_DELETE_ITEM event will be generated.
+     */
+    void Delete(const wxTreeItemId& item);
 
 protected:
     void DoEnsureVisible(const wxTreeItemId& item);

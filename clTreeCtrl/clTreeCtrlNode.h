@@ -8,6 +8,7 @@
 #include <wx/string.h>
 #include <wx/treebase.h>
 
+class clTreeCtrlModel;
 class clTreeCtrl;
 enum clTreeCtrlNodeFlags {
     kFontBold = (1 << 0),
@@ -36,6 +37,7 @@ public:
 
 protected:
     clTreeCtrl* m_tree = nullptr;
+    clTreeCtrlModel* m_model = nullptr;
     wxString m_label;
     int m_bitmapIndex = wxNOT_FOUND;
     int m_bitmapSelectedIndex = wxNOT_FOUND;
@@ -61,15 +63,14 @@ protected:
     }
 
     bool HasFlag(clTreeCtrlNodeFlags flag) const { return m_flags & flag; }
-    void RemoveChild(clTreeCtrlNode* child);
     bool IsVisible() const;
-    
+
     /**
      * @brief return the nth visible item
      */
     clTreeCtrlNode* GetVisibleItem(int index);
     clTreeCtrlNode* GetLastChild() const;
-    
+
 public:
     clTreeCtrlNode(clTreeCtrl* tree);
     clTreeCtrlNode(
@@ -79,7 +80,15 @@ public:
     clTreeCtrlNode* GetNext() const { return m_next; }
     clTreeCtrlNode* GetPrev() const { return m_prev; }
 
-    void RemoveAllChildren();
+    /**
+     * @brief remove and delete a single child
+     * @param child
+     */
+    void DeleteChild(clTreeCtrlNode* child);
+    /**
+     * @brief remove all children items
+     */
+    void DeleteAllChildren();
     void Render(wxDC& dc, const clTreeCtrlColours& colours);
     void SetHovered(bool b) { SetFlag(kHovered, b); }
     bool IsHovered() const { return m_flags & kHovered; }

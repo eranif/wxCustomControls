@@ -33,6 +33,7 @@ protected:
     virtual void OnExpandAll(wxCommandEvent& event);
     virtual void OnOpenFolder(wxCommandEvent& event);
     void OnItemExpanding(wxTreeEvent& event);
+    void OnItemDeleted(wxTreeEvent& event);
 
 public:
     MainFrame(wxWindow* parent);

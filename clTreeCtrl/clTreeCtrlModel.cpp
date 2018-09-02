@@ -17,7 +17,11 @@ clTreeCtrlModel::clTreeCtrlModel(clTreeCtrl* tree)
 {
 }
 
-clTreeCtrlModel::~clTreeCtrlModel() { wxDELETE(m_root); }
+clTreeCtrlModel::~clTreeCtrlModel()
+{
+    m_shutdown = true; // Disable events
+    wxDELETE(m_root);
+}
 
 void clTreeCtrlModel::GetNextItems(clTreeCtrlNode* from, int count, clTreeCtrlNode::Vec_t& items) const
 {
@@ -46,15 +50,6 @@ wxTreeItemId clTreeCtrlModel::GetRootItem() const
     return wxTreeItemId(const_cast<clTreeCtrlNode*>(m_root));
 }
 
-int clTreeCtrlModel::GetExpandedLines()
-{
-    if(!m_root) { return 0; }
-    if(m_nVisibleLines == wxNOT_FOUND) { m_nVisibleLines = m_root->GetExpandedLines(); }
-    return m_nVisibleLines;
-}
-
-void clTreeCtrlModel::StateModified() { m_nVisibleLines = wxNOT_FOUND; }
-
 void clTreeCtrlModel::UnselectAll()
 {
     for(size_t i = 0; i < m_selectedItems.size(); ++i) { m_selectedItems[i]->SetSelected(false); }
@@ -65,8 +60,14 @@ void clTreeCtrlModel::SelectItem(const wxTreeItemId& item, bool select)
 {
     clTreeCtrlNode* child = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
     if(!child) return;
-
-    if(m_tree->GetTreeStyle() & wxTR_MULTIPLE) {
+    if(select && !m_selectedItems.empty()) {
+        wxTreeEvent evt(wxEVT_TREE_SEL_CHANGING);
+        evt.SetEventObject(m_tree);
+        evt.SetOldItem(IsSingleSelection() ? GetSelections()[0] : wxTreeItemId(nullptr));
+        SendEvent(evt);
+        if(!evt.IsAllowed()) { return; }
+    }
+    if(IsMultiSelection()) {
         // If we are unselecting it, remove it from the array
         clTreeCtrlNode::Vec_t::iterator iter = std::find_if(
             m_selectedItems.begin(), m_selectedItems.end(), [&](clTreeCtrlNode* p) { return (p == child); });
@@ -75,13 +76,18 @@ void clTreeCtrlModel::SelectItem(const wxTreeItemId& item, bool select)
         UnselectAll();
     }
     child->SetSelected(select);
-    if(select) { m_selectedItems.push_back(child); }
+    if(select) {
+        m_selectedItems.push_back(child);
+        wxTreeEvent evt(wxEVT_TREE_SEL_CHANGED);
+        evt.SetEventObject(m_tree);
+        evt.SetItem(wxTreeItemId(child));
+        SendEvent(evt);
+    }
 }
 
 void clTreeCtrlModel::Clear()
 {
     m_selectedItems.clear();
-    m_nVisibleLines = wxNOT_FOUND;
     for(size_t i = 0; i < m_onScreenItems.size(); ++i) { m_onScreenItems[i]->ClearRects(); }
     m_onScreenItems.clear();
 }
@@ -108,7 +114,6 @@ bool clTreeCtrlModel::ExpandToItem(const wxTreeItemId& item)
         if(!parent->SetExpanded(true)) { return false; }
         parent = parent->GetParent();
     }
-    StateModified();
     return true;
 }
 
@@ -145,7 +150,6 @@ void clTreeCtrlModel::DoExpandAllChildren(const wxTreeItemId& item, bool expand)
         }
         p = p->GetNext();
     }
-    StateModified();
 }
 
 wxTreeItemId clTreeCtrlModel::GetItemBefore(const wxTreeItemId& item, bool visibleItem) const
@@ -174,4 +178,65 @@ wxTreeItemId clTreeCtrlModel::GetItemAfter(const wxTreeItemId& item, bool visibl
     } else {
         return wxTreeItemId(p->GetNext());
     }
+}
+
+void clTreeCtrlModel::DeleteItem(const wxTreeItemId& item)
+{
+    clTreeCtrlNode* node = ToPtr(item);
+    if(!node) { return; }
+    node->DeleteAllChildren();
+
+    // Send the delete event
+    wxTreeEvent event(wxEVT_TREE_DELETE_ITEM);
+    event.SetEventObject(m_tree);
+    event.SetItem(item);
+    SendEvent(event);
+
+    // Delete the item itself
+    if(node->GetParent()) {
+        node->GetParent()->DeleteChild(node);
+    } else {
+        // The root item
+        m_root = nullptr;
+    }
+}
+
+void clTreeCtrlModel::NodeDeleted(clTreeCtrlNode* node)
+{
+    clTreeCtrlNode::Vec_t::iterator iter
+        = std::find_if(m_selectedItems.begin(), m_selectedItems.end(), [&](clTreeCtrlNode* n) { return n == node; });
+    if(iter != m_selectedItems.end()) {
+        m_selectedItems.erase(iter);
+        if(m_selectedItems.empty()) {
+            // Dont leave the tree without a selected item
+            if(node->GetNext()) { SelectItem(wxTreeItemId(node->GetNext())); }
+        }
+    }
+}
+
+bool clTreeCtrlModel::NodeExpanding(clTreeCtrlNode* node, bool expanding)
+{
+    wxTreeEvent before(expanding ? wxEVT_TREE_ITEM_EXPANDING : wxEVT_TREE_ITEM_COLLAPSING);
+    before.SetItem(wxTreeItemId(node));
+    before.SetEventObject(m_tree);
+    SendEvent(before);
+    return before.IsAllowed();
+}
+
+void clTreeCtrlModel::NodeExpanded(clTreeCtrlNode* node, bool expanded)
+{
+    wxTreeEvent after(expanded ? wxEVT_TREE_ITEM_EXPANDED : wxEVT_TREE_ITEM_COLLAPSED);
+    after.SetItem(wxTreeItemId(node));
+    after.SetEventObject(m_tree);
+    SendEvent(after);
+}
+
+bool clTreeCtrlModel::IsSingleSelection() const { return m_tree && !(m_tree->GetTreeStyle() & wxTR_MULTIPLE); }
+
+bool clTreeCtrlModel::IsMultiSelection() const { return m_tree && (m_tree->GetTreeStyle() & wxTR_MULTIPLE); }
+
+bool clTreeCtrlModel::SendEvent(wxEvent& event)
+{
+    if(m_shutdown) { return false; }
+    return m_tree->GetEventHandler()->ProcessEvent(event);
 }

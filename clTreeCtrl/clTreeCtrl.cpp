@@ -96,14 +96,12 @@ wxTreeItemId clTreeCtrl::AppendItem(
     const wxTreeItemId& parent, const wxString& text, int image, int selImage, wxTreeItemData* data)
 {
     wxTreeItemId item = m_model.AppendItem(parent, text, image, selImage, data);
-    m_model.StateModified();
     return item;
 }
 
 wxTreeItemId clTreeCtrl::AddRoot(const wxString& text, int image, int selImage, wxTreeItemData* data)
 {
     wxTreeItemId root = m_model.AddRoot(text, image, selImage, data);
-    m_model.StateModified();
     return root;
 }
 
@@ -112,24 +110,20 @@ wxTreeItemId clTreeCtrl::GetRootItem() const { return m_model.GetRootItem(); }
 void clTreeCtrl::Expand(const wxTreeItemId& item)
 {
     if(!item.GetID()) return;
-    clTreeCtrlNode* child = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
+    clTreeCtrlNode* child = m_model.ToPtr(item);
     if(!child) return;
     child->SetExpanded(true);
-    m_model.StateModified();
     Refresh();
 }
 
 void clTreeCtrl::Collapse(const wxTreeItemId& item)
 {
     if(!item.GetID()) return;
-    clTreeCtrlNode* child = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
+    clTreeCtrlNode* child = m_model.ToPtr(item);
     if(!child) return;
     child->SetExpanded(false);
-    m_model.StateModified();
     Refresh();
 }
-
-int clTreeCtrl::GetExpandedLines() { return m_model.GetExpandedLines(); }
 
 void clTreeCtrl::SelectItem(const wxTreeItemId& item, bool select)
 {
@@ -151,7 +145,6 @@ void clTreeCtrl::OnMouseLeftDown(wxMouseEvent& event)
                 Expand(where);
             }
         } else {
-            UnselectAll();
             SelectItem(where, true);
         }
         Refresh();
@@ -197,7 +190,7 @@ void clTreeCtrl::DoEnsureVisible(const wxTreeItemId& item)
 {
     // scroll to the item
     if(!item.IsOk()) { return; }
-    clTreeCtrlNode* pNode = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
+    clTreeCtrlNode* pNode = m_model.ToPtr(item);
     if(IsItemVisible(pNode)) { return; }
     EnsureItemVisible(pNode, false); // make it visible at the bottom
     Refresh();
@@ -210,7 +203,6 @@ void clTreeCtrl::OnMouseLeftDClick(wxMouseEvent& event)
     wxPoint pt = DoFixPoint(event.GetPosition());
     wxTreeItemId where = HitTest(pt, flags);
     if(where.IsOk()) {
-        UnselectAll();
         SelectItem(where, true);
         if(ItemHasChildren(where)) {
             if(IsExpanded(where)) {
@@ -225,7 +217,7 @@ void clTreeCtrl::OnMouseLeftDClick(wxMouseEvent& event)
 bool clTreeCtrl::IsExpanded(const wxTreeItemId& item) const
 {
     if(!item.GetID()) return false;
-    clTreeCtrlNode* child = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
+    clTreeCtrlNode* child = m_model.ToPtr(item);
     if(!child) return false;
     return child->IsExpanded();
 }
@@ -233,7 +225,7 @@ bool clTreeCtrl::IsExpanded(const wxTreeItemId& item) const
 bool clTreeCtrl::ItemHasChildren(const wxTreeItemId& item) const
 {
     if(!item.GetID()) return false;
-    clTreeCtrlNode* child = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
+    clTreeCtrlNode* child = m_model.ToPtr(item);
     if(!child) return false;
     return child->HasChildren();
 }
@@ -251,22 +243,21 @@ bool clTreeCtrl::IsEmpty() const { return m_model.IsEmpty(); }
 size_t clTreeCtrl::GetChildrenCount(const wxTreeItemId& item, bool recursively) const
 {
     if(!item.GetID()) return 0;
-    clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
+    clTreeCtrlNode* node = m_model.ToPtr(item);
     return node->GetChildrenCount(recursively);
 }
 
 void clTreeCtrl::DeleteChildren(const wxTreeItemId& item)
 {
     if(!item.GetID()) return;
-    clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
-    node->RemoveAllChildren();
-    m_model.StateModified();
+    clTreeCtrlNode* node = m_model.ToPtr(item);
+    node->DeleteAllChildren();
 }
 
 wxTreeItemId clTreeCtrl::GetFirstChild(const wxTreeItemId& item, clTreeItemIdValue& cookie) const
 {
     if(!item.GetID()) return wxTreeItemId();
-    clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
+    clTreeCtrlNode* node = m_model.ToPtr(item);
     const clTreeCtrlNode::Vec_t& children = node->GetChildren();
     if(children.empty()) return wxTreeItemId(); // No children
     cookie.nextItem = 1;                        // the next item
@@ -276,7 +267,7 @@ wxTreeItemId clTreeCtrl::GetFirstChild(const wxTreeItemId& item, clTreeItemIdVal
 wxTreeItemId clTreeCtrl::GetNextChild(const wxTreeItemId& item, clTreeItemIdValue& cookie) const
 {
     if(!item.GetID()) return wxTreeItemId();
-    clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
+    clTreeCtrlNode* node = m_model.ToPtr(item);
     const clTreeCtrlNode::Vec_t& children = node->GetChildren();
     if((int)children.size() >= cookie.nextItem) return wxTreeItemId();
     wxTreeItemId child(children[cookie.nextItem]);
@@ -287,14 +278,14 @@ wxTreeItemId clTreeCtrl::GetNextChild(const wxTreeItemId& item, clTreeItemIdValu
 wxString clTreeCtrl::GetItemText(const wxTreeItemId& item) const
 {
     if(!item.GetID()) return "";
-    clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
+    clTreeCtrlNode* node = m_model.ToPtr(item);
     return node->GetLabel();
 }
 
 wxTreeItemData* clTreeCtrl::GetItemData(const wxTreeItemId& item) const
 {
     if(!item.GetID()) return nullptr;
-    clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
+    clTreeCtrlNode* node = m_model.ToPtr(item);
     return node->GetClientObject();
 }
 
@@ -341,7 +332,7 @@ void clTreeCtrl::OnIdle(wxIdleEvent& event)
     wxTreeItemId item = HitTest(pt, flags);
     if(item.IsOk()) {
         clTreeCtrlNode::Vec_t& items = m_model.GetOnScreenItems();
-        clTreeCtrlNode* hoveredNode = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
+        clTreeCtrlNode* hoveredNode = m_model.ToPtr(item);
         bool refreshNeeded = false;
         for(size_t i = 0; i < items.size(); ++i) {
             bool new_state = hoveredNode == items[i];
@@ -396,7 +387,7 @@ wxTreeItemId clTreeCtrl::DoGetSiblingVisibleItem(const wxTreeItemId& item, bool 
     if(!item.IsOk()) { return wxTreeItemId(); }
     const clTreeCtrlNode::Vec_t& items = m_model.GetOnScreenItems();
     if(items.empty()) { return wxTreeItemId(); }
-    clTreeCtrlNode* from = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
+    clTreeCtrlNode* from = m_model.ToPtr(item);
     clTreeCtrlNode::Vec_t::const_iterator iter
         = std::find_if(items.begin(), items.end(), [&](clTreeCtrlNode* p) { return p == from; });
     if(next && (iter == items.end())) { return wxTreeItemId(); }
@@ -432,17 +423,16 @@ void clTreeCtrl::OnKeyDown(wxKeyEvent& event)
 {
     event.Skip();
     wxTreeItemId selectedItem = GetSelection();
+    if(!selectedItem.IsOk()) { return; }
     if(event.GetKeyCode() == WXK_UP) {
         selectedItem = m_model.GetItemBefore(selectedItem, true);
         if(selectedItem.IsOk()) {
-            m_model.UnselectAll();
             SelectItem(selectedItem);
             EnsureItemVisible(m_model.ToPtr(selectedItem), true);
         }
     } else if(event.GetKeyCode() == WXK_DOWN) {
         selectedItem = m_model.GetItemAfter(selectedItem, true);
         if(selectedItem.IsOk()) {
-            m_model.UnselectAll();
             SelectItem(selectedItem);
             EnsureItemVisible(m_model.ToPtr(selectedItem), false);
         }
@@ -462,6 +452,15 @@ void clTreeCtrl::OnKeyDown(wxKeyEvent& event)
             SelectItem(selectedItem);
             EnsureItemVisible(m_model.ToPtr(selectedItem), true);
         }
+    } else if(event.GetKeyCode() == WXK_LEFT) {
+        if(m_model.ToPtr(selectedItem)->IsExpanded()) { Collapse(selectedItem); }
+    } else if(event.GetKeyCode() == WXK_RIGHT) {
+        if(!m_model.ToPtr(selectedItem)->IsExpanded()) { Expand(selectedItem); }
+    } else if(event.GetKeyCode() == WXK_NUMPAD_DELETE || event.GetKeyCode() == WXK_DELETE) {
+        // Delete the item (this will also fire
+        // wxEVT_TREE_DELETE_ITEM
+        Delete(selectedItem);
+    } else if(event.GetKeyCode() == WXK_RETURN || event.GetKeyCode() == WXK_NUMPAD_ENTER) {
     }
 }
 
@@ -491,4 +490,12 @@ int clTreeCtrl::GetNumLineCanFitOnScreen() const
     wxRect clientRect = GetClientRect();
     int max_lines_on_screen = ceil(clientRect.GetHeight() / m_lineHeight);
     return max_lines_on_screen;
+}
+
+void clTreeCtrl::Delete(const wxTreeItemId& item)
+{
+    // delete the item + its children
+    // fires event
+    m_model.DeleteItem(item);
+    Refresh();
 }

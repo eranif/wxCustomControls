@@ -5,11 +5,13 @@
 
 clTreeCtrlNode::clTreeCtrlNode(clTreeCtrl* tree)
     : m_tree(tree)
+    , m_model(tree ? &tree->GetModel() : nullptr)
 {
 }
 
 clTreeCtrlNode::clTreeCtrlNode(clTreeCtrl* tree, const wxString& label, int bitmapIndex, int bitmapSelectedIndex)
     : m_tree(tree)
+    , m_model(tree ? &tree->GetModel() : nullptr)
     , m_label(label)
     , m_bitmapIndex(bitmapIndex)
     , m_bitmapSelectedIndex(bitmapSelectedIndex)
@@ -19,8 +21,11 @@ clTreeCtrlNode::clTreeCtrlNode(clTreeCtrl* tree, const wxString& label, int bitm
 clTreeCtrlNode::~clTreeCtrlNode()
 {
     // Delete all the node children
-    RemoveAllChildren();
+    DeleteAllChildren();
     wxDELETE(m_clientData);
+
+    // Notify the model that a selection is being deleted
+    if(m_model) { m_model->NodeDeleted(this); }
 }
 
 void clTreeCtrlNode::AddChild(clTreeCtrlNode* child)
@@ -52,18 +57,18 @@ void clTreeCtrlNode::AddChild(clTreeCtrlNode* child)
 
 void clTreeCtrlNode::SetParent(clTreeCtrlNode* parent)
 {
-    if(m_parent) { m_parent->RemoveChild(this); }
+    if(m_parent) { m_parent->DeleteChild(this); }
     m_parent = parent;
 }
 
-void clTreeCtrlNode::RemoveChild(clTreeCtrlNode* child)
+void clTreeCtrlNode::DeleteChild(clTreeCtrlNode* child)
 {
     // first remove all of its children
-    // do this in a while loop since 'child->RemoveChild(c);' will alter 
+    // do this in a while loop since 'child->RemoveChild(c);' will alter
     // the array and will invalidate all iterators
     while(!child->m_children.empty()) {
         clTreeCtrlNode* c = child->m_children[0];
-        child->RemoveChild(c);
+        child->DeleteChild(c);
     }
 
     // Now disconnect this child from this node
@@ -135,21 +140,14 @@ void clTreeCtrlNode::UnselectAll()
 bool clTreeCtrlNode::SetExpanded(bool b)
 {
     // Already expanded?
+    if(!m_model) { return false; }
     if(b && IsExpanded()) { return true; }
     // Already collapsed?
     if(!b && !IsExpanded()) { return true; }
-
-    wxTreeEvent before(b ? wxEVT_TREE_ITEM_EXPANDING : wxEVT_TREE_ITEM_COLLAPSING);
-    before.SetItem(wxTreeItemId(this));
-    before.SetEventObject(m_tree);
-    m_tree->GetEventHandler()->ProcessEvent(before);
-    if(!before.IsAllowed()) { return false; }
+    if(!m_model->NodeExpanding(this, b)) { return false; }
 
     SetFlag(kExpanded, b);
-    wxTreeEvent after(b ? wxEVT_TREE_ITEM_EXPANDED : wxEVT_TREE_ITEM_COLLAPSED);
-    after.SetItem(wxTreeItemId(this));
-    after.SetEventObject(m_tree);
-    m_tree->GetEventHandler()->ProcessEvent(after);
+    m_model->NodeExpanded(this, b);
     return true;
 }
 
@@ -238,9 +236,9 @@ bool clTreeCtrlNode::IsVisible() const
     return true;
 }
 
-void clTreeCtrlNode::RemoveAllChildren()
+void clTreeCtrlNode::DeleteAllChildren()
 {
-    std::for_each(m_children.begin(), m_children.end(), [&](clTreeCtrlNode* c) { RemoveChild(c); });
+    std::for_each(m_children.begin(), m_children.end(), [&](clTreeCtrlNode* c) { DeleteChild(c); });
 }
 
 clTreeCtrlNode* clTreeCtrlNode::GetLastChild() const

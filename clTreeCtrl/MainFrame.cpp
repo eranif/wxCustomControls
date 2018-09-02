@@ -22,6 +22,7 @@ MainFrame::MainFrame(wxWindow* parent)
     m_mainPanel->GetSizer()->Insert(0, m_tree, 1, wxEXPAND);
 
     m_tree->Bind(wxEVT_TREE_ITEM_EXPANDING, &MainFrame::OnItemExpanding, this);
+    m_tree->Bind(wxEVT_TREE_DELETE_ITEM, &MainFrame::OnItemDeleted, this);
     m_tree->Bind(wxEVT_TREE_ITEM_EXPANDED, [&](wxTreeEvent& evt) {
         clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(evt.GetItem().GetID());
         LogMessage(wxString() << node->GetLabel() << " expanded");
@@ -34,11 +35,15 @@ MainFrame::MainFrame(wxWindow* parent)
         clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(evt.GetItem().GetID());
         LogMessage(wxString() << node->GetLabel() << " collapsed");
     });
+    m_tree->Bind(wxEVT_TREE_SEL_CHANGING, [&](wxTreeEvent& evt) {
+        LogMessage(wxString() << "Selection changing from:" << m_tree->GetItemText(evt.GetOldItem()));
+    });
+    m_tree->Bind(wxEVT_TREE_SEL_CHANGED, [&](wxTreeEvent& evt) {
+        LogMessage(wxString() << "Selection changed. selection is:" << m_tree->GetItemText(evt.GetItem()));
+    });
 }
 
-MainFrame::~MainFrame()
-{
-}
+MainFrame::~MainFrame() {}
 
 void MainFrame::OnExit(wxCommandEvent& event)
 {
@@ -59,7 +64,7 @@ void MainFrame::OnAbout(wxCommandEvent& event)
 void MainFrame::LogMessage(const wxString& message)
 {
     m_stc15->AddText(message + "\n");
-    // m_stc15->ScrollToEnd();
+    m_stc15->ScrollToEnd();
 }
 
 void MainFrame::OnOpenFolder(wxCommandEvent& event)
@@ -77,8 +82,8 @@ void MainFrame::OnItemExpanding(wxTreeEvent& event)
 {
     event.Skip();
     wxTreeItemId item = event.GetItem();
-    clTreeCtrlNode* node = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
-    LogMessage(wxString() << node->GetLabel() << " is expanding");
+    wxString text = m_tree->GetItemText(item);
+    LogMessage(wxString() << text << " is expanding");
 
     clTreeItemIdValue cookie;
     if(m_tree->ItemHasChildren(item)) {
@@ -126,4 +131,10 @@ void MainFrame::OnEnsureItemVisible(wxCommandEvent& event)
     // if(item.IsOk()) { wxMessageBox("Item is: " + m_tree->GetItemText(item)); }
     // m_tree->SelectItem(item);
     // m_tree->EnsureVisible(item);
+}
+
+void MainFrame::OnItemDeleted(wxTreeEvent& event)
+{
+    wxString text = m_tree->GetItemText(event.GetItem());
+    LogMessage("Item: " + text + " was deleted");
 }
