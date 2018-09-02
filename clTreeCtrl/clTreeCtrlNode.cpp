@@ -108,18 +108,15 @@ void clTreeCtrlNode::DeleteChild(clTreeCtrlNode* child)
         clTreeCtrlNode* c = child->m_children[0];
         child->DeleteChild(c);
     }
-
-    // Now disconnect this child from this node
-    clTreeCtrlNode::Vec_t::iterator iter
-        = std::find_if(m_children.begin(), m_children.end(), [&](clTreeCtrlNode* c) { return c == child; });
-    if(iter == m_children.end()) { return; }
-    m_children.erase(iter);
-
     // Connect the list
     clTreeCtrlNode* prev = child->m_prev;
     clTreeCtrlNode* next = child->m_next;
     if(prev) { prev->m_next = next; }
     if(next) { next->m_prev = prev; }
+    // Now disconnect this child from this node
+    clTreeCtrlNode::Vec_t::iterator iter
+        = std::find_if(m_children.begin(), m_children.end(), [&](clTreeCtrlNode* c) { return c == child; });
+    if(iter != m_children.end()) { m_children.erase(iter); }
     wxDELETE(child);
 }
 
@@ -287,7 +284,11 @@ bool clTreeCtrlNode::IsVisible() const
 
 void clTreeCtrlNode::DeleteAllChildren()
 {
-    std::for_each(m_children.begin(), m_children.end(), [&](clTreeCtrlNode* c) { DeleteChild(c); });
+    while(!m_children.empty()) {
+        clTreeCtrlNode* c = m_children[0];
+        // DeleteChild will remove it from the array
+        DeleteChild(c);
+    }
 }
 
 clTreeCtrlNode* clTreeCtrlNode::GetLastChild() const

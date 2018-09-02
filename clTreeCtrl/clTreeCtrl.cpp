@@ -460,7 +460,6 @@ size_t clTreeCtrl::GetSelections(wxArrayTreeItemIds& selections) const
 
 void clTreeCtrl::OnKeyDown(wxKeyEvent& event)
 {
-    event.Skip();
     wxTreeItemId selectedItem = GetSelection();
     if(!selectedItem.IsOk()) { return; }
 

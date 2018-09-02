@@ -229,14 +229,23 @@ void clTreeCtrlModel::DeleteItem(const wxTreeItemId& item)
 
 void clTreeCtrlModel::NodeDeleted(clTreeCtrlNode* node)
 {
-    clTreeCtrlNode::Vec_t::iterator iter
-        = std::find_if(m_selectedItems.begin(), m_selectedItems.end(), [&](clTreeCtrlNode* n) { return n == node; });
-    if(iter != m_selectedItems.end()) {
-        m_selectedItems.erase(iter);
-        if(m_selectedItems.empty()) {
-            // Dont leave the tree without a selected item
-            if(node->GetNext()) { SelectItem(wxTreeItemId(node->GetNext())); }
+    // Clear the various caches
+    {
+        clTreeCtrlNode::Vec_t::iterator iter = std::find_if(
+            m_selectedItems.begin(), m_selectedItems.end(), [&](clTreeCtrlNode* n) { return n == node; });
+        if(iter != m_selectedItems.end()) {
+            m_selectedItems.erase(iter);
+            if(m_selectedItems.empty()) {
+                // Dont leave the tree without a selected item
+                if(node->GetNext()) { SelectItem(wxTreeItemId(node->GetNext())); }
+            }
         }
+    }
+
+    {
+        clTreeCtrlNode::Vec_t::iterator iter = std::find_if(
+            m_onScreenItems.begin(), m_onScreenItems.end(), [&](clTreeCtrlNode* n) { return n == node; });
+        if(iter != m_onScreenItems.end()) { m_onScreenItems.erase(iter); }
     }
 }
 
