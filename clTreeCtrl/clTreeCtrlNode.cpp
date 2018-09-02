@@ -2,6 +2,7 @@
 #include "clTreeCtrlNode.h"
 #include <functional>
 #include <wx/dc.h>
+#include <wx/settings.h>
 
 clTreeCtrlNode::clTreeCtrlNode(clTreeCtrl* tree)
     : m_tree(tree)
