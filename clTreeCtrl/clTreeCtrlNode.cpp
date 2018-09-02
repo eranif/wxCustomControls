@@ -274,8 +274,8 @@ void clTreeCtrlColours::InitDarkDefaults()
     bgColour = wxColour("#1c2833");
     itemTextColour = wxColour("#eaecee");
     selItemTextColour = *wxWHITE;
-    selItemBgColour = wxColour("#2c3e50");
+    selItemBgColour = wxColour("#566573");
     buttonColour = itemTextColour;
-    hoverBgColour = wxColour("#566573");
+    hoverBgColour = wxColour("#2c3e50");
     itemBgColour = bgColour;
 }

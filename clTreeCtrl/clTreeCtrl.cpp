@@ -424,6 +424,14 @@ void clTreeCtrl::OnKeyDown(wxKeyEvent& event)
     event.Skip();
     wxTreeItemId selectedItem = GetSelection();
     if(!selectedItem.IsOk()) { return; }
+    
+    // Let the user chance to process this first
+    wxTreeEvent evt(wxEVT_TREE_KEY_DOWN);
+    evt.SetEventObject(this);
+    evt.SetKeyEvent(event);
+    evt.SetItem(selectedItem);
+    if(GetEventHandler()->ProcessEvent(evt)) { return; }
+    
     if(event.GetKeyCode() == WXK_UP) {
         selectedItem = m_model.GetItemBefore(selectedItem, true);
         if(selectedItem.IsOk()) {
