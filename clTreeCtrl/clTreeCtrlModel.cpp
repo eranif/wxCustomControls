@@ -268,7 +268,7 @@ void clTreeCtrlModel::SelectItems(const std::vector<std::pair<wxTreeItemId, bool
         if(selectIt && !m_selectedItems.empty()) {
             wxTreeEvent evt(wxEVT_TREE_SEL_CHANGING);
             evt.SetEventObject(m_tree);
-            evt.SetOldItem(IsSingleSelection() ? GetSelections()[0] : wxTreeItemId(nullptr));
+            evt.SetOldItem(IsSingleSelection() ?GetSingleSelection() : wxTreeItemId(nullptr));
             SendEvent(evt);
             if(!evt.IsAllowed()) { return; }
         }

@@ -80,7 +80,6 @@ public:
     const clTreeCtrlNode::Vec_t& GetOnScreenItems() const { return m_onScreenItems; }
     clTreeCtrlNode::Vec_t& GetOnScreenItems() { return m_onScreenItems; }
     const clTreeCtrlNode::Vec_t& GetSelections() const { return m_selectedItems; }
-    //clTreeCtrlNode::Vec_t& GetSelections() { return m_selectedItems; }
     bool ExpandToItem(const wxTreeItemId& item);
     wxTreeItemId GetSingleSelection() const;
     size_t GetSelectionsCount() const { return m_selectedItems.size(); }
