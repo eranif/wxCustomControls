@@ -30,10 +30,10 @@ MainFrame::MainFrame(wxWindow* parent)
     m_tree->Bind(wxEVT_TREE_ITEM_COLLAPSED,
         [&](wxTreeEvent& evt) { LogMessage(wxString() << m_tree->GetItemText(evt.GetItem()) << " collapsed"); });
     m_tree->Bind(wxEVT_TREE_SEL_CHANGING, [&](wxTreeEvent& evt) {
-        LogMessage(wxString() << "Selection changing from:" << m_tree->GetItemText(evt.GetOldItem()));
+        LogMessage(wxString() << "Selection changing from: " << m_tree->GetItemText(evt.GetOldItem()));
     });
     m_tree->Bind(wxEVT_TREE_SEL_CHANGED, [&](wxTreeEvent& evt) {
-        LogMessage(wxString() << "Selection changed. selection is:" << m_tree->GetItemText(evt.GetItem()));
+        LogMessage(wxString() << "Selection changed. selection is: " << m_tree->GetItemText(evt.GetItem()));
     });
 }
 
