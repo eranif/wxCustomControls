@@ -58,8 +58,15 @@ void clTreeCtrlModel::UnselectAll()
 
 void clTreeCtrlModel::SelectItem(const wxTreeItemId& item, bool select)
 {
-    clTreeCtrlNode* child = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
+    clTreeCtrlNode* child = ToPtr(item);
     if(!child) return;
+    if(select) {
+        clTreeCtrlNode::Vec_t::iterator iter = std::find_if(
+            m_selectedItems.begin(), m_selectedItems.end(), [&](clTreeCtrlNode* p) { return (p == child); });
+        // If the item is already selected, don't select it again
+        if(iter != m_selectedItems.end()) { return; }
+    }
+
     if(select && !m_selectedItems.empty()) {
         wxTreeEvent evt(wxEVT_TREE_SEL_CHANGING);
         evt.SetEventObject(m_tree);
@@ -106,7 +113,7 @@ void clTreeCtrlModel::SetOnScreenItems(const clTreeCtrlNode::Vec_t& items)
 
 bool clTreeCtrlModel::ExpandToItem(const wxTreeItemId& item)
 {
-    clTreeCtrlNode* child = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
+    clTreeCtrlNode* child = ToPtr(item);
     if(!child) { return false; }
 
     clTreeCtrlNode* parent = child->GetParent();
