@@ -431,8 +431,8 @@ size_t clTreeCtrl::GetSelections(wxArrayTreeItemIds& selections) const
 void clTreeCtrl::OnKeyDown(wxKeyEvent& event)
 {
     event.Skip();
+    wxTreeItemId selectedItem = GetSelection();
     if(event.GetKeyCode() == WXK_UP) {
-        wxTreeItemId selectedItem = GetSelection();
         selectedItem = m_model.GetItemBefore(selectedItem, true);
         if(selectedItem.IsOk()) {
             m_model.UnselectAll();
@@ -440,12 +440,27 @@ void clTreeCtrl::OnKeyDown(wxKeyEvent& event)
             EnsureItemVisible(m_model.ToPtr(selectedItem), true);
         }
     } else if(event.GetKeyCode() == WXK_DOWN) {
-        wxTreeItemId selectedItem = GetSelection();
         selectedItem = m_model.GetItemAfter(selectedItem, true);
         if(selectedItem.IsOk()) {
             m_model.UnselectAll();
             SelectItem(selectedItem);
             EnsureItemVisible(m_model.ToPtr(selectedItem), false);
+        }
+    } else if(event.GetKeyCode() == WXK_PAGEDOWN) {
+        clTreeCtrlNode::Vec_t items;
+        m_model.GetNextItems(m_model.ToPtr(selectedItem), GetNumLineCanFitOnScreen(), items);
+        if(!items.empty()) {
+            selectedItem = wxTreeItemId(items.back());
+            SelectItem(selectedItem);
+            EnsureItemVisible(m_model.ToPtr(selectedItem), false);
+        }
+    } else if(event.GetKeyCode() == WXK_PAGEUP) {
+        clTreeCtrlNode::Vec_t items;
+        m_model.GetPrevItems(m_model.ToPtr(selectedItem), GetNumLineCanFitOnScreen(), items);
+        if(!items.empty()) {
+            selectedItem = wxTreeItemId(items[0]);
+            SelectItem(selectedItem);
+            EnsureItemVisible(m_model.ToPtr(selectedItem), true);
         }
     }
 }
