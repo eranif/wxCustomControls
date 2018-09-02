@@ -36,6 +36,7 @@ clTreeCtrl::clTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
     Bind(wxEVT_MOUSEWHEEL, &clTreeCtrl::OnMouseScroll, this);
     Bind(wxEVT_LEAVE_WINDOW, &clTreeCtrl::OnLeaveWindow, this);
     Bind(wxEVT_KEY_DOWN, &clTreeCtrl::OnKeyDown, this);
+    Bind(wxEVT_CONTEXT_MENU, &clTreeCtrl::OnContextMenu, this);
 
     // Initialise default colours
     m_colours.InitDefaults();
@@ -52,6 +53,7 @@ clTreeCtrl::~clTreeCtrl()
     Unbind(wxEVT_MOUSEWHEEL, &clTreeCtrl::OnMouseScroll, this);
     Unbind(wxEVT_LEAVE_WINDOW, &clTreeCtrl::OnLeaveWindow, this);
     Unbind(wxEVT_KEY_DOWN, &clTreeCtrl::OnKeyDown, this);
+    Unbind(wxEVT_CONTEXT_MENU, &clTreeCtrl::OnContextMenu, this);
 }
 
 void clTreeCtrl::OnPaint(wxPaintEvent& event)
@@ -204,13 +206,13 @@ void clTreeCtrl::OnMouseLeftDClick(wxMouseEvent& event)
     wxTreeItemId where = HitTest(pt, flags);
     if(where.IsOk()) {
         SelectItem(where, true);
-        
+
         // Let sublclasses handle this first
         wxTreeEvent evt(wxEVT_TREE_ITEM_ACTIVATED);
         evt.SetEventObject(this);
         evt.SetItem(where);
         if(GetEventHandler()->ProcessEvent(evt)) { return; }
-        
+
         // Process the default action
         if(ItemHasChildren(where)) {
             if(IsExpanded(where)) {
@@ -377,6 +379,8 @@ void clTreeCtrl::CollapseAllChildren(const wxTreeItemId& item)
 {
     wxBusyCursor bc;
     m_model.CollapseAllChildren(item);
+    m_firstOnScreenItem = m_model.ToPtr(item);
+    SelectItem(item);
     Refresh();
 }
 
@@ -589,4 +593,19 @@ wxFont clTreeCtrl::GetItemFont(const wxTreeItemId& item) const
     clTreeCtrlNode* node = m_model.ToPtr(item);
     if(!node) { return wxNullFont; }
     return node->GetFont();
+}
+
+void clTreeCtrl::OnContextMenu(wxContextMenuEvent& event)
+{
+    event.Skip();
+    int flags = 0;
+    wxPoint pt = ScreenToClient(::wxGetMousePosition());
+    wxTreeItemId item = HitTest(pt, flags);
+    if(item.IsOk()) {
+        SelectItem(item, true);
+        wxTreeEvent evt(wxEVT_TREE_ITEM_MENU);
+        evt.SetItem(item);
+        evt.SetEventObject(this);
+        GetEventHandler()->ProcessEvent(evt);
+    }
 }

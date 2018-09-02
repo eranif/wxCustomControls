@@ -44,6 +44,14 @@ MainFrame::MainFrame(wxWindow* parent)
         evt.Skip(); // Let the default action take place
         LogMessage(wxString() << "Item activated: " << m_tree->GetItemText(evt.GetItem()));
     });
+    m_tree->Bind(wxEVT_TREE_ITEM_MENU, [&](wxTreeEvent& evt) {
+        evt.Skip(); // Let the default action take place
+        LogMessage(wxString() << "Context menu for item: " << m_tree->GetItemText(evt.GetItem()));
+        wxMenu menu;
+        menu.Append(wxID_OPEN);
+        menu.Append(wxID_REFRESH);
+        m_tree->PopupMenu(&menu);
+    });
 }
 
 MainFrame::~MainFrame() {}

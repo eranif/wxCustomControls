@@ -225,6 +225,7 @@ protected:
     void OnIdle(wxIdleEvent& event);
     void OnLeaveWindow(wxMouseEvent& event);
     void OnKeyDown(wxKeyEvent& event);
+    void OnContextMenu(wxContextMenuEvent& event);
 };
 
 #endif // CLTREECTRL_H
