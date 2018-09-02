@@ -15,6 +15,9 @@
 #define CHECK_ITEM_RET(item) \
     if(!item.IsOk()) { return; }
 
+#define CHECK_ROOT_RET() \
+    if(!m_model.GetRoot()) { return; }
+
 clTreeCtrl::clTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
     : wxPanel(parent, wxID_ANY, pos, size, wxWANTS_CHARS | wxTAB_TRAVERSAL)
     , m_model(this)
@@ -67,15 +70,15 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
     dc.SetPen(m_colours.bgColour);
     dc.SetBrush(m_colours.bgColour);
     dc.DrawRectangle(clientRect);
-    
-    if(!m_model.GetRoot()) { 
+
+    if(!m_model.GetRoot()) {
         // Reset the various items
         SetFirstItemOnScreen(nullptr);
         clTreeCtrlNode::Vec_t items;
         m_model.SetOnScreenItems(items);
-        return; 
+        return;
     }
-    
+
     int maxItems = GetNumLineCanFitOnScreen();
     if(!GetFirstItemOnScreen()) { SetFirstItemOnScreen(m_model.GetRoot()); }
     clTreeCtrlNode* firstItem = GetFirstItemOnScreen();
@@ -100,8 +103,8 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
 
 void clTreeCtrl::OnSize(wxSizeEvent& event)
 {
-    Refresh();
     event.Skip();
+    Refresh();
 }
 
 wxTreeItemId clTreeCtrl::InsertItem(const wxTreeItemId& parent, const wxTreeItemId& previous, const wxString& text,
@@ -153,8 +156,8 @@ void clTreeCtrl::SelectItem(const wxTreeItemId& item, bool select)
 void clTreeCtrl::OnMouseLeftDown(wxMouseEvent& event)
 {
     event.Skip();
-    if(!m_model.GetRoot()) { return; }
-    
+    CHECK_ROOT_RET();
+
     int flags = 0;
     wxPoint pt = DoFixPoint(event.GetPosition());
     wxTreeItemId where = HitTest(pt, flags);
@@ -198,7 +201,7 @@ void clTreeCtrl::OnMouseLeftDown(wxMouseEvent& event)
 wxTreeItemId clTreeCtrl::HitTest(const wxPoint& point, int& flags) const
 {
     if(!m_model.GetRoot()) { return wxTreeItemId(); }
-    
+
     flags = 0;
     for(size_t i = 0; i < m_model.GetOnScreenItems().size(); ++i) {
         const clTreeCtrlNode* item = m_model.GetOnScreenItems()[i];
@@ -246,8 +249,8 @@ void clTreeCtrl::DoEnsureVisible(const wxTreeItemId& item)
 void clTreeCtrl::OnMouseLeftDClick(wxMouseEvent& event)
 {
     event.Skip();
-    if(!m_model.GetRoot()) { return; }
-    
+    CHECK_ROOT_RET();
+
     int flags = 0;
     wxPoint pt = DoFixPoint(event.GetPosition());
     wxTreeItemId where = HitTest(pt, flags);
@@ -348,6 +351,7 @@ wxTreeItemData* clTreeCtrl::GetItemData(const wxTreeItemId& item) const
 
 void clTreeCtrl::OnMouseScroll(wxMouseEvent& event)
 {
+    CHECK_ROOT_RET();
     if(!GetFirstItemOnScreen()) { return; }
     clTreeCtrlNode::Vec_t items;
     if(event.GetWheelRotation() > 0) { // Scrolling up
@@ -384,6 +388,7 @@ void clTreeCtrl::SetBitmaps(const std::vector<wxBitmap>& bitmaps)
 
 void clTreeCtrl::OnIdle(wxIdleEvent& event)
 {
+    CHECK_ROOT_RET();
     int flags = 0;
     wxPoint pt = ScreenToClient(::wxGetMousePosition());
     wxTreeItemId item = HitTest(pt, flags);
@@ -404,6 +409,7 @@ void clTreeCtrl::OnIdle(wxIdleEvent& event)
 void clTreeCtrl::OnLeaveWindow(wxMouseEvent& event)
 {
     event.Skip();
+    CHECK_ROOT_RET();
     clTreeCtrlNode::Vec_t& items = m_model.GetOnScreenItems();
     for(size_t i = 0; i < items.size(); ++i) { items[i]->SetHovered(false); }
     Refresh();
@@ -475,10 +481,10 @@ size_t clTreeCtrl::GetSelections(wxArrayTreeItemIds& selections) const
 
 void clTreeCtrl::OnKeyDown(wxKeyEvent& event)
 {
-    if(!m_model.GetRoot()) { return; }
+    CHECK_ROOT_RET();
     wxTreeItemId selectedItem = GetSelection();
     if(!selectedItem.IsOk()) { return; }
-    
+
     // Let the user chance to process this first
     wxTreeEvent evt(wxEVT_TREE_KEY_DOWN);
     evt.SetEventObject(this);
@@ -640,6 +646,7 @@ wxFont clTreeCtrl::GetItemFont(const wxTreeItemId& item) const
 void clTreeCtrl::OnContextMenu(wxContextMenuEvent& event)
 {
     event.Skip();
+    CHECK_ROOT_RET();
     int flags = 0;
     wxPoint pt = ScreenToClient(::wxGetMousePosition());
     wxTreeItemId item = HitTest(pt, flags);
@@ -655,6 +662,7 @@ void clTreeCtrl::OnContextMenu(wxContextMenuEvent& event)
 void clTreeCtrl::OnRightDown(wxMouseEvent& event)
 {
     event.Skip();
+    CHECK_ROOT_RET();
     int flags = 0;
     wxPoint pt = DoFixPoint(event.GetPosition());
     wxTreeItemId where = HitTest(pt, flags);
