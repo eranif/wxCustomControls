@@ -40,6 +40,10 @@ MainFrame::MainFrame(wxWindow* parent)
         evt.Skip(); // Must call this for the default actions process
         LogMessage(wxString() << "Key event: " << m_tree->GetItemText(evt.GetItem()));
     });
+    m_tree->Bind(wxEVT_TREE_ITEM_ACTIVATED, [&](wxTreeEvent& evt) {
+        evt.Skip(); // Let the default action take place
+        LogMessage(wxString() << "Item activated: " << m_tree->GetItemText(evt.GetItem()));
+    });
 }
 
 MainFrame::~MainFrame() {}
