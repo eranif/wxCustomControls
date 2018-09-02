@@ -10,6 +10,11 @@
 #include <wx/utils.h>
 #include <wx/wupdlock.h>
 
+#define CHECK_PTR_RET(p) \
+    if(!p) { return; }
+#define CHECK_ITEM_RET(item) \
+    if(!item.IsOk()) { return; }
+
 clTreeCtrl::clTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
     : wxPanel(parent, wxID_ANY, pos, size, wxWANTS_CHARS | wxTAB_TRAVERSAL)
     , m_model(this)
@@ -33,12 +38,7 @@ clTreeCtrl::clTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
     Bind(wxEVT_KEY_DOWN, &clTreeCtrl::OnKeyDown, this);
 
     // Initialise default colours
-    m_colours.textColour = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT);
-    m_colours.selItemTextColour = m_colours.textColour;
-    m_colours.selItemBgColour = wxColour("rgb(199,203,209)");
-    m_colours.buttonColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW);
-    m_colours.hoverBgColour = wxColour("rgb(219,221,224)");
-    m_colours.bgColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE);
+    m_colours.InitDefaults();
 }
 
 clTreeCtrl::~clTreeCtrl()
@@ -498,4 +498,75 @@ void clTreeCtrl::Delete(const wxTreeItemId& item)
     // fires event
     m_model.DeleteItem(item);
     Refresh();
+}
+
+void clTreeCtrl::SetItemData(const wxTreeItemId& item, wxTreeItemData* data)
+{
+    clTreeCtrlNode* node = m_model.ToPtr(item);
+    CHECK_PTR_RET(node);
+    node->SetClientData(data);
+}
+
+void clTreeCtrl::SetItemBackgroundColour(const wxTreeItemId& item, const wxColour& colour)
+{
+    clTreeCtrlNode* node = m_model.ToPtr(item);
+    CHECK_PTR_RET(node);
+    node->SetBgColour(colour);
+    Refresh();
+}
+
+wxColour clTreeCtrl::GetItemBackgroudColour(const wxTreeItemId& item) const
+{
+    clTreeCtrlNode* node = m_model.ToPtr(item);
+    if(!node) { return wxNullColour; }
+    return node->GetBgColour();
+}
+
+void clTreeCtrl::SetItemTextColour(const wxTreeItemId& item, const wxColour& colour)
+{
+    clTreeCtrlNode* node = m_model.ToPtr(item);
+    CHECK_PTR_RET(node);
+    node->SetTextColour(colour);
+    Refresh();
+}
+
+wxColour clTreeCtrl::GetItemTextColour(const wxTreeItemId& item) const
+{
+    clTreeCtrlNode* node = m_model.ToPtr(item);
+    if(!node) { return wxNullColour; }
+    return node->GetTextColour();
+}
+
+void clTreeCtrl::SetItemText(const wxTreeItemId& item, const wxString& text)
+{
+    clTreeCtrlNode* node = m_model.ToPtr(item);
+    CHECK_PTR_RET(node);
+    node->SetLabel(text);
+    Refresh();
+}
+
+void clTreeCtrl::SetItemBold(const wxTreeItemId& item, bool bold)
+{
+    clTreeCtrlNode* node = m_model.ToPtr(item);
+    CHECK_PTR_RET(node);
+    wxFont f = node->GetFont();
+    if(!f.IsOk()) { f = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT); }
+    f.SetWeight(bold ? wxFONTWEIGHT_BOLD : wxFONTWEIGHT_NORMAL);
+    node->SetFont(f);
+    Refresh();
+}
+
+void clTreeCtrl::SetItemFont(const wxTreeItemId& item, const wxFont& font)
+{
+    clTreeCtrlNode* node = m_model.ToPtr(item);
+    CHECK_PTR_RET(node);
+    node->SetFont(font);
+    Refresh();
+}
+
+wxFont clTreeCtrl::GetItemFont(const wxTreeItemId& item) const
+{
+    clTreeCtrlNode* node = m_model.ToPtr(item);
+    if(!node) { return wxNullFont; }
+    return node->GetFont();
 }

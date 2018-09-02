@@ -21,11 +21,16 @@ enum clTreeCtrlNodeFlags {
 
 struct clTreeCtrlColours {
     wxColour hoverBgColour;     // Background colour of an hovered item
-    wxColour textColour;        // item text colour
+    wxColour itemTextColour;    // item text colour
+    wxColour itemBgColour;      // item bg colour
     wxColour selItemTextColour; // text colour for the selected item
     wxColour selItemBgColour;   // selected item background colour
     wxColour buttonColour;      // expand/collapse button colour
     wxColour bgColour;          // background colour for the control
+    
+    clTreeCtrlColours() { InitDefaults(); }
+    void InitDefaults();
+    void InitDarkDefaults();
 };
 
 class clTreeCtrlNode
@@ -42,7 +47,6 @@ protected:
     int m_bitmapIndex = wxNOT_FOUND;
     int m_bitmapSelectedIndex = wxNOT_FOUND;
     size_t m_flags = 0;
-    wxString m_colour;
     wxTreeItemData* m_clientData = nullptr;
     clTreeCtrlNode* m_parent = nullptr;
     clTreeCtrlNode::Vec_t m_children;
@@ -51,6 +55,9 @@ protected:
     int m_indentsCount = 0;
     wxRect m_itemRect;
     wxRect m_buttonRect;
+    wxFont m_font;
+    wxColour m_textColour;
+    wxColour m_bgColour;
 
 protected:
     void SetFlag(clTreeCtrlNodeFlags flag, bool b)
@@ -80,6 +87,12 @@ public:
     clTreeCtrlNode* GetNext() const { return m_next; }
     clTreeCtrlNode* GetPrev() const { return m_prev; }
 
+    void SetBgColour(const wxColour& bgColour) { this->m_bgColour = bgColour; }
+    void SetFont(const wxFont& font) { this->m_font = font; }
+    void SetTextColour(const wxColour& textColour) { this->m_textColour = textColour; }
+    const wxColour& GetBgColour() const { return m_bgColour; }
+    const wxFont& GetFont() const { return m_font; }
+    const wxColour& GetTextColour() const { return m_textColour; }
     /**
      * @brief remove and delete a single child
      * @param child
@@ -123,7 +136,11 @@ public:
     void SetParent(clTreeCtrlNode* parent);
     clTreeCtrlNode* GetParent() const { return m_parent; }
     bool HasChildren() const { return !m_children.empty(); }
-    void SetClientData(wxTreeItemData* clientData) { this->m_clientData = clientData; }
+    void SetClientData(wxTreeItemData* clientData)
+    {
+        wxDELETE(m_clientData);
+        this->m_clientData = clientData;
+    }
     void SetLabel(const wxString& label) { this->m_label = label; }
     const wxString& GetLabel() const { return m_label; }
     size_t GetChildrenCount(bool recurse) const;

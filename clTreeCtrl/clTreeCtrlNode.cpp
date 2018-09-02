@@ -157,13 +157,24 @@ void clTreeCtrlNode::ClearRects()
     m_itemRect = wxRect();
 }
 
-void clTreeCtrlNode::Render(wxDC& dc, const clTreeCtrlColours& colours)
+void clTreeCtrlNode::Render(wxDC& dc, const clTreeCtrlColours& c)
 {
     wxRect itemRect = GetItemRect();
+    clTreeCtrlColours colours = c;
+    wxFont f = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+    if(GetFont().IsOk()) { f = GetFont(); }
+    if(GetTextColour().IsOk()) { colours.itemTextColour = GetTextColour(); }
+    if(GetBgColour().IsOk()) { colours.itemBgColour = GetBgColour(); }
+    dc.SetFont(f);
+    
     if(IsSelected() || IsHovered()) {
         dc.SetBrush(IsSelected() ? colours.selItemBgColour : colours.hoverBgColour);
         dc.SetPen(IsSelected() ? colours.selItemBgColour : colours.hoverBgColour);
         dc.DrawRoundedRectangle(itemRect, 1.5);
+    } else if(colours.itemBgColour.IsOk()) {
+        dc.SetBrush(colours.itemBgColour);
+        dc.SetPen(colours.itemBgColour);
+        dc.DrawRectangle(itemRect);
     }
 
     wxSize textSize = dc.GetTextExtent(GetLabel());
@@ -211,7 +222,7 @@ void clTreeCtrlNode::Render(wxDC& dc, const clTreeCtrlColours& colours)
             textXOffset += X_SPACER;
         }
     }
-    dc.SetTextForeground(IsSelected() ? colours.selItemTextColour : colours.textColour);
+    dc.SetTextForeground(IsSelected() ? colours.selItemTextColour : colours.itemTextColour);
     dc.DrawText(GetLabel(), itemIndent + textXOffset, textY);
 }
 
@@ -245,4 +256,26 @@ clTreeCtrlNode* clTreeCtrlNode::GetLastChild() const
 {
     if(m_children.empty()) { return nullptr; }
     return m_children.back();
+}
+
+void clTreeCtrlColours::InitDefaults()
+{
+    itemTextColour = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT);
+    selItemTextColour = itemTextColour;
+    selItemBgColour = wxColour("rgb(199,203,209)");
+    buttonColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW);
+    hoverBgColour = wxColour("rgb(219,221,224)");
+    bgColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE);
+    itemBgColour = bgColour;
+}
+
+void clTreeCtrlColours::InitDarkDefaults()
+{
+    bgColour = wxColour("#1c2833");
+    itemTextColour = wxColour("#eaecee");
+    selItemTextColour = *wxWHITE;
+    selItemBgColour = wxColour("#2c3e50");
+    buttonColour = itemTextColour;
+    hoverBgColour = wxColour("#566573");
+    itemBgColour = bgColour;
 }

@@ -11,6 +11,7 @@ MainFrame::MainFrame(wxWindow* parent)
 {
     m_tree = new clTreeCtrl(m_mainPanel);
     clTreeCtrlColours colours = m_tree->GetColours();
+    colours.InitDarkDefaults();
     m_tree->SetColours(colours);
 
     std::vector<wxBitmap> bitmaps;
@@ -70,6 +71,7 @@ void MainFrame::OnOpenFolder(wxCommandEvent& event)
     wxTreeItemId root = m_tree->AddRoot(path, 0, 1, new MyItemData(m_path));
     m_tree->AppendItem(root, "dummy-node");
     m_tree->SelectItem(root);
+    m_tree->SetItemBold(root, true);
 }
 
 void MainFrame::OnItemExpanding(wxTreeEvent& event)

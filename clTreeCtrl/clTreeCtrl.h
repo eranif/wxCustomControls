@@ -31,7 +31,7 @@ public:
     // For internal use, dont use these two methods
     const clTreeCtrlModel& GetModel() const { return m_model; }
     clTreeCtrlModel& GetModel() { return m_model; }
-    
+
     void SetBitmaps(const std::vector<wxBitmap>& bitmaps);
     const std::vector<wxBitmap>& GetBitmaps() const { return m_bitmaps; }
 
@@ -169,15 +169,25 @@ public:
      */
     wxTreeItemId GetPrevVisible(const wxTreeItemId& item) const;
 
-    /**
-     * @brief return the item label
-     */
+    //===--------------------------------
+    // Item properties
+    //===--------------------------------
+    wxTreeItemData* GetItemData(const wxTreeItemId& item) const;
+    void SetItemData(const wxTreeItemId& item, wxTreeItemData* data);
+
+    void SetItemBackgroundColour(const wxTreeItemId& item, const wxColour& colour);
+    wxColour GetItemBackgroudColour(const wxTreeItemId& item) const;
+
+    void SetItemTextColour(const wxTreeItemId& item, const wxColour& colour);
+    wxColour GetItemTextColour(const wxTreeItemId& item) const;
+
+    void SetItemText(const wxTreeItemId& item, const wxString& text);
     wxString GetItemText(const wxTreeItemId& item) const;
 
-    /**
-     * @brief return the associated item data
-     */
-    wxTreeItemData* GetItemData(const wxTreeItemId& item) const;
+    void SetItemBold(const wxTreeItemId& item, bool bold);
+
+    void SetItemFont(const wxTreeItemId& item, const wxFont& font);
+    wxFont GetItemFont(const wxTreeItemId& item) const;
 
     /**
      * @brief expand this item and all its children
