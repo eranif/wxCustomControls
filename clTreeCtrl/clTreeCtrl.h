@@ -10,7 +10,6 @@ class clTreeCtrl : public wxPanel
 {
     int m_lineHeight = 0;
     clTreeCtrlModel m_model;
-    clTreeCtrlNode* m_firstOnScreenItem = nullptr;
     int m_scrollTick = 3;
     std::vector<wxBitmap> m_bitmaps;
     clTreeCtrlColours m_colours;
@@ -22,7 +21,9 @@ private:
     bool IsItemVisible(clTreeCtrlNode* item) const;
     void EnsureItemVisible(clTreeCtrlNode* item, bool fromTop);
     int GetNumLineCanFitOnScreen() const;
-
+    clTreeCtrlNode* GetFirstItemOnScreen();
+    void SetFirstItemOnScreen(clTreeCtrlNode* item);
+    
 public:
     clTreeCtrl(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
         const wxSize& size = wxDefaultSize, long style = 0);

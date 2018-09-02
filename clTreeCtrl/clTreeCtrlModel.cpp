@@ -151,7 +151,7 @@ wxTreeItemId clTreeCtrlModel::InsertItem(const wxTreeItemId& parent, const wxTre
     clTreeCtrlNode* pPrev = ToPtr(previous);
     clTreeCtrlNode* parentNode = ToPtr(parent);
     if(pPrev->GetParent() != parentNode) { return wxTreeItemId(); }
-    
+
     clTreeCtrlNode* child = new clTreeCtrlNode(m_tree, text, image, selImage);
     child->SetClientData(data);
     parentNode->InsertChild(child, pPrev);
@@ -246,6 +246,11 @@ void clTreeCtrlModel::NodeDeleted(clTreeCtrlNode* node)
         clTreeCtrlNode::Vec_t::iterator iter = std::find_if(
             m_onScreenItems.begin(), m_onScreenItems.end(), [&](clTreeCtrlNode* n) { return n == node; });
         if(iter != m_onScreenItems.end()) { m_onScreenItems.erase(iter); }
+    }
+    {
+        if(m_firstItemOnScreen == node) { 
+            m_firstItemOnScreen = nullptr;
+        }
     }
 }
 

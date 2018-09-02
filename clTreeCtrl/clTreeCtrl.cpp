@@ -69,8 +69,8 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
     dc.DrawRectangle(clientRect);
 
     int maxItems = GetNumLineCanFitOnScreen();
-    if(!m_firstOnScreenItem) { m_firstOnScreenItem = m_model.GetRoot(); }
-    clTreeCtrlNode* firstItem = m_firstOnScreenItem;
+    if(!GetFirstItemOnScreen()) { SetFirstItemOnScreen(m_model.GetRoot()); }
+    clTreeCtrlNode* firstItem = GetFirstItemOnScreen();
     if(!firstItem) { return; }
     int y = clientRect.GetY();
     clTreeCtrlNode::Vec_t items;
@@ -333,14 +333,14 @@ wxTreeItemData* clTreeCtrl::GetItemData(const wxTreeItemId& item) const
 
 void clTreeCtrl::OnMouseScroll(wxMouseEvent& event)
 {
-    if(!m_firstOnScreenItem) { return; }
+    if(!GetFirstItemOnScreen()) { return; }
     clTreeCtrlNode::Vec_t items;
     if(event.GetWheelRotation() > 0) { // Scrolling up
-        m_model.GetPrevItems(m_firstOnScreenItem, m_scrollTick, items);
-        m_firstOnScreenItem = items.front(); // first item
+        m_model.GetPrevItems(GetFirstItemOnScreen(), m_scrollTick, items);
+        SetFirstItemOnScreen(items.front()); // first item
     } else {
-        m_model.GetNextItems(m_firstOnScreenItem, m_scrollTick, items);
-        m_firstOnScreenItem = items.back(); // the last item
+        m_model.GetNextItems(GetFirstItemOnScreen(), m_scrollTick, items);
+        SetFirstItemOnScreen(items.back()); // the last item
     }
     Refresh();
 }
@@ -411,7 +411,7 @@ void clTreeCtrl::CollapseAllChildren(const wxTreeItemId& item)
 {
     wxBusyCursor bc;
     m_model.CollapseAllChildren(item);
-    m_firstOnScreenItem = m_model.ToPtr(item);
+    SetFirstItemOnScreen(m_model.ToPtr(item));
     SelectItem(item);
     Refresh();
 }
@@ -525,13 +525,13 @@ void clTreeCtrl::EnsureItemVisible(clTreeCtrlNode* item, bool fromTop)
 {
     if(IsItemVisible(item)) { return; }
     if(fromTop) {
-        m_firstOnScreenItem = item;
+        SetFirstItemOnScreen(item);
     } else {
         int max_lines_on_screen = GetNumLineCanFitOnScreen();
         clTreeCtrlNode::Vec_t items;
         m_model.GetPrevItems(item, max_lines_on_screen, items);
         if(items.empty()) { return; }
-        m_firstOnScreenItem = items[0];
+        SetFirstItemOnScreen(items[0]);
     }
 }
 
@@ -651,3 +651,7 @@ void clTreeCtrl::OnRightDown(wxMouseEvent& event)
         event.Skip();
     }
 }
+
+clTreeCtrlNode* clTreeCtrl::GetFirstItemOnScreen() { return m_model.GetFirstItemOnScreen(); }
+
+void clTreeCtrl::SetFirstItemOnScreen(clTreeCtrlNode* item) { m_model.SetFirstItemOnScreen(item); }

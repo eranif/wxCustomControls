@@ -19,6 +19,7 @@ class clTreeCtrlModel
     clTreeCtrlNode* m_root = nullptr;
     clTreeCtrlNode::Vec_t m_selectedItems;
     clTreeCtrlNode::Vec_t m_onScreenItems;
+    clTreeCtrlNode* m_firstItemOnScreen = nullptr;
     int m_indentSize = 16;
     bool m_shutdown = false;
 
@@ -32,6 +33,9 @@ public:
     clTreeCtrlModel(clTreeCtrl* tree);
     ~clTreeCtrlModel();
 
+    void SetFirstItemOnScreen(clTreeCtrlNode* firstItemOnScreen) { this->m_firstItemOnScreen = firstItemOnScreen; }
+    clTreeCtrlNode* GetFirstItemOnScreen() { return m_firstItemOnScreen; }
+    
     void ExpandAllChildren(const wxTreeItemId& item);
     void CollapseAllChildren(const wxTreeItemId& item);
 
