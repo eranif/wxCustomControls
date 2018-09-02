@@ -27,7 +27,7 @@ protected:
     bool IsSingleSelection() const;
     bool IsMultiSelection() const;
     bool SendEvent(wxEvent& event);
-    
+
 public:
     clTreeCtrlModel(clTreeCtrl* tree);
     ~clTreeCtrlModel();
@@ -66,7 +66,12 @@ public:
     /**
      * @brief select a given item
      */
-    void SelectItem(const wxTreeItemId& item, bool select = true);
+    void SelectItem(
+        const wxTreeItemId& item, bool select = true, bool addSelection = false, bool clear_old_selection = false);
+    /**
+     * @brief plural version
+     */
+    void SelectItems(const std::vector<std::pair<wxTreeItemId, bool>>& items);
 
     void Clear();
 
@@ -75,9 +80,11 @@ public:
     const clTreeCtrlNode::Vec_t& GetOnScreenItems() const { return m_onScreenItems; }
     clTreeCtrlNode::Vec_t& GetOnScreenItems() { return m_onScreenItems; }
     const clTreeCtrlNode::Vec_t& GetSelections() const { return m_selectedItems; }
-    clTreeCtrlNode::Vec_t& GetSelections() { return m_selectedItems; }
+    //clTreeCtrlNode::Vec_t& GetSelections() { return m_selectedItems; }
     bool ExpandToItem(const wxTreeItemId& item);
-
+    wxTreeItemId GetSingleSelection() const;
+    size_t GetSelectionsCount() const { return m_selectedItems.size(); }
+    
     /**
      * @brief do we have items in this tree? (root included)
      */
@@ -91,6 +98,13 @@ public:
      * @param item
      */
     void DeleteItem(const wxTreeItemId& item);
+    int GetItemIndex(clTreeCtrlNode* item) const;
+    
+    /**
+     * @brief get range of items from -> to
+     * Or from: to->from (incase 'to' has a lower index)
+     */
+    bool GetRange(clTreeCtrlNode* from, clTreeCtrlNode* to, clTreeCtrlNode::Vec_t& items) const;
 };
 
 #endif // CLTREECTRLMODEL_H

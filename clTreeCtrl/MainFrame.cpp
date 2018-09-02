@@ -9,7 +9,7 @@
 MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
 {
-    m_tree = new clTreeCtrl(m_mainPanel);
+    m_tree = new clTreeCtrl(m_mainPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_MULTIPLE);
     clTreeCtrlColours colours = m_tree->GetColours();
     colours.InitDarkDefaults();
     m_tree->SetColours(colours);
@@ -41,9 +41,15 @@ MainFrame::MainFrame(wxWindow* parent)
         LogMessage(wxString() << "Key event: " << m_tree->GetItemText(evt.GetItem()));
     });
     m_tree->Bind(wxEVT_TREE_ITEM_ACTIVATED, [&](wxTreeEvent& evt) {
-        evt.Skip(); // Let the default action take place
-        LogMessage(wxString() << "Item activated: " << m_tree->GetItemText(evt.GetItem()));
+        evt.Skip();
+        wxArrayTreeItemIds items;
+        m_tree->GetSelections(items);
+        LogMessage(wxString() << "Single selection is: " << m_tree->GetItemText(m_tree->GetSelection()));
+        for(size_t i = 0; i < items.GetCount(); ++i) {
+            LogMessage(wxString() << "Acticated item: " << m_tree->GetItemText(items[i]));
+        }
     });
+    
     m_tree->Bind(wxEVT_TREE_ITEM_MENU, [&](wxTreeEvent& evt) {
         evt.Skip(); // Let the default action take place
         LogMessage(wxString() << "Context menu for item: " << m_tree->GetItemText(evt.GetItem()));

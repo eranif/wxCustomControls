@@ -33,7 +33,7 @@ MainFrameBaseClass::MainFrameBaseClass(
     m_mainPanel->SetSizer(boxSizer11);
 
     m_stc15
-        = new wxStyledTextCtrl(m_mainPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainPanel, wxSize(-1, 50)), 0);
+        = new wxStyledTextCtrl(m_mainPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainPanel, wxSize(-1, 150)), 0);
 #ifdef __WXMSW__
     // To get the newer version of the font on MSW, we use font wxSYS_DEFAULT_GUI_FONT with family set to
     // wxFONTFAMILY_TELETYPE

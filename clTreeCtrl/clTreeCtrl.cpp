@@ -147,7 +147,30 @@ void clTreeCtrl::OnMouseLeftDown(wxMouseEvent& event)
                 Expand(where);
             }
         } else {
-            SelectItem(where, true);
+            clTreeCtrlNode* pNode = m_model.ToPtr(where);
+            if(event.ControlDown()) {
+                // Add one to the current selections
+                m_model.SelectItem(where, !pNode->IsSelected(), true);
+            } else if(event.ShiftDown()) {
+                // Range selection
+                clTreeCtrlNode::Vec_t range;
+                std::vector<std::pair<wxTreeItemId, bool>> itemsToSelect;
+                m_model.GetRange(pNode, m_model.ToPtr(m_model.GetSingleSelection()), range);
+                std::for_each(range.begin(), range.end(), [&](clTreeCtrlNode* p) {
+                    itemsToSelect.push_back({ wxTreeItemId(p), true });
+                });
+                m_model.SelectItems(itemsToSelect);
+            } else {
+                // The default, single selection
+                bool select_it = !pNode->IsSelected(); // Toggle is the default action
+                bool force_selection = false;
+                if(m_model.GetSelectionsCount() > 1) {
+                    // Unless multiple selections, in that case, select it
+                    select_it = true;
+                    force_selection = true;
+                }
+                m_model.SelectItem(where, select_it, false, force_selection);
+            }
         }
         Refresh();
     }
@@ -414,12 +437,7 @@ wxTreeItemId clTreeCtrl::DoGetSiblingVisibleItem(const wxTreeItemId& item, bool 
     return wxTreeItemId(*iter);
 }
 
-wxTreeItemId clTreeCtrl::GetSelection() const
-{
-    const clTreeCtrlNode::Vec_t& items = m_model.GetSelections();
-    if(items.empty()) { return wxTreeItemId(); }
-    return wxTreeItemId(items[0]);
-}
+wxTreeItemId clTreeCtrl::GetSelection() const { return m_model.GetSingleSelection(); }
 
 wxTreeItemId clTreeCtrl::GetFocusedItem() const { return GetSelection(); }
 

@@ -70,7 +70,6 @@ protected:
     }
 
     bool HasFlag(clTreeCtrlNodeFlags flag) const { return m_flags & flag; }
-    bool IsVisible() const;
 
     /**
      * @brief return the nth visible item
@@ -87,6 +86,7 @@ public:
     clTreeCtrlNode* GetNext() const { return m_next; }
     clTreeCtrlNode* GetPrev() const { return m_prev; }
 
+    bool IsVisible() const;
     void SetBgColour(const wxColour& bgColour) { this->m_bgColour = bgColour; }
     void SetFont(const wxFont& font) { this->m_font = font; }
     void SetTextColour(const wxColour& textColour) { this->m_textColour = textColour; }

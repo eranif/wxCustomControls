@@ -56,10 +56,12 @@ void clTreeCtrlModel::UnselectAll()
     m_selectedItems.clear();
 }
 
-void clTreeCtrlModel::SelectItem(const wxTreeItemId& item, bool select)
+void clTreeCtrlModel::SelectItem(const wxTreeItemId& item, bool select, bool addSelection, bool clear_old_selection)
 {
     clTreeCtrlNode* child = ToPtr(item);
     if(!child) return;
+    
+    if(clear_old_selection) { UnselectAll(); }
     if(select) {
         clTreeCtrlNode::Vec_t::iterator iter = std::find_if(
             m_selectedItems.begin(), m_selectedItems.end(), [&](clTreeCtrlNode* p) { return (p == child); });
@@ -70,11 +72,12 @@ void clTreeCtrlModel::SelectItem(const wxTreeItemId& item, bool select)
     if(select && !m_selectedItems.empty()) {
         wxTreeEvent evt(wxEVT_TREE_SEL_CHANGING);
         evt.SetEventObject(m_tree);
-        evt.SetOldItem(IsSingleSelection() ? GetSelections()[0] : wxTreeItemId(nullptr));
+        evt.SetOldItem(IsSingleSelection() ? GetSingleSelection() : wxTreeItemId(nullptr));
         SendEvent(evt);
         if(!evt.IsAllowed()) { return; }
     }
-    if(IsMultiSelection()) {
+
+    if(IsMultiSelection() && addSelection) {
         // If we are unselecting it, remove it from the array
         clTreeCtrlNode::Vec_t::iterator iter = std::find_if(
             m_selectedItems.begin(), m_selectedItems.end(), [&](clTreeCtrlNode* p) { return (p == child); });
@@ -246,4 +249,96 @@ bool clTreeCtrlModel::SendEvent(wxEvent& event)
 {
     if(m_shutdown) { return false; }
     return m_tree->GetEventHandler()->ProcessEvent(event);
+}
+
+void clTreeCtrlModel::SelectItems(const std::vector<std::pair<wxTreeItemId, bool>>& items)
+{
+    UnselectAll();
+    for(size_t i = 0; i < items.size(); ++i) {
+        clTreeCtrlNode* child = ToPtr(items[i].first);
+        bool selectIt = items[i].second;
+        if(!child) continue;
+        if(selectIt) {
+            clTreeCtrlNode::Vec_t::iterator iter = std::find_if(
+                m_selectedItems.begin(), m_selectedItems.end(), [&](clTreeCtrlNode* p) { return (p == child); });
+            // If the item is already selected, don't select it again
+            if(iter != m_selectedItems.end()) { continue; }
+        }
+
+        if(selectIt && !m_selectedItems.empty()) {
+            wxTreeEvent evt(wxEVT_TREE_SEL_CHANGING);
+            evt.SetEventObject(m_tree);
+            evt.SetOldItem(IsSingleSelection() ? GetSelections()[0] : wxTreeItemId(nullptr));
+            SendEvent(evt);
+            if(!evt.IsAllowed()) { return; }
+        }
+        if(!selectIt) {
+            // If we are unselecting it, remove it from the array
+            clTreeCtrlNode::Vec_t::iterator iter = std::find_if(
+                m_selectedItems.begin(), m_selectedItems.end(), [&](clTreeCtrlNode* p) { return (p == child); });
+            if(iter != m_selectedItems.end()) { m_selectedItems.erase(iter); }
+        }
+
+        child->SetSelected(selectIt);
+        if(selectIt) {
+            m_selectedItems.push_back(child);
+            wxTreeEvent evt(wxEVT_TREE_SEL_CHANGED);
+            evt.SetEventObject(m_tree);
+            evt.SetItem(wxTreeItemId(child));
+            SendEvent(evt);
+        }
+    }
+}
+
+wxTreeItemId clTreeCtrlModel::GetSingleSelection() const
+{
+    if(m_selectedItems.empty()) { return wxTreeItemId(); }
+    return wxTreeItemId(m_selectedItems.back());
+}
+
+int clTreeCtrlModel::GetItemIndex(clTreeCtrlNode* item) const
+{
+    if(!m_root) { return wxNOT_FOUND; }
+    int counter = 0;
+    clTreeCtrlNode* current = m_root;
+    while(current) {
+        if(current == item) { return counter; }
+        ++counter;
+        current = current->GetNext();
+    }
+    return wxNOT_FOUND;
+}
+
+bool clTreeCtrlModel::GetRange(clTreeCtrlNode* from, clTreeCtrlNode* to, clTreeCtrlNode::Vec_t& items) const
+{
+    items.clear();
+    if(from == nullptr || to == nullptr) { return false; }
+    if(from == nullptr) {
+        items.push_back(to);
+        return true;
+    }
+    if(to == nullptr) {
+        items.push_back(from);
+        return true;
+    }
+    if(from == to) {
+        items.push_back(from);
+        return true;
+    }
+
+    int index1 = GetItemIndex(from);
+    int index2 = GetItemIndex(to);
+
+    clTreeCtrlNode* start_item = index1 > index2 ? to : from;
+    clTreeCtrlNode* end_item = index1 > index2 ? from : to;
+    clTreeCtrlNode* current = start_item;
+    while(current) {
+        if(current == end_item) {
+            items.push_back(current);
+            break;
+        }
+        if(current->IsVisible()) { items.push_back(current); }
+        current = current->GetNext();
+    }
+    return true;
 }
