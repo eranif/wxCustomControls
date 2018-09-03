@@ -34,6 +34,7 @@ MainFrame::MainFrame(wxWindow* parent)
         LogMessage(wxString() << "Selection changing from: " << m_tree->GetItemText(evt.GetOldItem()));
     });
     m_tree->Bind(wxEVT_TREE_SEL_CHANGED, [&](wxTreeEvent& evt) {
+        evt.Skip();
         LogMessage(wxString() << "Selection changed. selection is: " << m_tree->GetItemText(evt.GetItem()));
     });
     m_tree->Bind(wxEVT_TREE_KEY_DOWN, [&](wxTreeEvent& evt) {
@@ -42,7 +43,7 @@ MainFrame::MainFrame(wxWindow* parent)
     });
     
     m_tree->Bind(wxEVT_TREE_ITEM_RIGHT_CLICK, [&](wxTreeEvent& evt) {
-        //evt.Skip(); // Must call this for the default actions process
+        evt.Skip(); // Must call this for the default actions process
         LogMessage(wxString() << "Tree right click: " << m_tree->GetItemText(evt.GetItem()));
     });
     
@@ -86,8 +87,9 @@ void MainFrame::OnAbout(wxCommandEvent& event)
 
 void MainFrame::LogMessage(const wxString& message)
 {
-    m_stc15->AddText(message + "\n");
-    m_stc15->ScrollToEnd();
+    //m_stc15->AddText(message + "\n");
+    //m_stc15->ScrollToEnd();
+    //m_tree->CallAfter(&wxPanel::SetFocus);
 }
 
 void MainFrame::OnOpenFolder(wxCommandEvent& event)
