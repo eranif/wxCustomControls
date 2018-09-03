@@ -144,6 +144,7 @@ wxTreeItemId clTreeCtrlModel::AppendItem(
     if(m_compareFunction) {
         const clTreeCtrlNode::Vec_t& children = parentNode->GetChildren();
         wxTreeItemId newItem(child);
+        // TODO:: use std::upper_bound here
         for(int i = ((int)children.size() - 1); i >= 0; --i) {
             if(!m_compareFunction(newItem, children[i])) {
                 insertAfter = ToPtr(children[i]);
