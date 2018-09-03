@@ -98,8 +98,6 @@ void clScrollBar::OnMouseLeftDown(wxMouseEvent& event)
         m_scrolling = true;
         m_anchorPoint = event.GetPosition();
         m_parent->CaptureMouse();
-        //        wxLogMessage("Scrollbar captured the mouse");
-        //        wxLogMessage(wxString() << "Capture point is @" << m_anchorPoint.x << "x" << m_anchorPoint.y);
     } else {
         event.Skip();
     }

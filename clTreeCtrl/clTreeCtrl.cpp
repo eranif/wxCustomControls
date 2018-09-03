@@ -420,7 +420,7 @@ void clTreeCtrl::OnIdle(wxIdleEvent& event)
             bool new_state = hoveredNode == items[i];
             bool old_state = items[i]->IsHovered();
             if(!refreshNeeded) { refreshNeeded = (new_state != old_state); }
-            items[i]->SetHovered(hoveredNode == items[i]);
+            items[i]->SetHovered(hoveredNode == items[i] && !HasCapture());
         }
         if(refreshNeeded) { Refresh(); }
     }
