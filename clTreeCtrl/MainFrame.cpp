@@ -151,11 +151,6 @@ void MainFrame::OnItemExpanding(wxTreeEvent& event)
             }
         }
     }
-    clTreeCtrlNode* n = reinterpret_cast<clTreeCtrlNode*>(item.GetID());
-    std::for_each(n->GetChildren().begin(), n->GetChildren().end(), [&](clTreeCtrlNode* c){
-        std::cout << c->GetLabel() << ","; 
-    });
-    std::cout << std::endl;
 }
 
 void MainFrame::OnExpandAll(wxCommandEvent& event) { m_tree->ExpandAll(); }
