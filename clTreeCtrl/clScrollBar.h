@@ -5,9 +5,8 @@
 
 class clScrollBar : public wxPanel
 {
-    int m_ticks = 0;
-    int m_thumbSize = 0;
-    int m_thumbPos = 0;
+    int m_totalTicks = 0;
+    int m_tickSize = 0;
     int m_firstTick = 0;
     wxOrientation m_orientation = wxVERTICAL;
 

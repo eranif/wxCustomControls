@@ -7,6 +7,10 @@ clScrollBar::clScrollBar(wxWindow* parent, wxOrientation orientation)
     , m_orientation(orientation)
 {
     Bind(wxEVT_PAINT, &clScrollBar::OnPaint, this);
+    Bind(wxEVT_SIZE, [&](wxSizeEvent& event) {
+        event.Skip();
+        Refresh();
+    });
     Bind(wxEVT_ERASE_BACKGROUND, [&](wxEraseEvent& event) { wxUnusedVar(event); });
     if(m_orientation == wxVERTICAL) {
         SetSizeHints(16, -1);
@@ -25,15 +29,8 @@ void clScrollBar::OnPaint(wxPaintEvent& event)
 
 void clScrollBar::Update(int ticksCount, int tickSize, int firstTick)
 {
-    wxRect clientRect = GetClientRect();
-    double thumbRatio = ((double)ticksCount / (double)visibleTicks);
-    m_thumbSize = thumbRatio * clientRect.GetHeight();
-    m_thumbPos = ((double)((double)firstTick / (double)ticksCount) * clientRect.GetHeight()) + clientRect.GetY();
-    if(m_thumbSize < 0) {
-        m_thumbSize = 0;
-    }
-    if(m_thumbPos < 0) {
-        m_thumbPos = 0;
-    }
+    m_tickSize = tickSize;
+    m_totalTicks = ticksCount;
+    m_firstTick = firstTick;
     Refresh();
 }
