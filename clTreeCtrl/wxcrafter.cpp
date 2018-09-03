@@ -32,55 +32,10 @@ MainFrameBaseClass::MainFrameBaseClass(
     wxBoxSizer* boxSizer11 = new wxBoxSizer(wxVERTICAL);
     m_mainPanel->SetSizer(boxSizer11);
 
-    m_stc15
-        = new wxStyledTextCtrl(m_mainPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainPanel, wxSize(-1, 150)), 0);
-#ifdef __WXMSW__
-    // To get the newer version of the font on MSW, we use font wxSYS_DEFAULT_GUI_FONT with family set to
-    // wxFONTFAMILY_TELETYPE
-    wxFont m_stc15Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
-    m_stc15Font.SetFamily(wxFONTFAMILY_TELETYPE);
-#else
-    wxFont m_stc15Font = wxSystemSettings::GetFont(wxSYS_ANSI_FIXED_FONT);
-    m_stc15Font.SetFamily(wxFONTFAMILY_TELETYPE);
-#endif
-    m_stc15->SetFont(m_stc15Font);
-    // Configure the fold margin
-    m_stc15->SetMarginType(4, wxSTC_MARGIN_SYMBOL);
-    m_stc15->SetMarginMask(4, wxSTC_MASK_FOLDERS);
-    m_stc15->SetMarginSensitive(4, true);
-    m_stc15->SetMarginWidth(4, 0);
+    m_textCtrlLog = new wxTextCtrl(m_mainPanel, wxID_ANY, wxT(""), wxDefaultPosition,
+        wxDLG_UNIT(m_mainPanel, wxSize(-1, 150)), wxTE_RICH | wxTE_MULTILINE);
 
-    // Configure the tracker margin
-    m_stc15->SetMarginWidth(1, 0);
-
-    // Configure the symbol margin
-    m_stc15->SetMarginType(2, wxSTC_MARGIN_SYMBOL);
-    m_stc15->SetMarginMask(2, ~(wxSTC_MASK_FOLDERS));
-    m_stc15->SetMarginWidth(2, 0);
-    m_stc15->SetMarginSensitive(2, true);
-
-    // Configure the line numbers margin
-    m_stc15->SetMarginType(0, wxSTC_MARGIN_NUMBER);
-    m_stc15->SetMarginWidth(0, 0);
-
-    // Configure the line symbol margin
-    m_stc15->SetMarginType(3, wxSTC_MARGIN_FORE);
-    m_stc15->SetMarginMask(3, 0);
-    m_stc15->SetMarginWidth(3, 0);
-    // Select the lexer
-    m_stc15->SetLexer(wxSTC_LEX_NULL);
-    // Set default font / styles
-    m_stc15->StyleClearAll();
-    for(int i = 0; i < wxSTC_STYLE_MAX; ++i) { m_stc15->StyleSetFont(i, m_stc15Font); }
-    m_stc15->SetWrapMode(0);
-    m_stc15->SetIndentationGuides(0);
-    m_stc15->SetKeyWords(0, wxT(""));
-    m_stc15->SetKeyWords(1, wxT(""));
-    m_stc15->SetKeyWords(2, wxT(""));
-    m_stc15->SetKeyWords(3, wxT(""));
-    m_stc15->SetKeyWords(4, wxT(""));
-
-    boxSizer11->Add(m_stc15, 0, wxALL | wxEXPAND | wxALIGN_BOTTOM, WXC_FROM_DIP(5));
+    boxSizer11->Add(m_textCtrlLog, 0, wxALL | wxEXPAND, WXC_FROM_DIP(5));
 
     m_menuBar = new wxMenuBar(0);
     this->SetMenuBar(m_menuBar);

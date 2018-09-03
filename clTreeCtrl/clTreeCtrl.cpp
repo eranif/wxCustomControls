@@ -1,3 +1,4 @@
+#include "clScrollBar.h"
 #include "clTreeCtrl.h"
 #include "clTreeCtrlModel.h"
 #include <algorithm>
@@ -42,6 +43,8 @@ clTreeCtrl::clTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
     Bind(wxEVT_CONTEXT_MENU, &clTreeCtrl::OnContextMenu, this);
     Bind(wxEVT_RIGHT_DOWN, &clTreeCtrl::OnRightDown, this);
 
+    m_scrollBar = new clScrollBar(this, wxVERTICAL);
+    m_scrollBar->Bind(wxEVT_SCROLL_THUMBTRACK, &clTreeCtrl::OnScroll, this);
     // Initialise default colours
     m_colours.InitDefaults();
 }
@@ -99,6 +102,7 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
         y += m_lineHeight;
     }
     m_model.SetOnScreenItems(items); // Keep track of the visible items
+    UpdateScrollBar(dc);
 }
 
 void clTreeCtrl::OnSize(wxSizeEvent& event)
@@ -353,6 +357,22 @@ void clTreeCtrl::OnMouseScroll(wxMouseEvent& event)
 {
     CHECK_ROOT_RET();
     if(!GetFirstItemOnScreen()) { return; }
+    const clTreeCtrlNode::Vec_t& onScreenItems = m_model.GetOnScreenItems();
+    if(onScreenItems.empty()) { return; }
+    clTreeCtrlNode* lastItem = onScreenItems.back();
+    clTreeCtrlNode* firstItem = onScreenItems.front();
+
+    // Can we scroll any further?
+    wxTreeItemId nextItem;
+    if(event.GetWheelRotation() > 0) { // Scrolling up
+        nextItem = m_model.GetItemAfter(firstItem, true);
+    } else {
+        nextItem = m_model.GetItemAfter(lastItem, true);
+    }
+    if(!nextItem.IsOk()) {
+        // No more items to draw
+        return;
+    }
     clTreeCtrlNode::Vec_t items;
     if(event.GetWheelRotation() > 0) { // Scrolling up
         m_model.GetPrevItems(GetFirstItemOnScreen(), m_scrollTick, items);
@@ -683,4 +703,21 @@ void clTreeCtrl::SetFirstItemOnScreen(clTreeCtrlNode* item) { m_model.SetFirstIt
 void clTreeCtrl::SetSortFunction(const std::function<bool(const wxTreeItemId&, const wxTreeItemId&)>& CompareFunc)
 {
     m_model.SetSortFunction(CompareFunc);
+}
+
+void clTreeCtrl::UpdateScrollBar(wxDC& dc)
+{
+    wxRect rect = GetClientRect();
+    m_scrollBar->SetScrollbar(m_model.GetItemIndex(m_model.GetFirstItemOnScreen()), rect.GetHeight() / m_lineHeight,
+        m_model.GetExpandedLines(), m_lineHeight);
+    m_scrollBar->Render(dc);
+}
+
+void clTreeCtrl::OnScroll(wxScrollEvent& event)
+{
+    int position = event.GetPosition();
+    clTreeCtrlNode* item = m_model.GetItemFromIndex(position);
+    if(!item) { return; }
+    SetFirstItemOnScreen(item);
+    Refresh();
 }

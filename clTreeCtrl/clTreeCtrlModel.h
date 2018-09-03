@@ -110,12 +110,15 @@ public:
      */
     void DeleteItem(const wxTreeItemId& item);
     int GetItemIndex(clTreeCtrlNode* item) const;
+    clTreeCtrlNode* GetItemFromIndex(int index) const;
 
     /**
      * @brief get range of items from -> to
      * Or from: to->from (incase 'to' has a lower index)
      */
     bool GetRange(clTreeCtrlNode* from, clTreeCtrlNode* to, clTreeCtrlNode::Vec_t& items) const;
+    
+    size_t GetExpandedLines() const;
 };
 
 #endif // CLTREECTRLMODEL_H

@@ -18,7 +18,7 @@
 #include <wx/panel.h>
 #include <wx/settings.h>
 #include <wx/sizer.h>
-#include <wx/stc/stc.h>
+#include <wx/textctrl.h>
 #include <wx/xrc/xh_bmp.h>
 #include <wx/xrc/xmlres.h>
 #if wxVERSION_NUMBER >= 2900
@@ -47,7 +47,7 @@ public:
 
 protected:
     wxPanel* m_mainPanel;
-    wxStyledTextCtrl* m_stc15;
+    wxTextCtrl* m_textCtrlLog;
     wxMenuBar* m_menuBar;
     wxMenu* m_name6;
     wxMenuItem* m_menuItem13;
@@ -73,7 +73,7 @@ protected:
     virtual void OnAbout(wxCommandEvent& event) { event.Skip(); }
 
 public:
-    wxStyledTextCtrl* GetStc15() { return m_stc15; }
+    wxTextCtrl* GetTextCtrlLog() { return m_textCtrlLog; }
     wxPanel* GetMainPanel() { return m_mainPanel; }
     wxMenuBar* GetMenuBar() { return m_menuBar; }
     MainFrameBaseClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("My Frame"),

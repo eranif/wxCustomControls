@@ -135,7 +135,7 @@ public:
 
     bool IsExpanded() const { return HasFlag(kExpanded); }
     bool SetExpanded(bool b);
-
+    bool IsRoot() const { return GetParent() == nullptr; }
     void SetBitmapIndex(int bitmapIndex) { this->m_bitmapIndex = bitmapIndex; }
     int GetBitmapIndex() const { return m_bitmapIndex; }
     void SetBitmapSelectedIndex(int bitmapIndex) { this->m_bitmapSelectedIndex = bitmapIndex; }

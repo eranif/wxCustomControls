@@ -3,9 +3,11 @@
 
 #include "clTreeCtrlModel.h"
 #include <wx/arrstr.h>
+#include <wx/dc.h>
 #include <wx/panel.h>
 #include <wx/scrolwin.h>
 
+class clScrollBar;
 class clTreeCtrl : public wxPanel
 {
     int m_lineHeight = 0;
@@ -14,6 +16,7 @@ class clTreeCtrl : public wxPanel
     std::vector<wxBitmap> m_bitmaps;
     clTreeCtrlColours m_colours;
     long m_treeStyle = 0;
+    clScrollBar* m_scrollBar;
 
 private:
     wxPoint DoFixPoint(const wxPoint& pt);
@@ -23,7 +26,8 @@ private:
     int GetNumLineCanFitOnScreen() const;
     clTreeCtrlNode* GetFirstItemOnScreen();
     void SetFirstItemOnScreen(clTreeCtrlNode* item);
-    
+    void UpdateScrollBar(wxDC& dc);
+
 public:
     clTreeCtrl(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
         const wxSize& size = wxDefaultSize, long style = 0);
@@ -32,13 +36,13 @@ public:
     // For internal use, dont use these two methods
     const clTreeCtrlModel& GetModel() const { return m_model; }
     clTreeCtrlModel& GetModel() { return m_model; }
-    
+
     /**
      * @brief set a sorting function for this tree. The function returns true if the first element should be placed
      * before the second element
      */
     void SetSortFunction(const std::function<bool(const wxTreeItemId&, const wxTreeItemId&)>& CompareFunc);
-    
+
     /**
      * @brief associate bitmap vector with this tree
      */
@@ -242,6 +246,7 @@ protected:
     void OnLeaveWindow(wxMouseEvent& event);
     void OnKeyDown(wxKeyEvent& event);
     void OnContextMenu(wxContextMenuEvent& event);
+    void OnScroll(wxScrollEvent& event);
 };
 
 #endif // CLTREECTRL_H

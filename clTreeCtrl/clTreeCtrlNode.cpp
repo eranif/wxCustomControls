@@ -127,7 +127,7 @@ int clTreeCtrlNode::GetExpandedLines() const
     clTreeCtrlNode* node = const_cast<clTreeCtrlNode*>(this);
     int counter = 0;
     while(node) {
-        if(node->IsExpanded()) {
+        if(node->IsVisible() || node->IsRoot()) {
             ++counter;
         }
         node = node->m_next;

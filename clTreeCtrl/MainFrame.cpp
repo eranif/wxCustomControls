@@ -13,6 +13,7 @@ MainFrame::MainFrame(wxWindow* parent)
     clTreeCtrlColours colours = m_tree->GetColours();
     colours.InitDarkDefaults();
     m_tree->SetColours(colours);
+    wxLog::SetActiveTarget(new wxLogTextCtrl(m_textCtrlLog));
     
     // Provide a sorting function to the tree
     std::function<bool(const wxTreeItemId& a, const wxTreeItemId& b)> SortFunc
@@ -102,9 +103,7 @@ void MainFrame::OnAbout(wxCommandEvent& event)
 
 void MainFrame::LogMessage(const wxString& message)
 {
-    // m_stc15->AddText(message + "\n");
-    // m_stc15->ScrollToEnd();
-    // m_tree->CallAfter(&wxPanel::SetFocus);
+    wxLogMessage(message);
 }
 
 void MainFrame::OnOpenFolder(wxCommandEvent& event)
