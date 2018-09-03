@@ -23,7 +23,7 @@ class clTreeCtrlModel
     clTreeCtrlNode* m_firstItemOnScreen = nullptr;
     int m_indentSize = 16;
     bool m_shutdown = false;
-    std::function<bool(const wxTreeItemId&, const wxTreeItemId&)> m_compareFunction = nullptr;
+    std::function<bool(const wxTreeItemId&, const wxTreeItemId&)> m_shouldInsertBeforeFunc = nullptr;
 
 protected:
     void DoExpandAllChildren(const wxTreeItemId& item, bool expand);
@@ -40,7 +40,7 @@ public:
 
     void SetSortFunction(const std::function<bool(const wxTreeItemId&, const wxTreeItemId&)>& CompareFunc)
     {
-        m_compareFunction = CompareFunc;
+        m_shouldInsertBeforeFunc = CompareFunc;
     }
     void ExpandAllChildren(const wxTreeItemId& item);
     void CollapseAllChildren(const wxTreeItemId& item);

@@ -26,52 +26,72 @@ clTreeCtrlNode::~clTreeCtrlNode()
     wxDELETE(m_clientData);
 
     // Notify the model that a selection is being deleted
-    if(m_model) { m_model->NodeDeleted(this); }
+    if(m_model) {
+        m_model->NodeDeleted(this);
+    }
 }
 
-void clTreeCtrlNode::InsertBetween(clTreeCtrlNode* first, clTreeCtrlNode* second)
+void clTreeCtrlNode::ConnectNodes(clTreeCtrlNode* first, clTreeCtrlNode* second)
 {
-    if(first) { first->m_next = this; }
+    if(first) {
+        first->m_next = this;
+    }
     this->m_prev = first;
     this->m_next = second;
-    if(second) { second->m_prev = this; }
+    if(second) {
+        second->m_prev = this;
+    }
 }
 
-void clTreeCtrlNode::InsertChild(clTreeCtrlNode* child, clTreeCtrlNode* where)
+void clTreeCtrlNode::InsertChild(clTreeCtrlNode* child, clTreeCtrlNode* prev)
 {
     child->SetParent(this);
     child->SetIndentsCount(GetIndentsCount() + 1);
 
-    // We need the last item of this subtree (where 'this' is the root)
-    clTreeCtrlNode* lastChild = where;
-
-    // Append the item
-
-    // lastCHild is used later to determine the sequential location for the newly added item
-    lastChild = where ? where : this;
-    while(lastChild && lastChild->GetLastChild()) { lastChild = lastChild->GetLastChild(); }
-
-    // Insert the item in the parent children list
-    clTreeCtrlNode::Vec_t::iterator iter = m_children.end();
-    iter = std::find_if(m_children.begin(), m_children.end(), [&](clTreeCtrlNode* c) { return c == where; });
-    if(iter == m_children.end()) {
-        m_children.push_back(child);
+    // We need the last item of this subtree (prev 'this' is the root)
+    if(prev == nullptr) {
+        // make it the first item
+        m_children.insert(m_children.begin(), child);
     } else {
-        // Insert the item _after_ 'where'
-        ++iter;
+        // Insert the item in the parent children list
+        clTreeCtrlNode::Vec_t::iterator iter = m_children.end();
+        iter = std::find_if(m_children.begin(), m_children.end(), [&](clTreeCtrlNode* c) { return c == prev; });
+        if(iter != m_children.end()) {
+            ++iter;
+        }
+        // if iter is end(), than the is actually appending the item
         m_children.insert(iter, child);
     }
+    
+    // Connect the linked list for sequential iteration
+    clTreeCtrlNode::Vec_t::iterator iterCur =
+        std::find_if(m_children.begin(), m_children.end(), [&](clTreeCtrlNode* c) { return c == child; });
 
-    // Connect the list
-    if(!lastChild) { lastChild = this; }
-    child->InsertBetween(lastChild, lastChild->m_next);
+    clTreeCtrlNode* nodeBefore = nullptr;
+    // Find the item before and after
+    if(iterCur == m_children.begin()) {
+        nodeBefore = child->GetParent(); // "this"
+    } else {
+        --iterCur;
+        clTreeCtrlNode* prevSibling = (*iterCur);
+        while(prevSibling && prevSibling->HasChildren()) {
+            prevSibling = prevSibling->GetLastChild();
+        }
+        nodeBefore = prevSibling;
+    }
+    child->ConnectNodes(nodeBefore, nodeBefore->m_next);
 }
 
-void clTreeCtrlNode::AddChild(clTreeCtrlNode* child) { InsertChild(child, nullptr); }
+void clTreeCtrlNode::AddChild(clTreeCtrlNode* child)
+{
+    InsertChild(child, m_children.empty() ? nullptr : m_children.back());
+}
 
 void clTreeCtrlNode::SetParent(clTreeCtrlNode* parent)
 {
-    if(m_parent) { m_parent->DeleteChild(this); }
+    if(m_parent) {
+        m_parent->DeleteChild(this);
+    }
     m_parent = parent;
 }
 
@@ -87,12 +107,18 @@ void clTreeCtrlNode::DeleteChild(clTreeCtrlNode* child)
     // Connect the list
     clTreeCtrlNode* prev = child->m_prev;
     clTreeCtrlNode* next = child->m_next;
-    if(prev) { prev->m_next = next; }
-    if(next) { next->m_prev = prev; }
+    if(prev) {
+        prev->m_next = next;
+    }
+    if(next) {
+        next->m_prev = prev;
+    }
     // Now disconnect this child from this node
-    clTreeCtrlNode::Vec_t::iterator iter
-        = std::find_if(m_children.begin(), m_children.end(), [&](clTreeCtrlNode* c) { return c == child; });
-    if(iter != m_children.end()) { m_children.erase(iter); }
+    clTreeCtrlNode::Vec_t::iterator iter =
+        std::find_if(m_children.begin(), m_children.end(), [&](clTreeCtrlNode* c) { return c == child; });
+    if(iter != m_children.end()) {
+        m_children.erase(iter);
+    }
     wxDELETE(child);
 }
 
@@ -101,7 +127,9 @@ int clTreeCtrlNode::GetExpandedLines() const
     clTreeCtrlNode* node = const_cast<clTreeCtrlNode*>(this);
     int counter = 0;
     while(node) {
-        if(node->IsExpanded()) { ++counter; }
+        if(node->IsExpanded()) {
+            ++counter;
+        }
         node = node->m_next;
     }
     return counter;
@@ -113,8 +141,12 @@ void clTreeCtrlNode::GetNextItems(int count, clTreeCtrlNode::Vec_t& items)
     items.push_back(this);
     clTreeCtrlNode* next = GetNext();
     while(next) {
-        if(next->IsVisible()) { items.push_back(next); }
-        if((int)items.size() == count) { return; }
+        if(next->IsVisible()) {
+            items.push_back(next);
+        }
+        if((int)items.size() == count) {
+            return;
+        }
         next = next->GetNext();
     }
 }
@@ -125,8 +157,12 @@ void clTreeCtrlNode::GetPrevItems(int count, clTreeCtrlNode::Vec_t& items)
     items.insert(items.begin(), this);
     clTreeCtrlNode* prev = GetPrev();
     while(prev) {
-        if(prev->IsVisible()) { items.insert(items.begin(), prev); }
-        if((int)items.size() == count) { return; }
+        if(prev->IsVisible()) {
+            items.insert(items.begin(), prev);
+        }
+        if((int)items.size() == count) {
+            return;
+        }
         prev = prev->GetPrev();
     }
 }
@@ -135,7 +171,9 @@ clTreeCtrlNode* clTreeCtrlNode::GetVisibleItem(int index)
 {
     clTreeCtrlNode::Vec_t items;
     GetNextItems(index, items);
-    if((int)items.size() != index) { return nullptr; }
+    if((int)items.size() != index) {
+        return nullptr;
+    }
     return items.back();
 }
 
@@ -151,11 +189,19 @@ void clTreeCtrlNode::UnselectAll()
 bool clTreeCtrlNode::SetExpanded(bool b)
 {
     // Already expanded?
-    if(!m_model) { return false; }
-    if(b && IsExpanded()) { return true; }
+    if(!m_model) {
+        return false;
+    }
+    if(b && IsExpanded()) {
+        return true;
+    }
     // Already collapsed?
-    if(!b && !IsExpanded()) { return true; }
-    if(!m_model->NodeExpanding(this, b)) { return false; }
+    if(!b && !IsExpanded()) {
+        return true;
+    }
+    if(!m_model->NodeExpanding(this, b)) {
+        return false;
+    }
 
     SetFlag(kExpanded, b);
     m_model->NodeExpanded(this, b);
@@ -173,9 +219,15 @@ void clTreeCtrlNode::Render(wxDC& dc, const clTreeCtrlColours& c)
     wxRect itemRect = GetItemRect();
     clTreeCtrlColours colours = c;
     wxFont f = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
-    if(GetFont().IsOk()) { f = GetFont(); }
-    if(GetTextColour().IsOk()) { colours.itemTextColour = GetTextColour(); }
-    if(GetBgColour().IsOk()) { colours.itemBgColour = GetBgColour(); }
+    if(GetFont().IsOk()) {
+        f = GetFont();
+    }
+    if(GetTextColour().IsOk()) {
+        colours.itemTextColour = GetTextColour();
+    }
+    if(GetBgColour().IsOk()) {
+        colours.itemBgColour = GetBgColour();
+    }
     dc.SetFont(f);
 
     if(IsSelected() || IsHovered()) {
@@ -243,7 +295,9 @@ size_t clTreeCtrlNode::GetChildrenCount(bool recurse) const
         return m_children.size();
     } else {
         size_t count = m_children.size();
-        for(size_t i = 0; i < count; ++i) { count += m_children[i]->GetChildrenCount(recurse); }
+        for(size_t i = 0; i < count; ++i) {
+            count += m_children[i]->GetChildrenCount(recurse);
+        }
         return count;
     }
 }
@@ -252,7 +306,9 @@ bool clTreeCtrlNode::IsVisible() const
 {
     clTreeCtrlNode* parent = GetParent();
     while(parent) {
-        if(!parent->IsExpanded()) { return false; }
+        if(!parent->IsExpanded()) {
+            return false;
+        }
         parent = parent->GetParent();
     }
     return true;
@@ -269,7 +325,9 @@ void clTreeCtrlNode::DeleteAllChildren()
 
 clTreeCtrlNode* clTreeCtrlNode::GetLastChild() const
 {
-    if(m_children.empty()) { return nullptr; }
+    if(m_children.empty()) {
+        return nullptr;
+    }
     return m_children.back();
 }
 
