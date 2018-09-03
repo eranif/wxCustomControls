@@ -6,15 +6,28 @@ class clTreeCtrl;
 class MyItemData : public wxTreeItemData
 {
     wxString m_path;
+    wxString m_fullname;
+    wxString m_fullnameLC;
+    bool m_isFolder;
 
 public:
-    MyItemData(const wxString& path)
-        : m_path(path)
+    MyItemData(const wxString& path, bool isFolder)
+        : m_isFolder(isFolder)
     {
+        wxFileName fn(path);
+        m_path = fn.GetFullPath();
+        m_fullname = fn.GetFullName();
+        m_fullnameLC = m_fullname.Lower();
     }
+    
     virtual ~MyItemData() {}
     void SetPath(const wxString& path) { this->m_path = path; }
     const wxString& GetPath() const { return m_path; }
+    void SetFullname(const wxString& fullname) { this->m_fullname = fullname; }
+    const wxString& GetFullname() const { return m_fullname; }
+    void SetIsFolder(bool isFolder) { this->m_isFolder = isFolder; }
+    bool IsFolder() const { return m_isFolder; }
+    const wxString& GetFullnameLC() const { return m_fullnameLC; }
 };
 
 class MainFrame : public MainFrameBaseClass

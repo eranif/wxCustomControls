@@ -32,7 +32,16 @@ public:
     // For internal use, dont use these two methods
     const clTreeCtrlModel& GetModel() const { return m_model; }
     clTreeCtrlModel& GetModel() { return m_model; }
-
+    
+    /**
+     * @brief set a sorting function for this tree. The function returns true if the first element should be placed
+     * before the second element
+     */
+    void SetSortFunction(const std::function<bool(const wxTreeItemId&, const wxTreeItemId&)>& CompareFunc);
+    
+    /**
+     * @brief associate bitmap vector with this tree
+     */
     void SetBitmaps(const std::vector<wxBitmap>& bitmaps);
     const std::vector<wxBitmap>& GetBitmaps() const { return m_bitmaps; }
 

@@ -46,11 +46,11 @@ void clTreeCtrlNode::InsertChild(clTreeCtrlNode* child, clTreeCtrlNode* where)
     clTreeCtrlNode* lastChild = where;
 
     // Append the item
-    
+
     // lastCHild is used later to determine the sequential location for the newly added item
-    lastChild = where ? where->GetLastChild() : GetLastChild();
+    lastChild = where ? where : this;
     while(lastChild && lastChild->GetLastChild()) { lastChild = lastChild->GetLastChild(); }
-    
+
     // Insert the item in the parent children list
     clTreeCtrlNode::Vec_t::iterator iter = m_children.end();
     iter = std::find_if(m_children.begin(), m_children.end(), [&](clTreeCtrlNode* c) { return c == where; });
@@ -61,37 +61,13 @@ void clTreeCtrlNode::InsertChild(clTreeCtrlNode* child, clTreeCtrlNode* where)
         ++iter;
         m_children.insert(iter, child);
     }
-    
+
     // Connect the list
     if(!lastChild) { lastChild = this; }
-
     child->InsertBetween(lastChild, lastChild->m_next);
-    if(HasFlag(kSortItems)) {
-        // Sort the items
-    }
 }
 
-void clTreeCtrlNode::AddChild(clTreeCtrlNode* child)
-{
-    InsertChild(child, nullptr);
-#if 0
-//    child->SetParent(this);
-//    child->SetIndentsCount(GetIndentsCount() + 1);
-//
-//    // We need the last item of this subtree (where 'this' is the root)
-//    clTreeCtrlNode* lastChild = GetLastChild();
-//    while(lastChild && lastChild->GetLastChild()) { lastChild = lastChild->GetLastChild(); }
-//    m_children.push_back(child);
-//
-//    // Conect the list
-//    if(!lastChild) { lastChild = this; }
-//
-//    child->InsertBetween(lastChild, lastChild->m_next);
-//    if(HasFlag(kSortItems)) {
-//        // Sort the items
-//    }
-#endif
-}
+void clTreeCtrlNode::AddChild(clTreeCtrlNode* child) { InsertChild(child, nullptr); }
 
 void clTreeCtrlNode::SetParent(clTreeCtrlNode* parent)
 {

@@ -2,6 +2,7 @@
 #define CLTREECTRLMODEL_H
 
 #include "clTreeCtrlNode.h"
+#include <functional>
 #include <vector>
 #include <wx/colour.h>
 #include <wx/sharedptr.h>
@@ -22,6 +23,7 @@ class clTreeCtrlModel
     clTreeCtrlNode* m_firstItemOnScreen = nullptr;
     int m_indentSize = 16;
     bool m_shutdown = false;
+    std::function<bool(const wxTreeItemId&, const wxTreeItemId&)> m_compareFunction = nullptr;
 
 protected:
     void DoExpandAllChildren(const wxTreeItemId& item, bool expand);
@@ -35,7 +37,11 @@ public:
 
     void SetFirstItemOnScreen(clTreeCtrlNode* firstItemOnScreen) { this->m_firstItemOnScreen = firstItemOnScreen; }
     clTreeCtrlNode* GetFirstItemOnScreen() { return m_firstItemOnScreen; }
-    
+
+    void SetSortFunction(const std::function<bool(const wxTreeItemId&, const wxTreeItemId&)>& CompareFunc)
+    {
+        m_compareFunction = CompareFunc;
+    }
     void ExpandAllChildren(const wxTreeItemId& item);
     void CollapseAllChildren(const wxTreeItemId& item);
 

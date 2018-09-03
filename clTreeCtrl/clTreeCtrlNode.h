@@ -164,6 +164,7 @@ public:
     bool IsSelected() const { return HasFlag(kSelected); }
     void SetSelected(bool b) { SetFlag(kSelected, b); }
     void UnselectAll();
+    bool IsSorted() const { return HasFlag(kSortItems); }
 };
 
 #endif // CLTREECTRLNODE_H

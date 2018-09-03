@@ -15,6 +15,10 @@
 clTreeCtrlModel::clTreeCtrlModel(clTreeCtrl* tree)
     : m_tree(tree)
 {
+    // Setup a default compare function
+    m_compareFunction = [&](const wxTreeItemId& a, const wxTreeItemId& b) {
+        return ToPtr(a)->GetLabel().CmpNoCase(ToPtr(b)->GetLabel()) < 0;
+    };
 }
 
 clTreeCtrlModel::~clTreeCtrlModel()
@@ -131,15 +135,24 @@ wxTreeItemId clTreeCtrlModel::AppendItem(
     const wxTreeItemId& parent, const wxString& text, int image, int selImage, wxTreeItemData* data)
 {
     clTreeCtrlNode* parentNode = nullptr;
-    if(parent.IsOk()) { parentNode = ToPtr(parent); }
+    if(!parent.IsOk()) { return wxTreeItemId(); }
+    parentNode = ToPtr(parent);
 
-    if(parentNode) {
-        clTreeCtrlNode* child = new clTreeCtrlNode(m_tree, text, image, selImage);
-        child->SetClientData(data);
-        parentNode->AddChild(child);
-        return wxTreeItemId(child);
+    clTreeCtrlNode* child = new clTreeCtrlNode(m_tree, text, image, selImage);
+    child->SetClientData(data);
+    clTreeCtrlNode* insertAfter = nullptr;
+    if(m_compareFunction) {
+        const clTreeCtrlNode::Vec_t& children = parentNode->GetChildren();
+        wxTreeItemId newItem(child);
+        for(int i = ((int)children.size() - 1); i >= 0; --i) {
+            if(!m_compareFunction(newItem, children[i])) {
+                insertAfter = ToPtr(children[i]);
+                break;
+            }
+        }
     }
-    return wxTreeItemId(nullptr);
+    parentNode->InsertChild(child, insertAfter);
+    return wxTreeItemId(child);
 }
 
 wxTreeItemId clTreeCtrlModel::InsertItem(const wxTreeItemId& parent, const wxTreeItemId& previous, const wxString& text,
@@ -248,14 +261,10 @@ void clTreeCtrlModel::NodeDeleted(clTreeCtrlNode* node)
         if(iter != m_onScreenItems.end()) { m_onScreenItems.erase(iter); }
     }
     {
-        if(m_firstItemOnScreen == node) { 
-            m_firstItemOnScreen = nullptr;
-        }
+        if(m_firstItemOnScreen == node) { m_firstItemOnScreen = nullptr; }
     }
     {
-        if(m_root == node) {
-            m_root = nullptr;
-        }
+        if(m_root == node) { m_root = nullptr; }
     }
 }
 

@@ -679,3 +679,8 @@ void clTreeCtrl::OnRightDown(wxMouseEvent& event)
 clTreeCtrlNode* clTreeCtrl::GetFirstItemOnScreen() { return m_model.GetFirstItemOnScreen(); }
 
 void clTreeCtrl::SetFirstItemOnScreen(clTreeCtrlNode* item) { m_model.SetFirstItemOnScreen(item); }
+
+void clTreeCtrl::SetSortFunction(const std::function<bool(const wxTreeItemId&, const wxTreeItemId&)>& CompareFunc)
+{
+    m_model.SetSortFunction(CompareFunc);
+}

@@ -13,7 +13,22 @@ MainFrame::MainFrame(wxWindow* parent)
     clTreeCtrlColours colours = m_tree->GetColours();
     colours.InitDarkDefaults();
     m_tree->SetColours(colours);
-
+    
+    // Provide a sorting function to the tree
+    std::function<bool(const wxTreeItemId& a, const wxTreeItemId& b)> SortFunc
+        = [&](const wxTreeItemId& a, const wxTreeItemId& b) {
+              // Compare based on item type and then by label
+              MyItemData* cd_a = dynamic_cast<MyItemData*>(m_tree->GetItemData(a));
+              MyItemData* cd_b = dynamic_cast<MyItemData*>(m_tree->GetItemData(b));
+              if(cd_a->IsFolder() && !cd_b->IsFolder()) {
+                  return true;
+              } else if(!cd_a->IsFolder() && cd_b->IsFolder()) {
+                  return false;
+              } else {
+                  return cd_a->GetFullnameLC() < cd_b->GetFullnameLC();
+              }
+          };
+    m_tree->SetSortFunction(SortFunc);
     std::vector<wxBitmap> bitmaps;
     MyImages images;
     bitmaps.push_back(images.Bitmap("folder"));
@@ -39,14 +54,14 @@ MainFrame::MainFrame(wxWindow* parent)
     });
     m_tree->Bind(wxEVT_TREE_KEY_DOWN, [&](wxTreeEvent& evt) {
         evt.Skip();
-        //LogMessage(wxString() << "Key event: " << m_tree->GetItemText(evt.GetItem()));
+        // LogMessage(wxString() << "Key event: " << m_tree->GetItemText(evt.GetItem()));
     });
-    
+
     m_tree->Bind(wxEVT_TREE_ITEM_RIGHT_CLICK, [&](wxTreeEvent& evt) {
         evt.Skip(); // Must call this for the default actions process
         LogMessage(wxString() << "Tree right click: " << m_tree->GetItemText(evt.GetItem()));
     });
-    
+
     m_tree->Bind(wxEVT_TREE_ITEM_ACTIVATED, [&](wxTreeEvent& evt) {
         evt.Skip();
         wxArrayTreeItemIds items;
@@ -87,9 +102,9 @@ void MainFrame::OnAbout(wxCommandEvent& event)
 
 void MainFrame::LogMessage(const wxString& message)
 {
-    //m_stc15->AddText(message + "\n");
-    //m_stc15->ScrollToEnd();
-    //m_tree->CallAfter(&wxPanel::SetFocus);
+    // m_stc15->AddText(message + "\n");
+    // m_stc15->ScrollToEnd();
+    // m_tree->CallAfter(&wxPanel::SetFocus);
 }
 
 void MainFrame::OnOpenFolder(wxCommandEvent& event)
@@ -98,7 +113,7 @@ void MainFrame::OnOpenFolder(wxCommandEvent& event)
     if(path.IsEmpty()) { return; }
     if(!m_tree->IsEmpty()) { return; }
     m_path = path;
-    wxTreeItemId root = m_tree->AddRoot(path, 0, 1, new MyItemData(m_path));
+    wxTreeItemId root = m_tree->AddRoot(path, 0, 1, new MyItemData(m_path, true));
     m_tree->AppendItem(root, "dummy-node");
     m_tree->SelectItem(root);
     m_tree->SetItemBold(root, true);
@@ -126,11 +141,11 @@ void MainFrame::OnItemExpanding(wxTreeEvent& event)
                 if(wxDirExists(fn.GetFullPath())) {
                     // A directory
                     wxTreeItemId folderItem
-                        = m_tree->AppendItem(item, filename, 0, 1, new MyItemData(fn.GetFullPath()));
+                        = m_tree->AppendItem(item, filename, 0, 1, new MyItemData(fn.GetFullPath(), true));
                     m_tree->AppendItem(folderItem, "dummy-node");
                 } else {
                     // A file
-                    m_tree->AppendItem(item, filename, 2, 2, new MyItemData(fn.GetFullPath()));
+                    m_tree->AppendItem(item, filename, 2, 2, new MyItemData(fn.GetFullPath(), false));
                 }
                 cont = dir.GetNext(&filename);
             }
