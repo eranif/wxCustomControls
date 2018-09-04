@@ -37,9 +37,13 @@ class clTreeCtrlNode
 {
 public:
     typedef std::vector<clTreeCtrlNode*> Vec_t;
+#ifdef __WXOSX__
+    static const int Y_SPACER = 1;
+    static const int X_SPACER = 1;
+#else
     static const int Y_SPACER = 2;
     static const int X_SPACER = 2;
-
+#endif
 protected:
     clTreeCtrl* m_tree = nullptr;
     clTreeCtrlModel* m_model = nullptr;
