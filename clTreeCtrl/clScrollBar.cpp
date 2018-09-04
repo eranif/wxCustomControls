@@ -1,8 +1,8 @@
 #include "clScrollBar.h"
+#include <cmath>
 #include <wx/dc.h>
 #include <wx/log.h>
 #include <wx/settings.h>
-#include <cmath>
 
 clScrollBar::clScrollBar(wxWindow* parent, wxOrientation orientation)
     : m_parent(parent)
@@ -69,6 +69,7 @@ void clScrollBar::Render(wxDC& dc)
     // Draw the thumb
     dc.SetPen(m_buttonColour);
     dc.SetBrush(m_buttonColour);
+    m_thumbRect.Deflate(1, 1);
     dc.DrawRoundedRectangle(m_thumbRect, 2.0);
 }
 
@@ -117,13 +118,15 @@ void clScrollBar::OnMouseMotion(wxMouseEvent& event)
         wxRect clientRect = GetClientRect();
         int maxjorAxis = IsVertical() ? clientRect.GetHeight() : clientRect.GetWidth();
         double pixelsPerLine = (double)maxjorAxis / (double)m_range;
-        if(pixelsPerLine == 0.0) { return; }
+        if(pixelsPerLine == 0.0) {
+            return;
+        }
 
         if(clientRect.GetHeight() <= 0) {
             DoCancelScrolling();
             return;
         }
-        
+
         wxPoint currpoint = event.GetPosition();
         wxRect buttonRect = m_thumbRect;
         double lines = 0.0;
@@ -139,11 +142,13 @@ void clScrollBar::OnMouseMotion(wxMouseEvent& event)
             buttonRect.SetX(buttonRect.GetX() + (moving_up ? -diff : diff));
             lines = ((double)buttonRect.GetX() - (double)m_thumbRect.GetX()) / pixelsPerLine;
         }
-        if(std::abs(lines) < 1.0) { return; }
-        
+        if(std::abs(lines) < 1.0) {
+            return;
+        }
+
         wxScrollEvent scrollEvent(wxEVT_SCROLL_THUMBTRACK);
         scrollEvent.SetEventObject(m_parent);
-        scrollEvent.SetPosition(lines); // Negative number means we moved up
+        scrollEvent.SetPosition(std::round(lines)); // Negative number means we moved up
         ProcessEvent(scrollEvent);
         m_anchorPoint = currpoint;
     }
