@@ -6,7 +6,7 @@
 #include <wx/gdicmn.h>
 #include <wx/window.h>
 
-class clScrollBar : public wxEvtHandler
+class clScrollBarHelper : public wxEvtHandler
 {
     wxWindow* m_parent = nullptr;
     int m_position = 0;
@@ -36,8 +36,8 @@ protected:
     bool IsVertical() const { return m_orientation == wxVERTICAL; }
 
 public:
-    clScrollBar(wxWindow* parent, wxOrientation orientation = wxVERTICAL);
-    virtual ~clScrollBar();
+    clScrollBarHelper(wxWindow* parent, wxOrientation orientation = wxVERTICAL);
+    virtual ~clScrollBarHelper();
 
     /**
      * @brief set the scrollbar colours

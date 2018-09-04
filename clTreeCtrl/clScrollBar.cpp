@@ -4,7 +4,7 @@
 #include <wx/log.h>
 #include <wx/settings.h>
 
-clScrollBar::clScrollBar(wxWindow* parent, wxOrientation orientation)
+clScrollBarHelper::clScrollBarHelper(wxWindow* parent, wxOrientation orientation)
     : m_parent(parent)
     , m_orientation(orientation)
 {
@@ -14,23 +14,21 @@ clScrollBar::clScrollBar(wxWindow* parent, wxOrientation orientation)
         e.Skip();
         DoCancelScrolling();
     });
-    m_parent->Bind(wxEVT_LEFT_DOWN, &clScrollBar::OnMouseLeftDown, this);
-    m_parent->Bind(wxEVT_LEFT_UP, &clScrollBar::OnMouseLeftUp, this);
-    m_parent->Bind(wxEVT_MOTION, &clScrollBar::OnMouseMotion, this);
+    m_parent->Bind(wxEVT_LEFT_DOWN, &clScrollBarHelper::OnMouseLeftDown, this);
+    m_parent->Bind(wxEVT_LEFT_UP, &clScrollBarHelper::OnMouseLeftUp, this);
+    m_parent->Bind(wxEVT_MOTION, &clScrollBarHelper::OnMouseMotion, this);
 }
 
-clScrollBar::~clScrollBar()
+clScrollBarHelper::~clScrollBarHelper()
 {
-    m_parent->Unbind(wxEVT_LEFT_DOWN, &clScrollBar::OnMouseLeftDown, this);
-    m_parent->Unbind(wxEVT_LEFT_UP, &clScrollBar::OnMouseLeftUp, this);
-    m_parent->Unbind(wxEVT_MOTION, &clScrollBar::OnMouseMotion, this);
+    m_parent->Unbind(wxEVT_LEFT_DOWN, &clScrollBarHelper::OnMouseLeftDown, this);
+    m_parent->Unbind(wxEVT_LEFT_UP, &clScrollBarHelper::OnMouseLeftUp, this);
+    m_parent->Unbind(wxEVT_MOTION, &clScrollBarHelper::OnMouseMotion, this);
 }
 
-void clScrollBar::Render(wxDC& dc)
+void clScrollBarHelper::Render(wxDC& dc)
 {
-    if(m_thumbSize == 0 || m_range == 0 || m_pageSize == 0 || m_lineInPixels == 0) {
-        return;
-    }
+    if(m_thumbSize == 0 || m_range == 0 || m_pageSize == 0 || m_lineInPixels == 0) { return; }
 
     wxRect rect = GetClientRect();
     m_thumbRect = wxRect();
@@ -47,18 +45,14 @@ void clScrollBar::Render(wxDC& dc)
             m_thumbRect.SetY(rect.GetHeight() - m_thumbRect.GetHeight());
         }
         // Do we need to show the bar?
-        if(m_thumbRect.GetHeight() >= rect.GetHeight()) {
-            return;
-        }
+        if(m_thumbRect.GetHeight() >= rect.GetHeight()) { return; }
     } else {
         m_thumbRect = wxRect(buttonPos, (parentRect.GetHeight() - rect.GetHeight()), buttonSize, rect.GetHeight());
         if((m_thumbRect.GetWidth() + m_thumbRect.GetX()) > rect.GetWidth()) {
             m_thumbRect.SetX(rect.GetWidth() - m_thumbRect.GetWidth());
         }
         // Do we need to show the bar?
-        if(m_thumbRect.GetWidth() >= rect.GetWidth()) {
-            return;
-        }
+        if(m_thumbRect.GetWidth() >= rect.GetWidth()) { return; }
     }
 
     // Draw the background
@@ -73,7 +67,7 @@ void clScrollBar::Render(wxDC& dc)
     dc.DrawRoundedRectangle(m_thumbRect, 2.0);
 }
 
-void clScrollBar::SetScrollbar(int position, int thumbSize, int range, int lineInPixels)
+void clScrollBarHelper::SetScrollbar(int position, int thumbSize, int range, int lineInPixels)
 {
     m_position = position;
     m_thumbSize = thumbSize;
@@ -82,7 +76,7 @@ void clScrollBar::SetScrollbar(int position, int thumbSize, int range, int lineI
     m_lineInPixels = lineInPixels;
 }
 
-wxRect clScrollBar::GetClientRect() const
+wxRect clScrollBarHelper::GetClientRect() const
 {
     wxRect parentSize = GetParent()->GetClientRect();
     wxRect rect;
@@ -100,7 +94,7 @@ wxRect clScrollBar::GetClientRect() const
     return rect;
 }
 
-void clScrollBar::OnMouseLeftDown(wxMouseEvent& event)
+void clScrollBarHelper::OnMouseLeftDown(wxMouseEvent& event)
 {
     if(m_thumbRect.Contains(event.GetPosition())) {
         m_scrolling = true;
@@ -111,16 +105,14 @@ void clScrollBar::OnMouseLeftDown(wxMouseEvent& event)
     }
 }
 
-void clScrollBar::OnMouseMotion(wxMouseEvent& event)
+void clScrollBarHelper::OnMouseMotion(wxMouseEvent& event)
 {
     event.Skip();
     if(m_parent->HasCapture()) {
         wxRect clientRect = GetClientRect();
         int maxjorAxis = IsVertical() ? clientRect.GetHeight() : clientRect.GetWidth();
         double pixelsPerLine = (double)maxjorAxis / (double)m_range;
-        if(pixelsPerLine == 0.0) {
-            return;
-        }
+        if(pixelsPerLine == 0.0) { return; }
 
         if(clientRect.GetHeight() <= 0) {
             DoCancelScrolling();
@@ -142,9 +134,7 @@ void clScrollBar::OnMouseMotion(wxMouseEvent& event)
             buttonRect.SetX(buttonRect.GetX() + (moving_up ? -diff : diff));
             lines = ((double)buttonRect.GetX() - (double)m_thumbRect.GetX()) / pixelsPerLine;
         }
-        if(std::abs(lines) < 1.0) {
-            return;
-        }
+        if(std::abs(lines) < 1.0) { return; }
 
         wxScrollEvent scrollEvent(wxEVT_SCROLL_THUMBTRACK);
         scrollEvent.SetEventObject(m_parent);
@@ -154,35 +144,31 @@ void clScrollBar::OnMouseMotion(wxMouseEvent& event)
     }
 }
 
-void clScrollBar::OnMouseLeftUp(wxMouseEvent& event)
+void clScrollBarHelper::OnMouseLeftUp(wxMouseEvent& event)
 {
     event.Skip();
     DoCancelScrolling();
 }
 
-void clScrollBar::DoCancelScrolling()
+void clScrollBarHelper::DoCancelScrolling()
 {
-    if(m_parent->HasCapture()) {
-        m_parent->ReleaseMouse();
-    }
+    if(m_parent->HasCapture()) { m_parent->ReleaseMouse(); }
     m_anchorPoint = wxPoint();
     m_scrolling = false;
 }
 
-int clScrollBar::DoGetButtonSize()
+int clScrollBarHelper::DoGetButtonSize()
 {
     wxRect clientRect = GetClientRect();
     int majorAxis = IsVertical() ? clientRect.GetHeight() : clientRect.GetWidth();
     int buttonSize = ((double)m_thumbSize / (double)m_range) * majorAxis;
 
     // Dont let the button size to be too small
-    if(buttonSize < GetMinButtonSize()) {
-        buttonSize = GetMinButtonSize();
-    }
+    if(buttonSize < GetMinButtonSize()) { buttonSize = GetMinButtonSize(); }
     return buttonSize;
 }
 
-int clScrollBar::DoGetButtonPosition()
+int clScrollBarHelper::DoGetButtonPosition()
 {
     wxRect clientRect = GetClientRect();
     int majorAxis = IsVertical() ? clientRect.GetHeight() : clientRect.GetWidth();
@@ -190,7 +176,7 @@ int clScrollBar::DoGetButtonPosition()
     return pos;
 }
 
-wxRect clScrollBar::GetVirtualRect() const
+wxRect clScrollBarHelper::GetVirtualRect() const
 {
     wxRect clientRect = GetClientRect();
     int majorAxis = IsVertical() ? clientRect.GetHeight() : clientRect.GetWidth();

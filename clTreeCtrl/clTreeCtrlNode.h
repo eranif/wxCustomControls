@@ -27,7 +27,7 @@ struct clTreeCtrlColours {
     wxColour selItemBgColour;   // selected item background colour
     wxColour buttonColour;      // expand/collapse button colour
     wxColour bgColour;          // background colour for the control
-    
+
     clTreeCtrlColours() { InitDefaults(); }
     void InitDefaults();
     void InitDarkDefaults();
@@ -116,17 +116,17 @@ public:
     const wxRect& GetButtonRect() const { return m_buttonRect; }
 
     void AddChild(clTreeCtrlNode* child);
-    
+
     /**
      * @brief insert item at 'where'. The new item is placed after 'prev'
      */
     void InsertChild(clTreeCtrlNode* child, clTreeCtrlNode* prev);
-    
+
     /**
      * @brief insert this node between first and second
      */
     void ConnectNodes(clTreeCtrlNode* first, clTreeCtrlNode* second);
-    
+
     bool IsBold() const { return HasFlag(kFontBold); }
     void SetBold(bool b) { SetFlag(kFontBold, b); }
 

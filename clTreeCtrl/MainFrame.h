@@ -19,7 +19,7 @@ public:
         m_fullname = fn.GetFullName();
         m_fullnameLC = m_fullname.Lower();
     }
-    
+
     virtual ~MyItemData() {}
     void SetPath(const wxString& path) { this->m_path = path; }
     const wxString& GetPath() const { return m_path; }

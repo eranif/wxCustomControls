@@ -7,7 +7,7 @@
 #include <wx/panel.h>
 #include <wx/scrolwin.h>
 
-class clScrollBar;
+class clScrollBarHelper;
 class clTreeCtrl : public wxPanel
 {
     int m_lineHeight = 0;
@@ -16,7 +16,7 @@ class clTreeCtrl : public wxPanel
     std::vector<wxBitmap> m_bitmaps;
     clTreeCtrlColours m_colours;
     long m_treeStyle = 0;
-    clScrollBar* m_scrollBar;
+    clScrollBarHelper* m_scrollBar;
 
 private:
     wxPoint DoFixPoint(const wxPoint& pt);

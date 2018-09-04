@@ -117,7 +117,7 @@ public:
      * Or from: to->from (incase 'to' has a lower index)
      */
     bool GetRange(clTreeCtrlNode* from, clTreeCtrlNode* to, clTreeCtrlNode::Vec_t& items) const;
-    
+
     size_t GetExpandedLines() const;
 };
 
