@@ -71,7 +71,7 @@ clTreeCtrl::~clTreeCtrl()
 
 void clTreeCtrl::OnPaint(wxPaintEvent& event)
 {
-    wxBufferedPaintDC pdc(this);
+    wxAutoBufferedPaintDC pdc(this);
     wxGCDC dc(pdc);
 
     wxRect clientRect = GetClientRect();
@@ -727,7 +727,7 @@ void clTreeCtrl::OnScroll(wxScrollEvent& event)
     wxTreeItemId cur(GetFirstVisibleItem());
     if((lines > 0) && ((int)m_model.GetOnScreenItems().size() < GetNumLineCanFitOnScreen())) { return; }
     int counter = 0;
-    int max_items = std::abs(lines);
+    long max_items = std::abs((double)lines);
     if(lines < 0) {
         // Moving up
         while(cur.IsOk()) {

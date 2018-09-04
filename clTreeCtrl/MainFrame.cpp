@@ -101,7 +101,13 @@ void MainFrame::OnAbout(wxCommandEvent& event)
     ::wxAboutBox(info);
 }
 
-void MainFrame::LogMessage(const wxString& message) { wxLogMessage(message); }
+void MainFrame::LogMessage(const wxString& message) 
+{ 
+#ifndef __WXOSX__
+    static int counter = 0;
+    wxLogMessage(wxString() << (++counter) << ": " << message); 
+#endif
+}
 
 void MainFrame::OnOpenFolder(wxCommandEvent& event)
 {
