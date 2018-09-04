@@ -363,6 +363,15 @@ void clTreeCtrl::OnMouseScroll(wxMouseEvent& event)
 {
     CHECK_ROOT_RET();
     if(!GetFirstItemOnScreen()) { return; }
+    
+    // Ignore the first tick (should fix an annoyance on OSX)
+    wxDirection direction = (event.GetWheelRotation() > 0) ? wxUP : wxDOWN;
+    if(direction != m_lastScrollDir) {
+        // Changing direction
+        m_lastScrollDir = direction;
+        return;
+    }
+
     const clTreeCtrlNode::Vec_t& onScreenItems = m_model.GetOnScreenItems();
     if(onScreenItems.empty()) { return; }
     clTreeCtrlNode* lastItem = onScreenItems.back();

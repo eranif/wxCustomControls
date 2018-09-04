@@ -12,11 +12,16 @@ class clTreeCtrl : public wxPanel
 {
     int m_lineHeight = 0;
     clTreeCtrlModel m_model;
+#ifdef __WXOSX__
+    int m_scrollTick = 2;
+#else
     int m_scrollTick = 3;
+#endif
     std::vector<wxBitmap> m_bitmaps;
     clTreeCtrlColours m_colours;
     long m_treeStyle = 0;
     clScrollBarHelper* m_scrollBar;
+    wxDirection m_lastScrollDir = wxDOWN;
 
 private:
     wxPoint DoFixPoint(const wxPoint& pt);
