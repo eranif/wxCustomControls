@@ -1,5 +1,5 @@
-#include "clTreeCtrl.h"
 #include "clScrollBar.h"
+#include "clTreeCtrl.h"
 #include "clTreeCtrlModel.h"
 #include <algorithm>
 #include <cmath>
@@ -744,5 +744,15 @@ void clTreeCtrl::OnScroll(wxScrollEvent& event)
     }
     if(!cur.IsOk()) { return; }
     SetFirstItemOnScreen(m_model.ToPtr(cur));
+    Refresh();
+}
+
+void clTreeCtrl::SelectChildren(const wxTreeItemId& item)
+{
+    if(!(GetTreeStyle() & wxTR_MULTIPLE)) {
+        // Can only be used with multiple selection trees
+        return;
+    }
+    m_model.SelectChildren(item);
     Refresh();
 }

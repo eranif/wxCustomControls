@@ -1,5 +1,5 @@
-#include "clTreeCtrlModel.h"
 #include "clTreeCtrl.h"
+#include "clTreeCtrlModel.h"
 #include <algorithm>
 #include <wx/dc.h>
 #include <wx/settings.h>
@@ -411,4 +411,22 @@ clTreeCtrlNode* clTreeCtrlModel::GetItemFromIndex(int index) const
         current = current->GetNext();
     }
     return nullptr;
+}
+
+void clTreeCtrlModel::SelectItems(const std::vector<wxTreeItemId>& items)
+{
+    std::vector<std::pair<wxTreeItemId, bool>> V;
+    for(size_t i = 0; i < items.size(); ++i) { V.push_back({ items[i], true }); }
+    SelectItems(V);
+}
+
+void clTreeCtrlModel::SelectChildren(const wxTreeItemId& item)
+{
+    clTreeCtrlNode* parent = ToPtr(item);
+    if(!parent) { return; }
+
+    std::vector<wxTreeItemId> items;
+    std::for_each(parent->GetChildren().begin(), parent->GetChildren().end(),
+        [&](clTreeCtrlNode* child) { items.push_back(wxTreeItemId(child)); });
+    SelectItems(items);
 }

@@ -233,7 +233,12 @@ public:
      * A EVT_TREE_DELETE_ITEM event will be generated.
      */
     void Delete(const wxTreeItemId& item);
-
+    
+    /**
+     * @brief Select all the immediate children of the given parent
+     */
+    void SelectChildren(const wxTreeItemId& item);
+    
 protected:
     void DoEnsureVisible(const wxTreeItemId& item);
     void OnPaint(wxPaintEvent& event);

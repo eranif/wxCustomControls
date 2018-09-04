@@ -82,9 +82,20 @@ public:
         const wxTreeItemId& item, bool select = true, bool addSelection = false, bool clear_old_selection = false);
     /**
      * @brief plural version
-     */
+     * Note that this function clears the old selections
+     * This fucntion fires wxEVT_TREE_SEL_CHANGING/wxEVT_TREE_SEL_CHANGED
+     * */
     void SelectItems(const std::vector<std::pair<wxTreeItemId, bool>>& items);
-
+    
+    /**
+     * @brief plural version, same as previous. But this time, use 'true' for all the items
+     * Note that this function clears the old selections
+     * This fucntion fires wxEVT_TREE_SEL_CHANGING/wxEVT_TREE_SEL_CHANGED
+     */
+    void SelectItems(const std::vector<wxTreeItemId>& items);
+    
+    void SelectChildren(const wxTreeItemId& item);
+    
     void Clear();
 
     void SetOnScreenItems(const clTreeCtrlNode::Vec_t& items);
