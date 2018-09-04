@@ -140,7 +140,7 @@ wxTreeItemId clTreeCtrl::GetRootItem() const { return m_model.GetRootItem(); }
 
 void clTreeCtrl::Expand(const wxTreeItemId& item)
 {
-    if(!item.GetID()) return;
+    CHECK_ITEM_RET(item);
     clTreeCtrlNode* child = m_model.ToPtr(item);
     if(!child) return;
     child->SetExpanded(true);
@@ -149,7 +149,7 @@ void clTreeCtrl::Expand(const wxTreeItemId& item)
 
 void clTreeCtrl::Collapse(const wxTreeItemId& item)
 {
-    if(!item.GetID()) return;
+    CHECK_ITEM_RET(item);
     clTreeCtrlNode* child = m_model.ToPtr(item);
     if(!child) return;
     child->SetExpanded(false);
@@ -158,7 +158,7 @@ void clTreeCtrl::Collapse(const wxTreeItemId& item)
 
 void clTreeCtrl::SelectItem(const wxTreeItemId& item, bool select)
 {
-    if(!item.IsOk()) { return; }
+    CHECK_ITEM_RET(item);
     m_model.SelectItem(item, select);
     Refresh();
 }

@@ -66,10 +66,16 @@ MainFrameBaseClass::MainFrameBaseClass(
     m_menuItemSelectChildren = new wxMenuItem(File, ID_SELECT_CHILDREN, _("Select Children"), wxT(""), wxITEM_NORMAL);
     File->Append(m_menuItemSelectChildren);
 
+    m_menuItemNextSibling = new wxMenuItem(File, ID_NEXT_SIBLING, _("Next Sibling\tF2"), wxT(""), wxITEM_NORMAL);
+    File->Append(m_menuItemNextSibling);
+
+    m_menuItemPrevSibling = new wxMenuItem(File, ID_PREV_SIBLING, _("Prev Sibling\tCtrl-F2"), wxT(""), wxITEM_NORMAL);
+    File->Append(m_menuItemPrevSibling);
+
     File->AppendSeparator();
 
-    m_menuItem7 = new wxMenuItem(File, wxID_EXIT, _("Exit\tAlt-X"), _("Quit"), wxITEM_NORMAL);
-    File->Append(m_menuItem7);
+    m_menuItemExit = new wxMenuItem(File, wxID_EXIT, _("Exit\tAlt-X"), _("Quit"), wxITEM_NORMAL);
+    File->Append(m_menuItemExit);
 
     SetName(wxT("MainFrameBaseClass"));
     SetSize(wxDLG_UNIT(this, wxSize(-1, -1)));
@@ -101,8 +107,12 @@ MainFrameBaseClass::MainFrameBaseClass(
         wxCommandEventHandler(MainFrameBaseClass::OnEnsureItemVisible), NULL, this);
     this->Connect(m_menuItemSelectChildren->GetId(), wxEVT_COMMAND_MENU_SELECTED,
         wxCommandEventHandler(MainFrameBaseClass::OnSelectChildren), NULL, this);
-    this->Connect(m_menuItem7->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBaseClass::OnExit),
-        NULL, this);
+    this->Connect(m_menuItemNextSibling->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+        wxCommandEventHandler(MainFrameBaseClass::OnNextSibling), NULL, this);
+    this->Connect(m_menuItemPrevSibling->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+        wxCommandEventHandler(MainFrameBaseClass::OnPrevSibling), NULL, this);
+    this->Connect(m_menuItemExit->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+        wxCommandEventHandler(MainFrameBaseClass::OnExit), NULL, this);
 }
 
 MainFrameBaseClass::~MainFrameBaseClass()
@@ -121,7 +131,11 @@ MainFrameBaseClass::~MainFrameBaseClass()
         wxCommandEventHandler(MainFrameBaseClass::OnEnsureItemVisible), NULL, this);
     this->Disconnect(m_menuItemSelectChildren->GetId(), wxEVT_COMMAND_MENU_SELECTED,
         wxCommandEventHandler(MainFrameBaseClass::OnSelectChildren), NULL, this);
-    this->Disconnect(m_menuItem7->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+    this->Disconnect(m_menuItemNextSibling->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+        wxCommandEventHandler(MainFrameBaseClass::OnNextSibling), NULL, this);
+    this->Disconnect(m_menuItemPrevSibling->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+        wxCommandEventHandler(MainFrameBaseClass::OnPrevSibling), NULL, this);
+    this->Disconnect(m_menuItemExit->GetId(), wxEVT_COMMAND_MENU_SELECTED,
         wxCommandEventHandler(MainFrameBaseClass::OnExit), NULL, this);
 }
 

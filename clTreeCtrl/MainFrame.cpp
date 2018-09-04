@@ -181,3 +181,13 @@ void MainFrame::OnSelectChildren(wxCommandEvent& event)
 {
     m_tree->SelectChildren(m_tree->GetFocusedItem());
 }
+void MainFrame::OnNextSibling(wxCommandEvent& event)
+{
+    m_tree->SelectItem(m_tree->GetNextSibling(m_tree->GetFocusedItem()));
+    m_tree->EnsureVisible(m_tree->GetFocusedItem());
+}
+void MainFrame::OnPrevSibling(wxCommandEvent& event)
+{
+    m_tree->SelectItem(m_tree->GetPrevSibling(m_tree->GetFocusedItem()));
+    m_tree->EnsureVisible(m_tree->GetFocusedItem());
+}

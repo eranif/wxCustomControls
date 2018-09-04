@@ -39,6 +39,8 @@ private:
     void LogMessage(const wxString& message);
 
 protected:
+    virtual void OnNextSibling(wxCommandEvent& event);
+    virtual void OnPrevSibling(wxCommandEvent& event);
     virtual void OnSelectChildren(wxCommandEvent& event);
     virtual void OnEnsureItemVisible(wxCommandEvent& event);
     virtual void OnFirstVisible(wxCommandEvent& event);

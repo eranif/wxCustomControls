@@ -41,9 +41,11 @@ class MainFrameBaseClass : public wxFrame
 {
 public:
     enum {
-        ID_SELECT_CHILDREN = 10001,
-        ID_EXPAND_ALL = 10002,
-        ID_OPEN_FOLDER = 10003,
+        ID_PREV_SIBLING = 10001,
+        ID_NEXT_SIBLING = 10002,
+        ID_SELECT_CHILDREN = 10003,
+        ID_EXPAND_ALL = 10004,
+        ID_OPEN_FOLDER = 10005,
     };
 
 protected:
@@ -59,8 +61,10 @@ protected:
     wxMenuItem* m_menuItemNextVisibleItem;
     wxMenuItem* m_menuItemEnsureVisible;
     wxMenuItem* m_menuItemSelectChildren;
+    wxMenuItem* m_menuItemNextSibling;
+    wxMenuItem* m_menuItemPrevSibling;
     wxMenuItem* m_separator2;
-    wxMenuItem* m_menuItem7;
+    wxMenuItem* m_menuItemExit;
 
 protected:
     virtual void OnOpenFolder(wxCommandEvent& event) { event.Skip(); }
@@ -70,6 +74,8 @@ protected:
     virtual void OnNextVisible(wxCommandEvent& event) { event.Skip(); }
     virtual void OnEnsureItemVisible(wxCommandEvent& event) { event.Skip(); }
     virtual void OnSelectChildren(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnNextSibling(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnPrevSibling(wxCommandEvent& event) { event.Skip(); }
     virtual void OnExit(wxCommandEvent& event) { event.Skip(); }
 
 public:
