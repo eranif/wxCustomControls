@@ -133,12 +133,12 @@ void clScrollBar::OnMouseMotion(wxMouseEvent& event)
         bool moving_up = false;
         if(IsVertical()) {
             moving_up = ((currpoint.y - m_anchorPoint.y) < 0);
-            int diff = abs(currpoint.y - m_anchorPoint.y);
+            int diff = std::abs(currpoint.y - m_anchorPoint.y);
             buttonRect.SetY(buttonRect.GetY() + (moving_up ? -diff : diff));
             lines = ((double)buttonRect.GetY() - (double)m_thumbRect.GetY()) / pixelsPerLine;
         } else {
             moving_up = ((currpoint.x - m_anchorPoint.x) < 0);
-            int diff = abs(currpoint.x - m_anchorPoint.x);
+            int diff = std::abs(currpoint.x - m_anchorPoint.x);
             buttonRect.SetX(buttonRect.GetX() + (moving_up ? -diff : diff));
             lines = ((double)buttonRect.GetX() - (double)m_thumbRect.GetX()) / pixelsPerLine;
         }

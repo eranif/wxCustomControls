@@ -796,8 +796,11 @@ void clTreeCtrl::OnScroll(wxScrollEvent& event)
     }
 
     wxTreeItemId cur(GetFirstVisibleItem());
+    if((lines > 0) && ((int)m_model.GetOnScreenItems().size() < GetNumLineCanFitOnScreen())) { 
+        return; 
+    }
     int counter = 0;
-    int max_items = abs(lines);
+    int max_items = std::abs(lines);
     if(lines < 0) {
         // Moving up
         while(cur.IsOk()) {
