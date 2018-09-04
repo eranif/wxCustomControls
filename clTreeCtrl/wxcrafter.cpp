@@ -40,39 +40,36 @@ MainFrameBaseClass::MainFrameBaseClass(
     m_menuBar = new wxMenuBar(0);
     this->SetMenuBar(m_menuBar);
 
-    m_name6 = new wxMenu();
-    m_menuBar->Append(m_name6, _("File"));
+    File = new wxMenu();
+    m_menuBar->Append(File, _("File"));
 
-    m_menuItem13 = new wxMenuItem(m_name6, ID_OPEN_FOLDER, _("Open folder..."), wxT(""), wxITEM_NORMAL);
-    m_name6->Append(m_menuItem13);
+    m_menuItem13 = new wxMenuItem(File, ID_OPEN_FOLDER, _("Open folder..."), wxT(""), wxITEM_NORMAL);
+    File->Append(m_menuItem13);
 
-    m_name6->AppendSeparator();
+    File->AppendSeparator();
 
-    m_menuItemExpandAll = new wxMenuItem(m_name6, wxID_ANY, _("Expand All"), wxT(""), wxITEM_NORMAL);
-    m_name6->Append(m_menuItemExpandAll);
+    m_menuItemExpandAll = new wxMenuItem(File, wxID_ANY, _("Expand All"), wxT(""), wxITEM_NORMAL);
+    File->Append(m_menuItemExpandAll);
 
-    m_menuItemCollapseAll = new wxMenuItem(m_name6, wxID_ANY, _("Collapse All"), wxT(""), wxITEM_NORMAL);
-    m_name6->Append(m_menuItemCollapseAll);
+    m_menuItemCollapseAll = new wxMenuItem(File, wxID_ANY, _("Collapse All"), wxT(""), wxITEM_NORMAL);
+    File->Append(m_menuItemCollapseAll);
 
-    m_menuItemFirstVisible = new wxMenuItem(m_name6, wxID_ANY, _("First Visible Item"), wxT(""), wxITEM_NORMAL);
-    m_name6->Append(m_menuItemFirstVisible);
+    m_menuItemFirstVisible = new wxMenuItem(File, wxID_ANY, _("First Visible Item\tCtrl-F4"), wxT(""), wxITEM_NORMAL);
+    File->Append(m_menuItemFirstVisible);
 
-    m_menuItemNextVisibleItem = new wxMenuItem(m_name6, wxID_ANY, _("Next Visible Item"), wxT(""), wxITEM_NORMAL);
-    m_name6->Append(m_menuItemNextVisibleItem);
+    m_menuItemNextVisibleItem = new wxMenuItem(File, wxID_ANY, _("Next Visible Item\tF4"), wxT(""), wxITEM_NORMAL);
+    File->Append(m_menuItemNextVisibleItem);
 
-    m_menuItemEnsureVisible = new wxMenuItem(m_name6, wxID_ANY, _("Ensure Item Visible"), wxT(""), wxITEM_NORMAL);
-    m_name6->Append(m_menuItemEnsureVisible);
+    m_menuItemEnsureVisible = new wxMenuItem(File, wxID_ANY, _("Ensure Item Visible"), wxT(""), wxITEM_NORMAL);
+    File->Append(m_menuItemEnsureVisible);
 
-    m_name6->AppendSeparator();
+    m_menuItemSelectChildren = new wxMenuItem(File, ID_SELECT_CHILDREN, _("Select Children"), wxT(""), wxITEM_NORMAL);
+    File->Append(m_menuItemSelectChildren);
 
-    m_menuItem7 = new wxMenuItem(m_name6, wxID_EXIT, _("Exit\tAlt-X"), _("Quit"), wxITEM_NORMAL);
-    m_name6->Append(m_menuItem7);
+    File->AppendSeparator();
 
-    m_name8 = new wxMenu();
-    m_menuBar->Append(m_name8, _("Help"));
-
-    m_menuItem9 = new wxMenuItem(m_name8, wxID_ABOUT, _("About..."), wxT(""), wxITEM_NORMAL);
-    m_name8->Append(m_menuItem9);
+    m_menuItem7 = new wxMenuItem(File, wxID_EXIT, _("Exit\tAlt-X"), _("Quit"), wxITEM_NORMAL);
+    File->Append(m_menuItem7);
 
     SetName(wxT("MainFrameBaseClass"));
     SetSize(wxDLG_UNIT(this, wxSize(-1, -1)));
@@ -102,9 +99,9 @@ MainFrameBaseClass::MainFrameBaseClass(
         wxCommandEventHandler(MainFrameBaseClass::OnNextVisible), NULL, this);
     this->Connect(m_menuItemEnsureVisible->GetId(), wxEVT_COMMAND_MENU_SELECTED,
         wxCommandEventHandler(MainFrameBaseClass::OnEnsureItemVisible), NULL, this);
+    this->Connect(m_menuItemSelectChildren->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+        wxCommandEventHandler(MainFrameBaseClass::OnSelectChildren), NULL, this);
     this->Connect(m_menuItem7->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBaseClass::OnExit),
-        NULL, this);
-    this->Connect(m_menuItem9->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBaseClass::OnAbout),
         NULL, this);
 }
 
@@ -122,10 +119,10 @@ MainFrameBaseClass::~MainFrameBaseClass()
         wxCommandEventHandler(MainFrameBaseClass::OnNextVisible), NULL, this);
     this->Disconnect(m_menuItemEnsureVisible->GetId(), wxEVT_COMMAND_MENU_SELECTED,
         wxCommandEventHandler(MainFrameBaseClass::OnEnsureItemVisible), NULL, this);
+    this->Disconnect(m_menuItemSelectChildren->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+        wxCommandEventHandler(MainFrameBaseClass::OnSelectChildren), NULL, this);
     this->Disconnect(m_menuItem7->GetId(), wxEVT_COMMAND_MENU_SELECTED,
         wxCommandEventHandler(MainFrameBaseClass::OnExit), NULL, this);
-    this->Disconnect(m_menuItem9->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-        wxCommandEventHandler(MainFrameBaseClass::OnAbout), NULL, this);
 }
 
 MyImages::MyImages()

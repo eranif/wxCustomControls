@@ -86,16 +86,16 @@ public:
      * This fucntion fires wxEVT_TREE_SEL_CHANGING/wxEVT_TREE_SEL_CHANGED
      * */
     void SelectItems(const std::vector<std::pair<wxTreeItemId, bool>>& items);
-    
+
     /**
      * @brief plural version, same as previous. But this time, use 'true' for all the items
      * Note that this function clears the old selections
      * This fucntion fires wxEVT_TREE_SEL_CHANGING/wxEVT_TREE_SEL_CHANGED
      */
     void SelectItems(const std::vector<wxTreeItemId>& items);
-    
+
     void SelectChildren(const wxTreeItemId& item);
-    
+
     void Clear();
 
     void SetOnScreenItems(const clTreeCtrlNode::Vec_t& items);
@@ -130,6 +130,9 @@ public:
     bool GetRange(clTreeCtrlNode* from, clTreeCtrlNode* to, clTreeCtrlNode::Vec_t& items) const;
 
     size_t GetExpandedLines() const;
+
+    clTreeCtrlNode* GetNextSibling(clTreeCtrlNode* item) const;
+    clTreeCtrlNode* GetPrevSibling(clTreeCtrlNode* item) const;
 };
 
 #endif // CLTREECTRLMODEL_H

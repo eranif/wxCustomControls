@@ -41,15 +41,16 @@ class MainFrameBaseClass : public wxFrame
 {
 public:
     enum {
-        ID_EXPAND_ALL = 10001,
-        ID_OPEN_FOLDER = 10002,
+        ID_SELECT_CHILDREN = 10001,
+        ID_EXPAND_ALL = 10002,
+        ID_OPEN_FOLDER = 10003,
     };
 
 protected:
     wxPanel* m_mainPanel;
     wxTextCtrl* m_textCtrlLog;
     wxMenuBar* m_menuBar;
-    wxMenu* m_name6;
+    wxMenu* File;
     wxMenuItem* m_menuItem13;
     wxMenuItem* m_separator1;
     wxMenuItem* m_menuItemExpandAll;
@@ -57,10 +58,9 @@ protected:
     wxMenuItem* m_menuItemFirstVisible;
     wxMenuItem* m_menuItemNextVisibleItem;
     wxMenuItem* m_menuItemEnsureVisible;
+    wxMenuItem* m_menuItemSelectChildren;
     wxMenuItem* m_separator2;
     wxMenuItem* m_menuItem7;
-    wxMenu* m_name8;
-    wxMenuItem* m_menuItem9;
 
 protected:
     virtual void OnOpenFolder(wxCommandEvent& event) { event.Skip(); }
@@ -69,8 +69,8 @@ protected:
     virtual void OnFirstVisible(wxCommandEvent& event) { event.Skip(); }
     virtual void OnNextVisible(wxCommandEvent& event) { event.Skip(); }
     virtual void OnEnsureItemVisible(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnSelectChildren(wxCommandEvent& event) { event.Skip(); }
     virtual void OnExit(wxCommandEvent& event) { event.Skip(); }
-    virtual void OnAbout(wxCommandEvent& event) { event.Skip(); }
 
 public:
     wxTextCtrl* GetTextCtrlLog() { return m_textCtrlLog; }

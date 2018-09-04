@@ -14,8 +14,12 @@
 
 #define CHECK_PTR_RET(p) \
     if(!p) { return; }
+    
 #define CHECK_ITEM_RET(item) \
     if(!item.IsOk()) { return; }
+
+#define CHECK_ITEM_RET_INVALID_ITEM(item) \
+    if(!item.IsOk()) { return wxTreeItemId(); }
 
 #define CHECK_ROOT_RET() \
     if(!m_model.GetRoot()) { return; }
@@ -154,6 +158,7 @@ void clTreeCtrl::Collapse(const wxTreeItemId& item)
 
 void clTreeCtrl::SelectItem(const wxTreeItemId& item, bool select)
 {
+    if(!item.IsOk()) { return; }
     m_model.SelectItem(item, select);
     Refresh();
 }
@@ -749,10 +754,23 @@ void clTreeCtrl::OnScroll(wxScrollEvent& event)
 
 void clTreeCtrl::SelectChildren(const wxTreeItemId& item)
 {
+    CHECK_ITEM_RET(item);
     if(!(GetTreeStyle() & wxTR_MULTIPLE)) {
         // Can only be used with multiple selection trees
         return;
     }
     m_model.SelectChildren(item);
     Refresh();
+}
+
+wxTreeItemId clTreeCtrl::GetNextSibling(const wxTreeItemId& item) const
+{
+    CHECK_ITEM_RET_INVALID_ITEM(item);
+    return m_model.GetNextSibling(m_model.ToPtr(item));
+}
+
+wxTreeItemId clTreeCtrl::GetPrevSibling(const wxTreeItemId& item) const
+{
+    CHECK_ITEM_RET_INVALID_ITEM(item);
+    return m_model.GetPrevSibling(m_model.ToPtr(item));
 }

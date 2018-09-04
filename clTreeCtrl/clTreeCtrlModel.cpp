@@ -430,3 +430,25 @@ void clTreeCtrlModel::SelectChildren(const wxTreeItemId& item)
         [&](clTreeCtrlNode* child) { items.push_back(wxTreeItemId(child)); });
     SelectItems(items);
 }
+
+clTreeCtrlNode* clTreeCtrlModel::GetNextSibling(clTreeCtrlNode* item) const
+{
+    if(!item->GetParent()) { return nullptr; }
+    const clTreeCtrlNode::Vec_t& children = item->GetParent()->GetChildren();
+    clTreeCtrlNode::Vec_t::const_iterator iter
+        = std::find_if(children.begin(), children.end(), [&](clTreeCtrlNode* sibling) { return (sibling == item); });
+    // If we got a match, move to the next item
+    if(iter != children.end()) { ++iter; }
+    return ((iter == children.end()) ? nullptr : (*iter));
+}
+
+clTreeCtrlNode* clTreeCtrlModel::GetPrevSibling(clTreeCtrlNode* item) const
+{
+    if(!item->GetParent()) { return nullptr; }
+    const clTreeCtrlNode::Vec_t& children = item->GetParent()->GetChildren();
+    clTreeCtrlNode::Vec_t::const_iterator iter
+        = std::find_if(children.begin(), children.end(), [&](clTreeCtrlNode* sibling) { return (sibling == item); });
+    // If we got a match, move to the next item
+    if((iter != children.end()) && (iter != children.begin())) { --iter; }
+    return ((iter == children.end()) ? nullptr : (*iter));
+}

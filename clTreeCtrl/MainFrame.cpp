@@ -154,13 +154,13 @@ void MainFrame::OnCollapseAll(wxCommandEvent& event) { m_tree->CollapAll(); }
 void MainFrame::OnFirstVisible(wxCommandEvent& event)
 {
     wxTreeItemId item = m_tree->GetFirstVisibleItem();
-    if(item.IsOk()) { wxMessageBox("First visible item: " + m_tree->GetItemText(item)); }
+    m_tree->SelectItem(item);
 }
 
 void MainFrame::OnNextVisible(wxCommandEvent& event)
 {
     wxTreeItemId item = m_tree->GetNextVisible(m_tree->GetFocusedItem());
-    if(item.IsOk()) { wxMessageBox("Next visible item (from selection): " + m_tree->GetItemText(item)); }
+    m_tree->SelectItem(item);
 }
 void MainFrame::OnEnsureItemVisible(wxCommandEvent& event)
 {
@@ -175,4 +175,9 @@ void MainFrame::OnItemDeleted(wxTreeEvent& event)
 {
     wxString text = m_tree->GetItemText(event.GetItem());
     LogMessage("Item: " + text + " was deleted");
+}
+
+void MainFrame::OnSelectChildren(wxCommandEvent& event)
+{
+    m_tree->SelectChildren(m_tree->GetFocusedItem());
 }
