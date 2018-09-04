@@ -289,6 +289,8 @@ void clTreeCtrlColours::InitDefaults()
     buttonColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW);
     hoverBgColour = wxColour("rgb(219,221,224)");
     bgColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE);
+    scrolBarButton = wxSystemSettings::GetColour(wxSYS_COLOUR_3DSHADOW);
+    scrollBarBgColour = bgColour.ChangeLightness(95); // A bit darker
     itemBgColour = bgColour;
 }
 
@@ -301,4 +303,6 @@ void clTreeCtrlColours::InitDarkDefaults()
     buttonColour = itemTextColour;
     hoverBgColour = wxColour("#2c3e50");
     itemBgColour = bgColour;
+    scrolBarButton = hoverBgColour;
+    scrollBarBgColour = wxColour("#212f3d"); // A bit darker
 }

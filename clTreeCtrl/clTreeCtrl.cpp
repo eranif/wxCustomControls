@@ -459,6 +459,8 @@ void clTreeCtrl::OnLeaveWindow(wxMouseEvent& event)
 void clTreeCtrl::SetColours(const clTreeCtrlColours& colours)
 {
     m_colours = colours;
+    m_scrollBar->SetBgColour(m_colours.scrollBarBgColour);
+    m_scrollBar->SetButtonColour(m_colours.scrolBarButton);
     Refresh();
 }
 

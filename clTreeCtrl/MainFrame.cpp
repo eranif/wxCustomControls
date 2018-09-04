@@ -11,7 +11,7 @@ MainFrame::MainFrame(wxWindow* parent)
 {
     m_tree = new clTreeCtrl(m_mainPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_MULTIPLE);
     clTreeCtrlColours colours = m_tree->GetColours();
-    colours.InitDarkDefaults();
+    colours.InitDefaults();
     m_tree->SetColours(colours);
     wxLog::SetActiveTarget(new wxLogTextCtrl(m_textCtrlLog));
 

@@ -27,7 +27,8 @@ struct clTreeCtrlColours {
     wxColour selItemBgColour;   // selected item background colour
     wxColour buttonColour;      // expand/collapse button colour
     wxColour bgColour;          // background colour for the control
-
+    wxColour scrolBarButton;    // The scrollbar thumb button colour
+    wxColour scrollBarBgColour; // The scrollbar background colour
     clTreeCtrlColours() { InitDefaults(); }
     void InitDefaults();
     void InitDarkDefaults();
