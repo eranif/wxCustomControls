@@ -22,17 +22,19 @@ class clScrollBar : public wxEvtHandler
     wxColour m_bgColour;
     bool m_scrolling = false;
     wxPoint m_anchorPoint;
-    
+
 protected:
-    wxRect GetClientRect();
-    wxWindow* GetParent() { return m_parent; }
+    wxRect GetClientRect() const;
+    wxWindow* GetParent() const { return m_parent; }
     void OnMouseLeftDown(wxMouseEvent& event);
     void OnMouseMotion(wxMouseEvent& event);
     void OnMouseLeftUp(wxMouseEvent& event);
     void DoCancelScrolling();
     int DoGetButtonSize();
     int DoGetButtonPosition();
-    
+    wxRect GetVirtualRect() const;
+    bool IsVertical() const { return m_orientation == wxVERTICAL; }
+
 public:
     clScrollBar(wxWindow* parent, wxOrientation orientation = wxVERTICAL);
     virtual ~clScrollBar();
