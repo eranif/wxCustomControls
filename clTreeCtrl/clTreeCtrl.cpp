@@ -6,6 +6,7 @@
 #include <wx/dcbuffer.h>
 #include <wx/dcgraph.h>
 #include <wx/dcmemory.h>
+#include <wx/log.h>
 #include <wx/renderer.h>
 #include <wx/settings.h>
 #include <wx/utils.h>
@@ -708,16 +709,35 @@ void clTreeCtrl::SetSortFunction(const std::function<bool(const wxTreeItemId&, c
 void clTreeCtrl::UpdateScrollBar(wxDC& dc)
 {
     wxRect rect = GetClientRect();
-    m_scrollBar->SetScrollbar(m_model.GetItemIndex(m_model.GetFirstItemOnScreen()), rect.GetHeight() / m_lineHeight,
-        m_model.GetExpandedLines(), m_lineHeight);
+    int position = m_model.GetItemIndex(m_model.GetFirstItemOnScreen());
+    m_scrollBar->SetScrollbar(position, rect.GetHeight() / m_lineHeight, m_model.GetExpandedLines(), m_lineHeight);
+    wxLogMessage(wxString() << "First visible item position is: " << position);
     m_scrollBar->Render(dc);
 }
 
 void clTreeCtrl::OnScroll(wxScrollEvent& event)
 {
-    int position = event.GetPosition();
-    clTreeCtrlNode* item = m_model.GetItemFromIndex(position);
-    if(!item) { return; }
-    SetFirstItemOnScreen(item);
+    int lines = event.GetPosition();
+    if(lines == 0) { return; }
+
+    clTreeCtrlNode::Vec_t items;
+    wxTreeItemId cur(GetFirstVisibleItem());
+    int counter = 0;
+    int max_items = abs(lines);
+    if(lines < 0) {
+        while(cur.IsOk()) {
+            cur = m_model.GetItemAfter(cur, true);
+            counter++;
+            if(max_items == counter) { break; }
+        }
+    } else {
+        while(cur.IsOk()) {
+            cur = m_model.GetItemBefore(cur, true);
+            counter++;
+            if(max_items == counter) { break; }
+        }
+    }
+    if(!cur.IsOk()) { return; }
+    SetFirstItemOnScreen(m_model.ToPtr(cur));
     Refresh();
 }

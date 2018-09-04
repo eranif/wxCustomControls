@@ -108,29 +108,37 @@ void clScrollBar::OnMouseMotion(wxMouseEvent& event)
     event.Skip();
     if(m_parent->HasCapture()) {
         wxRect clientRect = GetClientRect();
+        int maxjorAxis = m_orientation == wxVERTICAL ? clientRect.GetHeight() : clientRect.GetWidth();
+        double pixelsPerLine = (double)maxjorAxis / (double)m_range;
+        if(pixelsPerLine == 0.0) { return; }
+        
         if(clientRect.GetHeight() <= 0) {
             DoCancelScrolling();
             return;
         }
         wxPoint currpoint = event.GetPosition();
         int buttonSize = DoGetButtonSize();
-        //int buttonPos = DoGetButtonPosition();
+        // int buttonPos = DoGetButtonPosition();
         if(m_orientation == wxVERTICAL) {
             if((currpoint.y + buttonSize) >= clientRect.GetHeight()) { return; }
-            
+
             if(currpoint.y < 0) {
                 currpoint.y = 0;
             } else if(currpoint.y >= clientRect.GetHeight()) {
                 currpoint.y = clientRect.GetHeight();
             }
 
+            int diff = abs((m_anchorPoint.y - currpoint.y));
+            if(diff <= pixelsPerLine) { return; }
+            int lines = (m_anchorPoint.y - currpoint.y) / pixelsPerLine;
+
             // Calculate the position and fire the event
-            int pos = (currpoint.y * m_range) / clientRect.GetHeight();
+            // int pos = (currpoint.y * m_range) / clientRect.GetHeight();
             wxScrollEvent scrollEvent(wxEVT_SCROLL_THUMBTRACK);
             scrollEvent.SetEventObject(m_parent);
-            scrollEvent.SetPosition(pos);
+            scrollEvent.SetPosition(lines); // Negative number means we moved up
             ProcessEvent(scrollEvent);
-
+            m_anchorPoint = currpoint;
         } else if(m_orientation == wxHORIZONTAL) {
             if(currpoint.x < 0) {
                 currpoint.x = 0;
