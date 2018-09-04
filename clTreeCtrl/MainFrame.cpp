@@ -103,10 +103,8 @@ void MainFrame::OnAbout(wxCommandEvent& event)
 
 void MainFrame::LogMessage(const wxString& message) 
 { 
-#ifndef __WXOSX__
     static int counter = 0;
     wxLogMessage(wxString() << (++counter) << ": " << message); 
-#endif
 }
 
 void MainFrame::OnOpenFolder(wxCommandEvent& event)
@@ -119,7 +117,9 @@ void MainFrame::OnOpenFolder(wxCommandEvent& event)
     m_tree->AppendItem(root, "dummy-node");
     m_tree->SelectItem(root);
     m_tree->SetItemBold(root, true);
+    m_tree->CallAfter(&clTreeCtrl::SetFocus);
 }
+
 
 void MainFrame::OnItemExpanding(wxTreeEvent& event)
 {

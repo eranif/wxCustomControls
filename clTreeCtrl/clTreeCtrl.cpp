@@ -363,7 +363,11 @@ void clTreeCtrl::OnMouseScroll(wxMouseEvent& event)
 {
     CHECK_ROOT_RET();
     if(!GetFirstItemOnScreen()) { return; }
-    
+
+//static int counter = 0;
+//wxString directionS = event.GetWheelRotation() > 0 ? "Up" : "Down";
+//wxLogMessage(wxString() << ++counter << ": Scroll event..." << directionS);
+//
     // Ignore the first tick (should fix an annoyance on OSX)
     wxDirection direction = (event.GetWheelRotation() > 0) ? wxUP : wxDOWN;
     if(direction != m_lastScrollDir) {
@@ -424,6 +428,7 @@ void clTreeCtrl::SetBitmaps(const std::vector<wxBitmap>& bitmaps)
 void clTreeCtrl::OnIdle(wxIdleEvent& event)
 {
     CHECK_ROOT_RET();
+#ifndef __WXOSX__
     int flags = 0;
     wxPoint pt = ScreenToClient(::wxGetMousePosition());
     wxTreeItemId item = HitTest(pt, flags);
@@ -439,6 +444,7 @@ void clTreeCtrl::OnIdle(wxIdleEvent& event)
         }
         if(refreshNeeded) { Refresh(); }
     }
+#endif
 }
 
 void clTreeCtrl::OnLeaveWindow(wxMouseEvent& event)

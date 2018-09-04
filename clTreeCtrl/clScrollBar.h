@@ -15,7 +15,11 @@ class clScrollBarHelper : public wxEvtHandler
     int m_pageSize = 0;
     int m_lineInPixels = 0;
     int m_minButtonSize = 15;
-    int m_size = 18;
+#ifdef __WXOSX__
+    int m_size = 10;
+#else
+    int m_size = 14;
+#endif
     wxOrientation m_orientation = wxVERTICAL;
     wxRect m_thumbRect;
     wxColour m_buttonColour;
