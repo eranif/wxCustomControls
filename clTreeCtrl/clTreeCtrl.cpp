@@ -732,27 +732,8 @@ void clTreeCtrl::OnScroll(wxScrollEvent& event)
 
     wxTreeItemId cur(GetFirstVisibleItem());
     if((lines > 0) && ((int)m_model.GetOnScreenItems().size() < GetNumLineCanFitOnScreen())) { return; }
-    int counter = 0;
     long max_items = std::abs((double)lines);
-    if(lines < 0) {
-        // Moving up
-        while(cur.IsOk()) {
-            wxTreeItemId itemBefore = m_model.GetItemBefore(cur, true);
-            if(!itemBefore.IsOk()) { break; }
-            cur = itemBefore;
-            counter++;
-            if(max_items == counter) { break; }
-        }
-    } else {
-        // Moving down
-        while(cur.IsOk()) {
-            wxTreeItemId itemAfter = m_model.GetItemAfter(cur, true);
-            if(!itemAfter.IsOk()) { break; }
-            cur = itemAfter;
-            counter++;
-            if(max_items == counter) { break; }
-        }
-    }
+    cur = DoScrollLines(max_items, lines < 0, GetFirstVisibleItem(), false);
     if(!cur.IsOk()) { return; }
     SetFirstItemOnScreen(m_model.ToPtr(cur));
     Refresh();
@@ -781,10 +762,11 @@ wxTreeItemId clTreeCtrl::GetPrevSibling(const wxTreeItemId& item) const
     return m_model.GetPrevSibling(m_model.ToPtr(item));
 }
 
-bool clTreeCtrl::DoScrollLines(int numLines, bool up)
+wxTreeItemId clTreeCtrl::DoScrollLines(int numLines, bool up, wxTreeItemId from, bool selectIt)
 {
-    wxTreeItemId selectedItem = GetFocusedItem();
-    CHECK_ITEM_RET_FALSE(selectedItem);
+    wxTreeItemId selectedItem = from;
+    if(!selectedItem.IsOk()) { return wxTreeItemId(); }
+
     int counter = 0;
     wxTreeItemId nextItem = selectedItem;
     while(nextItem.IsOk() && (counter < numLines)) {
@@ -796,8 +778,8 @@ bool clTreeCtrl::DoScrollLines(int numLines, bool up)
         if(nextItem.IsOk()) { selectedItem = nextItem; }
         counter++;
     }
-    if(selectedItem.IsOk()) { SelectItem(selectedItem); }
-    return selectedItem.IsOk();
+    if(selectIt) { SelectItem(selectedItem); }
+    return selectedItem;
 }
 
 void clTreeCtrl::OnKeyScroll(wxScrollEvent& event)
@@ -805,13 +787,13 @@ void clTreeCtrl::OnKeyScroll(wxScrollEvent& event)
     CHECK_ROOT_RET();
     wxEventType type = event.GetEventType();
     if(type == wxEVT_SCROLL_LINEDOWN) {
-        DoScrollLines(1, false);
+        DoScrollLines(1, false, GetFocusedItem(), true);
     } else if(type == wxEVT_SCROLL_LINEUP) {
-        DoScrollLines(1, true);
+        DoScrollLines(1, true, GetFocusedItem(), true);
     } else if(type == wxEVT_SCROLL_PAGEDOWN) {
-        DoScrollLines(event.GetPosition(), false);
+        DoScrollLines(event.GetPosition(), false, GetFocusedItem(), true);
     } else if(type == wxEVT_SCROLL_PAGEUP) {
-        DoScrollLines(event.GetPosition(), true);
+        DoScrollLines(event.GetPosition(), true, GetFocusedItem(), true);
     } else if(type == wxEVT_SCROLL_TOP) {
         SelectItem(GetRootItem());
         EnsureVisible(GetRootItem());

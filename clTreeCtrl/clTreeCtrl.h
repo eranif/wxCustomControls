@@ -32,7 +32,7 @@ private:
     clTreeCtrlNode* GetFirstItemOnScreen();
     void SetFirstItemOnScreen(clTreeCtrlNode* item);
     void UpdateScrollBar(wxDC& dc);
-    bool DoScrollLines(int numLines , bool up);
+    wxTreeItemId DoScrollLines(int numLines, bool up, wxTreeItemId from, bool selectIt);
     
 public:
     clTreeCtrl(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
