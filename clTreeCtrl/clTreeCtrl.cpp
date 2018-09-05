@@ -651,6 +651,7 @@ bool clTreeCtrl::IsItemVisible(clTreeCtrlNode* item) const
 
 void clTreeCtrl::EnsureItemVisible(clTreeCtrlNode* item, bool fromTop)
 {
+    CHECK_PTR_RET(item)
     if(IsItemVisible(item)) {
         return;
     }
@@ -886,33 +887,35 @@ void clTreeCtrl::OnKeyScroll(wxScrollEvent& event)
 {
     CHECK_ROOT_RET();
     wxEventType type = event.GetEventType();
+    wxTreeItemId nextSelection;
+    bool fromTop = false;
     if(type == wxEVT_SCROLL_LINEDOWN) {
-        DoScrollLines(1, false, GetFocusedItem(), true);
-    } else if(type == wxEVT_SCROLL_LINEUP) {
-        DoScrollLines(1, true, GetFocusedItem(), true);
+        nextSelection = DoScrollLines(1, false, GetFocusedItem(), true);
     } else if(type == wxEVT_SCROLL_PAGEDOWN) {
-        DoScrollLines(event.GetPosition(), false, GetFocusedItem(), true);
+        nextSelection = DoScrollLines(event.GetPosition(), false, GetFocusedItem(), true);
+    } else if(type == wxEVT_SCROLL_LINEUP) {
+        nextSelection = DoScrollLines(1, true, GetFocusedItem(), true);
+        fromTop = true;
     } else if(type == wxEVT_SCROLL_PAGEUP) {
-        DoScrollLines(event.GetPosition(), true, GetFocusedItem(), true);
+        nextSelection = DoScrollLines(event.GetPosition(), true, GetFocusedItem(), true);
+        fromTop = true;
     } else if(type == wxEVT_SCROLL_TOP) {
-        wxTreeItemId item;
         if(IsRootHidden()) {
-            item = wxTreeItemId(m_model.ToPtr(GetRootItem())->GetFirstChild());
+            nextSelection = wxTreeItemId(m_model.ToPtr(GetRootItem())->GetFirstChild());
         } else {
-            item = GetRootItem();
+            nextSelection = GetRootItem();
         }
-        SelectItem(item);
-        EnsureVisible(item);
+        fromTop = true;
     } else if(type == wxEVT_SCROLL_BOTTOM) {
         // Find the last item, it does not matter if the root is hidden
         clTreeCtrlNode* node = m_model.ToPtr(GetRootItem());
         while(node->GetLastChild()) {
             node = node->GetLastChild();
         }
-        SelectItem(wxTreeItemId(node));
-        EnsureVisible(wxTreeItemId(node));
+        nextSelection = wxTreeItemId(node);
     }
-    EnsureVisible(GetFocusedItem());
+    SelectItem(nextSelection);
+    EnsureItemVisible(m_model.ToPtr(nextSelection), fromTop);
 }
 
 void clTreeCtrl::EnableStyle(int style, bool enable, bool refresh)
