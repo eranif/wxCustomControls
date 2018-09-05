@@ -26,6 +26,7 @@ class clScrollBarHelper : public wxEvtHandler
     wxColour m_bgColour;
     bool m_scrolling = false;
     wxPoint m_anchorPoint;
+    int m_remainder = 0;
 
 protected:
     wxRect GetClientRect() const;

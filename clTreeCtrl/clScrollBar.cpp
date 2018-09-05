@@ -127,17 +127,22 @@ void clScrollBarHelper::OnMouseMotion(wxMouseEvent& event)
         bool moving_up = false;
         if(IsVertical()) {
             moving_up = ((currpoint.y - m_anchorPoint.y) < 0);
-            int diff = std::abs((double)(currpoint.y - m_anchorPoint.y));
+            m_remainder = currpoint.y - m_anchorPoint.y;
+            int diff = std::abs((double)m_remainder);
             buttonRect.SetY(buttonRect.GetY() + (moving_up ? -diff : diff));
             lines = ((double)buttonRect.GetY() - (double)m_thumbRect.GetY()) / pixelsPerLine;
         } else {
             moving_up = ((currpoint.x - m_anchorPoint.x) < 0);
-            int diff = std::abs((double)(currpoint.x - m_anchorPoint.x));
+            m_remainder = currpoint.x - m_anchorPoint.x;
+            
+            int diff = std::abs((double)m_remainder);
             buttonRect.SetX(buttonRect.GetX() + (moving_up ? -diff : diff));
             lines = ((double)buttonRect.GetX() - (double)m_thumbRect.GetX()) / pixelsPerLine;
         }
-        if(std::abs(lines) < 1.0) { return; }
-
+        if(std::abs(lines) < 1.0) {
+            return;
+        }
+        m_remainder = 0;
         wxScrollEvent scrollEvent(wxEVT_SCROLL_THUMBTRACK);
         scrollEvent.SetEventObject(m_parent);
         scrollEvent.SetPosition(std::round(lines)); // Negative number means we moved up
@@ -175,7 +180,7 @@ int clScrollBarHelper::DoGetButtonPosition()
     wxRect clientRect = GetClientRect();
     int majorAxis = IsVertical() ? clientRect.GetHeight() : clientRect.GetWidth();
     int pos = ((double)m_position / (double)m_range) * majorAxis;
-    return pos;
+    return pos + m_remainder;
 }
 
 wxRect clScrollBarHelper::GetVirtualRect() const

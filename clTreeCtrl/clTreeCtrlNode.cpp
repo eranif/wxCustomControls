@@ -341,7 +341,7 @@ void clTreeCtrlColours::InitDarkDefaults()
     buttonColour = itemTextColour;
     hoverBgColour = wxColour("#2c3e50");
     itemBgColour = bgColour;
-    scrolBarButton = hoverBgColour;
+    scrolBarButton = selItemBgColour;
     scrollBarBgColour = wxColour("#212f3d"); // A bit darker
     alternateColourEven = bgColour.ChangeLightness(105);
     alternateColourOdd = bgColour.ChangeLightness(95);
