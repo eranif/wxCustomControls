@@ -77,9 +77,23 @@ MainFrameBaseClass::MainFrameBaseClass(
     m_menuItemExit = new wxMenuItem(File, wxID_EXIT, _("Exit\tAlt-X"), _("Quit"), wxITEM_NORMAL);
     File->Append(m_menuItemExit);
 
+    Styles = new wxMenu();
+    m_menuBar->Append(Styles, _("Styles"));
+
+    m_menuItemRowLines = new wxMenuItem(Styles, ID_ZEBRA_COLOURING, _("Zebra Colouring.."), wxT(""), wxITEM_CHECK);
+    Styles->Append(m_menuItemRowLines);
+
+    m_menuItemTheme = new wxMenuItem(Styles, ID_THEME_CHOOSE, _("Toggle Theme"), wxT(""), wxITEM_NORMAL);
+    Styles->Append(m_menuItemTheme);
+
+    m_menuItemHideRoot = new wxMenuItem(Styles, ID_HIDE_ROOT, _("Hide Root"), wxT(""), wxITEM_CHECK);
+    Styles->Append(m_menuItemHideRoot);
+
     SetName(wxT("MainFrameBaseClass"));
     SetSize(wxDLG_UNIT(this, wxSize(-1, -1)));
-    if(GetSizer()) { GetSizer()->Fit(this); }
+    if(GetSizer()) {
+        GetSizer()->Fit(this);
+    }
     if(GetParent()) {
         CentreOnParent(wxBOTH);
     } else {
@@ -113,6 +127,12 @@ MainFrameBaseClass::MainFrameBaseClass(
         wxCommandEventHandler(MainFrameBaseClass::OnPrevSibling), NULL, this);
     this->Connect(m_menuItemExit->GetId(), wxEVT_COMMAND_MENU_SELECTED,
         wxCommandEventHandler(MainFrameBaseClass::OnExit), NULL, this);
+    this->Connect(m_menuItemRowLines->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+        wxCommandEventHandler(MainFrameBaseClass::OnZebraColouring), NULL, this);
+    this->Connect(m_menuItemTheme->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+        wxCommandEventHandler(MainFrameBaseClass::OnToggleTheme), NULL, this);
+    this->Connect(m_menuItemHideRoot->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+        wxCommandEventHandler(MainFrameBaseClass::OnHideRoot), NULL, this);
 }
 
 MainFrameBaseClass::~MainFrameBaseClass()
@@ -137,6 +157,12 @@ MainFrameBaseClass::~MainFrameBaseClass()
         wxCommandEventHandler(MainFrameBaseClass::OnPrevSibling), NULL, this);
     this->Disconnect(m_menuItemExit->GetId(), wxEVT_COMMAND_MENU_SELECTED,
         wxCommandEventHandler(MainFrameBaseClass::OnExit), NULL, this);
+    this->Disconnect(m_menuItemRowLines->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+        wxCommandEventHandler(MainFrameBaseClass::OnZebraColouring), NULL, this);
+    this->Disconnect(m_menuItemTheme->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+        wxCommandEventHandler(MainFrameBaseClass::OnToggleTheme), NULL, this);
+    this->Disconnect(m_menuItemHideRoot->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+        wxCommandEventHandler(MainFrameBaseClass::OnHideRoot), NULL, this);
 }
 
 MyImages::MyImages()

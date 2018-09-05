@@ -21,15 +21,17 @@ enum clTreeCtrlNodeFlags {
 };
 
 struct clTreeCtrlColours {
-    wxColour hoverBgColour;     // Background colour of an hovered item
-    wxColour itemTextColour;    // item text colour
-    wxColour itemBgColour;      // item bg colour
-    wxColour selItemTextColour; // text colour for the selected item
-    wxColour selItemBgColour;   // selected item background colour
-    wxColour buttonColour;      // expand/collapse button colour
-    wxColour bgColour;          // background colour for the control
-    wxColour scrolBarButton;    // The scrollbar thumb button colour
-    wxColour scrollBarBgColour; // The scrollbar background colour
+    wxColour hoverBgColour;       // Background colour of an hovered item
+    wxColour itemTextColour;      // item text colour
+    wxColour itemBgColour;        // item bg colour
+    wxColour selItemTextColour;   // text colour for the selected item
+    wxColour selItemBgColour;     // selected item background colour
+    wxColour buttonColour;        // expand/collapse button colour
+    wxColour bgColour;            // background colour for the control
+    wxColour scrolBarButton;      // The scrollbar thumb button colour
+    wxColour scrollBarBgColour;   // The scrollbar background colour
+    wxColour alternateColourOdd;  // Colour to draw odd items background (wxTR_ROW_LINES)
+    wxColour alternateColourEven; // Colour to draw even items background (wxTR_ROW_LINES)
     clTreeCtrlColours() { InitDefaults(); }
     void InitDefaults();
     void InitDarkDefaults();
@@ -94,7 +96,7 @@ public:
     clTreeCtrlNode* GetNext() const { return m_next; }
     clTreeCtrlNode* GetPrev() const { return m_prev; }
     
-    void SetHidden(bool b) { SetFlag(kNF_Hidden, b); }
+    void SetHidden(bool b);
     bool IsHidden() const { return HasFlag(kNF_Hidden); }
     
     bool IsVisible() const;
@@ -113,7 +115,7 @@ public:
      * @brief remove all children items
      */
     void DeleteAllChildren();
-    void Render(wxDC& dc, const clTreeCtrlColours& colours);
+    void Render(wxDC& dc, const clTreeCtrlColours& colours, int visibileIndex);
     void SetHovered(bool b) { SetFlag(kNF_Hovered, b); }
     bool IsHovered() const { return m_flags & kNF_Hovered; }
 

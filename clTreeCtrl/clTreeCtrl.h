@@ -69,6 +69,17 @@ public:
      * @brief set the colours used for drawing items
      */
     void SetColours(const clTreeCtrlColours& colours);
+    
+    /**
+     * @brief enable style on the tree
+     */
+    void EnableStyle(int style, bool enable, bool refresh = true);
+    
+    /**
+     * @brief does the tree has 'style' enabled?
+     */
+    bool HasStyle(int style) const { return m_treeStyle & style; }
+    
     /**
      * @brief get the colours used for drawing items
      */

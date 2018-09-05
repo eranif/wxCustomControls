@@ -40,7 +40,7 @@ void clTreeCtrlNode::ConnectNodes(clTreeCtrlNode* first, clTreeCtrlNode* second)
 void clTreeCtrlNode::InsertChild(clTreeCtrlNode* child, clTreeCtrlNode* prev)
 {
     child->SetParent(this);
-    child->SetIndentsCount(IsHidden() ? GetIndentsCount() : (GetIndentsCount() + 1));
+    child->SetIndentsCount(GetIndentsCount() + 1);
 
     // We need the last item of this subtree (prev 'this' is the root)
     if(prev == nullptr) {
@@ -188,16 +188,23 @@ void clTreeCtrlNode::ClearRects()
     m_itemRect = wxRect();
 }
 
-void clTreeCtrlNode::Render(wxDC& dc, const clTreeCtrlColours& c)
+void clTreeCtrlNode::Render(wxDC& dc, const clTreeCtrlColours& c, int visibileIndex)
 {
     wxRect itemRect = GetItemRect();
+    bool zebraColouring = (m_tree->GetTreeStyle() & wxTR_ROW_LINES);
+    bool even_row = ((visibileIndex % 2) == 0);
+    
     clTreeCtrlColours colours = c;
     wxFont f = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
     if(GetFont().IsOk()) { f = GetFont(); }
     if(GetTextColour().IsOk()) { colours.itemTextColour = GetTextColour(); }
     if(GetBgColour().IsOk()) { colours.itemBgColour = GetBgColour(); }
     dc.SetFont(f);
-
+    
+    if(zebraColouring) {
+        colours.itemBgColour = even_row ? colours.alternateColourEven : colours.alternateColourOdd;
+    }
+    
     if(IsSelected() || IsHovered()) {
         dc.SetBrush(IsSelected() ? colours.selItemBgColour : colours.hoverBgColour);
         dc.SetPen(IsSelected() ? colours.selItemBgColour : colours.hoverBgColour);
@@ -299,6 +306,17 @@ clTreeCtrlNode* clTreeCtrlNode::GetFirstChild() const
     return m_children[0];
 }
 
+void clTreeCtrlNode::SetHidden(bool b)
+{
+    if(b && !IsRoot()) { return; }
+    SetFlag(kNF_Hidden, b);
+    if(b) {
+        m_indentsCount = -1;
+    } else {
+        m_indentsCount = 0;
+    }
+}
+
 void clTreeCtrlColours::InitDefaults()
 {
     itemTextColour = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT);
@@ -310,6 +328,8 @@ void clTreeCtrlColours::InitDefaults()
     scrolBarButton = wxSystemSettings::GetColour(wxSYS_COLOUR_3DSHADOW);
     scrollBarBgColour = bgColour.ChangeLightness(95); // A bit darker
     itemBgColour = bgColour;
+    alternateColourEven = bgColour.ChangeLightness(105);
+    alternateColourOdd = bgColour.ChangeLightness(95);
 }
 
 void clTreeCtrlColours::InitDarkDefaults()
@@ -323,4 +343,6 @@ void clTreeCtrlColours::InitDarkDefaults()
     itemBgColour = bgColour;
     scrolBarButton = hoverBgColour;
     scrollBarBgColour = wxColour("#212f3d"); // A bit darker
+    alternateColourEven = bgColour.ChangeLightness(105);
+    alternateColourOdd = bgColour.ChangeLightness(95);
 }

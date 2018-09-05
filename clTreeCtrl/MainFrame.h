@@ -1,6 +1,8 @@
 #ifndef MAINFRAME_H
 #define MAINFRAME_H
 #include "wxcrafter.h"
+#include <array>
+#include "clTreeCtrlNode.h"
 
 class clTreeCtrl;
 class MyItemData : public wxTreeItemData
@@ -34,11 +36,16 @@ class MainFrame : public MainFrameBaseClass
 {
     wxString m_path;
     clTreeCtrl* m_tree = nullptr;
+    std::array<clTreeCtrlColours, 2> m_coloursArr;
+    int m_selectedColours = 0;
 
 private:
     void LogMessage(const wxString& message);
 
 protected:
+    virtual void OnHideRoot(wxCommandEvent& event);
+    virtual void OnToggleTheme(wxCommandEvent& event);
+    virtual void OnZebraColouring(wxCommandEvent& event);
     virtual void OnNextSibling(wxCommandEvent& event);
     virtual void OnPrevSibling(wxCommandEvent& event);
     virtual void OnSelectChildren(wxCommandEvent& event);

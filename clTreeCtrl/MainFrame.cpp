@@ -9,12 +9,17 @@
 MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
 {
-    m_tree = new clTreeCtrl(m_mainPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_MULTIPLE | wxTR_HIDE_ROOT);
-    clTreeCtrlColours colours = m_tree->GetColours();
+    m_tree = new clTreeCtrl(m_mainPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_MULTIPLE);
+    clTreeCtrlColours colours;
     colours.InitDefaults();
-    m_tree->SetColours(colours);
-    m_tree->AddRoot("Hidden Root", -1, -1, nullptr);
+    m_coloursArr[0] = colours;
     
+    colours.InitDarkDefaults();
+    m_coloursArr[1] = colours;
+    
+    m_tree->SetColours(m_coloursArr[m_selectedColours]);
+    
+    m_tree->AddRoot("Root", -1, -1, nullptr);
     wxLog::SetActiveTarget(new wxLogTextCtrl(m_textCtrlLog));
 
     // Provide a sorting function to the tree
@@ -198,4 +203,24 @@ void MainFrame::OnPrevSibling(wxCommandEvent& event)
 {
     m_tree->SelectItem(m_tree->GetPrevSibling(m_tree->GetFocusedItem()));
     m_tree->EnsureVisible(m_tree->GetFocusedItem());
+}
+void MainFrame::OnToggleTheme(wxCommandEvent& event)
+{
+    if(m_selectedColours == 0) {
+        m_tree->SetColours(m_coloursArr[1]);
+        m_selectedColours = 1;
+    } else {
+        m_tree->SetColours(m_coloursArr[0]);
+        m_selectedColours = 0;
+    }
+    m_tree->Refresh();
+}
+
+void MainFrame::OnZebraColouring(wxCommandEvent& event)
+{
+    m_tree->EnableStyle(wxTR_ROW_LINES, !m_tree->HasStyle(wxTR_ROW_LINES));
+}
+void MainFrame::OnHideRoot(wxCommandEvent& event)
+{
+    m_tree->EnableStyle(wxTR_HIDE_ROOT, event.IsChecked());
 }

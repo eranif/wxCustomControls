@@ -41,11 +41,14 @@ class MainFrameBaseClass : public wxFrame
 {
 public:
     enum {
-        ID_PREV_SIBLING = 10001,
-        ID_NEXT_SIBLING = 10002,
-        ID_SELECT_CHILDREN = 10003,
-        ID_EXPAND_ALL = 10004,
-        ID_OPEN_FOLDER = 10005,
+        ID_THEME_CHOOSE = 10001,
+        ID_ZEBRA_COLOURING = 10002,
+        ID_PREV_SIBLING = 10003,
+        ID_NEXT_SIBLING = 10004,
+        ID_SELECT_CHILDREN = 10005,
+        ID_HIDE_ROOT = 10006,
+        ID_EXPAND_ALL = 10007,
+        ID_OPEN_FOLDER = 10008,
     };
 
 protected:
@@ -65,6 +68,10 @@ protected:
     wxMenuItem* m_menuItemPrevSibling;
     wxMenuItem* m_separator2;
     wxMenuItem* m_menuItemExit;
+    wxMenu* Styles;
+    wxMenuItem* m_menuItemRowLines;
+    wxMenuItem* m_menuItemTheme;
+    wxMenuItem* m_menuItemHideRoot;
 
 protected:
     virtual void OnOpenFolder(wxCommandEvent& event) { event.Skip(); }
@@ -77,6 +84,9 @@ protected:
     virtual void OnNextSibling(wxCommandEvent& event) { event.Skip(); }
     virtual void OnPrevSibling(wxCommandEvent& event) { event.Skip(); }
     virtual void OnExit(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnZebraColouring(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnToggleTheme(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnHideRoot(wxCommandEvent& event) { event.Skip(); }
 
 public:
     wxTextCtrl* GetTextCtrlLog() { return m_textCtrlLog; }
