@@ -33,6 +33,7 @@ protected:
     void OnMouseLeftDown(wxMouseEvent& event);
     void OnMouseMotion(wxMouseEvent& event);
     void OnMouseLeftUp(wxMouseEvent& event);
+    void OnKeyDown(wxKeyEvent& event);
     void DoCancelScrolling();
     int DoGetButtonSize();
     int DoGetButtonPosition();

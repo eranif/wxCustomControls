@@ -32,7 +32,8 @@ private:
     clTreeCtrlNode* GetFirstItemOnScreen();
     void SetFirstItemOnScreen(clTreeCtrlNode* item);
     void UpdateScrollBar(wxDC& dc);
-
+    bool DoScrollLines(int numLines , bool up);
+    
 public:
     clTreeCtrl(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
         const wxSize& size = wxDefaultSize, long style = 0);
@@ -267,6 +268,7 @@ protected:
     void OnKeyDown(wxKeyEvent& event);
     void OnContextMenu(wxContextMenuEvent& event);
     void OnScroll(wxScrollEvent& event);
+    void OnKeyScroll(wxScrollEvent& event);
 };
 
 #endif // CLTREECTRL_H

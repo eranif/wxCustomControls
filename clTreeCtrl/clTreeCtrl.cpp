@@ -14,12 +14,15 @@
 
 #define CHECK_PTR_RET(p) \
     if(!p) { return; }
-    
+
 #define CHECK_ITEM_RET(item) \
     if(!item.IsOk()) { return; }
 
 #define CHECK_ITEM_RET_INVALID_ITEM(item) \
     if(!item.IsOk()) { return wxTreeItemId(); }
+
+#define CHECK_ITEM_RET_FALSE(item) \
+    if(!item.IsOk()) { return false; }
 
 #define CHECK_ROOT_RET() \
     if(!m_model.GetRoot()) { return; }
@@ -50,6 +53,12 @@ clTreeCtrl::clTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
 
     m_scrollBar = new clScrollBarHelper(this, wxVERTICAL);
     m_scrollBar->Bind(wxEVT_SCROLL_THUMBTRACK, &clTreeCtrl::OnScroll, this);
+    m_scrollBar->Bind(wxEVT_SCROLL_LINEDOWN, &clTreeCtrl::OnKeyScroll, this);
+    m_scrollBar->Bind(wxEVT_SCROLL_LINEUP, &clTreeCtrl::OnKeyScroll, this);
+    m_scrollBar->Bind(wxEVT_SCROLL_PAGEDOWN, &clTreeCtrl::OnKeyScroll, this);
+    m_scrollBar->Bind(wxEVT_SCROLL_PAGEUP, &clTreeCtrl::OnKeyScroll, this);
+    m_scrollBar->Bind(wxEVT_SCROLL_BOTTOM, &clTreeCtrl::OnKeyScroll, this);
+    m_scrollBar->Bind(wxEVT_SCROLL_TOP, &clTreeCtrl::OnKeyScroll, this);
     // Initialise default colours
     m_colours.InitDefaults();
 }
@@ -67,6 +76,13 @@ clTreeCtrl::~clTreeCtrl()
     Unbind(wxEVT_KEY_DOWN, &clTreeCtrl::OnKeyDown, this);
     Unbind(wxEVT_CONTEXT_MENU, &clTreeCtrl::OnContextMenu, this);
     Unbind(wxEVT_RIGHT_DOWN, &clTreeCtrl::OnRightDown, this);
+    m_scrollBar->Unbind(wxEVT_SCROLL_THUMBTRACK, &clTreeCtrl::OnScroll, this);
+    m_scrollBar->Unbind(wxEVT_SCROLL_LINEDOWN, &clTreeCtrl::OnKeyScroll, this);
+    m_scrollBar->Unbind(wxEVT_SCROLL_LINEUP, &clTreeCtrl::OnKeyScroll, this);
+    m_scrollBar->Unbind(wxEVT_SCROLL_PAGEDOWN, &clTreeCtrl::OnKeyScroll, this);
+    m_scrollBar->Unbind(wxEVT_SCROLL_PAGEUP, &clTreeCtrl::OnKeyScroll, this);
+    m_scrollBar->Unbind(wxEVT_SCROLL_BOTTOM, &clTreeCtrl::OnKeyScroll, this);
+    m_scrollBar->Unbind(wxEVT_SCROLL_TOP, &clTreeCtrl::OnKeyScroll, this);
 }
 
 void clTreeCtrl::OnPaint(wxPaintEvent& event)
@@ -364,10 +380,10 @@ void clTreeCtrl::OnMouseScroll(wxMouseEvent& event)
     CHECK_ROOT_RET();
     if(!GetFirstItemOnScreen()) { return; }
 
-//static int counter = 0;
-//wxString directionS = event.GetWheelRotation() > 0 ? "Up" : "Down";
-//wxLogMessage(wxString() << ++counter << ": Scroll event..." << directionS);
-//
+    // static int counter = 0;
+    // wxString directionS = event.GetWheelRotation() > 0 ? "Up" : "Down";
+    // wxLogMessage(wxString() << ++counter << ": Scroll event..." << directionS);
+    //
     // Ignore the first tick (should fix an annoyance on OSX)
     wxDirection direction = (event.GetWheelRotation() > 0) ? wxUP : wxDOWN;
     if(direction != m_lastScrollDir) {
@@ -524,6 +540,7 @@ size_t clTreeCtrl::GetSelections(wxArrayTreeItemIds& selections) const
 
 void clTreeCtrl::OnKeyDown(wxKeyEvent& event)
 {
+    event.Skip();
     CHECK_ROOT_RET();
     wxTreeItemId selectedItem = GetSelection();
     if(!selectedItem.IsOk()) { return; }
@@ -535,35 +552,7 @@ void clTreeCtrl::OnKeyDown(wxKeyEvent& event)
     evt.SetItem(selectedItem);
     if(GetEventHandler()->ProcessEvent(evt)) { return; }
 
-    if(event.GetKeyCode() == WXK_UP) {
-        selectedItem = m_model.GetItemBefore(selectedItem, true);
-        if(selectedItem.IsOk()) {
-            SelectItem(selectedItem);
-            EnsureItemVisible(m_model.ToPtr(selectedItem), true);
-        }
-    } else if(event.GetKeyCode() == WXK_DOWN) {
-        selectedItem = m_model.GetItemAfter(selectedItem, true);
-        if(selectedItem.IsOk()) {
-            SelectItem(selectedItem);
-            EnsureItemVisible(m_model.ToPtr(selectedItem), false);
-        }
-    } else if(event.GetKeyCode() == WXK_PAGEDOWN) {
-        clTreeCtrlNode::Vec_t items;
-        m_model.GetNextItems(m_model.ToPtr(selectedItem), GetNumLineCanFitOnScreen(), items);
-        if(!items.empty()) {
-            selectedItem = wxTreeItemId(items.back());
-            SelectItem(selectedItem);
-            EnsureItemVisible(m_model.ToPtr(selectedItem), false);
-        }
-    } else if(event.GetKeyCode() == WXK_PAGEUP) {
-        clTreeCtrlNode::Vec_t items;
-        m_model.GetPrevItems(m_model.ToPtr(selectedItem), GetNumLineCanFitOnScreen(), items);
-        if(!items.empty()) {
-            selectedItem = wxTreeItemId(items[0]);
-            SelectItem(selectedItem);
-            EnsureItemVisible(m_model.ToPtr(selectedItem), true);
-        }
-    } else if(event.GetKeyCode() == WXK_LEFT) {
+    if(event.GetKeyCode() == WXK_LEFT) {
         if(m_model.ToPtr(selectedItem)->IsExpanded()) { Collapse(selectedItem); }
     } else if(event.GetKeyCode() == WXK_RIGHT) {
         if(!m_model.ToPtr(selectedItem)->IsExpanded()) { Expand(selectedItem); }
@@ -790,4 +779,43 @@ wxTreeItemId clTreeCtrl::GetPrevSibling(const wxTreeItemId& item) const
 {
     CHECK_ITEM_RET_INVALID_ITEM(item);
     return m_model.GetPrevSibling(m_model.ToPtr(item));
+}
+
+bool clTreeCtrl::DoScrollLines(int numLines, bool up)
+{
+    wxTreeItemId selectedItem = GetFocusedItem();
+    CHECK_ITEM_RET_FALSE(selectedItem);
+    int counter = 0;
+    wxTreeItemId nextItem = selectedItem;
+    while(nextItem.IsOk() && (counter < numLines)) {
+        if(up) {
+            nextItem = m_model.GetItemBefore(selectedItem, true);
+        } else {
+            nextItem = m_model.GetItemAfter(selectedItem, true);
+        }
+        if(nextItem.IsOk()) { selectedItem = nextItem; }
+        counter++;
+    }
+    if(selectedItem.IsOk()) { SelectItem(selectedItem); }
+    return selectedItem.IsOk();
+}
+
+void clTreeCtrl::OnKeyScroll(wxScrollEvent& event)
+{
+    CHECK_ROOT_RET();
+    wxEventType type = event.GetEventType();
+    if(type == wxEVT_SCROLL_LINEDOWN) {
+        DoScrollLines(1, false);
+    } else if(type == wxEVT_SCROLL_LINEUP) {
+        DoScrollLines(1, true);
+    } else if(type == wxEVT_SCROLL_PAGEDOWN) {
+        DoScrollLines(event.GetPosition(), false);
+    } else if(type == wxEVT_SCROLL_PAGEUP) {
+        DoScrollLines(event.GetPosition(), true);
+    } else if(type == wxEVT_SCROLL_TOP) {
+        SelectItem(GetRootItem());
+        EnsureVisible(GetRootItem());
+    } else if(type == wxEVT_SCROLL_BOTTOM) {
+    }
+    EnsureVisible(GetFocusedItem());
 }

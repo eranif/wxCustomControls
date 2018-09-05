@@ -3,7 +3,6 @@
 #include <wx/dc.h>
 #include <wx/log.h>
 #include <wx/settings.h>
-#include <cmath>
 
 clScrollBarHelper::clScrollBarHelper(wxWindow* parent, wxOrientation orientation)
     : m_parent(parent)
@@ -18,6 +17,7 @@ clScrollBarHelper::clScrollBarHelper(wxWindow* parent, wxOrientation orientation
     m_parent->Bind(wxEVT_LEFT_DOWN, &clScrollBarHelper::OnMouseLeftDown, this);
     m_parent->Bind(wxEVT_LEFT_UP, &clScrollBarHelper::OnMouseLeftUp, this);
     m_parent->Bind(wxEVT_MOTION, &clScrollBarHelper::OnMouseMotion, this);
+    m_parent->Bind(wxEVT_KEY_DOWN, &clScrollBarHelper::OnKeyDown, this);
 }
 
 clScrollBarHelper::~clScrollBarHelper()
@@ -25,6 +25,7 @@ clScrollBarHelper::~clScrollBarHelper()
     m_parent->Unbind(wxEVT_LEFT_DOWN, &clScrollBarHelper::OnMouseLeftDown, this);
     m_parent->Unbind(wxEVT_LEFT_UP, &clScrollBarHelper::OnMouseLeftUp, this);
     m_parent->Unbind(wxEVT_MOTION, &clScrollBarHelper::OnMouseMotion, this);
+    m_parent->Unbind(wxEVT_KEY_DOWN, &clScrollBarHelper::OnKeyDown, this);
 }
 
 void clScrollBarHelper::Render(wxDC& dc)
@@ -188,4 +189,53 @@ wxRect clScrollBarHelper::GetVirtualRect() const
         clientRect.SetX(m_position * pixelsPerLine);
     }
     return clientRect;
+}
+
+void clScrollBarHelper::OnKeyDown(wxKeyEvent& event)
+{
+    switch(event.GetKeyCode()) {
+    case WXK_UP: {
+        wxScrollEvent scrollEvent(wxEVT_SCROLL_LINEUP);
+        scrollEvent.SetPosition(1);
+        scrollEvent.SetEventObject(m_parent);
+        ProcessEvent(scrollEvent);
+        break;
+    }
+    case WXK_DOWN: {
+        wxScrollEvent scrollEvent(wxEVT_SCROLL_LINEDOWN);
+        scrollEvent.SetPosition(1);
+        scrollEvent.SetEventObject(m_parent);
+        ProcessEvent(scrollEvent);
+        break;
+    }
+    case WXK_PAGEUP: {
+        wxScrollEvent scrollEvent(wxEVT_SCROLL_PAGEUP);
+        scrollEvent.SetPosition(m_pageSize);
+        scrollEvent.SetEventObject(m_parent);
+        ProcessEvent(scrollEvent);
+        break;
+    }
+    case WXK_PAGEDOWN: {
+        wxScrollEvent scrollEvent(wxEVT_SCROLL_PAGEDOWN);
+        scrollEvent.SetPosition(m_pageSize);
+        scrollEvent.SetEventObject(m_parent);
+        ProcessEvent(scrollEvent);
+        break;
+    }
+    case WXK_HOME: {
+        wxScrollEvent scrollEvent(wxEVT_SCROLL_TOP);
+        scrollEvent.SetEventObject(m_parent);
+        ProcessEvent(scrollEvent);
+        break;
+    }
+    case WXK_END: {
+        wxScrollEvent scrollEvent(wxEVT_SCROLL_BOTTOM);
+        scrollEvent.SetEventObject(m_parent);
+        ProcessEvent(scrollEvent);
+        break;
+    }
+    default:
+        event.Skip();
+        return;
+    }
 }

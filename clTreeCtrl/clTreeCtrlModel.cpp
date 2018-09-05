@@ -200,28 +200,30 @@ wxTreeItemId clTreeCtrlModel::GetItemBefore(const wxTreeItemId& item, bool visib
 {
     clTreeCtrlNode* p = ToPtr(item);
     if(!p) { return wxTreeItemId(); }
-    if(visibleItem) {
-        clTreeCtrlNode::Vec_t items;
-        GetPrevItems(p, 2, items);
-        if(items.size() != 2) { return wxTreeItemId(); }
-        return wxTreeItemId(items[0]);
-    } else {
-        return wxTreeItemId(p->GetPrev());
+    p = p->GetPrev();
+    while(p) {
+        if(visibleItem && !p->IsVisible()) {
+            p = p->GetPrev();
+            continue;
+        }
+        break;
     }
+    return wxTreeItemId(p);
 }
 
 wxTreeItemId clTreeCtrlModel::GetItemAfter(const wxTreeItemId& item, bool visibleItem) const
 {
     clTreeCtrlNode* p = ToPtr(item);
     if(!p) { return wxTreeItemId(); }
-    if(visibleItem) {
-        clTreeCtrlNode::Vec_t items;
-        GetNextItems(p, 2, items);
-        if(items.size() != 2) { return wxTreeItemId(); }
-        return wxTreeItemId(items[1]);
-    } else {
-        return wxTreeItemId(p->GetNext());
+    p = p->GetNext();
+    while(p) {
+        if(visibleItem && !p->IsVisible()) {
+            p = p->GetNext();
+            continue;
+        }
+        break;
     }
+    return wxTreeItemId(p);
 }
 
 void clTreeCtrlModel::DeleteItem(const wxTreeItemId& item)
