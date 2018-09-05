@@ -66,7 +66,7 @@ void clScrollBarHelper::Render(wxDC& dc)
     dc.SetPen(m_buttonColour);
     dc.SetBrush(m_buttonColour);
     m_thumbRect.Deflate(1, 1);
-    dc.DrawRoundedRectangle(m_thumbRect, 2.0);
+    dc.DrawRoundedRectangle(m_thumbRect, 3.0);
 }
 
 void clScrollBarHelper::SetScrollbar(int position, int thumbSize, int range, int lineInPixels)
