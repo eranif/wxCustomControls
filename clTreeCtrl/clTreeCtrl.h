@@ -42,7 +42,7 @@ public:
     // For internal use, dont use these two methods
     const clTreeCtrlModel& GetModel() const { return m_model; }
     clTreeCtrlModel& GetModel() { return m_model; }
-
+    
     /**
      * @brief set a sorting function for this tree. The function returns true if the first element should be placed
      * before the second element
@@ -59,7 +59,12 @@ public:
      * @brief return the tree style
      */
     long GetTreeStyle() const { return m_treeStyle; }
-
+    
+    /**
+     * @brief is the root hidden?
+     */
+    bool IsRootHidden() const { return m_treeStyle & wxTR_HIDE_ROOT; }
+    
     /**
      * @brief set the colours used for drawing items
      */

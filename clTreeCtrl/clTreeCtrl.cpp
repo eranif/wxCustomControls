@@ -102,11 +102,20 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
         m_model.SetOnScreenItems(items);
         return;
     }
-
+    
+    
+    dc.SetClippingRegion(GetClientRect());
     int maxItems = GetNumLineCanFitOnScreen();
     if(!GetFirstItemOnScreen()) { SetFirstItemOnScreen(m_model.GetRoot()); }
     clTreeCtrlNode* firstItem = GetFirstItemOnScreen();
     if(!firstItem) { return; }
+    
+    // If the first item is hidden, we hide it by clipping the drawing area
+    if(firstItem->IsHidden()) {
+        clientRect.SetY(clientRect.GetY() - m_lineHeight);
+        clientRect.SetHeight(clientRect.GetHeight() + m_lineHeight);
+        maxItems += 1; // and increase the max numbers of items by 1
+    }
     int y = clientRect.GetY();
     clTreeCtrlNode::Vec_t items;
     m_model.GetNextItems(firstItem, maxItems, items);
@@ -124,6 +133,7 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
     }
     m_model.SetOnScreenItems(items); // Keep track of the visible items
     UpdateScrollBar(dc);
+    dc.DestroyClippingRegion();
 }
 
 void clTreeCtrl::OnSize(wxSizeEvent& event)
@@ -795,9 +805,22 @@ void clTreeCtrl::OnKeyScroll(wxScrollEvent& event)
     } else if(type == wxEVT_SCROLL_PAGEUP) {
         DoScrollLines(event.GetPosition(), true, GetFocusedItem(), true);
     } else if(type == wxEVT_SCROLL_TOP) {
-        SelectItem(GetRootItem());
-        EnsureVisible(GetRootItem());
+        wxTreeItemId item;
+        if(IsRootHidden()) {
+            item = wxTreeItemId(m_model.ToPtr(GetRootItem())->GetFirstChild());
+        } else {
+            item = GetRootItem();
+        }
+        SelectItem(item);
+        EnsureVisible(item);
     } else if(type == wxEVT_SCROLL_BOTTOM) {
+        // Find the last item, it does not matter if the root is hidden
+        clTreeCtrlNode* node = m_model.ToPtr(GetRootItem());
+        while(node->GetLastChild()) {
+            node = node->GetLastChild();
+        }
+        SelectItem(wxTreeItemId(node));
+        EnsureVisible(wxTreeItemId(node));
     }
     EnsureVisible(GetFocusedItem());
 }

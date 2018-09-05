@@ -45,6 +45,10 @@ wxTreeItemId clTreeCtrlModel::AddRoot(const wxString& text, int image, int selIm
     m_root->SetBitmapIndex(image);
     m_root->SetBitmapSelectedIndex(selImage);
     m_root->SetClientData(data);
+    if(m_tree->GetTreeStyle() & wxTR_HIDE_ROOT) {
+        m_root->SetHidden(true);
+        m_root->SetExpanded(true);
+    }
     return wxTreeItemId(m_root);
 }
 
@@ -64,7 +68,9 @@ void clTreeCtrlModel::SelectItem(const wxTreeItemId& item, bool select, bool add
 {
     clTreeCtrlNode* child = ToPtr(item);
     if(!child) return;
-
+    
+    if(child->IsHidden()) { return; }
+    
     if(clear_old_selection) { UnselectAll(); }
     if(select) {
         clTreeCtrlNode::Vec_t::iterator iter = std::find_if(
@@ -202,7 +208,7 @@ wxTreeItemId clTreeCtrlModel::GetItemBefore(const wxTreeItemId& item, bool visib
     if(!p) { return wxTreeItemId(); }
     p = p->GetPrev();
     while(p) {
-        if(visibleItem && !p->IsVisible()) {
+        if(visibleItem && (!p->IsVisible() || p->IsHidden())) {
             p = p->GetPrev();
             continue;
         }

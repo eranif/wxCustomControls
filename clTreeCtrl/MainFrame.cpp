@@ -9,10 +9,12 @@
 MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
 {
-    m_tree = new clTreeCtrl(m_mainPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_MULTIPLE);
+    m_tree = new clTreeCtrl(m_mainPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_MULTIPLE | wxTR_HIDE_ROOT);
     clTreeCtrlColours colours = m_tree->GetColours();
     colours.InitDefaults();
     m_tree->SetColours(colours);
+    m_tree->AddRoot("Hidden Root", -1, -1, nullptr);
+    
     wxLog::SetActiveTarget(new wxLogTextCtrl(m_textCtrlLog));
 
     // Provide a sorting function to the tree
@@ -111,15 +113,14 @@ void MainFrame::OnOpenFolder(wxCommandEvent& event)
 {
     wxString path = wxDirSelector();
     if(path.IsEmpty()) { return; }
-    if(!m_tree->IsEmpty()) { return; }
+    
     m_path = path;
-    wxTreeItemId root = m_tree->AddRoot(path, 0, 1, new MyItemData(m_path, true));
-    m_tree->AppendItem(root, "dummy-node");
-    m_tree->SelectItem(root);
-    m_tree->SetItemBold(root, true);
+    wxTreeItemId item = m_tree->AppendItem(m_tree->GetRootItem(), path, 0, 1, new MyItemData(m_path, true));
+    m_tree->AppendItem(item, "dummy-node");
+    m_tree->SelectItem(item);
+    m_tree->SetItemBold(item, true);
     m_tree->CallAfter(&clTreeCtrl::SetFocus);
 }
-
 
 void MainFrame::OnItemExpanding(wxTreeEvent& event)
 {

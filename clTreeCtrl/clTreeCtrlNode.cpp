@@ -40,7 +40,7 @@ void clTreeCtrlNode::ConnectNodes(clTreeCtrlNode* first, clTreeCtrlNode* second)
 void clTreeCtrlNode::InsertChild(clTreeCtrlNode* child, clTreeCtrlNode* prev)
 {
     child->SetParent(this);
-    child->SetIndentsCount(GetIndentsCount() + 1);
+    child->SetIndentsCount(IsHidden() ? GetIndentsCount() : (GetIndentsCount() + 1));
 
     // We need the last item of this subtree (prev 'this' is the root)
     if(prev == nullptr) {
@@ -109,7 +109,7 @@ int clTreeCtrlNode::GetExpandedLines() const
     clTreeCtrlNode* node = const_cast<clTreeCtrlNode*>(this);
     int counter = 0;
     while(node) {
-        if(node->IsVisible() || node->IsRoot()) { ++counter; }
+        if(node->IsVisible()) { ++counter; }
         node = node->m_next;
     }
     return counter;
@@ -158,14 +158,26 @@ void clTreeCtrlNode::UnselectAll()
 
 bool clTreeCtrlNode::SetExpanded(bool b)
 {
-    // Already expanded?
     if(!m_model) { return false; }
+    if(IsHidden() && !b) {
+        // Hidden root can not be hidden
+        return false;
+    }
+    
+    if(IsHidden()) {
+        // Hidden node do not fire events
+        SetFlag(kNF_Expanded, b);
+        return true;
+    }
+    
+    // Already expanded?
     if(b && IsExpanded()) { return true; }
+    
     // Already collapsed?
     if(!b && !IsExpanded()) { return true; }
     if(!m_model->NodeExpanding(this, b)) { return false; }
 
-    SetFlag(kExpanded, b);
+    SetFlag(kNF_Expanded, b);
     m_model->NodeExpanded(this, b);
     return true;
 }
@@ -279,6 +291,12 @@ clTreeCtrlNode* clTreeCtrlNode::GetLastChild() const
 {
     if(m_children.empty()) { return nullptr; }
     return m_children.back();
+}
+
+clTreeCtrlNode* clTreeCtrlNode::GetFirstChild() const
+{
+    if(m_children.empty()) { return nullptr; }
+    return m_children[0];
 }
 
 void clTreeCtrlColours::InitDefaults()

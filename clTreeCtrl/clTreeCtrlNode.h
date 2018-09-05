@@ -11,12 +11,13 @@
 class clTreeCtrlModel;
 class clTreeCtrl;
 enum clTreeCtrlNodeFlags {
-    kFontBold = (1 << 0),
-    kFontItalic = (1 << 1),
-    kSortItems = (1 << 2),
-    kExpanded = (1 << 3),
-    kSelected = (1 << 4),
-    kHovered = (1 << 5),
+    kNF_FontBold = (1 << 0),
+    kNF_FontItalic = (1 << 1),
+    kNF_SortItems = (1 << 2),
+    kNF_Expanded = (1 << 3),
+    kNF_Selected = (1 << 4),
+    kNF_Hovered = (1 << 5),
+    kNF_Hidden = (1 << 6),
 };
 
 struct clTreeCtrlColours {
@@ -80,9 +81,11 @@ protected:
      * @brief return the nth visible item
      */
     clTreeCtrlNode* GetVisibleItem(int index);
-    clTreeCtrlNode* GetLastChild() const;
 
 public:
+    clTreeCtrlNode* GetLastChild() const;
+    clTreeCtrlNode* GetFirstChild() const;
+    
     clTreeCtrlNode(clTreeCtrl* tree);
     clTreeCtrlNode(
         clTreeCtrl* tree, const wxString& label, int bitmapIndex = wxNOT_FOUND, int bitmapSelectedIndex = wxNOT_FOUND);
@@ -90,7 +93,10 @@ public:
 
     clTreeCtrlNode* GetNext() const { return m_next; }
     clTreeCtrlNode* GetPrev() const { return m_prev; }
-
+    
+    void SetHidden(bool b) { SetFlag(kNF_Hidden, b); }
+    bool IsHidden() const { return HasFlag(kNF_Hidden); }
+    
     bool IsVisible() const;
     void SetBgColour(const wxColour& bgColour) { this->m_bgColour = bgColour; }
     void SetFont(const wxFont& font) { this->m_font = font; }
@@ -108,8 +114,8 @@ public:
      */
     void DeleteAllChildren();
     void Render(wxDC& dc, const clTreeCtrlColours& colours);
-    void SetHovered(bool b) { SetFlag(kHovered, b); }
-    bool IsHovered() const { return m_flags & kHovered; }
+    void SetHovered(bool b) { SetFlag(kNF_Hovered, b); }
+    bool IsHovered() const { return m_flags & kNF_Hovered; }
 
     void ClearRects();
     void SetRects(const wxRect& rect, const wxRect& buttonRect)
@@ -132,13 +138,13 @@ public:
      */
     void ConnectNodes(clTreeCtrlNode* first, clTreeCtrlNode* second);
 
-    bool IsBold() const { return HasFlag(kFontBold); }
-    void SetBold(bool b) { SetFlag(kFontBold, b); }
+    bool IsBold() const { return HasFlag(kNF_FontBold); }
+    void SetBold(bool b) { SetFlag(kNF_FontBold, b); }
 
-    bool IsItalic() const { return HasFlag(kFontItalic); }
-    void SetItalic(bool b) { SetFlag(kFontItalic, b); }
+    bool IsItalic() const { return HasFlag(kNF_FontItalic); }
+    void SetItalic(bool b) { SetFlag(kNF_FontItalic, b); }
 
-    bool IsExpanded() const { return HasFlag(kExpanded); }
+    bool IsExpanded() const { return HasFlag(kNF_Expanded) || HasFlag(kNF_Hidden); }
     bool SetExpanded(bool b);
     bool IsRoot() const { return GetParent() == nullptr; }
     void SetBitmapIndex(int bitmapIndex) { this->m_bitmapIndex = bitmapIndex; }
@@ -165,10 +171,10 @@ public:
     void SetIndentsCount(int count) { this->m_indentsCount = count; }
     int GetIndentsCount() const { return m_indentsCount; }
 
-    bool IsSelected() const { return HasFlag(kSelected); }
-    void SetSelected(bool b) { SetFlag(kSelected, b); }
+    bool IsSelected() const { return HasFlag(kNF_Selected); }
+    void SetSelected(bool b) { SetFlag(kNF_Selected, b); }
     void UnselectAll();
-    bool IsSorted() const { return HasFlag(kSortItems); }
+    bool IsSorted() const { return HasFlag(kNF_SortItems); }
 };
 
 #endif // CLTREECTRLNODE_H
