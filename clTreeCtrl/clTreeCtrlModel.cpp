@@ -79,7 +79,7 @@ void clTreeCtrlModel::SelectItem(const wxTreeItemId& item, bool select, bool add
         return;
     }
 
-    if(clear_old_selection && !ClearSelections()) {
+    if(clear_old_selection && !ClearSelections(item != GetSingleSelection())) {
         return;
     }
 
@@ -100,7 +100,7 @@ void clTreeCtrlModel::SelectItem(const wxTreeItemId& item, bool select, bool add
             m_selectedItems.erase(iter);
         }
     } else {
-        if(!ClearSelections()) {
+        if(!ClearSelections(item != GetSingleSelection())) {
             return;
         }
     }
@@ -456,7 +456,7 @@ void clTreeCtrlModel::SelectChildren(const wxTreeItemId& item)
         return;
     }
 
-    if(!ClearSelections()) {
+    if(!ClearSelections(true)) {
         return;
     }
     std::for_each(parent->GetChildren().begin(), parent->GetChildren().end(),
@@ -528,13 +528,13 @@ void clTreeCtrlModel::AddSelection(const wxTreeItemId& item)
     SendEvent(evt);
 }
 
-bool clTreeCtrlModel::ClearSelections()
+bool clTreeCtrlModel::ClearSelections(bool notify)
 {
     if(m_selectedItems.empty()) {
         return true;
     }
 
-    {
+    if(notify) {
         // Check if we can proceed with this operation
         wxTreeEvent evt(wxEVT_TREE_SEL_CHANGING);
         evt.SetEventObject(m_tree);

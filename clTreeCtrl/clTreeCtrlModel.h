@@ -89,7 +89,7 @@ public:
     /**
      * @brief clear all selections, return true on sucess, this function fires the changing event
      */
-    bool ClearSelections();
+    bool ClearSelections(bool notify);
     
     /**
      * @brief select the children of 'item' this functin fires the changing and changed events
