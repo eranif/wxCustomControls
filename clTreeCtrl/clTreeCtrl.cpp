@@ -76,14 +76,14 @@ clTreeCtrl::clTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
     Bind(wxEVT_RIGHT_DOWN, &clTreeCtrl::OnRightDown, this);
     Bind(wxEVT_MOTION, &clTreeCtrl::OnMotion, this);
 
-    m_scrollBar = new clScrollBarHelper(this, wxVERTICAL);
-    m_scrollBar->Bind(wxEVT_SCROLL_THUMBTRACK, &clTreeCtrl::OnScroll, this);
-    m_scrollBar->Bind(wxEVT_SCROLL_LINEDOWN, &clTreeCtrl::OnKeyScroll, this);
-    m_scrollBar->Bind(wxEVT_SCROLL_LINEUP, &clTreeCtrl::OnKeyScroll, this);
-    m_scrollBar->Bind(wxEVT_SCROLL_PAGEDOWN, &clTreeCtrl::OnKeyScroll, this);
-    m_scrollBar->Bind(wxEVT_SCROLL_PAGEUP, &clTreeCtrl::OnKeyScroll, this);
-    m_scrollBar->Bind(wxEVT_SCROLL_BOTTOM, &clTreeCtrl::OnKeyScroll, this);
-    m_scrollBar->Bind(wxEVT_SCROLL_TOP, &clTreeCtrl::OnKeyScroll, this);
+    m_sb = new clScrollBarHelper(this, wxVERTICAL);
+    m_sb->Bind(wxEVT_SCROLL_THUMBTRACK, &clTreeCtrl::OnScroll, this);
+    m_sb->Bind(wxEVT_SCROLL_LINEDOWN, &clTreeCtrl::OnKeyScroll, this);
+    m_sb->Bind(wxEVT_SCROLL_LINEUP, &clTreeCtrl::OnKeyScroll, this);
+    m_sb->Bind(wxEVT_SCROLL_PAGEDOWN, &clTreeCtrl::OnKeyScroll, this);
+    m_sb->Bind(wxEVT_SCROLL_PAGEUP, &clTreeCtrl::OnKeyScroll, this);
+    m_sb->Bind(wxEVT_SCROLL_BOTTOM, &clTreeCtrl::OnKeyScroll, this);
+    m_sb->Bind(wxEVT_SCROLL_TOP, &clTreeCtrl::OnKeyScroll, this);
     // Initialise default colours
     m_colours.InitDefaults();
 
@@ -106,13 +106,13 @@ clTreeCtrl::~clTreeCtrl()
     Unbind(wxEVT_CONTEXT_MENU, &clTreeCtrl::OnContextMenu, this);
     Unbind(wxEVT_RIGHT_DOWN, &clTreeCtrl::OnRightDown, this);
     Unbind(wxEVT_MOTION, &clTreeCtrl::OnMotion, this);
-    m_scrollBar->Unbind(wxEVT_SCROLL_THUMBTRACK, &clTreeCtrl::OnScroll, this);
-    m_scrollBar->Unbind(wxEVT_SCROLL_LINEDOWN, &clTreeCtrl::OnKeyScroll, this);
-    m_scrollBar->Unbind(wxEVT_SCROLL_LINEUP, &clTreeCtrl::OnKeyScroll, this);
-    m_scrollBar->Unbind(wxEVT_SCROLL_PAGEDOWN, &clTreeCtrl::OnKeyScroll, this);
-    m_scrollBar->Unbind(wxEVT_SCROLL_PAGEUP, &clTreeCtrl::OnKeyScroll, this);
-    m_scrollBar->Unbind(wxEVT_SCROLL_BOTTOM, &clTreeCtrl::OnKeyScroll, this);
-    m_scrollBar->Unbind(wxEVT_SCROLL_TOP, &clTreeCtrl::OnKeyScroll, this);
+    m_sb->Unbind(wxEVT_SCROLL_THUMBTRACK, &clTreeCtrl::OnScroll, this);
+    m_sb->Unbind(wxEVT_SCROLL_LINEDOWN, &clTreeCtrl::OnKeyScroll, this);
+    m_sb->Unbind(wxEVT_SCROLL_LINEUP, &clTreeCtrl::OnKeyScroll, this);
+    m_sb->Unbind(wxEVT_SCROLL_PAGEDOWN, &clTreeCtrl::OnKeyScroll, this);
+    m_sb->Unbind(wxEVT_SCROLL_PAGEUP, &clTreeCtrl::OnKeyScroll, this);
+    m_sb->Unbind(wxEVT_SCROLL_BOTTOM, &clTreeCtrl::OnKeyScroll, this);
+    m_sb->Unbind(wxEVT_SCROLL_TOP, &clTreeCtrl::OnKeyScroll, this);
 }
 
 void clTreeCtrl::OnPaint(wxPaintEvent& event)
@@ -245,12 +245,10 @@ void clTreeCtrl::OnMouseLeftDown(wxMouseEvent& event)
             } else if(event.ShiftDown()) {
                 // Range selection
                 clTreeCtrlNode::Vec_t range;
-                std::vector<std::pair<wxTreeItemId, bool>> itemsToSelect;
                 m_model.GetRange(pNode, m_model.ToPtr(m_model.GetSingleSelection()), range);
                 std::for_each(range.begin(), range.end(), [&](clTreeCtrlNode* p) {
-                    itemsToSelect.push_back({ wxTreeItemId(p), true });
+                    m_model.AddSelection(wxTreeItemId(p));
                 });
-                m_model.SelectItems(itemsToSelect);
             } else {
                 // The default, single selection
                 bool has_multiple_selection = (m_model.GetSelectionsCount() > 1);
@@ -298,7 +296,15 @@ void clTreeCtrl::OnMouseLeftUp(wxMouseEvent& event)
 wxTreeItemId clTreeCtrl::HitTest(const wxPoint& point, int& flags) const
 {
     if(!m_model.GetRoot()) { return wxTreeItemId(); }
-
+    
+    if(m_sb) {
+        // Ignore clicks on the sb
+        wxRect sbRect = m_sb->GetClientRect();
+        if(sbRect.Contains(point)) { 
+            return wxTreeItemId(); 
+        }
+    }
+    
     flags = 0;
     for(size_t i = 0; i < m_model.GetOnScreenItems().size(); ++i) {
         const clTreeCtrlNode* item = m_model.GetOnScreenItems()[i];
@@ -549,8 +555,8 @@ void clTreeCtrl::OnLeaveWindow(wxMouseEvent& event)
 void clTreeCtrl::SetColours(const clTreeCtrlColours& colours)
 {
     m_colours = colours;
-    m_scrollBar->SetBgColour(m_colours.scrollBarBgColour);
-    m_scrollBar->SetButtonColour(m_colours.scrolBarButton);
+    m_sb->SetBgColour(m_colours.scrollBarBgColour);
+    m_sb->SetButtonColour(m_colours.scrolBarButton);
     Refresh();
 }
 
@@ -796,8 +802,8 @@ void clTreeCtrl::UpdateScrollBar(wxDC& dc)
 {
     wxRect rect = GetClientRect();
     int position = m_model.GetItemIndex(m_model.GetFirstItemOnScreen());
-    m_scrollBar->SetScrollbar(position, rect.GetHeight() / m_lineHeight, m_model.GetExpandedLines(), m_lineHeight);
-    m_scrollBar->Render(dc);
+    m_sb->SetScrollbar(position, rect.GetHeight() / m_lineHeight, m_model.GetExpandedLines(), m_lineHeight);
+    m_sb->Render(dc);
 }
 
 void clTreeCtrl::OnScroll(wxScrollEvent& event)

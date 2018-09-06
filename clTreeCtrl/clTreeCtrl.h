@@ -21,7 +21,7 @@ class clTreeCtrl : public wxPanel
     std::vector<wxBitmap> m_bitmaps;
     clTreeCtrlColours m_colours;
     long m_treeStyle = 0;
-    clScrollBarHelper* m_scrollBar;
+    clScrollBarHelper* m_sb;
     wxDirection m_lastScrollDir = wxDOWN;
     wxDateTime m_dragStartTime;
     wxPoint m_dragStartPos;

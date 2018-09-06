@@ -29,7 +29,6 @@ class clScrollBarHelper : public wxEvtHandler
     int m_remainder = 0;
 
 protected:
-    wxRect GetClientRect() const;
     wxWindow* GetParent() const { return m_parent; }
     void OnMouseLeftDown(wxMouseEvent& event);
     void OnMouseMotion(wxMouseEvent& event);
@@ -44,7 +43,12 @@ protected:
 public:
     clScrollBarHelper(wxWindow* parent, wxOrientation orientation = wxVERTICAL);
     virtual ~clScrollBarHelper();
-
+    
+    /**
+     * @brief return the scrollbar area
+     */
+    wxRect GetClientRect() const;
+    
     /**
      * @brief set the scrollbar colours
      */

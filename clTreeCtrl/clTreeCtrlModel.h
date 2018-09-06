@@ -87,23 +87,13 @@ public:
     void AddSelection(const wxTreeItemId& item);
     
     /**
-     * @brief remove an item from the selection
+     * @brief clear all selections, return true on sucess, this function fires the changing event
      */
-    void ClearSelection(const wxTreeItemId& item);
+    bool ClearSelections();
+    
     /**
-     * @brief plural version
-     * Note that this function clears the old selections
-     * This fucntion fires wxEVT_TREE_SEL_CHANGING/wxEVT_TREE_SEL_CHANGED
-     * */
-    void SelectItems(const std::vector<std::pair<wxTreeItemId, bool>>& items);
-
-    /**
-     * @brief plural version, same as previous. But this time, use 'true' for all the items
-     * Note that this function clears the old selections
-     * This fucntion fires wxEVT_TREE_SEL_CHANGING/wxEVT_TREE_SEL_CHANGED
+     * @brief select the children of 'item' this functin fires the changing and changed events
      */
-    void SelectItems(const std::vector<wxTreeItemId>& items);
-
     void SelectChildren(const wxTreeItemId& item);
 
     void Clear();
