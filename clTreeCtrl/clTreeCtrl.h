@@ -22,11 +22,11 @@ class WXDLLIMPEXP_SDK clTreeCtrl : public wxPanel
     std::vector<wxBitmap> m_bitmaps;
     clTreeCtrlColours m_colours;
     long m_treeStyle = 0;
-    clScrollBarHelper* m_sb;
+    clScrollBarHelper* m_vsb = nullptr;
     wxDirection m_lastScrollDir = wxDOWN;
     wxDateTime m_dragStartTime;
     wxPoint m_dragStartPos;
-
+    
 private:
     wxPoint DoFixPoint(const wxPoint& pt);
     wxTreeItemId DoGetSiblingVisibleItem(const wxTreeItemId& item, bool next) const;
@@ -35,7 +35,7 @@ private:
     int GetNumLineCanFitOnScreen() const;
     clTreeCtrlNode* GetFirstItemOnScreen();
     void SetFirstItemOnScreen(clTreeCtrlNode* item);
-    void UpdateScrollBar(wxDC& dc);
+    void UpdateScrollBar();
     wxTreeItemId DoScrollLines(int numLines, bool up, wxTreeItemId from, bool selectIt);
 
 protected:
@@ -314,10 +314,12 @@ protected:
     void OnMouseScroll(wxMouseEvent& event);
     void OnIdle(wxIdleEvent& event);
     void OnLeaveWindow(wxMouseEvent& event);
-    void OnKeyDown(wxKeyEvent& event);
+    void OnCharHook(wxKeyEvent& event);
     void OnContextMenu(wxContextMenuEvent& event);
+    /**
+     * @brief scroll events sent from the scrollbar
+     */
     void OnScroll(wxScrollEvent& event);
-    void OnKeyScroll(wxScrollEvent& event);
 };
 
 #endif // CLTREECTRL_H
