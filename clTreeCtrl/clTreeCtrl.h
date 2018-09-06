@@ -136,7 +136,12 @@ public:
      * @brief return the root item
      */
     wxTreeItemId GetRootItem() const;
-
+    
+    /**
+     * @brief return the item's parent
+     */
+    wxTreeItemId GetItemParent(const wxTreeItemId& item) const;
+    
     /**
      * @brief Expands the given item
      */
@@ -204,9 +209,23 @@ public:
     /**
      * @brief Returns the first child; call GetNextChild() for the next child.
      */
-    wxTreeItemId GetFirstChild(const wxTreeItemId& item, clTreeItemIdValue& cookie) const;
-    wxTreeItemId GetNextChild(const wxTreeItemId& item, clTreeItemIdValue& cookie) const;
-
+    wxTreeItemId GetFirstChild(const wxTreeItemId& item, wxTreeItemIdValue& cookie) const;
+    wxTreeItemId GetNextChild(const wxTreeItemId& item, wxTreeItemIdValue& cookie) const;
+    
+    /**
+     * @brief for compatibility, we dont really need to call this method manually
+     */
+    void SortChildren(const wxTreeItemId& item) { wxUnusedVar(item); }
+    
+    /**
+     * @brief set item's image index
+     */
+    void SetItemImage(const wxTreeItemId& item, int imageId, int openImageId = wxNOT_FOUND);
+    
+    /**
+     * @brief return the associated image id with this item
+     */
+    int GetItemImage(const wxTreeItemId& item, bool selectedImage = false) const;
     /**
      * @brief Returns the first visible item
      */

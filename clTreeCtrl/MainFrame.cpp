@@ -141,7 +141,7 @@ void MainFrame::OnItemExpanding(wxTreeEvent& event)
     wxString text = m_tree->GetItemText(item);
     LogMessage(wxString() << text << " is expanding");
 
-    clTreeItemIdValue cookie;
+    wxTreeItemIdValue cookie;
     if(m_tree->ItemHasChildren(item)) {
         wxTreeItemId child = m_tree->GetFirstChild(item, cookie);
         if(m_tree->GetItemText(child) == "dummy-node") {

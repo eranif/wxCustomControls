@@ -68,7 +68,7 @@ clTreeCtrl::clTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
     , m_dragStartTime((time_t)-1)
 {
     SetBackgroundStyle(wxBG_STYLE_PAINT);
-    
+
     wxBitmap bmp(1, 1);
     wxMemoryDC memDC(bmp);
     wxFont font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
@@ -190,14 +190,14 @@ void clTreeCtrl::OnSize(wxSizeEvent& event)
 }
 
 wxTreeItemId clTreeCtrl::InsertItem(const wxTreeItemId& parent, const wxTreeItemId& previous, const wxString& text,
-    int image, int selImage, wxTreeItemData* data)
+                                    int image, int selImage, wxTreeItemData* data)
 {
     wxTreeItemId item = m_model.InsertItem(parent, previous, text, image, selImage, data);
     return item;
 }
 
-wxTreeItemId clTreeCtrl::AppendItem(
-    const wxTreeItemId& parent, const wxString& text, int image, int selImage, wxTreeItemData* data)
+wxTreeItemId clTreeCtrl::AppendItem(const wxTreeItemId& parent, const wxString& text, int image, int selImage,
+                                    wxTreeItemData* data)
 {
     wxTreeItemId item = m_model.AppendItem(parent, text, image, selImage, data);
     return item;
@@ -265,8 +265,8 @@ void clTreeCtrl::OnMouseLeftDown(wxMouseEvent& event)
                     // Range selection
                     clTreeCtrlNode::Vec_t range;
                     m_model.GetRange(pNode, m_model.ToPtr(m_model.GetSingleSelection()), range);
-                    std::for_each(
-                        range.begin(), range.end(), [&](clTreeCtrlNode* p) { m_model.AddSelection(wxTreeItemId(p)); });
+                    std::for_each(range.begin(), range.end(),
+                                  [&](clTreeCtrlNode* p) { m_model.AddSelection(wxTreeItemId(p)); });
                 } else {
                     // The default, single selection
                     bool has_multiple_selection = (m_model.GetSelectionsCount() > 1);
@@ -289,7 +289,7 @@ void clTreeCtrl::OnMouseLeftDown(wxMouseEvent& event)
                 }
             }
         }
-        
+
         // Prepare to DnDclTreeCtrl_DnD
         if(event.LeftIsDown()) {
             m_dragStartTime = wxDateTime::UNow();
@@ -460,24 +460,28 @@ void clTreeCtrl::DeleteChildren(const wxTreeItemId& item)
     node->DeleteAllChildren();
 }
 
-wxTreeItemId clTreeCtrl::GetFirstChild(const wxTreeItemId& item, clTreeItemIdValue& cookie) const
+wxTreeItemId clTreeCtrl::GetFirstChild(const wxTreeItemId& item, wxTreeItemIdValue& cookie) const
 {
     if(!item.GetID()) return wxTreeItemId();
     clTreeCtrlNode* node = m_model.ToPtr(item);
     const clTreeCtrlNode::Vec_t& children = node->GetChildren();
     if(children.empty()) return wxTreeItemId(); // No children
-    cookie.nextItem = 1;                        // the next item
+    int* pidx = (int*)&cookie;
+    int& idx = (*pidx);
+    idx = 1; // the next item
     return wxTreeItemId(children[0]);
 }
 
-wxTreeItemId clTreeCtrl::GetNextChild(const wxTreeItemId& item, clTreeItemIdValue& cookie) const
+wxTreeItemId clTreeCtrl::GetNextChild(const wxTreeItemId& item, wxTreeItemIdValue& cookie) const
 {
     if(!item.GetID()) return wxTreeItemId();
+    int* pidx = (int*)&cookie;
+    int& idx = (*pidx);
     clTreeCtrlNode* node = m_model.ToPtr(item);
     const clTreeCtrlNode::Vec_t& children = node->GetChildren();
-    if((int)children.size() >= cookie.nextItem) return wxTreeItemId();
-    wxTreeItemId child(children[cookie.nextItem]);
-    cookie.nextItem++;
+    if(idx >= (int)children.size()) return wxTreeItemId();
+    wxTreeItemId child(children[idx]);
+    idx++;
     return child;
 }
 
@@ -726,7 +730,7 @@ bool clTreeCtrl::IsItemVisible(clTreeCtrlNode* item) const
 {
     const clTreeCtrlNode::Vec_t& onScreenItems = m_model.GetOnScreenItems();
     return (std::find_if(onScreenItems.begin(), onScreenItems.end(), [&](clTreeCtrlNode* p) { return p == item; }) !=
-        onScreenItems.end());
+            onScreenItems.end());
 }
 
 void clTreeCtrl::EnsureItemVisible(clTreeCtrlNode* item, bool fromTop)
@@ -1063,8 +1067,30 @@ void clTreeCtrl::OnMotion(wxMouseEvent& event)
     if(m_dragStartTime.IsValid() && event.LeftIsDown()) { // If we're tugging on the tab, consider starting D'n'D
         wxTimeSpan diff = wxDateTime::UNow() - m_dragStartTime;
         if(diff.GetMilliseconds() > 100 && // We need to check both x and y distances as tabs may be vertical
-            ((abs(m_dragStartPos.x - event.GetX()) > 5) || (abs(m_dragStartPos.y - event.GetY()) > 5))) {
+           ((abs(m_dragStartPos.x - event.GetX()) > 5) || (abs(m_dragStartPos.y - event.GetY()) > 5))) {
             OnBeginDrag(); // Sufficient time and distance since the LeftDown for a believable D'n'D start
         }
     }
+}
+
+wxTreeItemId clTreeCtrl::GetItemParent(const wxTreeItemId& item) const
+{
+    CHECK_ITEM_RET_INVALID_ITEM(item);
+    return wxTreeItemId(m_model.ToPtr(item)->GetParent());
+}
+
+void clTreeCtrl::SetItemImage(const wxTreeItemId& item, int imageId, int openImageId)
+{
+    clTreeCtrlNode* node = m_model.ToPtr(item);
+    CHECK_PTR_RET(node);
+    node->SetBitmapIndex(imageId);
+    node->SetBitmapSelectedIndex(openImageId);
+    Refresh();
+}
+
+int clTreeCtrl::GetItemImage(const wxTreeItemId& item, bool selectedImage) const
+{
+    if(!item.GetID()) { return wxNOT_FOUND; }
+    clTreeCtrlNode* node = m_model.ToPtr(item);
+    return selectedImage ? node->GetBitmapSelectedIndex() : node->GetBitmapIndex();
 }
