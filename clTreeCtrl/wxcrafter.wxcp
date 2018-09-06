@@ -643,7 +643,7 @@
           }, {
            "type": "string",
            "m_label": "Shortcut:",
-           "m_value": "Ctrl-F4"
+           "m_value": "Shift-F4"
           }, {
            "type": "string",
            "m_label": "Help String:",
@@ -898,7 +898,7 @@
           }, {
            "type": "string",
            "m_label": "Shortcut:",
-           "m_value": "Ctrl-F2"
+           "m_value": "Shift-F2"
           }, {
            "type": "string",
            "m_label": "Help String:",

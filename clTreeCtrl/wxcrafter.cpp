@@ -54,7 +54,7 @@ MainFrameBaseClass::MainFrameBaseClass(
     m_menuItemCollapseAll = new wxMenuItem(File, wxID_ANY, _("Collapse All"), wxT(""), wxITEM_NORMAL);
     File->Append(m_menuItemCollapseAll);
 
-    m_menuItemFirstVisible = new wxMenuItem(File, wxID_ANY, _("First Visible Item\tCtrl-F4"), wxT(""), wxITEM_NORMAL);
+    m_menuItemFirstVisible = new wxMenuItem(File, wxID_ANY, _("First Visible Item\tShift-F4"), wxT(""), wxITEM_NORMAL);
     File->Append(m_menuItemFirstVisible);
 
     m_menuItemNextVisibleItem = new wxMenuItem(File, wxID_ANY, _("Next Visible Item\tF4"), wxT(""), wxITEM_NORMAL);
@@ -69,7 +69,7 @@ MainFrameBaseClass::MainFrameBaseClass(
     m_menuItemNextSibling = new wxMenuItem(File, ID_NEXT_SIBLING, _("Next Sibling\tF2"), wxT(""), wxITEM_NORMAL);
     File->Append(m_menuItemNextSibling);
 
-    m_menuItemPrevSibling = new wxMenuItem(File, ID_PREV_SIBLING, _("Prev Sibling\tCtrl-F2"), wxT(""), wxITEM_NORMAL);
+    m_menuItemPrevSibling = new wxMenuItem(File, ID_PREV_SIBLING, _("Prev Sibling\tShift-F2"), wxT(""), wxITEM_NORMAL);
     File->Append(m_menuItemPrevSibling);
 
     File->AppendSeparator();
