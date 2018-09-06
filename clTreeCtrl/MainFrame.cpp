@@ -23,19 +23,19 @@ MainFrame::MainFrame(wxWindow* parent)
     wxLog::SetActiveTarget(new wxLogTextCtrl(m_textCtrlLog));
 
     // Provide a sorting function to the tree
-    std::function<bool(const wxTreeItemId& a, const wxTreeItemId& b)> SortFunc
-        = [&](const wxTreeItemId& a, const wxTreeItemId& b) {
-              // Compare based on item type and then by label
-              MyItemData* cd_a = dynamic_cast<MyItemData*>(m_tree->GetItemData(a));
-              MyItemData* cd_b = dynamic_cast<MyItemData*>(m_tree->GetItemData(b));
-              if(cd_a->IsFolder() && !cd_b->IsFolder()) {
-                  return true;
-              } else if(!cd_a->IsFolder() && cd_b->IsFolder()) {
-                  return false;
-              } else {
-                  return cd_a->GetFullnameLC() < cd_b->GetFullnameLC();
-              }
-          };
+    std::function<bool(const wxTreeItemId& a, const wxTreeItemId& b)> SortFunc = [&](
+        const wxTreeItemId& a, const wxTreeItemId& b) {
+        // Compare based on item type and then by label
+        MyItemData* cd_a = dynamic_cast<MyItemData*>(m_tree->GetItemData(a));
+        MyItemData* cd_b = dynamic_cast<MyItemData*>(m_tree->GetItemData(b));
+        if(cd_a->IsFolder() && !cd_b->IsFolder()) {
+            return true;
+        } else if(!cd_a->IsFolder() && cd_b->IsFolder()) {
+            return false;
+        } else {
+            return cd_a->GetFullnameLC() < cd_b->GetFullnameLC();
+        }
+    };
     m_tree->SetSortFunction(SortFunc);
     std::vector<wxBitmap> bitmaps;
     MyImages images;
@@ -122,7 +122,9 @@ void MainFrame::LogMessage(const wxString& message)
 void MainFrame::OnOpenFolder(wxCommandEvent& event)
 {
     wxString path = wxDirSelector();
-    if(path.IsEmpty()) { return; }
+    if(path.IsEmpty()) {
+        return;
+    }
 
     m_path = path;
     wxTreeItemId item = m_tree->AppendItem(m_tree->GetRootItem(), path, 0, 1, new MyItemData(m_path, true));
@@ -148,19 +150,21 @@ void MainFrame::OnItemExpanding(wxTreeEvent& event)
             MyItemData* cd = dynamic_cast<MyItemData*>(m_tree->GetItemData(item));
             wxString filename;
             wxDir dir(cd->GetPath());
-            bool cont = dir.GetFirst(&filename);
-            while(cont) {
-                wxFileName fn(cd->GetPath(), filename);
-                if(wxDirExists(fn.GetFullPath())) {
-                    // A directory
-                    wxTreeItemId folderItem
-                        = m_tree->AppendItem(item, filename, 0, 1, new MyItemData(fn.GetFullPath(), true));
-                    m_tree->AppendItem(folderItem, "dummy-node");
-                } else {
-                    // A file
-                    m_tree->AppendItem(item, filename, 2, 2, new MyItemData(fn.GetFullPath(), false));
+            if(dir.IsOpened()) {
+                bool cont = dir.GetFirst(&filename);
+                while(cont) {
+                    wxFileName fn(cd->GetPath(), filename);
+                    if(wxDirExists(fn.GetFullPath())) {
+                        // A directory
+                        wxTreeItemId folderItem =
+                            m_tree->AppendItem(item, filename, 0, 1, new MyItemData(fn.GetFullPath(), true));
+                        m_tree->AppendItem(folderItem, "dummy-node");
+                    } else {
+                        // A file
+                        m_tree->AppendItem(item, filename, 2, 2, new MyItemData(fn.GetFullPath(), false));
+                    }
+                    cont = dir.GetNext(&filename);
                 }
-                cont = dir.GetNext(&filename);
             }
         }
     }
@@ -223,3 +227,5 @@ void MainFrame::OnZebraColouring(wxCommandEvent& event)
     m_tree->EnableStyle(wxTR_ROW_LINES, !m_tree->HasStyle(wxTR_ROW_LINES));
 }
 void MainFrame::OnHideRoot(wxCommandEvent& event) { m_tree->EnableStyle(wxTR_HIDE_ROOT, event.IsChecked()); }
+
+void MainFrame::OnSingleSelection(wxCommandEvent& event) { m_tree->EnableStyle(wxTR_MULTIPLE, !event.IsChecked()); }

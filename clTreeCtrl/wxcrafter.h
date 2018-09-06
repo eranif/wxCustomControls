@@ -41,14 +41,15 @@ class MainFrameBaseClass : public wxFrame
 {
 public:
     enum {
-        ID_THEME_CHOOSE = 10001,
-        ID_ZEBRA_COLOURING = 10002,
-        ID_PREV_SIBLING = 10003,
-        ID_NEXT_SIBLING = 10004,
-        ID_SELECT_CHILDREN = 10005,
-        ID_HIDE_ROOT = 10006,
-        ID_EXPAND_ALL = 10007,
-        ID_OPEN_FOLDER = 10008,
+        ID_SINGLE_SELECTION = 10001,
+        ID_TOGGLE_THEMES = 10002,
+        ID_ZEBRA = 10003,
+        ID_PREV_SIBLING = 10004,
+        ID_NEXT_SIBLING = 10005,
+        ID_SELECT_CHILDREN = 10006,
+        ID_HIDE_ROOT = 10007,
+        ID_EXPAND_ALL = 10008,
+        ID_OPEN_FOLDER = 10009,
     };
 
 protected:
@@ -68,10 +69,11 @@ protected:
     wxMenuItem* m_menuItemPrevSibling;
     wxMenuItem* m_separator2;
     wxMenuItem* m_menuItemExit;
-    wxMenu* Styles;
-    wxMenuItem* m_menuItemRowLines;
-    wxMenuItem* m_menuItemTheme;
+    wxMenu* m_menu53;
+    wxMenuItem* m_menuItemZebra;
+    wxMenuItem* m_menuItemThemes;
     wxMenuItem* m_menuItemHideRoot;
+    wxMenuItem* m_menuItemSingleSelection;
 
 protected:
     virtual void OnOpenFolder(wxCommandEvent& event) { event.Skip(); }
@@ -87,6 +89,7 @@ protected:
     virtual void OnZebraColouring(wxCommandEvent& event) { event.Skip(); }
     virtual void OnToggleTheme(wxCommandEvent& event) { event.Skip(); }
     virtual void OnHideRoot(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnSingleSelection(wxCommandEvent& event) { event.Skip(); }
 
 public:
     wxTextCtrl* GetTextCtrlLog() { return m_textCtrlLog; }

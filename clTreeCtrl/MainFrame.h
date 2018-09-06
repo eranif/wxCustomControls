@@ -43,6 +43,7 @@ private:
     void LogMessage(const wxString& message);
 
 protected:
+    virtual void OnSingleSelection(wxCommandEvent& event);
     virtual void OnHideRoot(wxCommandEvent& event);
     virtual void OnToggleTheme(wxCommandEvent& event);
     virtual void OnZebraColouring(wxCommandEvent& event);

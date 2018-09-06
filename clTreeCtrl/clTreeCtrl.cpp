@@ -994,7 +994,7 @@ void clTreeCtrl::OnKeyScroll(wxScrollEvent& event)
         }
         nextSelection = wxTreeItemId(node);
     }
-    if(::wxGetKeyState(WXK_SHIFT)) {
+    if(::wxGetKeyState(WXK_SHIFT) && HasStyle(wxTR_MULTIPLE)) {
         m_model.AddSelection(nextSelection);
     } else {
         SelectItem(nextSelection);
