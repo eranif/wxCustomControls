@@ -13,12 +13,12 @@ MainFrame::MainFrame(wxWindow* parent)
     clTreeCtrlColours colours;
     colours.InitDefaults();
     m_coloursArr[0] = colours;
-    
+
     colours.InitDarkDefaults();
     m_coloursArr[1] = colours;
-    
+
     m_tree->SetColours(m_coloursArr[m_selectedColours]);
-    
+
     m_tree->AddRoot("Root", -1, -1, nullptr);
     wxLog::SetActiveTarget(new wxLogTextCtrl(m_textCtrlLog));
 
@@ -47,6 +47,11 @@ MainFrame::MainFrame(wxWindow* parent)
 
     m_tree->Bind(wxEVT_TREE_ITEM_EXPANDING, &MainFrame::OnItemExpanding, this);
     m_tree->Bind(wxEVT_TREE_DELETE_ITEM, &MainFrame::OnItemDeleted, this);
+    m_tree->Bind(wxEVT_TREE_BEGIN_DRAG, [&](wxTreeEvent& evt) { LogMessage(wxString() << "Drag started"); });
+    m_tree->Bind(wxEVT_TREE_END_DRAG, [&](wxTreeEvent& evt) {
+        LogMessage(wxString() << "Drag ended. Drop is on item: " << m_tree->GetItemText(evt.GetItem()));
+    });
+
     m_tree->Bind(wxEVT_TREE_ITEM_EXPANDED,
         [&](wxTreeEvent& evt) { LogMessage(wxString() << m_tree->GetItemText(evt.GetItem()) << " expanded"); });
     m_tree->Bind(wxEVT_TREE_ITEM_COLLAPSING,
@@ -108,17 +113,17 @@ void MainFrame::OnAbout(wxCommandEvent& event)
     ::wxAboutBox(info);
 }
 
-void MainFrame::LogMessage(const wxString& message) 
-{ 
+void MainFrame::LogMessage(const wxString& message)
+{
     static int counter = 0;
-    wxLogMessage(wxString() << (++counter) << ": " << message); 
+    wxLogMessage(wxString() << (++counter) << ": " << message);
 }
 
 void MainFrame::OnOpenFolder(wxCommandEvent& event)
 {
     wxString path = wxDirSelector();
     if(path.IsEmpty()) { return; }
-    
+
     m_path = path;
     wxTreeItemId item = m_tree->AppendItem(m_tree->GetRootItem(), path, 0, 1, new MyItemData(m_path, true));
     m_tree->AppendItem(item, "dummy-node");
@@ -189,10 +194,7 @@ void MainFrame::OnItemDeleted(wxTreeEvent& event)
     LogMessage("Item: " + text + " was deleted");
 }
 
-void MainFrame::OnSelectChildren(wxCommandEvent& event)
-{
-    m_tree->SelectChildren(m_tree->GetFocusedItem());
-}
+void MainFrame::OnSelectChildren(wxCommandEvent& event) { m_tree->SelectChildren(m_tree->GetFocusedItem()); }
 void MainFrame::OnNextSibling(wxCommandEvent& event)
 {
     m_tree->SelectItem(m_tree->GetNextSibling(m_tree->GetFocusedItem()));
@@ -220,7 +222,4 @@ void MainFrame::OnZebraColouring(wxCommandEvent& event)
 {
     m_tree->EnableStyle(wxTR_ROW_LINES, !m_tree->HasStyle(wxTR_ROW_LINES));
 }
-void MainFrame::OnHideRoot(wxCommandEvent& event)
-{
-    m_tree->EnableStyle(wxTR_HIDE_ROOT, event.IsChecked());
-}
+void MainFrame::OnHideRoot(wxCommandEvent& event) { m_tree->EnableStyle(wxTR_HIDE_ROOT, event.IsChecked()); }

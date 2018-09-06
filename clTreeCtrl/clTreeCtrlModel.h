@@ -81,6 +81,16 @@ public:
     void SelectItem(
         const wxTreeItemId& item, bool select = true, bool addSelection = false, bool clear_old_selection = false);
     /**
+     * @brief add an item to the selection list
+     * this function fires an event
+     */
+    void AddSelection(const wxTreeItemId& item);
+    
+    /**
+     * @brief remove an item from the selection
+     */
+    void ClearSelection(const wxTreeItemId& item);
+    /**
      * @brief plural version
      * Note that this function clears the old selections
      * This fucntion fires wxEVT_TREE_SEL_CHANGING/wxEVT_TREE_SEL_CHANGED

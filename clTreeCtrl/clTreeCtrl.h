@@ -6,6 +6,7 @@
 #include <wx/dc.h>
 #include <wx/panel.h>
 #include <wx/scrolwin.h>
+#include <wx/datetime.h>
 
 class clScrollBarHelper;
 class clTreeCtrl : public wxPanel
@@ -22,6 +23,8 @@ class clTreeCtrl : public wxPanel
     long m_treeStyle = 0;
     clScrollBarHelper* m_scrollBar;
     wxDirection m_lastScrollDir = wxDOWN;
+    wxDateTime m_dragStartTime;
+    wxPoint m_dragStartPos;
 
 private:
     wxPoint DoFixPoint(const wxPoint& pt);
@@ -33,16 +36,24 @@ private:
     void SetFirstItemOnScreen(clTreeCtrlNode* item);
     void UpdateScrollBar(wxDC& dc);
     wxTreeItemId DoScrollLines(int numLines, bool up, wxTreeItemId from, bool selectIt);
-    
+
+protected:
+    void OnBeginDrag();
+
 public:
     clTreeCtrl(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
         const wxSize& size = wxDefaultSize, long style = 0);
     virtual ~clTreeCtrl();
 
+    /**
+     * @brief the drop action
+     */
+    void DropOnItem(const wxTreeItemId& item);
+
     // For internal use, dont use these two methods
     const clTreeCtrlModel& GetModel() const { return m_model; }
     clTreeCtrlModel& GetModel() { return m_model; }
-    
+
     /**
      * @brief set a sorting function for this tree. The function returns true if the first element should be placed
      * before the second element
@@ -59,27 +70,27 @@ public:
      * @brief return the tree style
      */
     long GetTreeStyle() const { return m_treeStyle; }
-    
+
     /**
      * @brief is the root hidden?
      */
     bool IsRootHidden() const { return m_treeStyle & wxTR_HIDE_ROOT; }
-    
+
     /**
      * @brief set the colours used for drawing items
      */
     void SetColours(const clTreeCtrlColours& colours);
-    
+
     /**
      * @brief enable style on the tree
      */
     void EnableStyle(int style, bool enable, bool refresh = true);
-    
+
     /**
      * @brief does the tree has 'style' enabled?
      */
     bool HasStyle(int style) const { return m_treeStyle & style; }
-    
+
     /**
      * @brief get the colours used for drawing items
      */
@@ -276,7 +287,9 @@ protected:
     void OnPaint(wxPaintEvent& event);
     void OnSize(wxSizeEvent& event);
     void OnMouseLeftDown(wxMouseEvent& event);
+    void OnMouseLeftUp(wxMouseEvent& event);
     void OnRightDown(wxMouseEvent& event);
+    void OnMotion(wxMouseEvent& event);
     void OnMouseLeftDClick(wxMouseEvent& event);
     void OnMouseScroll(wxMouseEvent& event);
     void OnIdle(wxIdleEvent& event);

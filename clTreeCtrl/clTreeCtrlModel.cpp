@@ -68,9 +68,9 @@ void clTreeCtrlModel::SelectItem(const wxTreeItemId& item, bool select, bool add
 {
     clTreeCtrlNode* child = ToPtr(item);
     if(!child) return;
-    
+
     if(child->IsHidden()) { return; }
-    
+
     if(clear_old_selection) { UnselectAll(); }
     if(select) {
         clTreeCtrlNode::Vec_t::iterator iter = std::find_if(
@@ -459,4 +459,64 @@ clTreeCtrlNode* clTreeCtrlModel::GetPrevSibling(clTreeCtrlNode* item) const
     // If we got a match, move to the next item
     if((iter != children.end()) && (iter != children.begin())) { --iter; }
     return ((iter == children.end()) ? nullptr : (*iter));
+}
+
+void clTreeCtrlModel::AddSelection(const wxTreeItemId& item)
+{
+    clTreeCtrlNode* child = ToPtr(item);
+    if(!child) return;
+    if(child->IsHidden()) { return; }
+
+    clTreeCtrlNode::Vec_t::iterator iter
+        = std::find_if(m_selectedItems.begin(), m_selectedItems.end(), [&](clTreeCtrlNode* p) { return (p == child); });
+    // If the item is already selected, don't select it again
+    if(iter != m_selectedItems.end()) { return; }
+
+    // if we already got selections, notify about the change
+    if(!m_selectedItems.empty()) {
+        wxTreeEvent evt(wxEVT_TREE_SEL_CHANGING);
+        evt.SetEventObject(m_tree);
+        evt.SetOldItem(GetSingleSelection());
+        SendEvent(evt);
+        if(!evt.IsAllowed()) { return; }
+    }
+
+    child->SetSelected(true);
+    // Send 'SEL_CHANGED' event
+    m_selectedItems.push_back(child);
+    wxTreeEvent evt(wxEVT_TREE_SEL_CHANGED);
+    evt.SetEventObject(m_tree);
+    evt.SetItem(wxTreeItemId(child));
+    SendEvent(evt);
+}
+
+void clTreeCtrlModel::ClearSelection(const wxTreeItemId& item)
+{
+    clTreeCtrlNode* child = ToPtr(item);
+    if(!child) return;
+    if(child->IsHidden()) { return; }
+
+    // Remove the item from the selection array
+    clTreeCtrlNode::Vec_t::iterator iter
+        = std::find_if(m_selectedItems.begin(), m_selectedItems.end(), [&](clTreeCtrlNode* p) { return (p == child); });
+    if(iter != m_selectedItems.end()) {
+        {
+            // Check if we can proceed with this operation
+            wxTreeEvent evt(wxEVT_TREE_SEL_CHANGING);
+            evt.SetEventObject(m_tree);
+            evt.SetOldItem(GetSingleSelection());
+            SendEvent(evt);
+            if(!evt.IsAllowed()) { return; }
+        }
+        child->SetSelected(false);
+        m_selectedItems.erase(iter);
+        {
+            // Send 'SEL_CHANGED' event
+            m_selectedItems.push_back(child);
+            wxTreeEvent evt(wxEVT_TREE_SEL_CHANGED);
+            evt.SetEventObject(m_tree);
+            evt.SetItem(wxTreeItemId(child));
+            SendEvent(evt);
+        }
+    }
 }
