@@ -24,6 +24,7 @@
     <File Name="wxcrafter_bitmaps.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
+    <File Name="codelite_exports.h"/>
     <File Name="MainFrame.h"/>
     <File Name="wxcrafter.h"/>
   </VirtualDirectory>

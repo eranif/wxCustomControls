@@ -5,7 +5,7 @@
 #include <functional>
 #include <vector>
 
-class clTreeNodeVisitor
+class WXDLLIMPEXP_SDK clTreeNodeVisitor
 {
 public:
     clTreeNodeVisitor();

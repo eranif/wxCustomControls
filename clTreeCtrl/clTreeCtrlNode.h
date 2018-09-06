@@ -7,6 +7,7 @@
 #include <wx/sharedptr.h>
 #include <wx/string.h>
 #include <wx/treebase.h>
+#include "codelite_exports.h"
 
 class clTreeCtrlModel;
 class clTreeCtrl;
@@ -20,7 +21,7 @@ enum clTreeCtrlNodeFlags {
     kNF_Hidden = (1 << 6),
 };
 
-struct clTreeCtrlColours {
+struct WXDLLIMPEXP_SDK clTreeCtrlColours {
     wxColour hoverBgColour;       // Background colour of an hovered item
     wxColour itemTextColour;      // item text colour
     wxColour itemBgColour;        // item bg colour
@@ -37,7 +38,7 @@ struct clTreeCtrlColours {
     void InitDarkDefaults();
 };
 
-class clTreeCtrlNode
+class WXDLLIMPEXP_SDK clTreeCtrlNode
 {
 public:
     typedef std::vector<clTreeCtrlNode*> Vec_t;

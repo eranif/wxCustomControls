@@ -7,9 +7,10 @@
 #include <wx/panel.h>
 #include <wx/scrolwin.h>
 #include <wx/datetime.h>
+#include "codelite_exports.h"
 
 class clScrollBarHelper;
-class clTreeCtrl : public wxPanel
+class WXDLLIMPEXP_SDK clTreeCtrl : public wxPanel
 {
     int m_lineHeight = 0;
     clTreeCtrlModel m_model;

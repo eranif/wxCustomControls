@@ -5,8 +5,9 @@
 #include <wx/event.h>
 #include <wx/gdicmn.h>
 #include <wx/window.h>
+#include "codelite_exports.h"
 
-class clScrollBarHelper : public wxEvtHandler
+class WXDLLIMPEXP_SDK clScrollBarHelper : public wxEvtHandler
 {
     wxWindow* m_parent = nullptr;
     int m_position = 0;

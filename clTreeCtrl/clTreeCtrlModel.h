@@ -8,13 +8,14 @@
 #include <wx/sharedptr.h>
 #include <wx/string.h>
 #include <wx/treebase.h>
+#include "codelite_exports.h"
 
 class clTreeCtrl;
-struct clTreeItemIdValue {
+struct WXDLLIMPEXP_SDK clTreeItemIdValue {
     int nextItem = 0;
 };
 
-class clTreeCtrlModel
+class WXDLLIMPEXP_SDK clTreeCtrlModel
 {
     clTreeCtrl* m_tree = nullptr;
     clTreeCtrlNode* m_root = nullptr;
