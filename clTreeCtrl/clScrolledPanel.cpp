@@ -3,10 +3,6 @@
 #include <wx/log.h>
 #include <wx/sizer.h>
 
-#ifdef __WXGTK__
-#include <gtk/gtk.h>
-#endif
-
 clScrolledPanel::clScrolledPanel(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
     : wxWindow(parent, id, pos, size, style)
 {
@@ -26,17 +22,17 @@ clScrolledPanel::clScrolledPanel(wxWindow* parent, wxWindowID id, const wxPoint&
     m_vsb->Bind(wxEVT_SCROLL_TOP, &clScrolledPanel::OnVScroll, this);
     Bind(wxEVT_CHAR_HOOK, &clScrolledPanel::OnCharHook, this);
 
-//#ifdef __WXGTK__
-//    /// On GTK, UP/DOWN arrows is used to navigate between controls
-//    /// Disable it by capturing the event and calling 'Skip(false)'
-//    Bind(wxEVT_KEY_DOWN, [&](wxKeyEvent& event) {
-//        if(event.GetKeyCode() == WXK_UP || event.GetKeyCode() == WXK_DOWN) {
-//            event.Skip(false);
-//        } else {
-//            event.Skip(true);
-//        }
-//    });
-//#endif
+#ifdef __WXGTK__
+    /// On GTK, UP/DOWN arrows is used to navigate between controls
+    /// Disable it by capturing the event and calling 'Skip(false)'
+    Bind(wxEVT_KEY_DOWN, [&](wxKeyEvent& event) {
+        if(event.GetKeyCode() == WXK_UP || event.GetKeyCode() == WXK_DOWN) {
+            event.Skip(false);
+        } else {
+            event.Skip(true);
+        }
+    });
+#endif
 }
 
 clScrolledPanel::~clScrolledPanel()
@@ -132,14 +128,3 @@ void clScrolledPanel::OnCharHook(wxKeyEvent& event)
 }
 
 int clScrolledPanel::GetPageSize() const { return m_pageSize; }
-
-void clScrolledPanel::GrabFocus()
-{
-#ifdef __WXGTK__
-    gtk_widget_set_can_focus(GTK_WIDGET(this->GetHandle()), true);
-    gtk_widget_grab_focus(GTK_WIDGET(this->GetHandle()));
-#else
-    SetCanFocus(true);
-    SetFocus();
-#endif
-}

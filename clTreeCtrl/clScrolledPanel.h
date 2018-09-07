@@ -49,11 +49,6 @@ public:
     void UpdateVScrollBar(int position, int thumbSize, int rangeSize, int pageSize);
 
     /**
-     * @brief force the focus to this window
-     */
-    void GrabFocus();
-
-    /**
      * @brief called by the scrolled window whenver a key is down
      * return true if the key was processed and we should stop the processing of this event
      */

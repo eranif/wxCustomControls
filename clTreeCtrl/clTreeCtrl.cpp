@@ -212,8 +212,6 @@ void clTreeCtrl::SelectItem(const wxTreeItemId& item, bool select)
 void clTreeCtrl::OnMouseLeftDown(wxMouseEvent& event)
 {
     event.Skip();
-//    CallAfter(&clTreeCtrl::GrabFocus);
-
     CHECK_ROOT_RET();
 
     // Not considering D'n'D so reset any saved values
