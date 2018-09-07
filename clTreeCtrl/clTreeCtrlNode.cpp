@@ -322,7 +322,7 @@ void clTreeCtrlColours::InitDefaults()
     itemTextColour = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT);
     selItemTextColour = itemTextColour;
     selItemBgColour = wxColour("rgb(199,203,209)");
-    buttonColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW);
+    buttonColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DSHADOW);
     hoverBgColour = wxColour("rgb(219,221,224)");
     bgColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE);
     scrolBarButton = wxSystemSettings::GetColour(wxSYS_COLOUR_3DSHADOW);

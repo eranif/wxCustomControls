@@ -301,7 +301,7 @@ public:
      * @brief Returns the previous sibling of the specified item; call GetNextSibling() for the next sibling
      */
     wxTreeItemId GetPrevSibling(const wxTreeItemId& item) const;
-
+    
 protected:
     void DoEnsureVisible(const wxTreeItemId& item);
     void OnPaint(wxPaintEvent& event);
@@ -314,6 +314,7 @@ protected:
     void OnMouseScroll(wxMouseEvent& event);
     void OnIdle(wxIdleEvent& event);
     void OnLeaveWindow(wxMouseEvent& event);
+    void OnEnterWindow(wxMouseEvent& event);
     void OnCharHook(wxKeyEvent& event);
     void OnContextMenu(wxContextMenuEvent& event);
     /**

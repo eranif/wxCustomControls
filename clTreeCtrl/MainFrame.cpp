@@ -21,21 +21,20 @@ MainFrame::MainFrame(wxWindow* parent)
 
     m_tree->AddRoot("Root", -1, -1, nullptr);
     wxLog::SetActiveTarget(new wxLogTextCtrl(m_textCtrlLog));
-
     // Provide a sorting function to the tree
     std::function<bool(const wxTreeItemId& a, const wxTreeItemId& b)> SortFunc
-        = [&](const wxTreeItemId& a, const wxTreeItemId& b) {
-              // Compare based on item type and then by label
-              MyItemData* cd_a = dynamic_cast<MyItemData*>(m_tree->GetItemData(a));
-              MyItemData* cd_b = dynamic_cast<MyItemData*>(m_tree->GetItemData(b));
-              if(cd_a->IsFolder() && !cd_b->IsFolder()) {
-                  return true;
-              } else if(!cd_a->IsFolder() && cd_b->IsFolder()) {
-                  return false;
-              } else {
-                  return cd_a->GetFullnameLC() < cd_b->GetFullnameLC();
-              }
-          };
+    = [&](const wxTreeItemId& a, const wxTreeItemId& b) {
+        // Compare based on item type and then by label
+        MyItemData* cd_a = dynamic_cast<MyItemData*>(m_tree->GetItemData(a));
+        MyItemData* cd_b = dynamic_cast<MyItemData*>(m_tree->GetItemData(b));
+        if(cd_a->IsFolder() && !cd_b->IsFolder()) {
+            return true;
+        } else if(!cd_a->IsFolder() && cd_b->IsFolder()) {
+            return false;
+        } else {
+            return cd_a->GetFullnameLC() < cd_b->GetFullnameLC();
+        }
+    };
     m_tree->SetSortFunction(SortFunc);
     std::vector<wxBitmap> bitmaps;
     MyImages images;
@@ -47,25 +46,37 @@ MainFrame::MainFrame(wxWindow* parent)
 
     m_tree->Bind(wxEVT_TREE_ITEM_EXPANDING, &MainFrame::OnItemExpanding, this);
     m_tree->Bind(wxEVT_TREE_DELETE_ITEM, &MainFrame::OnItemDeleted, this);
-    m_tree->Bind(wxEVT_TREE_BEGIN_DRAG, [&](wxTreeEvent& evt) { LogMessage(wxString() << "Drag started"); });
+    m_tree->Bind(wxEVT_TREE_BEGIN_DRAG, [&](wxTreeEvent& evt) {
+        LogMessage(wxString() << "Drag started");
+    });
     m_tree->Bind(wxEVT_TREE_END_DRAG, [&](wxTreeEvent& evt) {
         LogMessage(wxString() << "Drag ended. Drop is on item: " << m_tree->GetItemText(evt.GetItem()));
     });
 
     m_tree->Bind(wxEVT_TREE_ITEM_EXPANDED,
-        [&](wxTreeEvent& evt) { LogMessage(wxString() << m_tree->GetItemText(evt.GetItem()) << " expanded"); });
+    [&](wxTreeEvent& evt) {
+        LogMessage(wxString() << m_tree->GetItemText(evt.GetItem()) << " expanded");
+    });
     m_tree->Bind(wxEVT_TREE_ITEM_COLLAPSING,
-        [&](wxTreeEvent& evt) { LogMessage(wxString() << m_tree->GetItemText(evt.GetItem()) << " is collapsing"); });
+    [&](wxTreeEvent& evt) {
+        LogMessage(wxString() << m_tree->GetItemText(evt.GetItem()) << " is collapsing");
+    });
     m_tree->Bind(wxEVT_TREE_ITEM_COLLAPSED,
-        [&](wxTreeEvent& evt) { LogMessage(wxString() << m_tree->GetItemText(evt.GetItem()) << " collapsed"); });
+    [&](wxTreeEvent& evt) {
+        LogMessage(wxString() << m_tree->GetItemText(evt.GetItem()) << " collapsed");
+    });
     m_tree->Bind(wxEVT_TREE_SEL_CHANGING, [&](wxTreeEvent& evt) {
+        evt.Skip();
         LogMessage(wxString() << "Selection changing from: " << m_tree->GetItemText(evt.GetOldItem()));
     });
     m_tree->Bind(wxEVT_TREE_SEL_CHANGED, [&](wxTreeEvent& evt) {
         evt.Skip();
         LogMessage(wxString() << "Selection changed. selection is: " << m_tree->GetItemText(evt.GetItem()));
     });
-    m_tree->Bind(wxEVT_TREE_KEY_DOWN, [&](wxTreeEvent& evt) { evt.Skip(); });
+    m_tree->Bind(wxEVT_TREE_KEY_DOWN, [&](wxTreeEvent& evt) {
+        evt.Skip();
+        LogMessage(wxString() << "Key down. selection is: " << m_tree->GetItemText(evt.GetItem()));
+    });
 
     m_tree->Bind(wxEVT_TREE_ITEM_RIGHT_CLICK, [&](wxTreeEvent& evt) {
         evt.Skip(); // Must call this for the default actions process
@@ -119,7 +130,9 @@ void MainFrame::LogMessage(const wxString& message)
 void MainFrame::OnOpenFolder(wxCommandEvent& event)
 {
     wxString path = wxDirSelector();
-    if(path.IsEmpty()) { return; }
+    if(path.IsEmpty()) {
+        return;
+    }
 
     m_path = path;
     wxTreeItemId item = m_tree->AppendItem(m_tree->GetRootItem(), path, 0, 1, new MyItemData(m_path, true));
@@ -165,8 +178,14 @@ void MainFrame::OnItemExpanding(wxTreeEvent& event)
     }
 }
 
-void MainFrame::OnExpandAll(wxCommandEvent& event) { m_tree->ExpandAll(); }
-void MainFrame::OnCollapseAll(wxCommandEvent& event) { m_tree->CollapAll(); }
+void MainFrame::OnExpandAll(wxCommandEvent& event)
+{
+    m_tree->ExpandAll();
+}
+void MainFrame::OnCollapseAll(wxCommandEvent& event)
+{
+    m_tree->CollapAll();
+}
 void MainFrame::OnFirstVisible(wxCommandEvent& event)
 {
     wxTreeItemId item = m_tree->GetFirstVisibleItem();
@@ -193,7 +212,10 @@ void MainFrame::OnItemDeleted(wxTreeEvent& event)
     LogMessage("Item: " + text + " was deleted");
 }
 
-void MainFrame::OnSelectChildren(wxCommandEvent& event) { m_tree->SelectChildren(m_tree->GetFocusedItem()); }
+void MainFrame::OnSelectChildren(wxCommandEvent& event)
+{
+    m_tree->SelectChildren(m_tree->GetFocusedItem());
+}
 void MainFrame::OnNextSibling(wxCommandEvent& event)
 {
     m_tree->SelectItem(m_tree->GetNextSibling(m_tree->GetFocusedItem()));
@@ -221,6 +243,12 @@ void MainFrame::OnZebraColouring(wxCommandEvent& event)
 {
     m_tree->EnableStyle(wxTR_ROW_LINES, !m_tree->HasStyle(wxTR_ROW_LINES));
 }
-void MainFrame::OnHideRoot(wxCommandEvent& event) { m_tree->EnableStyle(wxTR_HIDE_ROOT, event.IsChecked()); }
+void MainFrame::OnHideRoot(wxCommandEvent& event)
+{
+    m_tree->EnableStyle(wxTR_HIDE_ROOT, event.IsChecked());
+}
 
-void MainFrame::OnSingleSelection(wxCommandEvent& event) { m_tree->EnableStyle(wxTR_MULTIPLE, !event.IsChecked()); }
+void MainFrame::OnSingleSelection(wxCommandEvent& event)
+{
+    m_tree->EnableStyle(wxTR_MULTIPLE, !event.IsChecked());
+}

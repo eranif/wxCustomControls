@@ -16,6 +16,10 @@
 #include <wx/utils.h>
 #include <wx/wupdlock.h>
 
+#ifdef __WXGTK__
+#include <gtk/gtk.h>
+#endif
+
 #define CHECK_PTR_RET(p) \
     if(!p) { return; }
 
@@ -58,6 +62,9 @@ clTreeCtrl::clTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
     , m_dragStartTime((time_t)-1)
 {
     SetBackgroundStyle(wxBG_STYLE_PAINT);
+#ifdef __WXGTK__
+    
+#endif
 
     wxBitmap bmp(1, 1);
     wxMemoryDC memDC(bmp);
@@ -75,6 +82,7 @@ clTreeCtrl::clTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
     Bind(wxEVT_LEFT_DCLICK, &clTreeCtrl::OnMouseLeftDClick, this);
     Bind(wxEVT_MOUSEWHEEL, &clTreeCtrl::OnMouseScroll, this);
     Bind(wxEVT_LEAVE_WINDOW, &clTreeCtrl::OnLeaveWindow, this);
+    Bind(wxEVT_ENTER_WINDOW, &clTreeCtrl::OnEnterWindow, this);
 
     // Some events, (such has WXK_DELETE) will not be captured by wxEVT_KEY_DOWN when scrollbar is ON
     // as if the wxSB eats them. We need to use wxEVT_CHAR_HOOK to capture these events
@@ -118,6 +126,7 @@ clTreeCtrl::~clTreeCtrl()
     Unbind(wxEVT_LEFT_DCLICK, &clTreeCtrl::OnMouseLeftDClick, this);
     Unbind(wxEVT_MOUSEWHEEL, &clTreeCtrl::OnMouseScroll, this);
     Unbind(wxEVT_LEAVE_WINDOW, &clTreeCtrl::OnLeaveWindow, this);
+    Unbind(wxEVT_ENTER_WINDOW, &clTreeCtrl::OnEnterWindow, this);
     Unbind(wxEVT_CHAR_HOOK, &clTreeCtrl::OnCharHook, this);
     Unbind(wxEVT_CONTEXT_MENU, &clTreeCtrl::OnContextMenu, this);
     Unbind(wxEVT_RIGHT_DOWN, &clTreeCtrl::OnRightDown, this);
@@ -240,6 +249,11 @@ void clTreeCtrl::SelectItem(const wxTreeItemId& item, bool select)
 void clTreeCtrl::OnMouseLeftDown(wxMouseEvent& event)
 {
     event.Skip();
+#ifdef __WXGTK__
+    gtk_widget_set_can_focus(GTK_WIDGET(this->GetHandle()), true);
+    gtk_widget_grab_focus(GTK_WIDGET(this->GetHandle()));
+#endif
+    
     CHECK_ROOT_RET();
 
     // Not considering D'n'D so reset any saved values
@@ -486,6 +500,7 @@ wxTreeItemData* clTreeCtrl::GetItemData(const wxTreeItemId& item) const
 
 void clTreeCtrl::OnMouseScroll(wxMouseEvent& event)
 {
+    event.Skip();
     CHECK_ROOT_RET();
     if(!GetFirstItemOnScreen()) { return; }
 
@@ -554,6 +569,7 @@ void clTreeCtrl::SetBitmaps(const std::vector<wxBitmap>& bitmaps)
 
 void clTreeCtrl::OnIdle(wxIdleEvent& event)
 {
+    event.Skip();
     CHECK_ROOT_RET();
 #ifndef __WXOSX__
     int flags = 0;
@@ -693,9 +709,11 @@ void clTreeCtrl::OnCharHook(wxKeyEvent& event)
     if(!HasFocus()) { return; }
 
     if(event.GetKeyCode() == WXK_UP) {
+        event.Skip(false);
         wxScrollEvent scrollEvent(wxEVT_SCROLL_LINEUP);
         OnScroll(scrollEvent);
     } else if(event.GetKeyCode() == WXK_DOWN) {
+        event.Skip(false);
         wxScrollEvent scrollEvent(wxEVT_SCROLL_LINEDOWN);
         OnScroll(scrollEvent);
     } else if(event.GetKeyCode() == WXK_PAGEUP) {
@@ -885,6 +903,7 @@ void clTreeCtrl::UpdateScrollBar()
 
 void clTreeCtrl::OnScroll(wxScrollEvent& event)
 {
+    event.Skip();
     if(event.GetEventType() == wxEVT_SCROLL_THUMBTRACK) {
         int lines = event.GetPosition();
         clTreeCtrlNode* newTopLine = nullptr;
@@ -1057,4 +1076,11 @@ int clTreeCtrl::GetItemImage(const wxTreeItemId& item, bool selectedImage) const
     if(!item.GetID()) { return wxNOT_FOUND; }
     clTreeCtrlNode* node = m_model.ToPtr(item);
     return selectedImage ? node->GetBitmapSelectedIndex() : node->GetBitmapIndex();
+}
+
+void clTreeCtrl::OnEnterWindow(wxMouseEvent& event)
+{
+    event.Skip();
+    CallAfter(&clTreeCtrl::SetFocus);
+    CallAfter(&clTreeCtrl::SetFocusFromKbd);
 }
