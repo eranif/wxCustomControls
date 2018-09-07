@@ -6,12 +6,16 @@
 #include <wx/bitmap.h>
 #include <wx/gdicmn.h>
 #include <wx/string.h>
+#include <vector>
 
 class WXDLLIMPEXP_SDK clHeaderItem
 {
     wxString m_label;
     wxBitmap m_bitmap;
     wxRect m_rect;
+
+public:
+    typedef std::vector<clHeaderItem> Vect_t;
 
 public:
     clHeaderItem();

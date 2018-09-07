@@ -5,7 +5,7 @@
 #include <wx/panel.h>
 #include <wx/scrolbar.h>
 
-class WXDLLIMPEXP_SDK clScrolledPanel : public wxPanel
+class WXDLLIMPEXP_SDK clScrolledPanel : public wxWindow
 {
 private:
     wxScrollBar* m_vsb = nullptr;

@@ -8,7 +8,7 @@
 #endif
 
 clScrolledPanel::clScrolledPanel(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
-    : wxPanel(parent, id, pos, size, style)
+    : wxWindow(parent, id, pos, size, style)
 {
     SetSizer(new wxBoxSizer(wxHORIZONTAL));
 

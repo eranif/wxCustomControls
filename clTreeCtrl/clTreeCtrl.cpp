@@ -52,7 +52,7 @@ public:
 };
 
 clTreeCtrl::clTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
-    : clScrolledPanel(parent, wxID_ANY, pos, size, wxWANTS_CHARS | wxTAB_TRAVERSAL)
+    : clScrolledPanel(parent, wxID_ANY, pos, size, wxWANTS_CHARS)
     , m_model(this)
     , m_treeStyle(style)
     , m_dragStartTime((time_t)-1)
