@@ -79,7 +79,6 @@ MainFrame::MainFrame(wxWindow* parent)
         evt.Skip();
         wxArrayTreeItemIds items;
         m_tree->GetSelections(items);
-        LogMessage(wxString() << "Single selection is: " << m_tree->GetItemText(m_tree->GetSelection()));
         for(size_t i = 0; i < items.GetCount(); ++i) {
             LogMessage(wxString() << "Acticated item: " << m_tree->GetItemText(items[i]));
         }

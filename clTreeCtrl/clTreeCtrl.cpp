@@ -1,5 +1,5 @@
-#include "clTreeCtrl.h"
 #include "clScrollBar.h"
+#include "clTreeCtrl.h"
 #include "clTreeCtrlModel.h"
 #include "clTreeNodeVisitor.h"
 #include <algorithm>
@@ -15,10 +15,6 @@
 #include <wx/sizer.h>
 #include <wx/utils.h>
 #include <wx/wupdlock.h>
-
-#ifdef __WXGTK__
-//#include <gtk/gtk.h>
-#endif
 
 #define CHECK_PTR_RET(p) \
     if(!p) { return; }
@@ -56,7 +52,7 @@ public:
 };
 
 clTreeCtrl::clTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
-    : wxPanel(parent, wxID_ANY, pos, size, wxWANTS_CHARS | wxTAB_TRAVERSAL)
+    : clScrolledPanel(parent, wxID_ANY, pos, size, wxWANTS_CHARS | wxTAB_TRAVERSAL)
     , m_model(this)
     , m_treeStyle(style)
     , m_dragStartTime((time_t)-1)
@@ -80,34 +76,12 @@ clTreeCtrl::clTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
     Bind(wxEVT_MOUSEWHEEL, &clTreeCtrl::OnMouseScroll, this);
     Bind(wxEVT_LEAVE_WINDOW, &clTreeCtrl::OnLeaveWindow, this);
     Bind(wxEVT_ENTER_WINDOW, &clTreeCtrl::OnEnterWindow, this);
-
-    // Some events, (such has WXK_DELETE) will not be captured by wxEVT_KEY_DOWN when scrollbar is ON
-    // as if the wxSB eats them. We need to use wxEVT_CHAR_HOOK to capture these events
-    // However, we will need to handle them only in cases where the focus is set to us to make sure that
-    // the event is not processed twice
-    Bind(wxEVT_CHAR_HOOK, &clTreeCtrl::OnCharHook, this);
     Bind(wxEVT_CONTEXT_MENU, &clTreeCtrl::OnContextMenu, this);
     Bind(wxEVT_RIGHT_DOWN, &clTreeCtrl::OnRightDown, this);
     Bind(wxEVT_MOTION, &clTreeCtrl::OnMotion, this);
 
-    SetSizer(new wxBoxSizer(wxHORIZONTAL));
-
-    m_vsb = new clScrollBarHelper(this, wxVERTICAL);
-    GetSizer()->Add(0, 0, 1, wxALL | wxEXPAND);
-    GetSizer()->Add(m_vsb, 0, wxEXPAND | wxALIGN_RIGHT);
-
-    // These events will arrive from the scollbar
-    m_vsb->Bind(wxEVT_SCROLL_THUMBTRACK, &clTreeCtrl::OnScroll, this);
-    m_vsb->Bind(wxEVT_SCROLL_LINEDOWN, &clTreeCtrl::OnScroll, this);
-    m_vsb->Bind(wxEVT_SCROLL_LINEUP, &clTreeCtrl::OnScroll, this);
-    m_vsb->Bind(wxEVT_SCROLL_PAGEDOWN, &clTreeCtrl::OnScroll, this);
-    m_vsb->Bind(wxEVT_SCROLL_PAGEUP, &clTreeCtrl::OnScroll, this);
-    m_vsb->Bind(wxEVT_SCROLL_BOTTOM, &clTreeCtrl::OnScroll, this);
-    m_vsb->Bind(wxEVT_SCROLL_TOP, &clTreeCtrl::OnScroll, this);
     // Initialise default colours
     m_colours.InitDefaults();
-
-    GetSizer()->Layout();
     // Enable DnD
     SetDropTarget(new clTreeCtrlDropTarget(this));
 }
@@ -124,17 +98,9 @@ clTreeCtrl::~clTreeCtrl()
     Unbind(wxEVT_MOUSEWHEEL, &clTreeCtrl::OnMouseScroll, this);
     Unbind(wxEVT_LEAVE_WINDOW, &clTreeCtrl::OnLeaveWindow, this);
     Unbind(wxEVT_ENTER_WINDOW, &clTreeCtrl::OnEnterWindow, this);
-    Unbind(wxEVT_CHAR_HOOK, &clTreeCtrl::OnCharHook, this);
     Unbind(wxEVT_CONTEXT_MENU, &clTreeCtrl::OnContextMenu, this);
     Unbind(wxEVT_RIGHT_DOWN, &clTreeCtrl::OnRightDown, this);
     Unbind(wxEVT_MOTION, &clTreeCtrl::OnMotion, this);
-    m_vsb->Unbind(wxEVT_SCROLL_THUMBTRACK, &clTreeCtrl::OnScroll, this);
-    m_vsb->Unbind(wxEVT_SCROLL_LINEDOWN, &clTreeCtrl::OnScroll, this);
-    m_vsb->Unbind(wxEVT_SCROLL_LINEUP, &clTreeCtrl::OnScroll, this);
-    m_vsb->Unbind(wxEVT_SCROLL_PAGEDOWN, &clTreeCtrl::OnScroll, this);
-    m_vsb->Unbind(wxEVT_SCROLL_PAGEUP, &clTreeCtrl::OnScroll, this);
-    m_vsb->Unbind(wxEVT_SCROLL_BOTTOM, &clTreeCtrl::OnScroll, this);
-    m_vsb->Unbind(wxEVT_SCROLL_TOP, &clTreeCtrl::OnScroll, this);
 }
 
 void clTreeCtrl::OnPaint(wxPaintEvent& event)
@@ -246,12 +212,7 @@ void clTreeCtrl::SelectItem(const wxTreeItemId& item, bool select)
 void clTreeCtrl::OnMouseLeftDown(wxMouseEvent& event)
 {
     event.Skip();
-#ifdef __WXGTK__
-    //gtk_widget_set_can_focus(GTK_WIDGET(this->GetHandle()), true);
-    //gtk_widget_grab_focus(GTK_WIDGET(this->GetHandle()));
-    SetCanFocus(true);
-    SetFocus();
-#endif
+    GrabFocus();
 
     CHECK_ROOT_RET();
 
@@ -496,10 +457,6 @@ void clTreeCtrl::OnMouseScroll(wxMouseEvent& event)
     CHECK_ROOT_RET();
     if(!GetFirstItemOnScreen()) { return; }
 
-    // static int counter = 0;
-    // wxString directionS = event.GetWheelRotation() > 0 ? "Up" : "Down";
-    // wxLogMessage(wxString() << ++counter << ": Scroll event..." << directionS);
-    //
     // Ignore the first tick (should fix an annoyance on OSX)
     wxDirection direction = (event.GetWheelRotation() > 0) ? wxUP : wxDOWN;
     if(direction != m_lastScrollDir) {
@@ -575,7 +532,7 @@ void clTreeCtrl::OnIdle(wxIdleEvent& event)
             bool new_state = hoveredNode == items[i];
             bool old_state = items[i]->IsHovered();
             if(!refreshNeeded) { refreshNeeded = (new_state != old_state); }
-            items[i]->SetHovered(hoveredNode == items[i] && !m_vsb->HasCapture());
+            items[i]->SetHovered(hoveredNode == items[i]);
         }
         if(refreshNeeded) { Refresh(); }
     }
@@ -657,72 +614,46 @@ size_t clTreeCtrl::GetSelections(wxArrayTreeItemIds& selections) const
     return selections.size();
 }
 
-void clTreeCtrl::OnCharHook(wxKeyEvent& event)
+bool clTreeCtrl::DoKeyDown(const wxKeyEvent& event)
 {
-    event.Skip();
-
-    CHECK_ROOT_RET();
+    if(!m_model.GetRoot()) {
+        // we didnt process this event, carry on
+        return true;
+    }
     wxTreeItemId selectedItem = GetSelection();
-    if(!selectedItem.IsOk()) { return; }
+    if(!selectedItem.IsOk()) { return true; }
 
     // Let the user chance to process this first
     wxTreeEvent evt(wxEVT_TREE_KEY_DOWN);
     evt.SetEventObject(this);
     evt.SetKeyEvent(event);
     evt.SetItem(selectedItem);
-    if(GetEventHandler()->ProcessEvent(evt)) {
-        event.Skip(false);
-        return;
-    }
+    if(GetEventHandler()->ProcessEvent(evt)) { return true; }
 
     if(event.GetKeyCode() == WXK_LEFT) {
         if(m_model.ToPtr(selectedItem)->IsExpanded()) {
             Collapse(selectedItem);
-            event.Skip(false);
+            return true;
         }
     } else if(event.GetKeyCode() == WXK_RIGHT) {
         if(!m_model.ToPtr(selectedItem)->IsExpanded()) {
             Expand(selectedItem);
-            event.Skip(false);
+            return true;
         }
     } else if(event.GetKeyCode() == WXK_NUMPAD_DELETE || event.GetKeyCode() == WXK_DELETE) {
         // Delete the item (this will also fire
         // wxEVT_TREE_DELETE_ITEM
         Delete(selectedItem);
-        event.Skip(false);
+        return true;
     } else if(event.GetKeyCode() == WXK_RETURN || event.GetKeyCode() == WXK_NUMPAD_ENTER) {
         wxTreeEvent evt(wxEVT_TREE_ITEM_ACTIVATED);
         evt.SetEventObject(this);
         evt.SetItem(selectedItem);
         GetEventHandler()->ProcessEvent(evt);
+        return true;
     }
-
-    // The following events should be handled only if our window has the focus
-    if(!HasFocus()) { return; }
-
-    if(event.GetKeyCode() == WXK_UP) {
-        event.Skip(false);
-        wxScrollEvent scrollEvent(wxEVT_SCROLL_LINEUP);
-        OnScroll(scrollEvent);
-    } else if(event.GetKeyCode() == WXK_DOWN) {
-        event.Skip(false);
-        wxScrollEvent scrollEvent(wxEVT_SCROLL_LINEDOWN);
-        OnScroll(scrollEvent);
-    } else if(event.GetKeyCode() == WXK_PAGEUP) {
-        wxScrollEvent scrollEvent(wxEVT_SCROLL_PAGEUP);
-        scrollEvent.SetPosition(GetNumLineCanFitOnScreen() - 1);
-        OnScroll(scrollEvent);
-    } else if(event.GetKeyCode() == WXK_PAGEDOWN) {
-        wxScrollEvent scrollEvent(wxEVT_SCROLL_PAGEDOWN);
-        scrollEvent.SetPosition(GetNumLineCanFitOnScreen() - 1);
-        OnScroll(scrollEvent);
-    } else if(event.GetKeyCode() == WXK_HOME) {
-        wxScrollEvent scrollEvent(wxEVT_SCROLL_TOP);
-        OnScroll(scrollEvent);
-    } else if(event.GetKeyCode() == WXK_END) {
-        wxScrollEvent scrollEvent(wxEVT_SCROLL_BOTTOM);
-        OnScroll(scrollEvent);
-    }
+    // We didnt process this event, continue on processing it
+    return false;
 }
 
 bool clTreeCtrl::IsItemVisible(clTreeCtrlNode* item) const
@@ -881,67 +812,52 @@ void clTreeCtrl::UpdateScrollBar()
     int thumbSize = (rect.GetHeight() / m_lineHeight); // Number of lines can be drawn
     int pageSize = (thumbSize - 1);
     int rangeSize = m_model.GetExpandedLines();
-    if(rangeSize <= thumbSize) {
-        m_vsb->Hide();
-        GetSizer()->Layout();
-        return;
-    } else {
-        m_vsb->Show();
-        GetSizer()->Layout();
-    }
     int position = m_model.GetItemIndex(m_model.GetFirstItemOnScreen());
-    m_vsb->SetScrollbar(position, thumbSize, rangeSize, pageSize);
-    m_vsb->Refresh();
+    UpdateVScrollBar(position, thumbSize, rangeSize, pageSize);
 }
 
-void clTreeCtrl::OnScroll(wxScrollEvent& event)
+void clTreeCtrl::ScrollToLine(int firstLine)
 {
-    event.Skip();
-    if(event.GetEventType() == wxEVT_SCROLL_THUMBTRACK) {
-        int lines = event.GetPosition();
-        clTreeCtrlNode* newTopLine = nullptr;
-        // Thumbtrack sends the top-line index in event.GetPosition()
-        newTopLine = m_model.GetItemFromIndex(lines);
-        if(newTopLine) { SetFirstItemOnScreen(m_model.ToPtr(newTopLine)); }
-        Refresh();
-    } else {
-        // Process the rest of the scrolling events here
-        wxEventType type = event.GetEventType();
-        wxTreeItemId nextSelection;
-        bool fromTop = false;
-        if(type == wxEVT_SCROLL_LINEDOWN) {
-            nextSelection = DoScrollLines(1, false, GetFocusedItem(), false);
-        } else if(type == wxEVT_SCROLL_PAGEDOWN) {
-            nextSelection = DoScrollLines(event.GetPosition(), false, GetFocusedItem(), false);
-        } else if(type == wxEVT_SCROLL_LINEUP) {
-            nextSelection = DoScrollLines(1, true, GetFocusedItem(), false);
-            fromTop = true;
-        } else if(type == wxEVT_SCROLL_PAGEUP) {
-            nextSelection = DoScrollLines(event.GetPosition(), true, GetFocusedItem(), false);
-            fromTop = true;
-        } else if(type == wxEVT_SCROLL_TOP) {
+    clTreeCtrlNode* newTopLine = nullptr;
+    // Thumbtrack sends the top-line index in event.GetPosition()
+    newTopLine = m_model.GetItemFromIndex(firstLine);
+    if(newTopLine) { SetFirstItemOnScreen(m_model.ToPtr(newTopLine)); }
+    Refresh();
+}
+
+void clTreeCtrl::ScrollLines(int steps, wxDirection direction)
+{
+    // Process the rest of the scrolling events here
+    wxTreeItemId nextSelection;
+    bool fromTop = false;
+    if(steps == 0) {
+        // Top or Bottom
+        if(direction == wxUP) {
             if(IsRootHidden()) {
                 nextSelection = wxTreeItemId(m_model.ToPtr(GetRootItem())->GetFirstChild());
             } else {
                 nextSelection = GetRootItem();
             }
             fromTop = true;
-        } else if(type == wxEVT_SCROLL_BOTTOM) {
+        } else {
             // Find the last item, it does not matter if the root is hidden
             clTreeCtrlNode* node = m_model.ToPtr(GetRootItem());
             while(node->GetLastChild()) { node = node->GetLastChild(); }
             nextSelection = wxTreeItemId(node);
-            
         }
-        if(::wxGetKeyState(WXK_SHIFT) && HasStyle(wxTR_MULTIPLE)) {
-            m_model.AddSelection(nextSelection);
-        } else {
-            SelectItem(nextSelection);
-        }
-        EnsureItemVisible(m_model.ToPtr(nextSelection), fromTop);
-        Refresh();
-        UpdateScrollBar();
+    } else {
+        nextSelection = DoScrollLines(steps, direction == wxUP, GetFocusedItem(), false);
+        fromTop = (direction == wxUP);
     }
+
+    if(::wxGetKeyState(WXK_SHIFT) && HasStyle(wxTR_MULTIPLE)) {
+        m_model.AddSelection(nextSelection);
+    } else {
+        SelectItem(nextSelection);
+    }
+    EnsureItemVisible(m_model.ToPtr(nextSelection), fromTop);
+    Refresh();
+    UpdateScrollBar();
 }
 
 void clTreeCtrl::SelectChildren(const wxTreeItemId& item)

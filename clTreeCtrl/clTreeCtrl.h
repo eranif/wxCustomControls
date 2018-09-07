@@ -1,6 +1,7 @@
 #ifndef CLTREECTRL_H
 #define CLTREECTRL_H
 
+#include "clScrolledPanel.h"
 #include "clTreeCtrlModel.h"
 #include "codelite_exports.h"
 #include <wx/arrstr.h>
@@ -10,7 +11,7 @@
 #include <wx/scrolwin.h>
 
 class clScrollBarHelper;
-class WXDLLIMPEXP_SDK clTreeCtrl : public wxPanel
+class WXDLLIMPEXP_SDK clTreeCtrl : public clScrolledPanel
 {
     int m_lineHeight = 0;
     clTreeCtrlModel m_model;
@@ -22,7 +23,7 @@ class WXDLLIMPEXP_SDK clTreeCtrl : public wxPanel
     std::vector<wxBitmap> m_bitmaps;
     clTreeCtrlColours m_colours;
     long m_treeStyle = 0;
-    clScrollBarHelper* m_vsb = nullptr;
+    // clScrollBarHelper* m_vsb = nullptr;
     wxDirection m_lastScrollDir = wxDOWN;
     wxDateTime m_dragStartTime;
     wxPoint m_dragStartPos;
@@ -303,6 +304,7 @@ public:
     wxTreeItemId GetPrevSibling(const wxTreeItemId& item) const;
 
 protected:
+    virtual bool DoKeyDown(const wxKeyEvent& event);
     void DoEnsureVisible(const wxTreeItemId& item);
     void OnPaint(wxPaintEvent& event);
     void OnSize(wxSizeEvent& event);
@@ -315,12 +317,10 @@ protected:
     void OnIdle(wxIdleEvent& event);
     void OnLeaveWindow(wxMouseEvent& event);
     void OnEnterWindow(wxMouseEvent& event);
-    void OnCharHook(wxKeyEvent& event);
     void OnContextMenu(wxContextMenuEvent& event);
-    /**
-     * @brief scroll events sent from the scrollbar
-     */
-    void OnScroll(wxScrollEvent& event);
+    
+    void ScrollLines(int steps, wxDirection direction);
+    void ScrollToLine(int firstLine);
 };
 
 #endif // CLTREECTRL_H
