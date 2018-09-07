@@ -306,7 +306,12 @@ public:
      * @brief Returns the previous sibling of the specified item; call GetNextSibling() for the next sibling
      */
     wxTreeItemId GetPrevSibling(const wxTreeItemId& item) const;
-
+    
+    /**
+     * @brief delete all items in tree
+     */
+    void DeleteAllItems() { Delete(GetRootItem()); }
+    
 protected:
     virtual bool DoKeyDown(const wxKeyEvent& event);
     void DoEnsureVisible(const wxTreeItemId& item);

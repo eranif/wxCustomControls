@@ -685,6 +685,7 @@ int clTreeCtrl::GetNumLineCanFitOnScreen() const
 
 void clTreeCtrl::Delete(const wxTreeItemId& item)
 {
+    CHECK_ITEM_RET(item);
     // delete the item + its children
     // fires event
     m_model.DeleteItem(item);
