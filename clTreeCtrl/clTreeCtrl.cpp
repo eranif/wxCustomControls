@@ -62,9 +62,6 @@ clTreeCtrl::clTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
     , m_dragStartTime((time_t)-1)
 {
     SetBackgroundStyle(wxBG_STYLE_PAINT);
-#ifdef __WXGTK__
-
-#endif
 
     wxBitmap bmp(1, 1);
     wxMemoryDC memDC(bmp);
@@ -250,8 +247,10 @@ void clTreeCtrl::OnMouseLeftDown(wxMouseEvent& event)
 {
     event.Skip();
 #ifdef __WXGTK__
-    gtk_widget_set_can_focus(GTK_WIDGET(this->GetHandle()), true);
-    gtk_widget_grab_focus(GTK_WIDGET(this->GetHandle()));
+    //gtk_widget_set_can_focus(GTK_WIDGET(this->GetHandle()), true);
+    //gtk_widget_grab_focus(GTK_WIDGET(this->GetHandle()));
+    SetCanFocus(true);
+    SetFocus();
 #endif
 
     CHECK_ROOT_RET();
