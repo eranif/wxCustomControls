@@ -1,48 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plist version="1.0">
-  <dict>
-    <key>CFBundleDevelopmentRegion</key>
-    <string>English</string>
-    <key>NSPrincipalClass</key>
-    <string>NSApplication</string>
-    <key>CFBundleExecutable</key>
-    <string>clTreeCtrl</string>
-    <key>CFBundleInfoDictionaryVersion</key>
-    <string>1.0</string>
-    <key>CFBundleName</key>
-    <string>clTreeCtrl</string>
-    <key>CFBundleIconFile</key>
-    <string>icon.icns</string>
-    <key>CFBundlePackageType</key>
-    <string>APPL</string>
-    <key>CFBundleIdentifier</key>
-    <string>com.eranif.clTreeCtrl</string>
-    <key>CFBundleVersion</key>
-    <string>clTreeCtrl 1.0</string>
-    <key>CFBundleShortVersionString</key>
-    <string>clTreeCtrl 1.0</string>
-    <key>CSResourcesFileMapped</key>
-    <true/>
-    <key>CFBundleDocumentTypes</key>
-    <array>
-      <dict>
-        <key>CFBundleTypeExtensions</key>
-        <array>
-          <string>workspace</string>
-        </array>
-        <key>CFBundleTypeIconFile</key>
-        <string>cl_workspace.icns</string>
-        <key>CFBundleTypeName</key>
-        <string>clTreeCtrl workspace</string>
-        <key>CFBundleTypeRole</key>
-        <string>Editor</string>
-        <key>LSIsAppleDefaultForType</key>
+    <dict>
+        <key>CFBundleDevelopmentRegion</key>
+        <string>English</string>
+        <key>NSPrincipalClass</key>
+        <string>NSApplication</string>
+        <key>CFBundleExecutable</key>
+        <string>clTreeCtrl</string>
+        <key>CFBundleInfoDictionaryVersion</key>
+        <string>1.0</string>
+        <key>CFBundleName</key>
+        <string>clTreeCtrl</string>
+        <key>CFBundleIconFile</key>
+        <string>icon.icns</string>
+        <key>CFBundlePackageType</key>
+        <string>APPL</string>
+        <key>CFBundleIdentifier</key>
+        <string>com.eranif.clTreeCtrl</string>
+        <key>CFBundleVersion</key>
+        <string>clTreeCtrl 1.0</string>
+        <key>CFBundleShortVersionString</key>
+        <string>clTreeCtrl 1.0</string>
+        <key>CSResourcesFileMapped</key>
         <true/>
-        <key>LSTypeIsPackage</key>
-        <false/>
-      </dict>
-    </array>
-    <key>NSHighResolutionCapable</key>
-    <true/>
-  </dict>
+        <key>CFBundleDocumentTypes</key>
+        <array>
+            <dict>
+                <key>CFBundleTypeExtensions</key>
+                <array>
+                    <string>workspace</string>
+                </array>
+                <key>CFBundleTypeIconFile</key>
+                <string>cl_workspace.icns</string>
+                <key>CFBundleTypeName</key>
+                <string>clTreeCtrl workspace</string>
+                <key>CFBundleTypeRole</key>
+                <string>Editor</string>
+                <key>LSIsAppleDefaultForType</key>
+                <true/>
+                <key>LSTypeIsPackage</key>
+                <false/>
+            </dict>
+        </array>
+        <key>NSHighResolutionCapable</key>
+        <true/>
+    </dict>
 </plist>

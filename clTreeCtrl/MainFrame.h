@@ -1,8 +1,8 @@
 #ifndef MAINFRAME_H
 #define MAINFRAME_H
+#include "clTreeCtrlNode.h"
 #include "wxcrafter.h"
 #include <array>
-#include "clTreeCtrlNode.h"
 
 class clTreeCtrl;
 class MyItemData : public wxTreeItemData

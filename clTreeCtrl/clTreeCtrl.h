@@ -2,12 +2,12 @@
 #define CLTREECTRL_H
 
 #include "clTreeCtrlModel.h"
+#include "codelite_exports.h"
 #include <wx/arrstr.h>
+#include <wx/datetime.h>
 #include <wx/dc.h>
 #include <wx/panel.h>
 #include <wx/scrolwin.h>
-#include <wx/datetime.h>
-#include "codelite_exports.h"
 
 class clScrollBarHelper;
 class WXDLLIMPEXP_SDK clTreeCtrl : public wxPanel
@@ -26,7 +26,7 @@ class WXDLLIMPEXP_SDK clTreeCtrl : public wxPanel
     wxDirection m_lastScrollDir = wxDOWN;
     wxDateTime m_dragStartTime;
     wxPoint m_dragStartPos;
-    
+
 private:
     wxPoint DoFixPoint(const wxPoint& pt);
     wxTreeItemId DoGetSiblingVisibleItem(const wxTreeItemId& item, bool next) const;
@@ -136,12 +136,12 @@ public:
      * @brief return the root item
      */
     wxTreeItemId GetRootItem() const;
-    
+
     /**
      * @brief return the item's parent
      */
     wxTreeItemId GetItemParent(const wxTreeItemId& item) const;
-    
+
     /**
      * @brief Expands the given item
      */
@@ -211,17 +211,17 @@ public:
      */
     wxTreeItemId GetFirstChild(const wxTreeItemId& item, wxTreeItemIdValue& cookie) const;
     wxTreeItemId GetNextChild(const wxTreeItemId& item, wxTreeItemIdValue& cookie) const;
-    
+
     /**
      * @brief for compatibility, we dont really need to call this method manually
      */
     void SortChildren(const wxTreeItemId& item) { wxUnusedVar(item); }
-    
+
     /**
      * @brief set item's image index
      */
     void SetItemImage(const wxTreeItemId& item, int imageId, int openImageId = wxNOT_FOUND);
-    
+
     /**
      * @brief return the associated image id with this item
      */
@@ -301,7 +301,7 @@ public:
      * @brief Returns the previous sibling of the specified item; call GetNextSibling() for the next sibling
      */
     wxTreeItemId GetPrevSibling(const wxTreeItemId& item) const;
-    
+
 protected:
     void DoEnsureVisible(const wxTreeItemId& item);
     void OnPaint(wxPaintEvent& event);

@@ -89,15 +89,13 @@ MainFrameBaseClass::MainFrameBaseClass(
     m_menuItemHideRoot = new wxMenuItem(m_menu53, ID_HIDE_ROOT, _("Hide Root"), wxT(""), wxITEM_CHECK);
     m_menu53->Append(m_menuItemHideRoot);
 
-    m_menuItemSingleSelection =
-        new wxMenuItem(m_menu53, ID_SINGLE_SELECTION, _("Single Selection Tree"), wxT(""), wxITEM_CHECK);
+    m_menuItemSingleSelection
+        = new wxMenuItem(m_menu53, ID_SINGLE_SELECTION, _("Single Selection Tree"), wxT(""), wxITEM_CHECK);
     m_menu53->Append(m_menuItemSingleSelection);
 
     SetName(wxT("MainFrameBaseClass"));
     SetSize(wxDLG_UNIT(this, wxSize(-1, -1)));
-    if(GetSizer()) {
-        GetSizer()->Fit(this);
-    }
+    if(GetSizer()) { GetSizer()->Fit(this); }
     if(GetParent()) {
         CentreOnParent(wxBOTH);
     } else {

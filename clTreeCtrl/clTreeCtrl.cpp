@@ -1,5 +1,5 @@
-#include "clScrollBar.h"
 #include "clTreeCtrl.h"
+#include "clScrollBar.h"
 #include "clTreeCtrlModel.h"
 #include "clTreeNodeVisitor.h"
 #include <algorithm>
@@ -63,7 +63,7 @@ clTreeCtrl::clTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
 {
     SetBackgroundStyle(wxBG_STYLE_PAINT);
 #ifdef __WXGTK__
-    
+
 #endif
 
     wxBitmap bmp(1, 1);
@@ -253,7 +253,7 @@ void clTreeCtrl::OnMouseLeftDown(wxMouseEvent& event)
     gtk_widget_set_can_focus(GTK_WIDGET(this->GetHandle()), true);
     gtk_widget_grab_focus(GTK_WIDGET(this->GetHandle()));
 #endif
-    
+
     CHECK_ROOT_RET();
 
     // Not considering D'n'D so reset any saved values
@@ -337,13 +337,6 @@ void clTreeCtrl::OnMouseLeftUp(wxMouseEvent& event)
 wxTreeItemId clTreeCtrl::HitTest(const wxPoint& point, int& flags) const
 {
     if(!m_model.GetRoot()) { return wxTreeItemId(); }
-
-    if(m_vsb) {
-        // Ignore clicks on the sb
-        wxRect sbRect = m_vsb->GetClientRect();
-        if(sbRect.Contains(point)) { return wxTreeItemId(); }
-    }
-
     flags = 0;
     for(size_t i = 0; i < m_model.GetOnScreenItems().size(); ++i) {
         const clTreeCtrlNode* item = m_model.GetOnScreenItems()[i];
@@ -682,7 +675,7 @@ void clTreeCtrl::OnCharHook(wxKeyEvent& event)
         event.Skip(false);
         return;
     }
-    
+
     if(event.GetKeyCode() == WXK_LEFT) {
         if(m_model.ToPtr(selectedItem)->IsExpanded()) {
             Collapse(selectedItem);

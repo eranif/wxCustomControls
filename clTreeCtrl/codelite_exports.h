@@ -16,20 +16,18 @@
 #endif
 
 #ifdef WXMAKINGDLL_SDK
-#    define WXDLLIMPEXP_SDK __declspec(dllexport)
+#define WXDLLIMPEXP_SDK __declspec(dllexport)
 #elif defined(WXUSINGDLL_SDK)
-#    define WXDLLIMPEXP_SDK __declspec(dllimport)
+#define WXDLLIMPEXP_SDK __declspec(dllimport)
 #else // not making nor using DLL
-#    define WXDLLIMPEXP_SDK
+#define WXDLLIMPEXP_SDK
 #endif
 
 #else // !MSW
-#    define WXDLLIMPEXP_CL
-#    define WXDLLIMPEXP_SDK
+#define WXDLLIMPEXP_CL
+#define WXDLLIMPEXP_SDK
 #endif
 
 #endif // CODELITE_EXPORTS
-
-
 
 #endif // CODELITE_EXPORTS_H
