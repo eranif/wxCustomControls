@@ -17,7 +17,7 @@
 #include <wx/wupdlock.h>
 
 #ifdef __WXGTK__
-#include <gtk/gtk.h>
+//#include <gtk/gtk.h>
 #endif
 
 #define CHECK_PTR_RET(p) \
