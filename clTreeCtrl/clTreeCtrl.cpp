@@ -891,6 +891,7 @@ void clTreeCtrl::UpdateScrollBar()
     }
     int position = m_model.GetItemIndex(m_model.GetFirstItemOnScreen());
     m_vsb->SetScrollbar(position, thumbSize, rangeSize, pageSize);
+    m_vsb->Refresh();
 }
 
 void clTreeCtrl::OnScroll(wxScrollEvent& event)
@@ -910,18 +911,14 @@ void clTreeCtrl::OnScroll(wxScrollEvent& event)
         bool fromTop = false;
         if(type == wxEVT_SCROLL_LINEDOWN) {
             nextSelection = DoScrollLines(1, false, GetFocusedItem(), false);
-            UpdateScrollBar();
         } else if(type == wxEVT_SCROLL_PAGEDOWN) {
             nextSelection = DoScrollLines(event.GetPosition(), false, GetFocusedItem(), false);
-            UpdateScrollBar();
         } else if(type == wxEVT_SCROLL_LINEUP) {
             nextSelection = DoScrollLines(1, true, GetFocusedItem(), false);
             fromTop = true;
-            UpdateScrollBar();
         } else if(type == wxEVT_SCROLL_PAGEUP) {
             nextSelection = DoScrollLines(event.GetPosition(), true, GetFocusedItem(), false);
             fromTop = true;
-            UpdateScrollBar();
         } else if(type == wxEVT_SCROLL_TOP) {
             if(IsRootHidden()) {
                 nextSelection = wxTreeItemId(m_model.ToPtr(GetRootItem())->GetFirstChild());
@@ -929,13 +926,12 @@ void clTreeCtrl::OnScroll(wxScrollEvent& event)
                 nextSelection = GetRootItem();
             }
             fromTop = true;
-            UpdateScrollBar();
         } else if(type == wxEVT_SCROLL_BOTTOM) {
             // Find the last item, it does not matter if the root is hidden
             clTreeCtrlNode* node = m_model.ToPtr(GetRootItem());
             while(node->GetLastChild()) { node = node->GetLastChild(); }
             nextSelection = wxTreeItemId(node);
-            UpdateScrollBar();
+            
         }
         if(::wxGetKeyState(WXK_SHIFT) && HasStyle(wxTR_MULTIPLE)) {
             m_model.AddSelection(nextSelection);
@@ -944,6 +940,7 @@ void clTreeCtrl::OnScroll(wxScrollEvent& event)
         }
         EnsureItemVisible(m_model.ToPtr(nextSelection), fromTop);
         Refresh();
+        UpdateScrollBar();
     }
 }
 

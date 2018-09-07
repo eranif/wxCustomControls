@@ -61,8 +61,7 @@
       </Debugger>
       <PreBuild/>
       <PostBuild>
-        <Command Enabled="yes">cp $(ProjectPath)\cl*.cpp $(CL_HOME)/Plugin</Command>
-        <Command Enabled="yes">cp $(ProjectPath)\cl*.h $(CL_HOME)/Plugin</Command>
+        <Command Enabled="yes"/>
       </PostBuild>
       <CustomBuild Enabled="no">
         <RebuildCommand/>
