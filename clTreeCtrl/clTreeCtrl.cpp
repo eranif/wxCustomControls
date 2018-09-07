@@ -204,7 +204,7 @@ void clTreeCtrl::Collapse(const wxTreeItemId& item)
 void clTreeCtrl::SelectItem(const wxTreeItemId& item, bool select)
 {
     CHECK_ITEM_RET(item);
-    if(GetFocusedItem() == item) { return; }
+    if((select && m_model.IsItemSelected(item)) || (!select && !m_model.IsItemSelected(item))) { return; }
     m_model.SelectItem(item, select, false, true);
     Refresh();
 }
