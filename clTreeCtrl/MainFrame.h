@@ -36,7 +36,7 @@ class MainFrame : public MainFrameBaseClass
 {
     wxString m_path;
     clTreeCtrl* m_tree = nullptr;
-    std::array<clTreeCtrlColours, 2> m_coloursArr;
+    std::array<clColours, 2> m_coloursArr;
     int m_selectedColours = 0;
 
 private:

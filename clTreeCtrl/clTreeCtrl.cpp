@@ -109,8 +109,8 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
     wxGCDC dc(pdc);
 
     wxRect clientRect = GetClientRect();
-    dc.SetPen(m_colours.bgColour);
-    dc.SetBrush(m_colours.bgColour);
+    dc.SetPen(m_colours.GetBgColour());
+    dc.SetBrush(m_colours.GetBgColour());
     dc.DrawRectangle(clientRect);
 
     if(!m_model.GetRoot()) {
@@ -548,7 +548,7 @@ void clTreeCtrl::OnLeaveWindow(wxMouseEvent& event)
     Refresh();
 }
 
-void clTreeCtrl::SetColours(const clTreeCtrlColours& colours)
+void clTreeCtrl::SetColours(const clColours& colours)
 {
     m_colours = colours;
     Refresh();
@@ -988,4 +988,9 @@ void clTreeCtrl::OnEnterWindow(wxMouseEvent& event)
     event.Skip();
     CallAfter(&clTreeCtrl::SetFocus);
     CallAfter(&clTreeCtrl::SetFocusFromKbd);
+}
+
+wxRect clTreeCtrl::GetItemsRect() const
+{
+    return GetClientRect();
 }

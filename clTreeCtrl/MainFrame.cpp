@@ -10,7 +10,7 @@ MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
 {
     m_tree = new clTreeCtrl(m_mainPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_MULTIPLE);
-    clTreeCtrlColours colours;
+    clColours colours;
     colours.InitDefaults();
     m_coloursArr[0] = colours;
 

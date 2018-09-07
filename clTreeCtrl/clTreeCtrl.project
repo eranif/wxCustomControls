@@ -8,6 +8,10 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="clColours.cpp"/>
+    <File Name="clColours.h"/>
+    <File Name="clHeaderItem.cpp"/>
+    <File Name="clHeaderItem.h"/>
     <File Name="clScrolledPanel.cpp"/>
     <File Name="clScrolledPanel.h"/>
     <File Name="clScrollBar.cpp"/>
