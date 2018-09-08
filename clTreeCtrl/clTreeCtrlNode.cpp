@@ -9,8 +9,12 @@ clTreeCtrlNode::clTreeCtrlNode(clTreeCtrl* tree, const wxString& label, int bitm
     : m_tree(tree)
     , m_model(tree ? &tree->GetModel() : nullptr)
 {
+    // Fill the verctor with items constructed using the _non_ default constructor
+    // to makes sure that IsOk() returns TRUE
+    m_cells.resize(
+        m_tree->GetHeader().size() ? m_tree->GetHeader().size() : 1, clCellValue("", -1, -1)); // at least one column
     clCellValue cv(label, bitmapIndex, bitmapSelectedIndex);
-    m_cells.push_back(cv);
+    m_cells[0] = cv;
 }
 
 clTreeCtrlNode::~clTreeCtrlNode()
@@ -179,83 +183,90 @@ bool clTreeCtrlNode::SetExpanded(bool b)
 void clTreeCtrlNode::ClearRects()
 {
     m_buttonRect = wxRect();
-    m_itemRect = wxRect();
+    m_rowRect = wxRect();
 }
 
 void clTreeCtrlNode::Render(wxDC& dc, const clColours& c, int row_index)
 {
-    wxRect itemRect = GetItemRect();
+    wxRect rowRect = GetItemRect();
     bool zebraColouring = (m_tree->GetTreeStyle() & wxTR_ROW_LINES);
     bool even_row = ((row_index % 2) == 0);
 
+    // Not cell related
     clColours colours = c;
-    wxFont f = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
-    if(GetFont().IsOk()) { f = GetFont(); }
-    if(GetTextColour().IsOk()) { colours.SetItemTextColour(GetTextColour()); }
-    if(GetBgColour().IsOk()) { colours.SetItemBgColour(GetBgColour()); }
-    dc.SetFont(f);
-
-    if(zebraColouring) {
-        colours.SetItemBgColour(even_row ? colours.GetAlternateColourEven() : colours.GetAlternateColourOdd());
-    }
-
+    if(zebraColouring) { colours.SetItemBgColour(even_row ? c.GetAlternateColourEven() : c.GetAlternateColourOdd()); }
     if(IsSelected() || IsHovered()) {
         dc.SetBrush(IsSelected() ? colours.GetSelItemBgColour() : colours.GetHoverBgColour());
         dc.SetPen(IsSelected() ? colours.GetSelItemBgColour() : colours.GetHoverBgColour());
-        dc.DrawRoundedRectangle(itemRect, 1.5);
+        dc.DrawRoundedRectangle(rowRect, 1.5);
     } else if(colours.GetItemBgColour().IsOk()) {
         dc.SetBrush(colours.GetItemBgColour());
         dc.SetPen(colours.GetItemBgColour());
-        dc.DrawRectangle(itemRect);
+        dc.DrawRectangle(rowRect);
     }
 
-    wxSize textSize = dc.GetTextExtent(GetLabel());
-    int textY = itemRect.GetY() + (m_tree->GetLineHeight() - textSize.GetHeight()) / 2;
-    // Draw the button
-    int textXOffset = 0;
-    if(HasChildren()) {
-        wxPoint pts[3];
-        wxRect buttonRect = GetButtonRect();
-        textXOffset += buttonRect.GetWidth();
-        buttonRect.Deflate((buttonRect.GetWidth() / 3), (buttonRect.GetHeight() / 3));
-        if(IsExpanded()) {
-            pts[0] = buttonRect.GetTopRight();
-            pts[1] = buttonRect.GetBottomRight();
-            pts[2] = buttonRect.GetBottomLeft();
-            dc.SetBrush(colours.GetButtonColour());
-            dc.SetPen(colours.GetButtonColour());
-            dc.DrawPolygon(3, pts);
-        } else {
-            pts[0] = buttonRect.GetTopLeft();
-            pts[1] = buttonRect.GetBottomLeft();
-            pts[2].x = buttonRect.GetRight();
-            pts[2].y = (buttonRect.GetY() + (buttonRect.GetHeight() / 2));
-            dc.SetBrush(*wxTRANSPARENT_BRUSH);
-            dc.SetPen(colours.GetButtonColour());
-            dc.DrawPolygon(3, pts);
+    // Per cell drawings
+    for(size_t i = 0; i < m_cells.size(); ++i) {
+        colours = c; // reset the colours
+        wxFont f = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+        clCellValue& cell = GetColumn(i);
+        if(cell.GetFont().IsOk()) { f = cell.GetFont(); }
+        if(cell.GetTextColour().IsOk()) { colours.SetItemTextColour(cell.GetTextColour()); }
+        if(cell.GetBgColour().IsOk()) { colours.SetItemBgColour(cell.GetBgColour()); }
+        dc.SetFont(f);
+
+        wxSize textSize = dc.GetTextExtent(cell.GetText());
+        int textY = rowRect.GetY() + (m_tree->GetLineHeight() - textSize.GetHeight()) / 2;
+        // Draw the button
+        int textXOffset = m_tree->GetHeader().Item(i).GetRect().GetX();
+        if(i == 0) {
+            // The expand button is only make sense for the first cell
+            if(HasChildren()) {
+                wxPoint pts[3];
+                wxRect buttonRect = GetButtonRect();
+                textXOffset += buttonRect.GetWidth();
+                buttonRect.Deflate((buttonRect.GetWidth() / 3), (buttonRect.GetHeight() / 3));
+                if(IsExpanded()) {
+                    pts[0] = buttonRect.GetTopRight();
+                    pts[1] = buttonRect.GetBottomRight();
+                    pts[2] = buttonRect.GetBottomLeft();
+                    dc.SetBrush(colours.GetButtonColour());
+                    dc.SetPen(colours.GetButtonColour());
+                    dc.DrawPolygon(3, pts);
+                } else {
+                    pts[0] = buttonRect.GetTopLeft();
+                    pts[1] = buttonRect.GetBottomLeft();
+                    pts[2].x = buttonRect.GetRight();
+                    pts[2].y = (buttonRect.GetY() + (buttonRect.GetHeight() / 2));
+                    dc.SetBrush(*wxTRANSPARENT_BRUSH);
+                    dc.SetPen(colours.GetButtonColour());
+                    dc.DrawPolygon(3, pts);
+                }
+            } else {
+                textXOffset += rowRect.GetHeight();
+            }
         }
-    } else {
-        textXOffset += itemRect.GetHeight();
-    }
-
-    int itemIndent = (GetIndentsCount() * m_tree->GetIndent());
-    int bitmapIndex = GetBitmapIndex();
-    if(IsExpanded() && HasChildren() && GetBitmapSelectedIndex() != wxNOT_FOUND) {
-        bitmapIndex = GetBitmapSelectedIndex();
-    }
-
-    if(bitmapIndex != wxNOT_FOUND) {
-        const wxBitmap& bmp = m_tree->GetBitmap(bitmapIndex);
-        if(bmp.IsOk()) {
-            textXOffset += X_SPACER;
-            int bitmapY = itemRect.GetY() + ((itemRect.GetHeight() - bmp.GetScaledHeight()) / 2);
-            dc.DrawBitmap(bmp, itemIndent + textXOffset, bitmapY);
-            textXOffset += bmp.GetScaledWidth();
-            textXOffset += X_SPACER;
+        int itemIndent = (GetIndentsCount() * m_tree->GetIndent());
+        int bitmapIndex = cell.GetBitmapIndex();
+        if(IsExpanded() && HasChildren() && cell.GetBitmapSelectedIndex() != wxNOT_FOUND) {
+            bitmapIndex = cell.GetBitmapSelectedIndex();
         }
+
+        if(bitmapIndex != wxNOT_FOUND) {
+            const wxBitmap& bmp = m_tree->GetBitmap(bitmapIndex);
+            if(bmp.IsOk()) {
+                textXOffset += X_SPACER;
+                int bitmapY = rowRect.GetY() + ((rowRect.GetHeight() - bmp.GetScaledHeight()) / 2);
+                dc.DrawBitmap(bmp, itemIndent + textXOffset, bitmapY);
+                textXOffset += bmp.GetScaledWidth();
+                textXOffset += X_SPACER;
+            }
+        }
+        dc.SetTextForeground(IsSelected() ? colours.GetSelItemTextColour() : colours.GetItemTextColour());
+        
+        // Draw the indentation only for the first cell
+        dc.DrawText(cell.GetText(), (i == 0 ? itemIndent : 0) + textXOffset, textY);
     }
-    dc.SetTextForeground(IsSelected() ? colours.GetSelItemTextColour() : colours.GetItemTextColour());
-    dc.DrawText(GetLabel(), itemIndent + textXOffset, textY);
 }
 
 size_t clTreeCtrlNode::GetChildrenCount(bool recurse) const
@@ -314,18 +325,21 @@ void clTreeCtrlNode::SetHidden(bool b)
 int clTreeCtrlNode::CalcItemWidth(wxDC& dc, int rowHeight, size_t col)
 {
     wxUnusedVar(col);
+    if(col >= m_cells.size()) { return 0; }
+
+    clCellValue& cell = GetColumn(col);
     wxFont f = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
-    if(GetFont().IsOk()) { f = GetFont(); }
+    if(cell.GetFont().IsOk()) { f = cell.GetFont(); }
     dc.SetFont(f);
 
-    wxSize textSize = dc.GetTextExtent(GetLabel());
-    int item_width = 0;
+    wxSize textSize = dc.GetTextExtent(cell.GetText());
+    int item_width = 5;
     // always make room for the twist button
     item_width += rowHeight;
 
-    int bitmapIndex = GetBitmapIndex();
-    if(IsExpanded() && HasChildren() && GetBitmapSelectedIndex() != wxNOT_FOUND) {
-        bitmapIndex = GetBitmapSelectedIndex();
+    int bitmapIndex = cell.GetBitmapIndex();
+    if(IsExpanded() && HasChildren() && cell.GetBitmapSelectedIndex() != wxNOT_FOUND) {
+        bitmapIndex = cell.GetBitmapSelectedIndex();
     }
 
     if(bitmapIndex != wxNOT_FOUND) {
@@ -339,7 +353,7 @@ int clTreeCtrlNode::CalcItemWidth(wxDC& dc, int rowHeight, size_t col)
     int itemIndent = (GetIndentsCount() * m_tree->GetIndent());
     item_width += itemIndent;
     item_width += textSize.GetWidth();
-    item_width += X_SPACER;
+    item_width += 5;
     return item_width;
 }
 

@@ -17,7 +17,7 @@ clTreeCtrlModel::clTreeCtrlModel(clTreeCtrl* tree)
 {
     // Setup a default compare function
     m_shouldInsertBeforeFunc = [&](const wxTreeItemId& a, const wxTreeItemId& b) {
-        return ToPtr(a)->GetLabel().CmpNoCase(ToPtr(b)->GetLabel()) < 0;
+        return ToPtr(a)->GetLabel(0).CmpNoCase(ToPtr(b)->GetLabel(0)) < 0;
     };
 }
 

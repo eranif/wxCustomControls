@@ -58,7 +58,8 @@ public:
     clTreeCtrl(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
         const wxSize& size = wxDefaultSize, long style = 0);
     virtual ~clTreeCtrl();
-    
+
+    const clHeaderBar& GetHeader() const { return m_header; }
     //===--------------------
     // table view support
     //===--------------------
@@ -66,7 +67,7 @@ public:
      * @param header
      */
     void SetHeader(const clHeaderBar& header);
-    
+
     /**
      * @brief the drop action
      */
@@ -241,12 +242,12 @@ public:
     /**
      * @brief set item's image index
      */
-    void SetItemImage(const wxTreeItemId& item, int imageId, int openImageId = wxNOT_FOUND);
+    void SetItemImage(const wxTreeItemId& item, int imageId, int openImageId = wxNOT_FOUND, size_t col = 0);
 
     /**
      * @brief return the associated image id with this item
      */
-    int GetItemImage(const wxTreeItemId& item, bool selectedImage = false) const;
+    int GetItemImage(const wxTreeItemId& item, bool selectedImage = false, size_t col = 0) const;
     /**
      * @brief Returns the first visible item
      */

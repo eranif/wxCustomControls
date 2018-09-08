@@ -42,7 +42,7 @@ protected:
     clTreeCtrlNode* m_next = nullptr;
     clTreeCtrlNode* m_prev = nullptr;
     int m_indentsCount = 0;
-    wxRect m_itemRect;
+    wxRect m_rowRect;
     wxRect m_buttonRect;
 
 protected:
@@ -106,10 +106,10 @@ public:
     void ClearRects();
     void SetRects(const wxRect& rect, const wxRect& buttonRect)
     {
-        m_itemRect = rect;
+        m_rowRect = rect;
         m_buttonRect = buttonRect;
     }
-    const wxRect& GetItemRect() const { return m_itemRect; }
+    const wxRect& GetItemRect() const { return m_rowRect; }
     const wxRect& GetButtonRect() const { return m_buttonRect; }
 
     void AddChild(clTreeCtrlNode* child);

@@ -45,7 +45,7 @@ wxSize clHeaderBar::GetTextSize(const wxString& label) const
 
 void clHeaderBar::Render(wxDC& dc, const wxRect& rect, const clColours& colours)
 {
-    wxColour barBgColour = colours.GetBgColour().ChangeLightness(120);
+    wxColour barBgColour = colours.GetBgColour().ChangeLightness(140);
     clColours _colours = colours;
     _colours.SetBgColour(barBgColour);
 

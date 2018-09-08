@@ -743,7 +743,7 @@ void clTreeCtrl::SetItemBold(const wxTreeItemId& item, bool bold, size_t col)
 {
     clTreeCtrlNode* node = m_model.ToPtr(item);
     CHECK_PTR_RET(node);
-    wxFont f = node->GetFont();
+    wxFont f = node->GetFont(col);
     if(!f.IsOk()) { f = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT); }
     f.SetWeight(bold ? wxFONTWEIGHT_BOLD : wxFONTWEIGHT_NORMAL);
     node->SetFont(f, col);
@@ -971,20 +971,20 @@ wxTreeItemId clTreeCtrl::GetItemParent(const wxTreeItemId& item) const
     return wxTreeItemId(m_model.ToPtr(item)->GetParent());
 }
 
-void clTreeCtrl::SetItemImage(const wxTreeItemId& item, int imageId, int openImageId)
+void clTreeCtrl::SetItemImage(const wxTreeItemId& item, int imageId, int openImageId, size_t col)
 {
     clTreeCtrlNode* node = m_model.ToPtr(item);
     CHECK_PTR_RET(node);
-    node->SetBitmapIndex(imageId);
-    node->SetBitmapSelectedIndex(openImageId);
+    node->SetBitmapIndex(imageId, col);
+    node->SetBitmapSelectedIndex(openImageId, col);
     Refresh();
 }
 
-int clTreeCtrl::GetItemImage(const wxTreeItemId& item, bool selectedImage) const
+int clTreeCtrl::GetItemImage(const wxTreeItemId& item, bool selectedImage, size_t col) const
 {
     if(!item.GetID()) { return wxNOT_FOUND; }
     clTreeCtrlNode* node = m_model.ToPtr(item);
-    return selectedImage ? node->GetBitmapSelectedIndex() : node->GetBitmapIndex();
+    return selectedImage ? node->GetBitmapSelectedIndex(col) : node->GetBitmapIndex(col);
 }
 
 void clTreeCtrl::OnEnterWindow(wxMouseEvent& event)

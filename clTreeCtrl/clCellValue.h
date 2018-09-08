@@ -15,12 +15,12 @@ class WXDLLIMPEXP_SDK clCellValue
     wxFont m_font;
     wxColour m_textColour;
     wxColour m_bgColour;
-
+    bool m_isNull = true;
 public:
     clCellValue();
     clCellValue(const wxString& text, int bmpIndex = wxNOT_FOUND, int bmpOpenIndex = wxNOT_FOUND);
     virtual ~clCellValue();
-    bool IsOk() const { return (!m_text.IsEmpty()) || (m_bitmapIndex != wxNOT_FOUND); }
+    bool IsOk() const { return !m_isNull; }
 
     void SetText(const wxString& text) { this->m_text = text; }
     int GetBitmapIndex() const { return m_bitmapIndex; }

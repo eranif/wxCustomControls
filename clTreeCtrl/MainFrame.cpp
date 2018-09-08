@@ -20,11 +20,13 @@ MainFrame::MainFrame(wxWindow* parent)
     m_tree->SetColours(m_coloursArr[m_selectedColours]);
 
     clHeaderBar header;
-    header.Add("First Name");
-    header.Add("Last Name");
+    header.Add("Path");
+    header.Add("Kind");
     m_tree->SetHeader(header);
 
-    m_tree->AddRoot("Root", -1, -1, nullptr);
+    wxTreeItemId root = m_tree->AddRoot("Root", -1, -1, nullptr);
+    m_tree->SetItemText(root, "??", 1);
+    
     wxLog::SetActiveTarget(new wxLogTextCtrl(m_textCtrlLog));
     // Provide a sorting function to the tree
     std::function<bool(const wxTreeItemId& a, const wxTreeItemId& b)> SortFunc
@@ -131,9 +133,9 @@ void MainFrame::OnOpenFolder(wxCommandEvent& event)
 
     m_path = path;
     wxTreeItemId item = m_tree->AppendItem(m_tree->GetRootItem(), path, 0, 1, new MyItemData(m_path, true));
+    m_tree->SetItemText(item, "Folder", 1);
     m_tree->AppendItem(item, "dummy-node");
     m_tree->SelectItem(item);
-    m_tree->SetItemBold(item, true);
     m_tree->CallAfter(&clTreeCtrl::SetFocus);
 }
 
@@ -161,10 +163,13 @@ void MainFrame::OnItemExpanding(wxTreeEvent& event)
                         // A directory
                         wxTreeItemId folderItem
                             = m_tree->AppendItem(item, filename, 0, 1, new MyItemData(fn.GetFullPath(), true));
+                        m_tree->SetItemText(folderItem, "Folder", 1);
                         m_tree->AppendItem(folderItem, "dummy-node");
                     } else {
                         // A file
-                        m_tree->AppendItem(item, filename, 2, 2, new MyItemData(fn.GetFullPath(), false));
+                        wxTreeItemId fileItem
+                            = m_tree->AppendItem(item, filename, 2, 2, new MyItemData(fn.GetFullPath(), false));
+                        m_tree->SetItemText(fileItem, "File", 1);
                     }
                     cont = dir.GetNext(&filename);
                 }
