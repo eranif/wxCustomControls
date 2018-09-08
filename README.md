@@ -1,6 +1,6 @@
 # clTreeCtrl
 
-This control has a consistent look and feel across all platforms. It uses the exact `wxTreeCtrl` API with slight modifications. The goal is to be able to use it as a drop in replacement in your code for `wxTreeCtrl`.
+This control has a consistent look and feel across all platforms. It uses the exact `wxTreeCtrl` API with slight modifications. The goal is to be able to use it as a drop-in replacement in your code for `wxTreeCtrl`.
 In addition to the traditional tree view, `clTreeCtrl` allows you to display columns (similar to `wxTreeListCtrl`)
 
 Advantages over the standrd wx controls out there:
