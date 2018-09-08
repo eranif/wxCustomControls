@@ -1,6 +1,6 @@
 #ifndef MAINFRAME_H
 #define MAINFRAME_H
-#include "clTreeCtrlNode.h"
+#include "clRowEntry.h"
 #include "wxcrafter.h"
 #include <array>
 

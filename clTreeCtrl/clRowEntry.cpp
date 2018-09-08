@@ -1,6 +1,6 @@
 #include "clCellValue.h"
 #include "clTreeCtrl.h"
-#include "clTreeCtrlNode.h"
+#include "clRowEntry.h"
 #include <functional>
 #include <wx/dc.h>
 #include <wx/settings.h>

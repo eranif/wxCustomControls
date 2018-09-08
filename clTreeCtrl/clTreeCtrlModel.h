@@ -1,7 +1,7 @@
 #ifndef CLTREECTRLMODEL_H
 #define CLTREECTRLMODEL_H
 
-#include "clTreeCtrlNode.h"
+#include "clRowEntry.h"
 #include "codelite_exports.h"
 #include <functional>
 #include <vector>

@@ -8,6 +8,8 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="clRowEntry.h"/>
+    <File Name="clRowEntry.cpp"/>
     <File Name="clCellValue.cpp"/>
     <File Name="clCellValue.h"/>
     <File Name="clHeaderBar.cpp"/>
@@ -20,8 +22,6 @@
     <File Name="clScrolledPanel.h"/>
     <File Name="clScrollBar.cpp"/>
     <File Name="clScrollBar.h"/>
-    <File Name="clTreeCtrlNode.cpp"/>
-    <File Name="clTreeCtrlNode.h"/>
     <File Name="clTreeNodeVisitor.cpp"/>
     <File Name="clTreeNodeVisitor.h"/>
     <File Name="clTreeCtrlModel.cpp"/>
