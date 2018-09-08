@@ -33,11 +33,11 @@ class WXDLLIMPEXP_SDK clTreeCtrl : public clScrolledPanel
 private:
     wxPoint DoFixPoint(const wxPoint& pt);
     wxTreeItemId DoGetSiblingVisibleItem(const wxTreeItemId& item, bool next) const;
-    bool IsItemVisible(clTreeCtrlNode* item) const;
-    void EnsureItemVisible(clTreeCtrlNode* item, bool fromTop);
+    bool IsItemVisible(clRowEntry* item) const;
+    void EnsureItemVisible(clRowEntry* item, bool fromTop);
     int GetNumLineCanFitOnScreen() const;
-    clTreeCtrlNode* GetFirstItemOnScreen();
-    void SetFirstItemOnScreen(clTreeCtrlNode* item);
+    clRowEntry* GetFirstItemOnScreen();
+    void SetFirstItemOnScreen(clRowEntry* item);
     void UpdateScrollBar();
     wxTreeItemId DoScrollLines(int numLines, bool up, wxTreeItemId from, bool selectIt);
     /**

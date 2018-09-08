@@ -5,7 +5,7 @@
 #include <wx/dc.h>
 #include <wx/settings.h>
 
-clTreeCtrlNode::clTreeCtrlNode(clTreeCtrl* tree, const wxString& label, int bitmapIndex, int bitmapSelectedIndex)
+clRowEntry::clRowEntry(clTreeCtrl* tree, const wxString& label, int bitmapIndex, int bitmapSelectedIndex)
     : m_tree(tree)
     , m_model(tree ? &tree->GetModel() : nullptr)
 {
@@ -17,7 +17,7 @@ clTreeCtrlNode::clTreeCtrlNode(clTreeCtrl* tree, const wxString& label, int bitm
     m_cells[0] = cv;
 }
 
-clTreeCtrlNode::~clTreeCtrlNode()
+clRowEntry::~clRowEntry()
 {
     // Delete all the node children
     DeleteAllChildren();
@@ -27,7 +27,7 @@ clTreeCtrlNode::~clTreeCtrlNode()
     if(m_model) { m_model->NodeDeleted(this); }
 }
 
-void clTreeCtrlNode::ConnectNodes(clTreeCtrlNode* first, clTreeCtrlNode* second)
+void clRowEntry::ConnectNodes(clRowEntry* first, clRowEntry* second)
 {
     if(first) { first->m_next = this; }
     this->m_prev = first;
@@ -35,7 +35,7 @@ void clTreeCtrlNode::ConnectNodes(clTreeCtrlNode* first, clTreeCtrlNode* second)
     if(second) { second->m_prev = this; }
 }
 
-void clTreeCtrlNode::InsertChild(clTreeCtrlNode* child, clTreeCtrlNode* prev)
+void clRowEntry::InsertChild(clRowEntry* child, clRowEntry* prev)
 {
     child->SetParent(this);
     child->SetIndentsCount(GetIndentsCount() + 1);
@@ -46,65 +46,65 @@ void clTreeCtrlNode::InsertChild(clTreeCtrlNode* child, clTreeCtrlNode* prev)
         m_children.insert(m_children.begin(), child);
     } else {
         // Insert the item in the parent children list
-        clTreeCtrlNode::Vec_t::iterator iter = m_children.end();
-        iter = std::find_if(m_children.begin(), m_children.end(), [&](clTreeCtrlNode* c) { return c == prev; });
+        clRowEntry::Vec_t::iterator iter = m_children.end();
+        iter = std::find_if(m_children.begin(), m_children.end(), [&](clRowEntry* c) { return c == prev; });
         if(iter != m_children.end()) { ++iter; }
         // if iter is end(), than the is actually appending the item
         m_children.insert(iter, child);
     }
 
     // Connect the linked list for sequential iteration
-    clTreeCtrlNode::Vec_t::iterator iterCur
-        = std::find_if(m_children.begin(), m_children.end(), [&](clTreeCtrlNode* c) { return c == child; });
+    clRowEntry::Vec_t::iterator iterCur
+        = std::find_if(m_children.begin(), m_children.end(), [&](clRowEntry* c) { return c == child; });
 
-    clTreeCtrlNode* nodeBefore = nullptr;
+    clRowEntry* nodeBefore = nullptr;
     // Find the item before and after
     if(iterCur == m_children.begin()) {
         nodeBefore = child->GetParent(); // "this"
     } else {
         --iterCur;
-        clTreeCtrlNode* prevSibling = (*iterCur);
+        clRowEntry* prevSibling = (*iterCur);
         while(prevSibling && prevSibling->HasChildren()) { prevSibling = prevSibling->GetLastChild(); }
         nodeBefore = prevSibling;
     }
     child->ConnectNodes(nodeBefore, nodeBefore->m_next);
 }
 
-void clTreeCtrlNode::AddChild(clTreeCtrlNode* child)
+void clRowEntry::AddChild(clRowEntry* child)
 {
     InsertChild(child, m_children.empty() ? nullptr : m_children.back());
 }
 
-void clTreeCtrlNode::SetParent(clTreeCtrlNode* parent)
+void clRowEntry::SetParent(clRowEntry* parent)
 {
     if(m_parent) { m_parent->DeleteChild(this); }
     m_parent = parent;
 }
 
-void clTreeCtrlNode::DeleteChild(clTreeCtrlNode* child)
+void clRowEntry::DeleteChild(clRowEntry* child)
 {
     // first remove all of its children
     // do this in a while loop since 'child->RemoveChild(c);' will alter
     // the array and will invalidate all iterators
     while(!child->m_children.empty()) {
-        clTreeCtrlNode* c = child->m_children[0];
+        clRowEntry* c = child->m_children[0];
         child->DeleteChild(c);
     }
     // Connect the list
-    clTreeCtrlNode* prev = child->m_prev;
-    clTreeCtrlNode* next = child->m_next;
+    clRowEntry* prev = child->m_prev;
+    clRowEntry* next = child->m_next;
     if(prev) { prev->m_next = next; }
     if(next) { next->m_prev = prev; }
     // Now disconnect this child from this node
-    clTreeCtrlNode::Vec_t::iterator iter
-        = std::find_if(m_children.begin(), m_children.end(), [&](clTreeCtrlNode* c) { return c == child; });
+    clRowEntry::Vec_t::iterator iter
+        = std::find_if(m_children.begin(), m_children.end(), [&](clRowEntry* c) { return c == child; });
     if(iter != m_children.end()) { m_children.erase(iter); }
     wxDELETE(child);
 }
 
-int clTreeCtrlNode::GetExpandedLines() const
+int clRowEntry::GetExpandedLines() const
 {
-    clTreeCtrlNode* node = const_cast<clTreeCtrlNode*>(this);
+    clRowEntry* node = const_cast<clRowEntry*>(this);
     int counter = 0;
     while(node) {
         if(node->IsVisible()) { ++counter; }
@@ -113,11 +113,11 @@ int clTreeCtrlNode::GetExpandedLines() const
     return counter;
 }
 
-void clTreeCtrlNode::GetNextItems(int count, clTreeCtrlNode::Vec_t& items)
+void clRowEntry::GetNextItems(int count, clRowEntry::Vec_t& items)
 {
     items.reserve(count);
     items.push_back(this);
-    clTreeCtrlNode* next = GetNext();
+    clRowEntry* next = GetNext();
     while(next) {
         if(next->IsVisible()) { items.push_back(next); }
         if((int)items.size() == count) { return; }
@@ -125,11 +125,11 @@ void clTreeCtrlNode::GetNextItems(int count, clTreeCtrlNode::Vec_t& items)
     }
 }
 
-void clTreeCtrlNode::GetPrevItems(int count, clTreeCtrlNode::Vec_t& items)
+void clRowEntry::GetPrevItems(int count, clRowEntry::Vec_t& items)
 {
     items.reserve(count);
     items.insert(items.begin(), this);
-    clTreeCtrlNode* prev = GetPrev();
+    clRowEntry* prev = GetPrev();
     while(prev) {
         if(prev->IsVisible()) { items.insert(items.begin(), prev); }
         if((int)items.size() == count) { return; }
@@ -137,24 +137,24 @@ void clTreeCtrlNode::GetPrevItems(int count, clTreeCtrlNode::Vec_t& items)
     }
 }
 
-clTreeCtrlNode* clTreeCtrlNode::GetVisibleItem(int index)
+clRowEntry* clRowEntry::GetVisibleItem(int index)
 {
-    clTreeCtrlNode::Vec_t items;
+    clRowEntry::Vec_t items;
     GetNextItems(index, items);
     if((int)items.size() != index) { return nullptr; }
     return items.back();
 }
 
-void clTreeCtrlNode::UnselectAll()
+void clRowEntry::UnselectAll()
 {
-    clTreeCtrlNode* item = const_cast<clTreeCtrlNode*>(this);
+    clRowEntry* item = const_cast<clRowEntry*>(this);
     while(item) {
         item->SetSelected(false);
         item = item->GetNext();
     }
 }
 
-bool clTreeCtrlNode::SetExpanded(bool b)
+bool clRowEntry::SetExpanded(bool b)
 {
     if(!m_model) { return false; }
     if(IsHidden() && !b) {
@@ -180,13 +180,13 @@ bool clTreeCtrlNode::SetExpanded(bool b)
     return true;
 }
 
-void clTreeCtrlNode::ClearRects()
+void clRowEntry::ClearRects()
 {
     m_buttonRect = wxRect();
     m_rowRect = wxRect();
 }
 
-void clTreeCtrlNode::Render(wxDC& dc, const clColours& c, int row_index)
+void clRowEntry::Render(wxDC& dc, const clColours& c, int row_index)
 {
     wxRect rowRect = GetItemRect();
     bool zebraColouring = (m_tree->GetTreeStyle() & wxTR_ROW_LINES);
@@ -269,7 +269,7 @@ void clTreeCtrlNode::Render(wxDC& dc, const clColours& c, int row_index)
     }
 }
 
-size_t clTreeCtrlNode::GetChildrenCount(bool recurse) const
+size_t clRowEntry::GetChildrenCount(bool recurse) const
 {
     if(!recurse) {
         return m_children.size();
@@ -280,9 +280,9 @@ size_t clTreeCtrlNode::GetChildrenCount(bool recurse) const
     }
 }
 
-bool clTreeCtrlNode::IsVisible() const
+bool clRowEntry::IsVisible() const
 {
-    clTreeCtrlNode* parent = GetParent();
+    clRowEntry* parent = GetParent();
     while(parent) {
         if(!parent->IsExpanded()) { return false; }
         parent = parent->GetParent();
@@ -290,28 +290,28 @@ bool clTreeCtrlNode::IsVisible() const
     return true;
 }
 
-void clTreeCtrlNode::DeleteAllChildren()
+void clRowEntry::DeleteAllChildren()
 {
     while(!m_children.empty()) {
-        clTreeCtrlNode* c = m_children[0];
+        clRowEntry* c = m_children[0];
         // DeleteChild will remove it from the array
         DeleteChild(c);
     }
 }
 
-clTreeCtrlNode* clTreeCtrlNode::GetLastChild() const
+clRowEntry* clRowEntry::GetLastChild() const
 {
     if(m_children.empty()) { return nullptr; }
     return m_children.back();
 }
 
-clTreeCtrlNode* clTreeCtrlNode::GetFirstChild() const
+clRowEntry* clRowEntry::GetFirstChild() const
 {
     if(m_children.empty()) { return nullptr; }
     return m_children[0];
 }
 
-void clTreeCtrlNode::SetHidden(bool b)
+void clRowEntry::SetHidden(bool b)
 {
     if(b && !IsRoot()) { return; }
     SetFlag(kNF_Hidden, b);
@@ -322,7 +322,7 @@ void clTreeCtrlNode::SetHidden(bool b)
     }
 }
 
-int clTreeCtrlNode::CalcItemWidth(wxDC& dc, int rowHeight, size_t col)
+int clRowEntry::CalcItemWidth(wxDC& dc, int rowHeight, size_t col)
 {
     wxUnusedVar(col);
     if(col >= m_cells.size()) { return 0; }
@@ -357,42 +357,42 @@ int clTreeCtrlNode::CalcItemWidth(wxDC& dc, int rowHeight, size_t col)
     return item_width;
 }
 
-void clTreeCtrlNode::SetBitmapIndex(int bitmapIndex, size_t col)
+void clRowEntry::SetBitmapIndex(int bitmapIndex, size_t col)
 {
     clCellValue& cell = GetColumn(col);
     if(!cell.IsOk()) { return; }
     return cell.SetBitmapIndex(bitmapIndex);
 }
 
-int clTreeCtrlNode::GetBitmapIndex(size_t col) const
+int clRowEntry::GetBitmapIndex(size_t col) const
 {
     const clCellValue& cell = GetColumn(col);
     if(!cell.IsOk()) { return wxNOT_FOUND; }
     return cell.GetBitmapIndex();
 }
 
-void clTreeCtrlNode::SetBitmapSelectedIndex(int bitmapIndex, size_t col)
+void clRowEntry::SetBitmapSelectedIndex(int bitmapIndex, size_t col)
 {
     clCellValue& cell = GetColumn(col);
     if(!cell.IsOk()) { return; }
     return cell.SetBitmapSelectedIndex(bitmapIndex);
 }
 
-int clTreeCtrlNode::GetBitmapSelectedIndex(size_t col) const
+int clRowEntry::GetBitmapSelectedIndex(size_t col) const
 {
     const clCellValue& cell = GetColumn(col);
     if(!cell.IsOk()) { return wxNOT_FOUND; }
     return cell.GetBitmapSelectedIndex();
 }
 
-void clTreeCtrlNode::SetLabel(const wxString& label, size_t col)
+void clRowEntry::SetLabel(const wxString& label, size_t col)
 {
     clCellValue& cell = GetColumn(col);
     if(!cell.IsOk()) { return; }
     return cell.SetText(label);
 }
 
-const wxString& clTreeCtrlNode::GetLabel(size_t col) const
+const wxString& clRowEntry::GetLabel(size_t col) const
 {
     const clCellValue& cell = GetColumn(col);
     if(!cell.IsOk()) {
@@ -402,7 +402,7 @@ const wxString& clTreeCtrlNode::GetLabel(size_t col) const
     return cell.GetText();
 }
 
-const clCellValue& clTreeCtrlNode::GetColumn(size_t col) const
+const clCellValue& clRowEntry::GetColumn(size_t col) const
 {
     if(col >= m_cells.size()) {
         static clCellValue null_column;
@@ -411,7 +411,7 @@ const clCellValue& clTreeCtrlNode::GetColumn(size_t col) const
     return m_cells[col];
 }
 
-clCellValue& clTreeCtrlNode::GetColumn(size_t col)
+clCellValue& clRowEntry::GetColumn(size_t col)
 {
     if(col >= m_cells.size()) {
         static clCellValue null_column;
@@ -420,28 +420,28 @@ clCellValue& clTreeCtrlNode::GetColumn(size_t col)
     return m_cells[col];
 }
 
-void clTreeCtrlNode::SetBgColour(const wxColour& bgColour, size_t col)
+void clRowEntry::SetBgColour(const wxColour& bgColour, size_t col)
 {
     clCellValue& cell = GetColumn(col);
     if(!cell.IsOk()) { return; }
     cell.SetBgColour(bgColour);
 }
 
-void clTreeCtrlNode::SetFont(const wxFont& font, size_t col)
+void clRowEntry::SetFont(const wxFont& font, size_t col)
 {
     clCellValue& cell = GetColumn(col);
     if(!cell.IsOk()) { return; }
     cell.SetFont(font);
 }
 
-void clTreeCtrlNode::SetTextColour(const wxColour& textColour, size_t col)
+void clRowEntry::SetTextColour(const wxColour& textColour, size_t col)
 {
     clCellValue& cell = GetColumn(col);
     if(!cell.IsOk()) { return; }
     cell.SetTextColour(textColour);
 }
 
-const wxColour& clTreeCtrlNode::GetBgColour(size_t col) const
+const wxColour& clRowEntry::GetBgColour(size_t col) const
 {
     const clCellValue& cell = GetColumn(col);
     if(!cell.IsOk()) {
@@ -451,7 +451,7 @@ const wxColour& clTreeCtrlNode::GetBgColour(size_t col) const
     return cell.GetBgColour();
 }
 
-const wxFont& clTreeCtrlNode::GetFont(size_t col) const
+const wxFont& clRowEntry::GetFont(size_t col) const
 {
     const clCellValue& cell = GetColumn(col);
     if(!cell.IsOk()) {
@@ -461,7 +461,7 @@ const wxFont& clTreeCtrlNode::GetFont(size_t col) const
     return cell.GetFont();
 }
 
-const wxColour& clTreeCtrlNode::GetTextColour(size_t col) const
+const wxColour& clRowEntry::GetTextColour(size_t col) const
 {
     const clCellValue& cell = GetColumn(col);
     if(!cell.IsOk()) {
