@@ -56,3 +56,6 @@ As a bonus, no more `wxImageList`! - `clTreeCtrl` uses `std::vector<wxBitmap>` f
 
 The code is licensed under the MIT license, see the LICENSE file for more details
 
+![alt text](https://github.com/eranif/clTreeCtrl/blob/master/clTreeCtrl-Linux.png)
+
+![alt text](https://github.com/eranif/clTreeCtrl/blob/master/clTreeCtrl-Windows.png)
