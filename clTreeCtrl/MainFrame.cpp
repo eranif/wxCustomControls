@@ -1,10 +1,12 @@
 #include "MainFrame.h"
 #include "clTreeCtrl.h"
+#include <cmath>
 #include <wx/aboutdlg.h>
 #include <wx/dir.h>
 #include <wx/dirdlg.h>
 #include <wx/msgdlg.h>
 #include <wx/numdlg.h>
+#include <wx/utils.h>
 
 MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
@@ -22,10 +24,12 @@ MainFrame::MainFrame(wxWindow* parent)
     clHeaderBar header;
     header.Add("Path");
     header.Add("Kind");
+    header.Add("Size");
     m_tree->SetHeader(header);
 
     wxTreeItemId root = m_tree->AddRoot("Root", -1, -1, nullptr);
     m_tree->SetItemText(root, "??", 1);
+    m_tree->SetItemText(root, "0KB", 2);
 
     wxLog::SetActiveTarget(new wxLogTextCtrl(m_textCtrlLog));
     // Provide a sorting function to the tree
@@ -96,7 +100,17 @@ MainFrame::MainFrame(wxWindow* parent)
         LogMessage(wxString() << "Context menu for item: " << m_tree->GetItemText(evt.GetItem()));
         wxMenu menu;
         menu.Append(wxID_OPEN);
-        menu.Append(wxID_REFRESH);
+        menu.Bind(wxEVT_MENU,
+            [&](wxCommandEvent& e) {
+                wxArrayTreeItemIds items;
+                if(m_tree->GetSelections(items)) {
+                    for(size_t i = 0; i < items.size(); ++i) {
+                        MyItemData* cd = dynamic_cast<MyItemData*>(m_tree->GetItemData(items[i]));
+                        if(cd) { ::wxLaunchDefaultApplication(cd->GetPath()); }
+                    }
+                }
+            },
+            wxID_OPEN);
         m_tree->PopupMenu(&menu);
     });
 }
@@ -134,6 +148,7 @@ void MainFrame::OnOpenFolder(wxCommandEvent& event)
     m_path = path;
     wxTreeItemId item = m_tree->AppendItem(m_tree->GetRootItem(), path, 0, 1, new MyItemData(m_path, true));
     m_tree->SetItemText(item, "Folder", 1);
+    m_tree->SetItemText(item, "0KB", 2);
     m_tree->AppendItem(item, "dummy-node");
     m_tree->SelectItem(item);
     m_tree->CallAfter(&clTreeCtrl::SetFocus);
@@ -164,12 +179,16 @@ void MainFrame::OnItemExpanding(wxTreeEvent& event)
                         wxTreeItemId folderItem
                             = m_tree->AppendItem(item, filename, 0, 1, new MyItemData(fn.GetFullPath(), true));
                         m_tree->SetItemText(folderItem, "Folder", 1);
+                        m_tree->SetItemText(folderItem, "0KB", 2);
                         m_tree->AppendItem(folderItem, "dummy-node");
                     } else {
                         // A file
                         wxTreeItemId fileItem
                             = m_tree->AppendItem(item, filename, 2, 2, new MyItemData(fn.GetFullPath(), false));
                         m_tree->SetItemText(fileItem, "File", 1);
+                        wxString t;
+                        t << std::ceil((double)fn.GetSize().ToDouble() / 1024.0) << "KB";
+                        m_tree->SetItemText(fileItem, t, 2);
                     }
                     cont = dir.GetNext(&filename);
                 }
