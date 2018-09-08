@@ -2,6 +2,9 @@
 #define CLSCROLLEDPANEL_H
 
 #include "codelite_exports.h"
+#include <wx/bitmap.h>
+#include <wx/dcgraph.h>
+#include <wx/dcmemory.h>
 #include <wx/panel.h>
 #include <wx/scrolbar.h>
 
@@ -10,6 +13,9 @@ class WXDLLIMPEXP_SDK clScrolledPanel : public wxWindow
 private:
     wxScrollBar* m_vsb = nullptr;
     int m_pageSize = 0;
+    wxBitmap m_tmpBmp;
+    wxMemoryDC* m_memDC = nullptr;
+    wxGCDC* m_gcdc = nullptr;
 
 protected:
     virtual void OnVScroll(wxScrollEvent& event);
@@ -19,7 +25,9 @@ public:
     clScrolledPanel(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
         const wxSize& size = wxDefaultSize, long style = 0);
     virtual ~clScrolledPanel();
-
+    
+    wxDC& GetTempDC() const { return *m_gcdc; }
+    
     /**
      * @brief return the number lines can fit into the page (vertically)
      */

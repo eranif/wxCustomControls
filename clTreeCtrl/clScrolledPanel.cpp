@@ -33,10 +33,17 @@ clScrolledPanel::clScrolledPanel(wxWindow* parent, wxWindowID id, const wxPoint&
         }
     });
 #endif
+    m_tmpBmp = wxBitmap(1, 1);
+    m_memDC = new wxMemoryDC(m_tmpBmp);
+    m_gcdc = new wxGCDC(*m_memDC);
 }
 
 clScrolledPanel::~clScrolledPanel()
 {
+    // Destory the DCs in the reverse order of their creation
+    wxDELETE(m_gcdc);
+    wxDELETE(m_memDC);
+    
     m_vsb->Unbind(wxEVT_SCROLL_THUMBTRACK, &clScrolledPanel::OnVScroll, this);
     m_vsb->Unbind(wxEVT_SCROLL_LINEDOWN, &clScrolledPanel::OnVScroll, this);
     m_vsb->Unbind(wxEVT_SCROLL_LINEUP, &clScrolledPanel::OnVScroll, this);

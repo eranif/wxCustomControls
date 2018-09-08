@@ -1,22 +1,16 @@
+#include "clCellValue.h"
 #include "clTreeCtrl.h"
 #include "clTreeCtrlNode.h"
 #include <functional>
 #include <wx/dc.h>
 #include <wx/settings.h>
 
-clTreeCtrlNode::clTreeCtrlNode(clTreeCtrl* tree)
-    : m_tree(tree)
-    , m_model(tree ? &tree->GetModel() : nullptr)
-{
-}
-
 clTreeCtrlNode::clTreeCtrlNode(clTreeCtrl* tree, const wxString& label, int bitmapIndex, int bitmapSelectedIndex)
     : m_tree(tree)
     , m_model(tree ? &tree->GetModel() : nullptr)
-    , m_label(label)
-    , m_bitmapIndex(bitmapIndex)
-    , m_bitmapSelectedIndex(bitmapSelectedIndex)
 {
+    clCellValue cv(label, bitmapIndex, bitmapSelectedIndex);
+    m_cells.push_back(cv);
 }
 
 clTreeCtrlNode::~clTreeCtrlNode()
@@ -188,11 +182,11 @@ void clTreeCtrlNode::ClearRects()
     m_itemRect = wxRect();
 }
 
-void clTreeCtrlNode::Render(wxDC& dc, const clColours& c, int visibileIndex)
+void clTreeCtrlNode::Render(wxDC& dc, const clColours& c, int row_index)
 {
     wxRect itemRect = GetItemRect();
     bool zebraColouring = (m_tree->GetTreeStyle() & wxTR_ROW_LINES);
-    bool even_row = ((visibileIndex % 2) == 0);
+    bool even_row = ((row_index % 2) == 0);
 
     clColours colours = c;
     wxFont f = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
@@ -317,32 +311,148 @@ void clTreeCtrlNode::SetHidden(bool b)
     }
 }
 
-void clColours::InitDefaults()
+int clTreeCtrlNode::CalcItemWidth(wxDC& dc, int rowHeight, size_t col)
 {
-    itemTextColour = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT);
-    selItemTextColour = itemTextColour;
-    selItemBgColour = wxColour("rgb(199,203,209)");
-    buttonColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DSHADOW);
-    hoverBgColour = wxColour("rgb(219,221,224)");
-    bgColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE);
-    scrolBarButton = wxSystemSettings::GetColour(wxSYS_COLOUR_3DSHADOW);
-    scrollBarBgColour = bgColour.ChangeLightness(95); // A bit darker
-    itemBgColour = bgColour;
-    alternateColourEven = bgColour.ChangeLightness(105);
-    alternateColourOdd = bgColour.ChangeLightness(95);
+    wxUnusedVar(col);
+    wxFont f = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+    if(GetFont().IsOk()) { f = GetFont(); }
+    dc.SetFont(f);
+
+    wxSize textSize = dc.GetTextExtent(GetLabel());
+    int item_width = 0;
+    // always make room for the twist button
+    item_width += rowHeight;
+
+    int bitmapIndex = GetBitmapIndex();
+    if(IsExpanded() && HasChildren() && GetBitmapSelectedIndex() != wxNOT_FOUND) {
+        bitmapIndex = GetBitmapSelectedIndex();
+    }
+
+    if(bitmapIndex != wxNOT_FOUND) {
+        const wxBitmap& bmp = m_tree->GetBitmap(bitmapIndex);
+        if(bmp.IsOk()) {
+            item_width += X_SPACER;
+            item_width += bmp.GetScaledWidth();
+            item_width += X_SPACER;
+        }
+    }
+    int itemIndent = (GetIndentsCount() * m_tree->GetIndent());
+    item_width += itemIndent;
+    item_width += textSize.GetWidth();
+    item_width += X_SPACER;
+    return item_width;
 }
 
-void clColours::InitDarkDefaults()
+void clTreeCtrlNode::SetBitmapIndex(int bitmapIndex, size_t col)
 {
-    bgColour = wxColour("#1c2833");
-    itemTextColour = wxColour("#eaecee");
-    selItemTextColour = *wxWHITE;
-    selItemBgColour = wxColour("#566573");
-    buttonColour = itemTextColour;
-    hoverBgColour = wxColour("#2c3e50");
-    itemBgColour = bgColour;
-    scrolBarButton = selItemBgColour;
-    scrollBarBgColour = wxColour("#212f3d"); // A bit darker
-    alternateColourEven = bgColour.ChangeLightness(105);
-    alternateColourOdd = bgColour.ChangeLightness(95);
+    clCellValue& cell = GetColumn(col);
+    if(!cell.IsOk()) { return; }
+    return cell.SetBitmapIndex(bitmapIndex);
+}
+
+int clTreeCtrlNode::GetBitmapIndex(size_t col) const
+{
+    const clCellValue& cell = GetColumn(col);
+    if(!cell.IsOk()) { return wxNOT_FOUND; }
+    return cell.GetBitmapIndex();
+}
+
+void clTreeCtrlNode::SetBitmapSelectedIndex(int bitmapIndex, size_t col)
+{
+    clCellValue& cell = GetColumn(col);
+    if(!cell.IsOk()) { return; }
+    return cell.SetBitmapSelectedIndex(bitmapIndex);
+}
+
+int clTreeCtrlNode::GetBitmapSelectedIndex(size_t col) const
+{
+    const clCellValue& cell = GetColumn(col);
+    if(!cell.IsOk()) { return wxNOT_FOUND; }
+    return cell.GetBitmapSelectedIndex();
+}
+
+void clTreeCtrlNode::SetLabel(const wxString& label, size_t col)
+{
+    clCellValue& cell = GetColumn(col);
+    if(!cell.IsOk()) { return; }
+    return cell.SetText(label);
+}
+
+const wxString& clTreeCtrlNode::GetLabel(size_t col) const
+{
+    const clCellValue& cell = GetColumn(col);
+    if(!cell.IsOk()) {
+        static wxString empty_string;
+        return empty_string;
+    }
+    return cell.GetText();
+}
+
+const clCellValue& clTreeCtrlNode::GetColumn(size_t col) const
+{
+    if(col >= m_cells.size()) {
+        static clCellValue null_column;
+        return null_column;
+    }
+    return m_cells[col];
+}
+
+clCellValue& clTreeCtrlNode::GetColumn(size_t col)
+{
+    if(col >= m_cells.size()) {
+        static clCellValue null_column;
+        return null_column;
+    }
+    return m_cells[col];
+}
+
+void clTreeCtrlNode::SetBgColour(const wxColour& bgColour, size_t col)
+{
+    clCellValue& cell = GetColumn(col);
+    if(!cell.IsOk()) { return; }
+    cell.SetBgColour(bgColour);
+}
+
+void clTreeCtrlNode::SetFont(const wxFont& font, size_t col)
+{
+    clCellValue& cell = GetColumn(col);
+    if(!cell.IsOk()) { return; }
+    cell.SetFont(font);
+}
+
+void clTreeCtrlNode::SetTextColour(const wxColour& textColour, size_t col)
+{
+    clCellValue& cell = GetColumn(col);
+    if(!cell.IsOk()) { return; }
+    cell.SetTextColour(textColour);
+}
+
+const wxColour& clTreeCtrlNode::GetBgColour(size_t col) const
+{
+    const clCellValue& cell = GetColumn(col);
+    if(!cell.IsOk()) {
+        static wxColour invalid_colour;
+        return invalid_colour;
+    }
+    return cell.GetBgColour();
+}
+
+const wxFont& clTreeCtrlNode::GetFont(size_t col) const
+{
+    const clCellValue& cell = GetColumn(col);
+    if(!cell.IsOk()) {
+        static wxFont invalid_font;
+        return invalid_font;
+    }
+    return cell.GetFont();
+}
+
+const wxColour& clTreeCtrlNode::GetTextColour(size_t col) const
+{
+    const clCellValue& cell = GetColumn(col);
+    if(!cell.IsOk()) {
+        static wxColour invalid_colour;
+        return invalid_colour;
+    }
+    return cell.GetTextColour();
 }

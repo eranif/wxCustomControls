@@ -40,10 +40,7 @@ void clTreeCtrlModel::GetPrevItems(clTreeCtrlNode* from, int count, clTreeCtrlNo
 wxTreeItemId clTreeCtrlModel::AddRoot(const wxString& text, int image, int selImage, wxTreeItemData* data)
 {
     if(m_root) { return wxTreeItemId(m_root); }
-    m_root = new clTreeCtrlNode(m_tree);
-    m_root->SetLabel(text);
-    m_root->SetBitmapIndex(image);
-    m_root->SetBitmapSelectedIndex(selImage);
+    m_root = new clTreeCtrlNode(m_tree, text, image, selImage);
     m_root->SetClientData(data);
     if(m_tree->GetTreeStyle() & wxTR_HIDE_ROOT) {
         m_root->SetHidden(true);

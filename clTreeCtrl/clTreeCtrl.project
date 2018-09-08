@@ -8,6 +8,10 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="clCellValue.cpp"/>
+    <File Name="clCellValue.h"/>
+    <File Name="clHeaderBar.cpp"/>
+    <File Name="clHeaderBar.h"/>
     <File Name="clColours.cpp"/>
     <File Name="clColours.h"/>
     <File Name="clHeaderItem.cpp"/>

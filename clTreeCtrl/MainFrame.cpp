@@ -19,6 +19,11 @@ MainFrame::MainFrame(wxWindow* parent)
 
     m_tree->SetColours(m_coloursArr[m_selectedColours]);
 
+    clHeaderBar header;
+    header.Add("First Name");
+    header.Add("Last Name");
+    m_tree->SetHeader(header);
+
     m_tree->AddRoot("Root", -1, -1, nullptr);
     wxLog::SetActiveTarget(new wxLogTextCtrl(m_textCtrlLog));
     // Provide a sorting function to the tree

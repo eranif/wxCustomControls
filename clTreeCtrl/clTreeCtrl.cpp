@@ -58,12 +58,7 @@ clTreeCtrl::clTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
     , m_dragStartTime((time_t)-1)
 {
     SetBackgroundStyle(wxBG_STYLE_PAINT);
-
-    wxBitmap bmp(1, 1);
-    wxMemoryDC memDC(bmp);
-    wxFont font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
-    memDC.SetFont(font);
-    wxSize textSize = memDC.GetTextExtent("Tp");
+    wxSize textSize = GetTextSize("Tp");
     m_lineHeight = clTreeCtrlNode::Y_SPACER + textSize.GetHeight() + clTreeCtrlNode::Y_SPACER;
     SetIndent(m_lineHeight);
     Bind(wxEVT_IDLE, &clTreeCtrl::OnIdle, this);
@@ -108,10 +103,14 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
     wxBufferedPaintDC pdc(this);
     wxGCDC dc(pdc);
 
-    wxRect clientRect = GetClientRect();
+    wxRect clientRect = GetItemsRect();
     dc.SetPen(m_colours.GetBgColour());
     dc.SetBrush(m_colours.GetBgColour());
     dc.DrawRectangle(clientRect);
+
+    wxRect headerRect = GetClientRect();
+    headerRect.SetHeight(m_header.GetHeight());
+    m_header.Render(dc, headerRect, m_colours);
 
     if(!m_model.GetRoot()) {
         // Reset the various items
@@ -121,7 +120,7 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
         return;
     }
 
-    dc.SetClippingRegion(GetClientRect());
+    dc.SetClippingRegion(GetItemsRect());
     int maxItems = GetNumLineCanFitOnScreen();
     if(!GetFirstItemOnScreen()) { SetFirstItemOnScreen(m_model.GetRoot()); }
     clTreeCtrlNode* firstItem = GetFirstItemOnScreen();
@@ -163,6 +162,7 @@ wxTreeItemId clTreeCtrl::InsertItem(const wxTreeItemId& parent, const wxTreeItem
     int image, int selImage, wxTreeItemData* data)
 {
     wxTreeItemId item = m_model.InsertItem(parent, previous, text, image, selImage, data);
+    DoUpdateHeader(item);
     return item;
 }
 
@@ -170,12 +170,14 @@ wxTreeItemId clTreeCtrl::AppendItem(
     const wxTreeItemId& parent, const wxString& text, int image, int selImage, wxTreeItemData* data)
 {
     wxTreeItemId item = m_model.AppendItem(parent, text, image, selImage, data);
+    DoUpdateHeader(item);
     return item;
 }
 
 wxTreeItemId clTreeCtrl::AddRoot(const wxString& text, int image, int selImage, wxTreeItemData* data)
 {
     wxTreeItemId root = m_model.AddRoot(text, image, selImage, data);
+    DoUpdateHeader(root);
     return root;
 }
 
@@ -435,11 +437,11 @@ wxTreeItemId clTreeCtrl::GetNextChild(const wxTreeItemId& item, wxTreeItemIdValu
     return child;
 }
 
-wxString clTreeCtrl::GetItemText(const wxTreeItemId& item) const
+wxString clTreeCtrl::GetItemText(const wxTreeItemId& item, size_t col) const
 {
     if(!item.GetID()) return "";
     clTreeCtrlNode* node = m_model.ToPtr(item);
-    return node->GetLabel();
+    return node->GetLabel(col);
 }
 
 wxTreeItemData* clTreeCtrl::GetItemData(const wxTreeItemId& item) const
@@ -678,7 +680,7 @@ void clTreeCtrl::EnsureItemVisible(clTreeCtrlNode* item, bool fromTop)
 
 int clTreeCtrl::GetNumLineCanFitOnScreen() const
 {
-    wxRect clientRect = GetClientRect();
+    wxRect clientRect = GetItemsRect();
     int max_lines_on_screen = ceil(clientRect.GetHeight() / m_lineHeight);
     return max_lines_on_screen;
 }
@@ -699,68 +701,71 @@ void clTreeCtrl::SetItemData(const wxTreeItemId& item, wxTreeItemData* data)
     node->SetClientData(data);
 }
 
-void clTreeCtrl::SetItemBackgroundColour(const wxTreeItemId& item, const wxColour& colour)
+void clTreeCtrl::SetItemBackgroundColour(const wxTreeItemId& item, const wxColour& colour, size_t col)
 {
     clTreeCtrlNode* node = m_model.ToPtr(item);
     CHECK_PTR_RET(node);
-    node->SetBgColour(colour);
+    node->SetBgColour(colour, col);
     Refresh();
 }
 
-wxColour clTreeCtrl::GetItemBackgroudColour(const wxTreeItemId& item) const
+wxColour clTreeCtrl::GetItemBackgroudColour(const wxTreeItemId& item, size_t col) const
 {
     clTreeCtrlNode* node = m_model.ToPtr(item);
     if(!node) { return wxNullColour; }
-    return node->GetBgColour();
+    return node->GetBgColour(col);
 }
 
-void clTreeCtrl::SetItemTextColour(const wxTreeItemId& item, const wxColour& colour)
+void clTreeCtrl::SetItemTextColour(const wxTreeItemId& item, const wxColour& colour, size_t col)
 {
     clTreeCtrlNode* node = m_model.ToPtr(item);
     CHECK_PTR_RET(node);
-    node->SetTextColour(colour);
+    node->SetTextColour(colour, col);
     Refresh();
 }
 
-wxColour clTreeCtrl::GetItemTextColour(const wxTreeItemId& item) const
+wxColour clTreeCtrl::GetItemTextColour(const wxTreeItemId& item, size_t col) const
 {
     clTreeCtrlNode* node = m_model.ToPtr(item);
     if(!node) { return wxNullColour; }
-    return node->GetTextColour();
+    return node->GetTextColour(col);
 }
 
-void clTreeCtrl::SetItemText(const wxTreeItemId& item, const wxString& text)
+void clTreeCtrl::SetItemText(const wxTreeItemId& item, const wxString& text, size_t col)
 {
     clTreeCtrlNode* node = m_model.ToPtr(item);
     CHECK_PTR_RET(node);
-    node->SetLabel(text);
+    node->SetLabel(text, col);
     Refresh();
 }
 
-void clTreeCtrl::SetItemBold(const wxTreeItemId& item, bool bold)
+void clTreeCtrl::SetItemBold(const wxTreeItemId& item, bool bold, size_t col)
 {
     clTreeCtrlNode* node = m_model.ToPtr(item);
     CHECK_PTR_RET(node);
     wxFont f = node->GetFont();
     if(!f.IsOk()) { f = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT); }
     f.SetWeight(bold ? wxFONTWEIGHT_BOLD : wxFONTWEIGHT_NORMAL);
-    node->SetFont(f);
+    node->SetFont(f, col);
+    
+    // Changing font can change the width of the text, so update the header if needed
+    DoUpdateHeader(item);
     Refresh();
 }
 
-void clTreeCtrl::SetItemFont(const wxTreeItemId& item, const wxFont& font)
+void clTreeCtrl::SetItemFont(const wxTreeItemId& item, const wxFont& font, size_t col)
 {
     clTreeCtrlNode* node = m_model.ToPtr(item);
     CHECK_PTR_RET(node);
-    node->SetFont(font);
+    node->SetFont(font, col);
     Refresh();
 }
 
-wxFont clTreeCtrl::GetItemFont(const wxTreeItemId& item) const
+wxFont clTreeCtrl::GetItemFont(const wxTreeItemId& item, size_t col) const
 {
     clTreeCtrlNode* node = m_model.ToPtr(item);
     if(!node) { return wxNullFont; }
-    return node->GetFont();
+    return node->GetFont(col);
 }
 
 void clTreeCtrl::OnContextMenu(wxContextMenuEvent& event)
@@ -807,7 +812,7 @@ void clTreeCtrl::SetSortFunction(const std::function<bool(const wxTreeItemId&, c
 
 void clTreeCtrl::UpdateScrollBar()
 {
-    wxRect rect = GetClientRect();
+    wxRect rect = GetItemsRect();
     int thumbSize = (rect.GetHeight() / m_lineHeight); // Number of lines can be drawn
     int pageSize = (thumbSize - 1);
     int rangeSize = m_model.GetExpandedLines();
@@ -991,5 +996,41 @@ void clTreeCtrl::OnEnterWindow(wxMouseEvent& event)
 
 wxRect clTreeCtrl::GetItemsRect() const
 {
-    return GetClientRect();
+    // Return the rectangle taking header into consideration
+    int yOffset = m_header.GetHeight();
+    wxRect clientRect = GetClientRect();
+    clientRect.SetY(yOffset);
+    clientRect.SetHeight(clientRect.GetHeight() - yOffset);
+    return clientRect;
+}
+
+void clTreeCtrl::SetHeader(const clHeaderBar& header)
+{
+    wxASSERT_MSG(!IsEmpty(), "SetColumns can't be called on a non empty tree");
+    m_header = header;
+}
+
+wxSize clTreeCtrl::GetTextSize(const wxString& label) const
+{
+    wxDC& dc = GetTempDC();
+    wxFont font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+    dc.SetFont(font);
+    wxSize textSize = dc.GetTextExtent("label");
+    return textSize;
+}
+
+void clTreeCtrl::DoUpdateHeader(const wxTreeItemId& item)
+{
+    // do we have header?
+    if(m_header.empty()) { return; }
+    
+    clTreeCtrlNode* pNode = m_model.ToPtr(item);
+    CHECK_PTR_RET(pNode);
+    wxDC& dc = GetTempDC();
+    
+    // Use bold font, to get the maximum width needed
+    for(size_t i = 0; i < m_header.size(); ++i) {
+        int row_width = pNode->CalcItemWidth(dc, m_lineHeight, i);
+        m_header.UpdateColWidthIfNeeded(i, row_width, false);
+    }
 }
