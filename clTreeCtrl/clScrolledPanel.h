@@ -39,7 +39,7 @@ public:
      * depending on the direction. otherwise, scroll 'steps' into the correct 'direction'
      * @param direction direction to scroll
      */
-    virtual void ScrollLines(int steps, wxDirection direction)
+    virtual void ScrollRows(int steps, wxDirection direction)
     {
         wxUnusedVar(steps);
         wxUnusedVar(direction);
@@ -48,7 +48,7 @@ public:
     /**
      * @brief scroll to set 'firstLine' as the first visible line in the view
      */
-    virtual void ScrollToLine(int firstLine) { wxUnusedVar(firstLine); }
+    virtual void ScrollToRow(int firstLine) { wxUnusedVar(firstLine); }
 
     /**
      * @brief whenver the view changes (i.e. there is a new top line) call this method so the scrollbar

@@ -345,8 +345,8 @@ protected:
     void OnEnterWindow(wxMouseEvent& event);
     void OnContextMenu(wxContextMenuEvent& event);
 
-    void ScrollLines(int steps, wxDirection direction);
-    void ScrollToLine(int firstLine);
+    void ScrollRows(int steps, wxDirection direction);
+    void ScrollToRow(int firstLine);
 };
 
 #endif // CLTREECTRL_H

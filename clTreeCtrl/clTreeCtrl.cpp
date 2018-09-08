@@ -820,7 +820,7 @@ void clTreeCtrl::UpdateScrollBar()
     UpdateVScrollBar(position, thumbSize, rangeSize, pageSize);
 }
 
-void clTreeCtrl::ScrollToLine(int firstLine)
+void clTreeCtrl::ScrollToRow(int firstLine)
 {
     clRowEntry* newTopLine = nullptr;
     // Thumbtrack sends the top-line index in event.GetPosition()
@@ -829,7 +829,7 @@ void clTreeCtrl::ScrollToLine(int firstLine)
     Refresh();
 }
 
-void clTreeCtrl::ScrollLines(int steps, wxDirection direction)
+void clTreeCtrl::ScrollRows(int steps, wxDirection direction)
 {
     // Process the rest of the scrolling events here
     wxTreeItemId nextSelection;

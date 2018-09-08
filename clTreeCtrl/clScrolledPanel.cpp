@@ -82,9 +82,9 @@ void clScrolledPanel::OnVScroll(wxScrollEvent& event)
     }
 
     if(steps) {
-        ScrollLines(steps, direction);
+        ScrollRows(steps, direction);
     } else if(newTopLine != wxNOT_FOUND) {
-        ScrollToLine(newTopLine);
+        ScrollToRow(newTopLine);
     }
 }
 
@@ -115,21 +115,21 @@ void clScrolledPanel::OnCharHook(wxKeyEvent& event)
 
     // Always process the HOME/END buttons
     if(event.GetKeyCode() == WXK_HOME) {
-        ScrollLines(0, wxUP);
+        ScrollRows(0, wxUP);
     } else if(event.GetKeyCode() == WXK_END) {
-        ScrollLines(0, wxDOWN);
+        ScrollRows(0, wxDOWN);
     }
     
     // The following can be processed only once
     if(event.GetEventObject() == this) {
         if(event.GetKeyCode() == WXK_UP) {
-            ScrollLines(1, wxUP);
+            ScrollRows(1, wxUP);
         } else if(event.GetKeyCode() == WXK_DOWN) {
-            ScrollLines(1, wxDOWN);
+            ScrollRows(1, wxDOWN);
         } else if(event.GetKeyCode() == WXK_PAGEUP) {
-            ScrollLines(GetPageSize(), wxUP);
+            ScrollRows(GetPageSize(), wxUP);
         } else if(event.GetKeyCode() == WXK_PAGEDOWN) {
-            ScrollLines(GetPageSize(), wxDOWN);
+            ScrollRows(GetPageSize(), wxDOWN);
         }
     }
 }
