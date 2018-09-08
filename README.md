@@ -11,7 +11,7 @@ Advantages over the standrd wx controls out there:
 
 For example, lets assume you have a tree representing the file system. You want folders to be displayed first, sorted A-Z, followed by files (which should also be sorted A-Z)
 
-Also, lets assume that you keep client data per node, holding the node type, so your code should look something like this:
+Also, let's assume that you keep client data per node, holding the node type, so your code should look something like this:
 
 ```c++
 clTreeCtrl* tree = new clTreeCtrl(this);
