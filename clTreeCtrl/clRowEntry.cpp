@@ -12,7 +12,7 @@ clRowEntry::clRowEntry(clTreeCtrl* tree, const wxString& label, int bitmapIndex,
     // Fill the verctor with items constructed using the _non_ default constructor
     // to makes sure that IsOk() returns TRUE
     m_cells.resize(
-        m_tree->GetHeader().size() ? m_tree->GetHeader().size() : 1, clCellValue("", -1, -1)); // at least one column
+        m_tree->GetHeader().empty() ? 1 : m_tree->GetHeader().size(), clCellValue("", -1, -1)); // at least one column
     clCellValue cv(label, bitmapIndex, bitmapSelectedIndex);
     m_cells[0] = cv;
 }
