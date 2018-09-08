@@ -242,7 +242,7 @@ void clTreeCtrlModel::DeleteItem(const wxTreeItemId& item)
         node->GetParent()->DeleteChild(node);
     } else {
         // The root item
-        m_root = nullptr;
+        wxDELETE(m_root);
     }
 }
 

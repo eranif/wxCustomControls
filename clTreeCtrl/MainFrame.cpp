@@ -99,6 +99,7 @@ MainFrame::~MainFrame() {}
 void MainFrame::OnExit(wxCommandEvent& event)
 {
     wxUnusedVar(event);
+    m_tree->DeleteAllItems();
     Close();
 }
 
