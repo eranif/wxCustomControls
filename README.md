@@ -5,7 +5,7 @@ In addition to the traditional tree view, `clTreeCtrl` allows you to display col
 
 Advantages over the standrd wx controls out there:
 - Performance & Optimization: you can display thousands (and more, many more) entries, and the performance is close to instant
-- Customisation: you can colour any part of the control (text, selected item text, font, selected text, selected text background, hover bg colour, expand/collapse button, unlike other controls, you can do this per cell. 
+- Customisation: you can colour any part of the control (text, selected item text, font, selected text, selected text background, hover bg colour, expand/collapse button; and unlike other controls, you can do this per cell. 
 - scrollbar on demand: the scrollbar to can be set to hide when the control loses the focus
 - Sorting: one of the headaches using wxTreeCtrl is sorting items. `clTreeCtrl` uses modern C++ API to support this. 
 
