@@ -41,15 +41,16 @@ class MainFrameBaseClass : public wxFrame
 {
 public:
     enum {
-        ID_SINGLE_SELECTION = 10001,
-        ID_TOGGLE_THEMES = 10002,
-        ID_ZEBRA = 10003,
-        ID_PREV_SIBLING = 10004,
-        ID_NEXT_SIBLING = 10005,
-        ID_SELECT_CHILDREN = 10006,
-        ID_HIDE_ROOT = 10007,
-        ID_EXPAND_ALL = 10008,
-        ID_OPEN_FOLDER = 10009,
+        ID_TOGGLE_THEMES = 10001,
+        ID_ZEBRA = 10002,
+        ID_SINGLE_SELECTION = 10003,
+        ID_HIDE_ROOT = 10004,
+        ID_PREV_SIBLING = 10005,
+        ID_SHOW_SB_ON_FOCUS = 10006,
+        ID_NEXT_SIBLING = 10007,
+        ID_SELECT_CHILDREN = 10008,
+        ID_EXPAND_ALL = 10009,
+        ID_OPEN_FOLDER = 10010,
     };
 
 protected:
@@ -74,6 +75,7 @@ protected:
     wxMenuItem* m_menuItemThemes;
     wxMenuItem* m_menuItemHideRoot;
     wxMenuItem* m_menuItemSingleSelection;
+    wxMenuItem* m_menuItemShowSBOnFocus;
 
 protected:
     virtual void OnOpenFolder(wxCommandEvent& event) { event.Skip(); }
@@ -90,6 +92,7 @@ protected:
     virtual void OnToggleTheme(wxCommandEvent& event) { event.Skip(); }
     virtual void OnHideRoot(wxCommandEvent& event) { event.Skip(); }
     virtual void OnSingleSelection(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnShowSBOnFocus(wxCommandEvent& event) { event.Skip(); }
 
 public:
     wxTextCtrl* GetTextCtrlLog() { return m_textCtrlLog; }

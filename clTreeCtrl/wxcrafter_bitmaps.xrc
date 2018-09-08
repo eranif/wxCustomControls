@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resource xmlns="http://www.wxwidgets.org/wxxrc">
   <!-- Handler Generation is ON -->
-  <object class="wxBitmap" name="file">/home/eran/devl/clTreeCtrl/bitmaps/24-file-regular.png</object>
-  <object class="wxBitmap" name="file@2x">/home/eran/devl/clTreeCtrl/bitmaps/24-file-regular@2x.png</object>
-  <object class="wxBitmap" name="file@2x">/home/eran/devl/clTreeCtrl/bitmaps/24-file-regular@2x.png</object>
-  <object class="wxBitmap" name="folder">/home/eran/devl/clTreeCtrl/bitmaps/24-folder-regular.png</object>
-  <object class="wxBitmap" name="folder@2x">/home/eran/devl/clTreeCtrl/bitmaps/24-folder-regular@2x.png</object>
-  <object class="wxBitmap" name="folder@2x">/home/eran/devl/clTreeCtrl/bitmaps/24-folder-regular@2x.png</object>
-  <object class="wxBitmap" name="folder_open">/home/eran/devl/clTreeCtrl/bitmaps/24-folder-open-regular.png</object>
-  <object class="wxBitmap" name="folder_open@2x">/home/eran/devl/clTreeCtrl/bitmaps/24-folder-open-regular@2x.png</object>
-  <object class="wxBitmap" name="folder_open@2x">/home/eran/devl/clTreeCtrl/bitmaps/24-folder-open-regular@2x.png</object>
+  <object class="wxBitmap" name="file">D:\src\clTreeCtrl\bitmaps\24-file-regular.png</object>
+  <object class="wxBitmap" name="file@2x">D:\src\clTreeCtrl\bitmaps\24-file-regular@2x.png</object>
+  <object class="wxBitmap" name="file@2x">D:\src\clTreeCtrl\bitmaps\24-file-regular@2x.png</object>
+  <object class="wxBitmap" name="folder">D:\src\clTreeCtrl\bitmaps\24-folder-regular.png</object>
+  <object class="wxBitmap" name="folder@2x">D:\src\clTreeCtrl\bitmaps\24-folder-regular@2x.png</object>
+  <object class="wxBitmap" name="folder@2x">D:\src\clTreeCtrl\bitmaps\24-folder-regular@2x.png</object>
+  <object class="wxBitmap" name="folder_open">D:\src\clTreeCtrl\bitmaps\24-folder-open-regular.png</object>
+  <object class="wxBitmap" name="folder_open@2x">D:\src\clTreeCtrl\bitmaps\24-folder-open-regular@2x.png</object>
+  <object class="wxBitmap" name="folder_open@2x">D:\src\clTreeCtrl\bitmaps\24-folder-open-regular@2x.png</object>
 </resource>

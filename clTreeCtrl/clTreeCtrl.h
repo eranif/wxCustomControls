@@ -11,7 +11,7 @@
 #include <wx/panel.h>
 #include <wx/scrolwin.h>
 
-class clScrollBarHelper;
+class clScrollBar;
 class WXDLLIMPEXP_SDK clTreeCtrl : public clScrolledPanel
 {
     int m_lineHeight = 0;
@@ -24,7 +24,7 @@ class WXDLLIMPEXP_SDK clTreeCtrl : public clScrolledPanel
     std::vector<wxBitmap> m_bitmaps;
     clColours m_colours;
     long m_treeStyle = 0;
-    // clScrollBarHelper* m_vsb = nullptr;
+    // clScrollBar* m_vsb = nullptr;
     wxDirection m_lastScrollDir = wxDOWN;
     wxDateTime m_dragStartTime;
     wxPoint m_dragStartPos;
@@ -340,7 +340,7 @@ protected:
     void OnMotion(wxMouseEvent& event);
     void OnMouseLeftDClick(wxMouseEvent& event);
     void OnMouseScroll(wxMouseEvent& event);
-    void OnIdle(wxIdleEvent& event);
+    void ProcessIdle();
     void OnLeaveWindow(wxMouseEvent& event);
     void OnEnterWindow(wxMouseEvent& event);
     void OnContextMenu(wxContextMenuEvent& event);

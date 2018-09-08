@@ -516,9 +516,8 @@ void clTreeCtrl::SetBitmaps(const std::vector<wxBitmap>& bitmaps)
     Refresh();
 }
 
-void clTreeCtrl::OnIdle(wxIdleEvent& event)
+void clTreeCtrl::ProcessIdle()
 {
-    event.Skip();
     CHECK_ROOT_RET();
 #ifndef __WXOSX__
     int flags = 0;

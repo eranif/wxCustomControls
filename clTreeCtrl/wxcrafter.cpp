@@ -93,6 +93,10 @@ MainFrameBaseClass::MainFrameBaseClass(
         = new wxMenuItem(m_menu53, ID_SINGLE_SELECTION, _("Single Selection Tree"), wxT(""), wxITEM_CHECK);
     m_menu53->Append(m_menuItemSingleSelection);
 
+    m_menuItemShowSBOnFocus
+        = new wxMenuItem(m_menu53, ID_SHOW_SB_ON_FOCUS, _("Show Scrollbar when focused Only"), wxT(""), wxITEM_CHECK);
+    m_menu53->Append(m_menuItemShowSBOnFocus);
+
     SetName(wxT("MainFrameBaseClass"));
     SetSize(wxDLG_UNIT(this, wxSize(-1, -1)));
     if(GetSizer()) { GetSizer()->Fit(this); }
@@ -137,6 +141,8 @@ MainFrameBaseClass::MainFrameBaseClass(
         wxCommandEventHandler(MainFrameBaseClass::OnHideRoot), NULL, this);
     this->Connect(m_menuItemSingleSelection->GetId(), wxEVT_COMMAND_MENU_SELECTED,
         wxCommandEventHandler(MainFrameBaseClass::OnSingleSelection), NULL, this);
+    this->Connect(m_menuItemShowSBOnFocus->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+        wxCommandEventHandler(MainFrameBaseClass::OnShowSBOnFocus), NULL, this);
 }
 
 MainFrameBaseClass::~MainFrameBaseClass()
@@ -169,6 +175,8 @@ MainFrameBaseClass::~MainFrameBaseClass()
         wxCommandEventHandler(MainFrameBaseClass::OnHideRoot), NULL, this);
     this->Disconnect(m_menuItemSingleSelection->GetId(), wxEVT_COMMAND_MENU_SELECTED,
         wxCommandEventHandler(MainFrameBaseClass::OnSingleSelection), NULL, this);
+    this->Disconnect(m_menuItemShowSBOnFocus->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+        wxCommandEventHandler(MainFrameBaseClass::OnShowSBOnFocus), NULL, this);
 }
 
 MyImages::MyImages()

@@ -1,6 +1,7 @@
 #ifndef CLSCROLLEDPANEL_H
 #define CLSCROLLEDPANEL_H
 
+#include "clScrollBar.h"
 #include "codelite_exports.h"
 #include <wx/bitmap.h>
 #include <wx/dcgraph.h>
@@ -11,27 +12,47 @@
 class WXDLLIMPEXP_SDK clScrolledPanel : public wxWindow
 {
 private:
-    wxScrollBar* m_vsb = nullptr;
+    clScrollBar* m_vsb = nullptr;
     int m_pageSize = 0;
     wxBitmap m_tmpBmp;
     wxMemoryDC* m_memDC = nullptr;
     wxGCDC* m_gcdc = nullptr;
+    bool m_showSBOnFocus = false;
 
 protected:
     virtual void OnVScroll(wxScrollEvent& event);
     virtual void OnCharHook(wxKeyEvent& event);
+    virtual void OnIdle(wxIdleEvent& event);
+
+protected:
+    bool ShouldShowScrollBar() const;
 
 public:
     clScrolledPanel(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
         const wxSize& size = wxDefaultSize, long style = 0);
     virtual ~clScrolledPanel();
-    
+
+    /**
+     * @brief when enabled, the scrollbar will only be shown (if needed at all) when this window has the focus (or any
+     * of its decendants)
+     */
+    void SetShowScrollBarOnFocus(bool b) { m_showSBOnFocus = b; }
     wxDC& GetTempDC() const { return *m_gcdc; }
-    
+
     /**
      * @brief return the number lines can fit into the page (vertically)
      */
     int GetPageSize() const;
+
+    /**
+     * @brief whenver the view changes (i.e. there is a new top line) call this method so the scrollbar
+     * will adjust its position
+     */
+    void UpdateVScrollBar(int position, int thumbSize, int rangeSize, int pageSize);
+
+    //===----------------------------------------------------
+    // Overridables
+    //===----------------------------------------------------
 
     /**
      * @brief override this method to scroll the view
@@ -51,12 +72,6 @@ public:
     virtual void ScrollToRow(int firstLine) { wxUnusedVar(firstLine); }
 
     /**
-     * @brief whenver the view changes (i.e. there is a new top line) call this method so the scrollbar
-     * will adjust its position
-     */
-    void UpdateVScrollBar(int position, int thumbSize, int rangeSize, int pageSize);
-
-    /**
      * @brief called by the scrolled window whenver a key is down
      * return true if the key was processed and we should stop the processing of this event
      */
@@ -65,6 +80,9 @@ public:
         wxUnusedVar(event);
         return false;
     }
+
+    // Process idle events. Override this in the subclass
+    virtual void ProcessIdle() {}
 };
 
 #endif // CLSCROLLEDPANEL_H

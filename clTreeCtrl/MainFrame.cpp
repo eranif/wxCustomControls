@@ -26,7 +26,7 @@ MainFrame::MainFrame(wxWindow* parent)
 
     wxTreeItemId root = m_tree->AddRoot("Root", -1, -1, nullptr);
     m_tree->SetItemText(root, "??", 1);
-    
+
     wxLog::SetActiveTarget(new wxLogTextCtrl(m_textCtrlLog));
     // Provide a sorting function to the tree
     std::function<bool(const wxTreeItemId& a, const wxTreeItemId& b)> SortFunc
@@ -237,3 +237,4 @@ void MainFrame::OnZebraColouring(wxCommandEvent& event)
 void MainFrame::OnHideRoot(wxCommandEvent& event) { m_tree->EnableStyle(wxTR_HIDE_ROOT, event.IsChecked()); }
 
 void MainFrame::OnSingleSelection(wxCommandEvent& event) { m_tree->EnableStyle(wxTR_MULTIPLE, !event.IsChecked()); }
+void MainFrame::OnShowSBOnFocus(wxCommandEvent& event) { m_tree->SetShowScrollBarOnFocus(event.IsChecked()); }
