@@ -301,7 +301,7 @@ public:
     /**
      * @brief expand the entire tree
      */
-    void CollapAll() { CollapseAllChildren(GetRootItem()); }
+    void CollapseAll() { CollapseAllChildren(GetRootItem()); }
 
     /**
      * @brief Deletes the specified item.
