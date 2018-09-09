@@ -203,6 +203,7 @@ public:
      * @brief Returns true if the item has children.
      */
     bool ItemHasChildren(const wxTreeItemId& item) const;
+    bool HasChildren(const wxTreeItemId& item) const { return ItemHasChildren(item); }
 
     /**
      * @brief set the item's indent size
