@@ -198,7 +198,7 @@ void MainFrame::OnItemExpanding(wxTreeEvent& event)
 }
 
 void MainFrame::OnExpandAll(wxCommandEvent& event) { m_tree->ExpandAll(); }
-void MainFrame::OnCollapseAll(wxCommandEvent& event) { m_tree->CollapAll(); }
+void MainFrame::OnCollapseAll(wxCommandEvent& event) { m_tree->CollapseAll(); }
 void MainFrame::OnFirstVisible(wxCommandEvent& event)
 {
     wxTreeItemId item = m_tree->GetFirstVisibleItem();
