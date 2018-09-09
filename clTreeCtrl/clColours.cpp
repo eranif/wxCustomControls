@@ -22,18 +22,18 @@ void clColours::InitDefaults()
 
 void clColours::InitDarkDefaults()
 {
-    bgColour = wxColour("#4D5656");
+    bgColour = wxColour("#5F6A6A");
     itemTextColour = wxColour("#F4F6F6");
     selItemTextColour = *wxWHITE;
     selItemBgColour = wxColour("#6D7B8D");
     selbuttonColour = selItemTextColour;
     buttonColour = itemTextColour;
-    hoverBgColour = wxColour("#5F6A6A");
+    hoverBgColour = wxColour("#717D7E");
     itemBgColour = bgColour;
     scrolBarButton = selItemBgColour;
     alternateColourEven = bgColour;
     alternateColourOdd = bgColour.ChangeLightness(95);
-    headerBgColour = wxColour("#7F8C8D");
+    headerBgColour = wxColour("#4D5656");
     headerHBorderColour = wxColour("#839192");
     headerVBorderColour = wxColour("#BFC9CA");
 }
