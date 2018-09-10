@@ -39,6 +39,7 @@
     <File Name="wxcrafter.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="resources">
+    <File Name="../.clang-format"/>
     <File Name="../Info.plist"/>
     <File Name="wxcrafter.wxcp"/>
     <File Name="win_resources.rc"/>
