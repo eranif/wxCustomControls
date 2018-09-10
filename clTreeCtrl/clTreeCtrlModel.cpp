@@ -71,16 +71,16 @@ void clTreeCtrlModel::SelectItem(const wxTreeItemId& item, bool select, bool add
     if(clear_old_selection && !ClearSelections(item != GetSingleSelection())) { return; }
 
     if(select) {
-        clRowEntry::Vec_t::iterator iter = std::find_if(
-            m_selectedItems.begin(), m_selectedItems.end(), [&](clRowEntry* p) { return (p == child); });
+        clRowEntry::Vec_t::iterator iter
+            = std::find_if(m_selectedItems.begin(), m_selectedItems.end(), [&](clRowEntry* p) { return (p == child); });
         // If the item is already selected, don't select it again
         if(iter != m_selectedItems.end()) { return; }
     }
 
     if(IsMultiSelection() && addSelection) {
         // If we are unselecting it, remove it from the array
-        clRowEntry::Vec_t::iterator iter = std::find_if(
-            m_selectedItems.begin(), m_selectedItems.end(), [&](clRowEntry* p) { return (p == child); });
+        clRowEntry::Vec_t::iterator iter
+            = std::find_if(m_selectedItems.begin(), m_selectedItems.end(), [&](clRowEntry* p) { return (p == child); });
         if(iter != m_selectedItems.end() && !select) { m_selectedItems.erase(iter); }
     } else {
         if(!ClearSelections(item != GetSingleSelection())) { return; }
@@ -247,8 +247,8 @@ void clTreeCtrlModel::NodeDeleted(clRowEntry* node)
 {
     // Clear the various caches
     {
-        clRowEntry::Vec_t::iterator iter = std::find_if(
-            m_selectedItems.begin(), m_selectedItems.end(), [&](clRowEntry* n) { return n == node; });
+        clRowEntry::Vec_t::iterator iter
+            = std::find_if(m_selectedItems.begin(), m_selectedItems.end(), [&](clRowEntry* n) { return n == node; });
         if(iter != m_selectedItems.end()) {
             m_selectedItems.erase(iter);
             if(m_selectedItems.empty()) {
@@ -259,8 +259,8 @@ void clTreeCtrlModel::NodeDeleted(clRowEntry* node)
     }
 
     {
-        clRowEntry::Vec_t::iterator iter = std::find_if(
-            m_onScreenItems.begin(), m_onScreenItems.end(), [&](clRowEntry* n) { return n == node; });
+        clRowEntry::Vec_t::iterator iter
+            = std::find_if(m_onScreenItems.begin(), m_onScreenItems.end(), [&](clRowEntry* n) { return n == node; });
         if(iter != m_onScreenItems.end()) { m_onScreenItems.erase(iter); }
     }
     {

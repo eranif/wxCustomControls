@@ -15,6 +15,10 @@ class WXDLLIMPEXP_SDK clScrolledPanel : public wxWindow
 private:
     clScrollBar* m_vsb = nullptr;
     int m_pageSize = 0;
+    int m_position = 0;
+    int m_thumbSize = 0;
+    int m_rangeSize = 0;
+    
     wxBitmap m_tmpBmp;
     wxMemoryDC* m_memDC = nullptr;
     wxGCDC* m_gcdc = nullptr;

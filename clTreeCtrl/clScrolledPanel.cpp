@@ -102,8 +102,14 @@ void clScrolledPanel::OnVScroll(wxScrollEvent& event)
 void clScrolledPanel::UpdateVScrollBar(int position, int thumbSize, int rangeSize, int pageSize)
 {
     // Sanity
-    if(pageSize < 0 || position < 0 || thumbSize < 0 || rangeSize < 0) { return; }
-
+    if(pageSize <= 0 || position < 0 || thumbSize <= 0 || rangeSize <= 0) { return; }
+    
+    // Keep the values
+    m_pageSize = pageSize;
+    m_position = position;
+    m_thumbSize = thumbSize;
+    m_rangeSize = rangeSize;
+    
     // Hide the scrollbar if needed
     bool should_show = thumbSize < rangeSize;
     if(!should_show && m_vsb && m_vsb->IsShown()) {
@@ -158,8 +164,10 @@ void clScrolledPanel::OnIdle(wxIdleEvent& event)
         wxWindow* focus_win = wxWindow::FindFocus();
         bool inOurWindows = IsDescendant(focus_win);
         if(ShouldShowScrollBar() && !m_vsb->IsShown() && inOurWindows) {
+            // Update the scrollbar with the latest values
             m_vsb->Show();
             GetSizer()->Layout();
+            m_vsb->SetScrollbar(m_position, m_thumbSize, m_rangeSize, m_pageSize);
         } else if(!inOurWindows && m_vsb->IsShown()) {
             m_vsb->Hide();
             GetSizer()->Layout();
