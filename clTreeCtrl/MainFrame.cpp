@@ -33,19 +33,19 @@ MainFrame::MainFrame(wxWindow* parent)
 
     wxLog::SetActiveTarget(new wxLogTextCtrl(m_textCtrlLog));
     // Provide a sorting function to the tree
-    std::function<bool(const wxTreeItemId& a, const wxTreeItemId& b)> SortFunc
-        = [&](const wxTreeItemId& a, const wxTreeItemId& b) {
-              // Compare based on item type and then by label
-              MyItemData* cd_a = dynamic_cast<MyItemData*>(m_tree->GetItemData(a));
-              MyItemData* cd_b = dynamic_cast<MyItemData*>(m_tree->GetItemData(b));
-              if(cd_a->IsFolder() && !cd_b->IsFolder()) {
-                  return true;
-              } else if(!cd_a->IsFolder() && cd_b->IsFolder()) {
-                  return false;
-              } else {
-                  return cd_a->GetFullnameLC() < cd_b->GetFullnameLC();
-              }
-          };
+    std::function<bool(const wxTreeItemId& a, const wxTreeItemId& b)> SortFunc = [&](const wxTreeItemId& a,
+                                                                                     const wxTreeItemId& b) {
+        // Compare based on item type and then by label
+        MyItemData* cd_a = dynamic_cast<MyItemData*>(m_tree->GetItemData(a));
+        MyItemData* cd_b = dynamic_cast<MyItemData*>(m_tree->GetItemData(b));
+        if(cd_a->IsFolder() && !cd_b->IsFolder()) {
+            return true;
+        } else if(!cd_a->IsFolder() && cd_b->IsFolder()) {
+            return false;
+        } else {
+            return cd_a->GetFullnameLC() < cd_b->GetFullnameLC();
+        }
+    };
     m_tree->SetSortFunction(SortFunc);
     std::vector<wxBitmap> bitmaps;
     MyImages images;
@@ -62,12 +62,15 @@ MainFrame::MainFrame(wxWindow* parent)
         LogMessage(wxString() << "Drag ended. Drop is on item: " << m_tree->GetItemText(evt.GetItem()));
     });
 
-    m_tree->Bind(wxEVT_TREE_ITEM_EXPANDED,
-        [&](wxTreeEvent& evt) { LogMessage(wxString() << m_tree->GetItemText(evt.GetItem()) << " expanded"); });
-    m_tree->Bind(wxEVT_TREE_ITEM_COLLAPSING,
-        [&](wxTreeEvent& evt) { LogMessage(wxString() << m_tree->GetItemText(evt.GetItem()) << " is collapsing"); });
-    m_tree->Bind(wxEVT_TREE_ITEM_COLLAPSED,
-        [&](wxTreeEvent& evt) { LogMessage(wxString() << m_tree->GetItemText(evt.GetItem()) << " collapsed"); });
+    m_tree->Bind(wxEVT_TREE_ITEM_EXPANDED, [&](wxTreeEvent& evt) {
+        LogMessage(wxString() << m_tree->GetItemText(evt.GetItem()) << " expanded");
+    });
+    m_tree->Bind(wxEVT_TREE_ITEM_COLLAPSING, [&](wxTreeEvent& evt) {
+        LogMessage(wxString() << m_tree->GetItemText(evt.GetItem()) << " is collapsing");
+    });
+    m_tree->Bind(wxEVT_TREE_ITEM_COLLAPSED, [&](wxTreeEvent& evt) {
+        LogMessage(wxString() << m_tree->GetItemText(evt.GetItem()) << " collapsed");
+    });
     m_tree->Bind(wxEVT_TREE_SEL_CHANGING, [&](wxTreeEvent& evt) {
         evt.Skip();
         LogMessage(wxString() << "Selection changing from: " << m_tree->GetItemText(evt.GetOldItem()));
@@ -101,16 +104,16 @@ MainFrame::MainFrame(wxWindow* parent)
         wxMenu menu;
         menu.Append(wxID_OPEN);
         menu.Bind(wxEVT_MENU,
-            [&](wxCommandEvent& e) {
-                wxArrayTreeItemIds items;
-                if(m_tree->GetSelections(items)) {
-                    for(size_t i = 0; i < items.size(); ++i) {
-                        MyItemData* cd = dynamic_cast<MyItemData*>(m_tree->GetItemData(items[i]));
-                        if(cd) { ::wxLaunchDefaultApplication(cd->GetPath()); }
-                    }
-                }
-            },
-            wxID_OPEN);
+                  [&](wxCommandEvent& e) {
+                      wxArrayTreeItemIds items;
+                      if(m_tree->GetSelections(items)) {
+                          for(size_t i = 0; i < items.size(); ++i) {
+                              MyItemData* cd = dynamic_cast<MyItemData*>(m_tree->GetItemData(items[i]));
+                              if(cd) { ::wxLaunchDefaultApplication(cd->GetPath()); }
+                          }
+                      }
+                  },
+                  wxID_OPEN);
         m_tree->PopupMenu(&menu);
     });
 }
@@ -176,15 +179,15 @@ void MainFrame::OnItemExpanding(wxTreeEvent& event)
                     wxFileName fn(cd->GetPath(), filename);
                     if(wxDirExists(fn.GetFullPath())) {
                         // A directory
-                        wxTreeItemId folderItem
-                            = m_tree->AppendItem(item, filename, 0, 1, new MyItemData(fn.GetFullPath(), true));
+                        wxTreeItemId folderItem =
+                            m_tree->AppendItem(item, filename, 0, 1, new MyItemData(fn.GetFullPath(), true));
                         m_tree->SetItemText(folderItem, "Folder", 1);
                         m_tree->SetItemText(folderItem, "0KB", 2);
                         m_tree->AppendItem(folderItem, "dummy-node");
                     } else {
                         // A file
-                        wxTreeItemId fileItem
-                            = m_tree->AppendItem(item, filename, 2, 2, new MyItemData(fn.GetFullPath(), false));
+                        wxTreeItemId fileItem =
+                            m_tree->AppendItem(item, filename, 2, 2, new MyItemData(fn.GetFullPath(), false));
                         m_tree->SetItemText(fileItem, "File", 1);
                         wxString t;
                         t << std::ceil((double)fn.GetSize().ToDouble() / 1024.0) << "KB";

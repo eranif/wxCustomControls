@@ -16,7 +16,7 @@ protected:
 public:
     clHeaderBar();
     virtual ~clHeaderBar();
-    
+
     /**
      * @brief update the column width, but only if the new width is greater than the current one, unless 'force' is set
      * to 'true'

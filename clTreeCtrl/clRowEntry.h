@@ -68,8 +68,8 @@ public:
     clRowEntry* GetLastChild() const;
     clRowEntry* GetFirstChild() const;
 
-    clRowEntry(
-        clTreeCtrl* tree, const wxString& label, int bitmapIndex = wxNOT_FOUND, int bitmapSelectedIndex = wxNOT_FOUND);
+    clRowEntry(clTreeCtrl* tree, const wxString& label, int bitmapIndex = wxNOT_FOUND,
+               int bitmapSelectedIndex = wxNOT_FOUND);
     ~clRowEntry();
 
     clRowEntry* GetNext() const { return m_next; }

@@ -1,5 +1,5 @@
-#include "clScrollBar.h"
 #include "clScrolledPanel.h"
+#include "clScrollBar.h"
 #include <wx/log.h>
 #include <wx/sizer.h>
 
@@ -103,13 +103,13 @@ void clScrolledPanel::UpdateVScrollBar(int position, int thumbSize, int rangeSiz
 {
     // Sanity
     if(pageSize <= 0 || position < 0 || thumbSize <= 0 || rangeSize <= 0) { return; }
-    
+
     // Keep the values
     m_pageSize = pageSize;
     m_position = position;
     m_thumbSize = thumbSize;
     m_rangeSize = rangeSize;
-    
+
     // Hide the scrollbar if needed
     bool should_show = thumbSize < rangeSize;
     if(!should_show && m_vsb && m_vsb->IsShown()) {
@@ -119,7 +119,7 @@ void clScrolledPanel::UpdateVScrollBar(int position, int thumbSize, int rangeSiz
         m_vsb->Show();
         GetSizer()->Layout();
     }
-    m_pageSize = pageSize;
+
     m_vsb->SetScrollbar(position, thumbSize, rangeSize, pageSize);
     m_vsb->Refresh();
 }
@@ -209,11 +209,11 @@ void clScrolledPanel::OnLeftUp(wxMouseEvent& event)
 void clScrolledPanel::OnMotion(wxMouseEvent& event)
 {
     event.Skip();
-    if(m_dragStartTime.IsValid() && event.LeftIsDown()
-        && !m_dragging) { // If we're tugging on the tab, consider starting D'n'D
+    if(m_dragStartTime.IsValid() && event.LeftIsDown() &&
+       !m_dragging) { // If we're tugging on the tab, consider starting D'n'D
         wxTimeSpan diff = wxDateTime::UNow() - m_dragStartTime;
         if(diff.GetMilliseconds() > 100 && // We need to check both x and y distances as tabs may be vertical
-            ((abs(m_dragStartPos.x - event.GetX()) > 5) || (abs(m_dragStartPos.y - event.GetY()) > 5))) {
+           ((abs(m_dragStartPos.x - event.GetX()) > 5) || (abs(m_dragStartPos.y - event.GetY()) > 5))) {
             DoBeginDrag(); // Sufficient time and distance since the LeftDown for a believable D'n'D start
         }
     }
@@ -239,7 +239,7 @@ void clScrolledPanel::DoBeginDrag()
     if(!event.IsAllowed()) { return; }
 
     // Change the cursor indicating DnD in progress
-    SetCursor(wxCURSOR_HAND );
+    SetCursor(wxCURSOR_HAND);
     m_dragging = true;
 }
 

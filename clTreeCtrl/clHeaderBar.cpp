@@ -33,7 +33,7 @@ void clHeaderBar::DoUpdateSize()
         clHeaderItem& item = m_columns[i];
         wxSize textSize = GetTextSize(item.GetLabel());
         wxRect headerRect(xx, 0, textSize.GetWidth() + (2 * clHeaderItem::X_SPACER),
-            fixedText.GetHeight() + (2 * clHeaderItem::Y_SPACER));
+                          fixedText.GetHeight() + (2 * clHeaderItem::Y_SPACER));
         item.SetRect(headerRect);
         xx += item.GetRect().GetWidth();
     }

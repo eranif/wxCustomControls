@@ -348,7 +348,7 @@ protected:
 
     void ScrollRows(int steps, wxDirection direction);
     void ScrollToRow(int firstLine);
-    
+
     wxTreeItemId GetRow(const wxPoint& pt) const;
 };
 

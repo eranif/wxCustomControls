@@ -18,7 +18,7 @@ private:
     int m_position = 0;
     int m_thumbSize = 0;
     int m_rangeSize = 0;
-    
+
     wxBitmap m_tmpBmp;
     wxMemoryDC* m_memDC = nullptr;
     wxGCDC* m_gcdc = nullptr;
@@ -48,7 +48,7 @@ protected:
 
 public:
     clScrolledPanel(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
-        const wxSize& size = wxDefaultSize, long style = 0);
+                    const wxSize& size = wxDefaultSize, long style = 0);
     virtual ~clScrolledPanel();
 
     /**
