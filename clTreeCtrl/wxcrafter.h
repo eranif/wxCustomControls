@@ -7,24 +7,24 @@
 #ifndef _CLTREECTRL_CLTREECTRL_WXCRAFTER_BASE_CLASSES_H
 #define _CLTREECTRL_CLTREECTRL_WXCRAFTER_BASE_CLASSES_H
 
-#include <map>
-#include <wx/artprov.h>
-#include <wx/bitmap.h>
-#include <wx/frame.h>
-#include <wx/icon.h>
-#include <wx/iconbndl.h>
-#include <wx/imaglist.h>
-#include <wx/menu.h>
-#include <wx/panel.h>
 #include <wx/settings.h>
-#include <wx/sizer.h>
-#include <wx/textctrl.h>
-#include <wx/xrc/xh_bmp.h>
 #include <wx/xrc/xmlres.h>
+#include <wx/xrc/xh_bmp.h>
+#include <wx/frame.h>
+#include <wx/iconbndl.h>
+#include <wx/artprov.h>
+#include <wx/sizer.h>
+#include <wx/panel.h>
+#include <wx/textctrl.h>
+#include <wx/menu.h>
+#include <wx/imaglist.h>
+#include <wx/bitmap.h>
+#include <map>
+#include <wx/icon.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
-#include <wx/persist/bookctrl.h>
 #include <wx/persist/toplevel.h>
+#include <wx/persist/bookctrl.h>
 #include <wx/persist/treebook.h>
 #endif
 
@@ -41,14 +41,14 @@ class MainFrameBaseClass : public wxFrame
 {
 public:
     enum {
-        ID_TOGGLE_THEMES = 10001,
-        ID_ZEBRA = 10002,
-        ID_SINGLE_SELECTION = 10003,
-        ID_HIDE_ROOT = 10004,
-        ID_PREV_SIBLING = 10005,
-        ID_SHOW_SB_ON_FOCUS = 10006,
-        ID_NEXT_SIBLING = 10007,
-        ID_SELECT_CHILDREN = 10008,
+        ID_SHOW_SB_ON_FOCUS = 10001,
+        ID_SINGLE_SELECTION = 10002,
+        ID_ZEBRA = 10003,
+        ID_PREV_SIBLING = 10004,
+        ID_SELECT_CHILDREN = 10005,
+        ID_HIDE_ROOT = 10006,
+        ID_TOGGLE_THEMES = 10007,
+        ID_NEXT_SIBLING = 10008,
         ID_EXPAND_ALL = 10009,
         ID_OPEN_FOLDER = 10010,
     };
@@ -56,7 +56,7 @@ public:
 protected:
     wxPanel* m_mainPanel;
     wxTextCtrl* m_textCtrlLog;
-    wxMenuBar* m_menuBar;
+    wxMenuBar* m_myMenuBar;
     wxMenu* File;
     wxMenuItem* m_menuItem13;
     wxMenuItem* m_separator1;
@@ -78,30 +78,86 @@ protected:
     wxMenuItem* m_menuItemShowSBOnFocus;
 
 protected:
-    virtual void OnOpenFolder(wxCommandEvent& event) { event.Skip(); }
-    virtual void OnExpandAll(wxCommandEvent& event) { event.Skip(); }
-    virtual void OnCollapseAll(wxCommandEvent& event) { event.Skip(); }
-    virtual void OnFirstVisible(wxCommandEvent& event) { event.Skip(); }
-    virtual void OnNextVisible(wxCommandEvent& event) { event.Skip(); }
-    virtual void OnEnsureItemVisible(wxCommandEvent& event) { event.Skip(); }
-    virtual void OnSelectChildren(wxCommandEvent& event) { event.Skip(); }
-    virtual void OnNextSibling(wxCommandEvent& event) { event.Skip(); }
-    virtual void OnPrevSibling(wxCommandEvent& event) { event.Skip(); }
-    virtual void OnExit(wxCommandEvent& event) { event.Skip(); }
-    virtual void OnZebraColouring(wxCommandEvent& event) { event.Skip(); }
-    virtual void OnToggleTheme(wxCommandEvent& event) { event.Skip(); }
-    virtual void OnHideRoot(wxCommandEvent& event) { event.Skip(); }
-    virtual void OnSingleSelection(wxCommandEvent& event) { event.Skip(); }
-    virtual void OnShowSBOnFocus(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnOpenFolder(wxCommandEvent& event)
+    {
+        event.Skip();
+    }
+    virtual void OnExpandAll(wxCommandEvent& event)
+    {
+        event.Skip();
+    }
+    virtual void OnCollapseAll(wxCommandEvent& event)
+    {
+        event.Skip();
+    }
+    virtual void OnFirstVisible(wxCommandEvent& event)
+    {
+        event.Skip();
+    }
+    virtual void OnNextVisible(wxCommandEvent& event)
+    {
+        event.Skip();
+    }
+    virtual void OnEnsureItemVisible(wxCommandEvent& event)
+    {
+        event.Skip();
+    }
+    virtual void OnSelectChildren(wxCommandEvent& event)
+    {
+        event.Skip();
+    }
+    virtual void OnNextSibling(wxCommandEvent& event)
+    {
+        event.Skip();
+    }
+    virtual void OnPrevSibling(wxCommandEvent& event)
+    {
+        event.Skip();
+    }
+    virtual void OnExit(wxCommandEvent& event)
+    {
+        event.Skip();
+    }
+    virtual void OnZebraColouring(wxCommandEvent& event)
+    {
+        event.Skip();
+    }
+    virtual void OnToggleTheme(wxCommandEvent& event)
+    {
+        event.Skip();
+    }
+    virtual void OnHideRoot(wxCommandEvent& event)
+    {
+        event.Skip();
+    }
+    virtual void OnSingleSelection(wxCommandEvent& event)
+    {
+        event.Skip();
+    }
+    virtual void OnShowSBOnFocus(wxCommandEvent& event)
+    {
+        event.Skip();
+    }
 
 public:
-    wxTextCtrl* GetTextCtrlLog() { return m_textCtrlLog; }
-    wxPanel* GetMainPanel() { return m_mainPanel; }
-    wxMenuBar* GetMenuBar() { return m_menuBar; }
-    MainFrameBaseClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("My Frame"),
-                       const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1, -1),
-                       long style = wxCAPTION | wxRESIZE_BORDER | wxMAXIMIZE_BOX | wxMINIMIZE_BOX | wxSYSTEM_MENU |
-                                    wxCLOSE_BOX);
+    wxTextCtrl* GetTextCtrlLog()
+    {
+        return m_textCtrlLog;
+    }
+    wxPanel* GetMainPanel()
+    {
+        return m_mainPanel;
+    }
+    wxMenuBar* GetMyMenuBar()
+    {
+        return m_myMenuBar;
+    }
+    MainFrameBaseClass(wxWindow* parent,
+        wxWindowID id = wxID_ANY,
+        const wxString& title = _("My Frame"),
+        const wxPoint& pos = wxDefaultPosition,
+        const wxSize& size = wxSize(500, 300),
+        long style = wxCAPTION | wxRESIZE_BORDER | wxMAXIMIZE_BOX | wxMINIMIZE_BOX | wxSYSTEM_MENU | wxCLOSE_BOX);
     virtual ~MainFrameBaseClass();
 };
 
@@ -120,11 +176,15 @@ public:
     MyImages();
     const wxBitmap& Bitmap(const wxString& name) const
     {
-        if(!m_bitmaps.count(name + m_resolution)) return wxNullBitmap;
+        if(!m_bitmaps.count(name + m_resolution))
+            return wxNullBitmap;
         return m_bitmaps.find(name + m_resolution)->second;
     }
 
-    void SetBitmapResolution(const wxString& res = wxEmptyString) { m_resolution = res; }
+    void SetBitmapResolution(const wxString& res = wxEmptyString)
+    {
+        m_resolution = res;
+    }
 
     virtual ~MyImages();
 };
