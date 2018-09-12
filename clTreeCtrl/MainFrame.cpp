@@ -26,7 +26,6 @@ MainFrame::MainFrame(wxWindow* parent)
     header.Add("Kind");
     header.Add("Size");
     m_tree->SetHeader(header);
-
     wxTreeItemId root = m_tree->AddRoot("Root", -1, -1, nullptr);
     m_tree->SetItemText(root, "??", 1);
     m_tree->SetItemText(root, "0KB", 2);
