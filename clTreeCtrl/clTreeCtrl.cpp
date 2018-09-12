@@ -384,6 +384,7 @@ void clTreeCtrl::DeleteChildren(const wxTreeItemId& item)
     if(!item.GetID()) return;
     clRowEntry* node = m_model.ToPtr(item);
     node->DeleteAllChildren();
+    UpdateScrollBar();
     Refresh();
 }
 
@@ -669,6 +670,7 @@ void clTreeCtrl::Delete(const wxTreeItemId& item)
     // delete the item + its children
     // fires event
     m_model.DeleteItem(item);
+    UpdateScrollBar();
     Refresh();
 }
 
@@ -803,7 +805,7 @@ void clTreeCtrl::UpdateScrollBar()
         // H-scrollbar
         int thumbSize = GetClientRect().GetWidth();
         int pageSize = (thumbSize - 1);
-        int rangeSize = m_header.GetWidth();
+        int rangeSize = IsEmpty() ? 0 : m_header.GetWidth();
         int position = m_firstColumn;
         UpdateHScrollBar(position, thumbSize, rangeSize, pageSize);
     }

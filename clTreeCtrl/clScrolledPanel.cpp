@@ -153,7 +153,10 @@ void clScrolledPanel::OnVScroll(wxScrollEvent& event)
 void clScrolledPanel::UpdateVScrollBar(int position, int thumbSize, int rangeSize, int pageSize)
 {
     // Sanity
-    if(pageSize <= 0 || position < 0 || thumbSize <= 0 || rangeSize <= 0) { return; }
+    if(pageSize <= 0 || position < 0 || thumbSize <= 0 || rangeSize <= 0) {
+        m_vsb->Hide();
+        return;
+    }
 
     // Keep the values
     m_pageSize = pageSize;
@@ -348,6 +351,10 @@ void clScrolledPanel::OnScrolledPanelSize(wxSizeEvent& event)
 
 void clScrolledPanel::UpdateHScrollBar(int position, int thumbSize, int rangeSize, int pageSize)
 {
+    if(rangeSize <= 0) {
+        m_hsb->Hide();
+        return;
+    }
     bool should_show = thumbSize < rangeSize;
     if(should_show && !m_hsb->IsShown()) {
         DoPositionHScrollbar();

@@ -72,6 +72,9 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     m_menuItemPrevSibling = new wxMenuItem(File, ID_PREV_SIBLING, _("Prev Sibling\tShift-F2"), wxT(""), wxITEM_NORMAL);
     File->Append(m_menuItemPrevSibling);
 
+    m_menuItemDeleteAllItems = new wxMenuItem(File, wxID_ANY, _("Delete All Items"), wxT(""), wxITEM_NORMAL);
+    File->Append(m_menuItemDeleteAllItems);
+
     File->AppendSeparator();
 
     m_menuItemExit = new wxMenuItem(File, wxID_EXIT, _("Exit\tAlt-X"), _("Quit"), wxITEM_NORMAL);
@@ -88,6 +91,8 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
 
     m_menuItemHideRoot = new wxMenuItem(m_menu53, ID_HIDE_ROOT, _("Hide Root"), wxT(""), wxITEM_CHECK);
     m_menu53->Append(m_menuItemHideRoot);
+
+    m_menu53->AppendSeparator();
 
     m_menuItemSingleSelection =
         new wxMenuItem(m_menu53, ID_SINGLE_SELECTION, _("Single Selection Tree"), wxT(""), wxITEM_CHECK);
@@ -134,6 +139,8 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
                   wxCommandEventHandler(MainFrameBaseClass::OnNextSibling), NULL, this);
     this->Connect(m_menuItemPrevSibling->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                   wxCommandEventHandler(MainFrameBaseClass::OnPrevSibling), NULL, this);
+    this->Connect(m_menuItemDeleteAllItems->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                  wxCommandEventHandler(MainFrameBaseClass::OnDeleteAllItems), NULL, this);
     this->Connect(m_menuItemExit->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                   wxCommandEventHandler(MainFrameBaseClass::OnExit), NULL, this);
     this->Connect(m_menuItemZebra->GetId(), wxEVT_COMMAND_MENU_SELECTED,
@@ -170,6 +177,8 @@ MainFrameBaseClass::~MainFrameBaseClass()
                      wxCommandEventHandler(MainFrameBaseClass::OnNextSibling), NULL, this);
     this->Disconnect(m_menuItemPrevSibling->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                      wxCommandEventHandler(MainFrameBaseClass::OnPrevSibling), NULL, this);
+    this->Disconnect(m_menuItemDeleteAllItems->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                     wxCommandEventHandler(MainFrameBaseClass::OnDeleteAllItems), NULL, this);
     this->Disconnect(m_menuItemExit->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                      wxCommandEventHandler(MainFrameBaseClass::OnExit), NULL, this);
     this->Disconnect(m_menuItemZebra->GetId(), wxEVT_COMMAND_MENU_SELECTED,

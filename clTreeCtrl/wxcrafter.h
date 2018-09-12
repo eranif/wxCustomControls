@@ -68,12 +68,14 @@ protected:
     wxMenuItem* m_menuItemSelectChildren;
     wxMenuItem* m_menuItemNextSibling;
     wxMenuItem* m_menuItemPrevSibling;
+    wxMenuItem* m_menuItemDeleteAllItems;
     wxMenuItem* m_separator2;
     wxMenuItem* m_menuItemExit;
     wxMenu* m_menu53;
     wxMenuItem* m_menuItemZebra;
     wxMenuItem* m_menuItemThemes;
     wxMenuItem* m_menuItemHideRoot;
+    wxMenuItem* m_menuItem67;
     wxMenuItem* m_menuItemSingleSelection;
     wxMenuItem* m_menuItemShowSBOnFocus;
     wxMenuItem* m_menuItemHideHeaders;
@@ -88,6 +90,7 @@ protected:
     virtual void OnSelectChildren(wxCommandEvent& event) { event.Skip(); }
     virtual void OnNextSibling(wxCommandEvent& event) { event.Skip(); }
     virtual void OnPrevSibling(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnDeleteAllItems(wxCommandEvent& event) { event.Skip(); }
     virtual void OnExit(wxCommandEvent& event) { event.Skip(); }
     virtual void OnZebraColouring(wxCommandEvent& event) { event.Skip(); }
     virtual void OnToggleTheme(wxCommandEvent& event) { event.Skip(); }

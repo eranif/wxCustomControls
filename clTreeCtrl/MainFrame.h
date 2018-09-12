@@ -41,8 +41,10 @@ class MainFrame : public MainFrameBaseClass
 
 private:
     void LogMessage(const wxString& message);
+    void DoAddRoot();
 
 protected:
+    virtual void OnDeleteAllItems(wxCommandEvent& event);
     virtual void OnHideHeaders(wxCommandEvent& event);
     virtual void OnShowSBOnFocus(wxCommandEvent& event);
     virtual void OnSingleSelection(wxCommandEvent& event);

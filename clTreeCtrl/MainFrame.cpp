@@ -26,9 +26,7 @@ MainFrame::MainFrame(wxWindow* parent)
     header.Add("Kind");
     header.Add("Size");
     m_tree->SetHeader(header);
-    wxTreeItemId root = m_tree->AddRoot("Root", -1, -1, nullptr);
-    m_tree->SetItemText(root, "??", 1);
-    m_tree->SetItemText(root, "0KB", 2);
+    DoAddRoot();
 
     wxLog::SetActiveTarget(new wxLogTextCtrl(m_textCtrlLog));
     // Provide a sorting function to the tree
@@ -260,3 +258,15 @@ void MainFrame::OnHideRoot(wxCommandEvent& event) { m_tree->EnableStyle(wxTR_HID
 void MainFrame::OnSingleSelection(wxCommandEvent& event) { m_tree->EnableStyle(wxTR_MULTIPLE, !event.IsChecked()); }
 void MainFrame::OnShowSBOnFocus(wxCommandEvent& event) { m_tree->SetShowScrollBarOnFocus(event.IsChecked()); }
 void MainFrame::OnHideHeaders(wxCommandEvent& event) { m_tree->SetShowHeader(!event.IsChecked()); }
+void MainFrame::OnDeleteAllItems(wxCommandEvent& event)
+{
+    m_tree->DeleteAllItems();
+    DoAddRoot();
+}
+
+void MainFrame::DoAddRoot()
+{
+    wxTreeItemId root = m_tree->AddRoot("Root", -1, -1, nullptr);
+    m_tree->SetItemText(root, "??", 1);
+    m_tree->SetItemText(root, "0KB", 2);
+}
