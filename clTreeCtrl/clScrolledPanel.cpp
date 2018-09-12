@@ -2,6 +2,7 @@
 #include "clScrollBar.h"
 #include <wx/log.h>
 #include <wx/sizer.h>
+#include <wx/settings.h>
 
 clScrolledPanel::clScrolledPanel(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
     : wxWindow(parent, id, pos, size, style)
@@ -249,4 +250,14 @@ void clScrolledPanel::DoCancelDrag()
     m_dragStartPos = wxPoint();
     SetCursor(wxCURSOR_DEFAULT);
     m_dragging = false;
+}
+
+wxFont clScrolledPanel::GetDefaultFont()
+{
+    wxFont f = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+#ifdef __WXGTK__
+    // for some reason, drawing the font size on GTK3 with wxGCDC is too small
+    f.SetPointSize(f.GetPointSize() + 2);
+#endif
+    return f;
 }

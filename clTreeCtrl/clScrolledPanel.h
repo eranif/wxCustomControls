@@ -50,7 +50,12 @@ public:
     clScrolledPanel(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
                     const wxSize& size = wxDefaultSize, long style = 0);
     virtual ~clScrolledPanel();
-
+    
+    /**
+     * @brief return the system default font
+     */
+    static wxFont GetDefaultFont();
+    
     /**
      * @brief when enabled, the scrollbar will only be shown (if needed at all) when this window has the focus (or any
      * of its decendants)
