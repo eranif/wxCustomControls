@@ -273,7 +273,10 @@ wxTreeItemId clTreeCtrl::HitTest(const wxPoint& point, int& flags) const
     flags = 0;
     for(size_t i = 0; i < m_model.GetOnScreenItems().size(); ++i) {
         const clRowEntry* item = m_model.GetOnScreenItems()[i];
-        if(item->GetButtonRect().Contains(point)) {
+        wxRect buttonRect = item->GetButtonRect();
+        // Adjust the coordiantes incase we got h-scroll
+        buttonRect.SetX(buttonRect.GetX() + m_firstColumn);
+        if(buttonRect.Contains(point)) {
             flags |= wxTREE_HITTEST_ONITEMBUTTON;
             return wxTreeItemId(const_cast<clRowEntry*>(item));
         }
