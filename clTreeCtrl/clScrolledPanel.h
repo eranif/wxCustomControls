@@ -74,6 +74,11 @@ public:
     int GetPageSize() const;
 
     /**
+     * @brief return the client area, taking scrollbars into consideration
+     */
+    wxRect GetClientArea() const;
+
+    /**
      * @brief whenver the view changes (i.e. there is a new top line) call this method so the scrollbar
      * will adjust its position
      */

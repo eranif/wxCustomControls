@@ -175,6 +175,7 @@ void clScrolledPanel::UpdateVScrollBar(int position, int thumbSize, int rangeSiz
 
     m_vsb->SetScrollbar(position, thumbSize, rangeSize, pageSize);
     m_vsb->Refresh();
+    CallAfter(&clScrolledPanel::DoPositionHScrollbar);
 }
 
 void clScrolledPanel::OnCharHook(wxKeyEvent& event)
@@ -274,7 +275,6 @@ void clScrolledPanel::OnMotion(wxMouseEvent& event)
 void clScrolledPanel::OnLeaveWindow(wxMouseEvent& event)
 {
     event.Skip();
-    wxLogMessage("Left window, dnd cancelled");
     DoCancelDrag();
 }
 
@@ -319,6 +319,7 @@ void clScrolledPanel::DoPositionVScrollbar()
     wxSize vsbSize = m_vsb->GetSize();
 
     int height = clientRect.GetHeight();
+    if(m_hsb && m_hsb->IsShown()) { height -= m_hsb->GetSize().GetHeight(); }
     int width = vsbSize.GetWidth();
     int x = clientRect.GetWidth() - vsbSize.GetWidth();
     int y = 0;
@@ -364,4 +365,13 @@ void clScrolledPanel::UpdateHScrollBar(int position, int thumbSize, int rangeSiz
     }
     m_hsb->SetScrollbar(position, thumbSize, rangeSize, pageSize);
     m_hsb->Refresh();
+    CallAfter(&clScrolledPanel::DoPositionVScrollbar);
+}
+
+wxRect clScrolledPanel::GetClientArea() const
+{
+    wxRect r = GetClientRect();
+    if(m_hsb && m_hsb->IsShown()) { r.SetHeight(r.GetHeight() - m_hsb->GetSize().GetHeight()); }
+    if(m_vsb && m_vsb->IsShown()) { r.SetWidth(r.GetWidth() - m_vsb->GetSize().GetWidth()); }
+    return r;
 }

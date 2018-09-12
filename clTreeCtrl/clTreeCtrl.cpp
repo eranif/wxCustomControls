@@ -94,7 +94,7 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
     dc.SetDeviceOrigin(m_firstColumn, 0);
     wxRect clientRect = GetItemsRect();
     if(IsHeaderVisible()) {
-        wxRect headerRect = GetClientRect();
+        wxRect headerRect = GetClientArea();
         headerRect.SetHeight(m_header.GetHeight());
         m_header.Render(dc, headerRect, m_colours);
     }
@@ -803,7 +803,7 @@ void clTreeCtrl::UpdateScrollBar()
     }
     {
         // H-scrollbar
-        int thumbSize = GetClientRect().GetWidth();
+        int thumbSize = GetClientArea().GetWidth();
         int pageSize = (thumbSize - 1);
         int rangeSize = IsEmpty() ? 0 : m_header.GetWidth();
         int position = m_firstColumn;
@@ -835,7 +835,7 @@ void clTreeCtrl::ScrollColumns(int steps, wxDirection direction)
     } else {
         int max_width = m_header.GetWidth();
         int firstColumn = m_firstColumn + ((direction == wxRIGHT) ? -steps : steps);
-        if((std::abs(firstColumn) + GetClientRect().GetWidth()) > max_width) { return; }
+        if((std::abs(firstColumn) + GetClientArea().GetWidth()) > max_width) { return; }
         if(firstColumn > 0) { return; }
         m_firstColumn += (direction == wxRIGHT) ? -steps : steps;
     }
@@ -982,7 +982,7 @@ wxRect clTreeCtrl::GetItemsRect() const
 {
     // Return the rectangle taking header into consideration
     int yOffset = m_header.GetHeight();
-    wxRect clientRect = GetClientRect();
+    wxRect clientRect = GetClientArea();
     clientRect.SetY(yOffset);
     clientRect.SetHeight(clientRect.GetHeight() - yOffset);
     return clientRect;
