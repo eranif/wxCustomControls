@@ -15,7 +15,7 @@ clHeaderBar::~clHeaderBar() {}
 
 size_t clHeaderBar::GetHeight() const
 {
-    if(m_columns.empty()) { return 0; }
+    if(m_hideHeaders || m_columns.empty()) { return 0; }
     return m_columns[0].GetRect().GetHeight();
 }
 
@@ -84,3 +84,5 @@ void clHeaderBar::UpdateColWidthIfNeeded(size_t col, size_t width, bool force)
         xx += column.GetWidth();
     }
 }
+
+void clHeaderBar::SetHideHeaders(bool b) { m_hideHeaders = b; }

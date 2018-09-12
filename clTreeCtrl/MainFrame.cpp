@@ -260,3 +260,4 @@ void MainFrame::OnHideRoot(wxCommandEvent& event) { m_tree->EnableStyle(wxTR_HID
 
 void MainFrame::OnSingleSelection(wxCommandEvent& event) { m_tree->EnableStyle(wxTR_MULTIPLE, !event.IsChecked()); }
 void MainFrame::OnShowSBOnFocus(wxCommandEvent& event) { m_tree->SetShowScrollBarOnFocus(event.IsChecked()); }
+void MainFrame::OnHideHeaders(wxCommandEvent& event) { m_tree->SetShowHeader(!event.IsChecked()); }

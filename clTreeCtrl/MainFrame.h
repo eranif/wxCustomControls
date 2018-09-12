@@ -43,6 +43,7 @@ private:
     void LogMessage(const wxString& message);
 
 protected:
+    virtual void OnHideHeaders(wxCommandEvent& event);
     virtual void OnShowSBOnFocus(wxCommandEvent& event);
     virtual void OnSingleSelection(wxCommandEvent& event);
     virtual void OnHideRoot(wxCommandEvent& event);
