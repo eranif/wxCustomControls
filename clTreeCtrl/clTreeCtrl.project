@@ -8,6 +8,10 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="clControlWithItems.cpp"/>
+    <File Name="clControlWithItems.h"/>
+    <File Name="clDataViewListCtrl.cpp"/>
+    <File Name="clDataViewListCtrl.h"/>
     <File Name="clRowEntry.h"/>
     <File Name="clRowEntry.cpp"/>
     <File Name="clCellValue.cpp"/>
