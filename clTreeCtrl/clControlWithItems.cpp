@@ -82,10 +82,6 @@ int clControlWithItems::GetNumLineCanFitOnScreen() const
     return max_lines_on_screen;
 }
 
-clRowEntry* clControlWithItems::GetFirstItemOnScreen() { return m_firstItemOnScreen; }
-
-void clControlWithItems::SetFirstItemOnScreen(clRowEntry* item) { m_firstItemOnScreen = item; }
-
 void clControlWithItems::UpdateScrollBar()
 {
     {

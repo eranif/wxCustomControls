@@ -2,9 +2,13 @@
 #define CLDATAVIEWLISTCTRL_H
 
 #include "clControlWithItems.h"
+#include <wx/dataview.h>
+#include <vector>
 
 class WXDLLIMPEXP_SDK clDataViewListCtrl : public clControlWithItems
 {
+    std::vector<wxDataViewItem> m_items;
+
 protected:
     void OnPaint(wxPaintEvent& event);
 
@@ -25,7 +29,17 @@ public:
      * @brief scroll to set 'firstLine' as the first visible line in the view
      */
     virtual void ScrollToRow(int firstLine);
-
+    
+    /**
+     * @brief return item's index
+     */
+    int ItemToRow(const wxDataViewItem& item) const;
+    
+    /**
+     * @brief return item from row
+     */
+    wxDataViewItem RowToItem(int row) const;
+    
     void ProcessIdle();
 };
 

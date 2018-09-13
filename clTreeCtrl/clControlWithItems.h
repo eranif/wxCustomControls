@@ -18,7 +18,6 @@ class WXDLLIMPEXP_SDK clControlWithItems : public clScrolledPanel
 private:
     clHeaderBar m_viewHeader;
     clColours m_colours;
-    clRowEntry* m_firstItemOnScreen = nullptr;
     int m_firstColumn = 0;
     int m_lineHeight = 0;
     int m_indent = 0;
@@ -27,8 +26,6 @@ private:
 
 protected:
     int GetNumLineCanFitOnScreen() const;
-    virtual clRowEntry* GetFirstItemOnScreen();
-    virtual void SetFirstItemOnScreen(clRowEntry* item);
     void RenderHeader(wxDC& dc);
     void RenderItems(wxDC& dc, const clRowEntry::Vec_t& items);
     void OnSize(wxSizeEvent& event);
