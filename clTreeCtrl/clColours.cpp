@@ -48,5 +48,5 @@ void clColours::InitDarkDefaults()
     headerBgColour = wxColour("#4D5656");
     headerHBorderColour = wxColour("#839192");
     headerVBorderColour = wxColour("#BFC9CA");
-    selItemBgColourNoFocus = wxColour("#BDC3C7");
+    selItemBgColourNoFocus = wxColour("#707B7C");
 }
