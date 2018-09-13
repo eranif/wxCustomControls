@@ -38,6 +38,15 @@ clScrolledPanel::clScrolledPanel(wxWindow* parent, wxWindowID id, const wxPoint&
     Bind(wxEVT_LEAVE_WINDOW, &clScrolledPanel::OnLeaveWindow, this);
     Bind(wxEVT_SIZE, &clScrolledPanel::OnScrolledPanelSize, this);
 
+    Bind(wxEVT_SET_FOCUS, [&](wxFocusEvent& event) {
+        event.Skip();
+        Refresh();
+    });
+    Bind(wxEVT_KILL_FOCUS, [&](wxFocusEvent& event) {
+        event.Skip();
+        Refresh();
+    });
+
 #ifdef __WXGTK__
     /// On GTK, UP/DOWN arrows is used to navigate between controls
     /// Disable it by capturing the event and calling 'Skip(false)'
