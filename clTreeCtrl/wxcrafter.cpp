@@ -32,10 +32,30 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     wxBoxSizer* boxSizer11 = new wxBoxSizer(wxVERTICAL);
     m_mainPanel->SetSizer(boxSizer11);
 
-    m_textCtrlLog = new wxTextCtrl(m_mainPanel, wxID_ANY, wxT(""), wxDefaultPosition,
-                                   wxDLG_UNIT(m_mainPanel, wxSize(-1, 150)), wxTE_RICH | wxTE_MULTILINE);
+    wxBoxSizer* boxSizer71 = new wxBoxSizer(wxHORIZONTAL);
 
-    boxSizer11->Add(m_textCtrlLog, 0, wxEXPAND, WXC_FROM_DIP(5));
+    boxSizer11->Add(boxSizer71, 1, wxEXPAND, WXC_FROM_DIP(5));
+
+    m_treeCtrl = new clTreeCtrl(m_mainPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainPanel, wxSize(-1, -1)),
+                                wxTR_DEFAULT_STYLE);
+
+    boxSizer71->Add(m_treeCtrl, 1, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
+    m_dataView = new clDataViewListCtrl(m_mainPanel, wxID_ANY, wxDefaultPosition,
+                                        wxDLG_UNIT(m_mainPanel, wxSize(-1, -1)), wxDV_ROW_LINES | wxDV_SINGLE);
+
+    boxSizer71->Add(m_dataView, 1, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
+    m_dataView->AppendIconTextColumn(_("Path"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT,
+                                     wxDATAVIEW_COL_RESIZABLE);
+    m_dataView->AppendTextColumn(_("Type"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT,
+                                 wxDATAVIEW_COL_RESIZABLE);
+    m_dataView->AppendTextColumn(_("Size"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT,
+                                 wxDATAVIEW_COL_RESIZABLE);
+    m_textCtrlLog = new wxTextCtrl(m_mainPanel, wxID_ANY, wxT(""), wxDefaultPosition,
+                                   wxDLG_UNIT(m_mainPanel, wxSize(-1, 100)), wxTE_RICH | wxTE_MULTILINE);
+
+    boxSizer11->Add(m_textCtrlLog, 0, wxEXPAND, WXC_FROM_DIP(1));
 
     m_myMenuBar = new wxMenuBar(0);
     this->SetMenuBar(m_myMenuBar);

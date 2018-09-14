@@ -41,8 +41,8 @@ wxTreeItemId clTreeCtrlModel::AddRoot(const wxString& text, int image, int selIm
 {
     if(m_root) { return wxTreeItemId(m_root); }
     m_root = new clRowEntry(m_tree, text, image, selImage);
-    m_root->SetClientData(data);
-    if(m_tree->GetTreeStyle() & wxTR_HIDE_ROOT) {
+    m_root->SetClientObject(data);
+    if(m_tree->HasControlStyle(wxTR_HIDE_ROOT)) {
         m_root->SetHidden(true);
         m_root->SetExpanded(true);
     }
@@ -139,7 +139,7 @@ wxTreeItemId clTreeCtrlModel::AppendItem(const wxTreeItemId& parent, const wxStr
     parentNode = ToPtr(parent);
 
     clRowEntry* child = new clRowEntry(m_tree, text, image, selImage);
-    child->SetClientData(data);
+    child->SetClientObject(data);
     // Find the best insertion point
     clRowEntry* prevItem = nullptr;
     if(m_shouldInsertBeforeFunc) {
@@ -171,7 +171,7 @@ wxTreeItemId clTreeCtrlModel::InsertItem(const wxTreeItemId& parent, const wxTre
     if(pPrev->GetParent() != parentNode) { return wxTreeItemId(); }
 
     clRowEntry* child = new clRowEntry(m_tree, text, image, selImage);
-    child->SetClientData(data);
+    child->SetClientObject(data);
     parentNode->InsertChild(child, pPrev);
     return wxTreeItemId(child);
 }
@@ -292,9 +292,9 @@ void clTreeCtrlModel::NodeExpanded(clRowEntry* node, bool expanded)
     SendEvent(after);
 }
 
-bool clTreeCtrlModel::IsSingleSelection() const { return m_tree && !(m_tree->GetTreeStyle() & wxTR_MULTIPLE); }
+bool clTreeCtrlModel::IsSingleSelection() const { return m_tree && !m_tree->HasControlStyle(wxTR_MULTIPLE); }
 
-bool clTreeCtrlModel::IsMultiSelection() const { return m_tree && (m_tree->GetTreeStyle() & wxTR_MULTIPLE); }
+bool clTreeCtrlModel::IsMultiSelection() const { return !IsSingleSelection(); }
 
 bool clTreeCtrlModel::SendEvent(wxEvent& event)
 {

@@ -60,8 +60,14 @@ public:
     /**
      * @brief add new column to the header bar
      */
-    void Add(const wxString& label, const wxBitmap& bitmap = wxNullBitmap) { push_back(clHeaderItem(label, bitmap)); }
+    clHeaderItem& Add(const wxString& label, const wxBitmap& bitmap = wxNullBitmap)
+    {
+        push_back(clHeaderItem(label, bitmap));
+        return Last();
+    }
 
+    const clHeaderItem& Last() const;
+    clHeaderItem& Last();
     /**
      * @brief draw the header bar using dc and colours
      */

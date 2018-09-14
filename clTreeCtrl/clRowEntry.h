@@ -3,6 +3,7 @@
 
 #include "clCellValue.h"
 #include "clColours.h"
+#include "clItemModelBase.h"
 #include "codelite_exports.h"
 #include <vector>
 #include <wx/colour.h>
@@ -11,9 +12,7 @@
 #include <wx/string.h>
 #include <wx/treebase.h>
 
-class clTreeCtrlModel;
-class clTreeCtrl;
-enum clTreeCtrlNodeFlags {
+enum clRowEntryFlags {
     kNF_FontBold = (1 << 0),
     kNF_FontItalic = (1 << 1),
     kNF_SortItems = (1 << 2),
@@ -22,21 +21,21 @@ enum clTreeCtrlNodeFlags {
     kNF_Hovered = (1 << 5),
     kNF_Hidden = (1 << 6),
 };
-
+class clControlWithItems;
 class WXDLLIMPEXP_SDK clRowEntry
 {
-
 public:
     typedef std::vector<clRowEntry*> Vec_t;
     static const int Y_SPACER = 1;
     static const int X_SPACER = 3;
 
 protected:
-    clTreeCtrl* m_tree = nullptr;
-    clTreeCtrlModel* m_model = nullptr;
+    clControlWithItems* m_control = nullptr;
+    clItemModelBase* m_model = nullptr;
     clCellValue::Vect_t m_cells;
     size_t m_flags = 0;
-    wxTreeItemData* m_clientData = nullptr;
+    wxTreeItemData* m_clientObject = nullptr;
+    wxUIntPtr m_data = 0;
     clRowEntry* m_parent = nullptr;
     clRowEntry::Vec_t m_children;
     clRowEntry* m_next = nullptr;
@@ -46,7 +45,7 @@ protected:
     wxRect m_buttonRect;
 
 protected:
-    void SetFlag(clTreeCtrlNodeFlags flag, bool b)
+    void SetFlag(clRowEntryFlags flag, bool b)
     {
         if(b) {
             m_flags |= flag;
@@ -55,7 +54,7 @@ protected:
         }
     }
 
-    bool HasFlag(clTreeCtrlNodeFlags flag) const { return m_flags & flag; }
+    bool HasFlag(clRowEntryFlags flag) const { return m_flags & flag; }
 
     /**
      * @brief return the nth visible item
@@ -68,7 +67,7 @@ public:
     clRowEntry* GetLastChild() const;
     clRowEntry* GetFirstChild() const;
 
-    clRowEntry(clTreeCtrl* tree, const wxString& label, int bitmapIndex = wxNOT_FOUND,
+    clRowEntry(clControlWithItems* control, const wxString& label, int bitmapIndex = wxNOT_FOUND,
                int bitmapSelectedIndex = wxNOT_FOUND);
     ~clRowEntry();
 
@@ -143,15 +142,24 @@ public:
     const wxString& GetLabel(size_t col = 0) const;
 
     const std::vector<clRowEntry*>& GetChildren() const { return m_children; }
-    wxTreeItemData* GetClientObject() const { return m_clientData; }
+    wxTreeItemData* GetClientObject() const { return m_clientObject; }
     void SetParent(clRowEntry* parent);
     clRowEntry* GetParent() const { return m_parent; }
     bool HasChildren() const { return !m_children.empty(); }
-    void SetClientData(wxTreeItemData* clientData)
+    /**
+     * @brief set client object. the object is deleted by _this_ class
+     */
+    void SetClientObject(wxTreeItemData* clientObject)
     {
-        wxDELETE(m_clientData);
-        this->m_clientData = clientData;
+        wxDELETE(m_clientObject);
+        this->m_clientObject = clientObject;
     }
+
+    /**
+     * @brief set client data. The data will be deleted by the user!
+     */
+    void SetClientData(wxUIntPtr data) { this->m_data = data; }
+
     size_t GetChildrenCount(bool recurse) const;
     int GetExpandedLines() const;
     void GetNextItems(int count, clRowEntry::Vec_t& items);

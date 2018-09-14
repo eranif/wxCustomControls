@@ -12,7 +12,7 @@
 #define SCROLL_TICK 3
 #endif
 
-class clRowEntry;
+class clItemModelBase;
 class WXDLLIMPEXP_SDK clControlWithItems : public clScrolledPanel
 {
 private:
@@ -23,6 +23,7 @@ private:
     int m_indent = 0;
     std::vector<wxBitmap> m_bitmaps;
     int m_scrollTick = SCROLL_TICK;
+    int m_controlStyle = 0;
 
 protected:
     int GetNumLineCanFitOnScreen() const;
@@ -51,7 +52,23 @@ public:
 
     void SetScrollTick(int scrollTick) { this->m_scrollTick = scrollTick; }
     int GetScrollTick() const { return m_scrollTick; }
+
+    /**
+     * @brief return the tree style
+     */
+    long GetControlStyle() const { return m_controlStyle; }
+    void SetControlStyle(int style) { m_controlStyle = style; }
     
+    bool HasControlStyle(int style) const { return m_controlStyle & style; }
+
+    void EnableControlStyle(int style, bool set)
+    {
+        if(set) {
+            m_controlStyle |= style;
+        } else {
+            m_controlStyle &= ~style;
+        }
+    }
     /**
      * @brief return bitmap at a given index
      */
@@ -114,6 +131,18 @@ public:
     void ScollToColumn(int firstColumn);
     void ScrollColumns(int steps, wxDirection direction);
 
+    /**
+     * @brief Calculates which (if any) item is under the given point, returning the tree item id at this point plus
+     *  extra information flags.
+     *  flags is a bitlist of the following:
+     *  wxTREE_HITTEST_NOWHERE: In the client area but below the last item.
+     *  wxTREE_HITTEST_ONITEMBUTTON: On the button associated with an item.
+     *  wxTREE_HITTEST_ONITEMICON: On the bitmap associated with an item.
+     *  wxTREE_HITTEST_ONITEMLABEL: On the label (string) associated with an item.
+     * wxTREE_HITTEST_ONITEM
+     */
+    clRowEntry* HitTest(const wxPoint& point, int& flags) const;
+
     //===-----------------------------------------
     //===-----------------------------------------
 
@@ -131,6 +160,16 @@ public:
      * @brief return the row number of the first visible item in the view
      */
     virtual int GetFirstItemPosition() const = 0;
+
+    /**
+     * @brief return list of all visible items
+     */
+    virtual clRowEntry::Vec_t GetOnScreenItems() const = 0;
+    
+    /**
+     * @brief return the model associated with this control
+     */
+    virtual clItemModelBase* GetModel() = 0;
 };
 
 #endif // CLCONTROLWITHITEMS_H

@@ -37,20 +37,64 @@ void clDataViewListCtrl::OnPaint(wxPaintEvent& event)
     RenderItems(dc, items);
 }
 
-int clDataViewListCtrl::ItemToRow(const wxDataViewItem& item) const
+int clDataViewListCtrl::ItemToRow(const wxDataViewItem& item) const { return m_model.ItemToRow(item); }
+
+wxDataViewItem clDataViewListCtrl::RowToItem(int row) const { return m_model.RowToItem(row); }
+
+int clDataViewListCtrl::GetFirstItemPosition() const { return m_firstItemOnScreen; }
+
+clRowEntry::Vec_t clDataViewListCtrl::GetOnScreenItems() const
 {
-    int index = 0;
-    std::vector<wxDataViewItem>::const_iterator iter =
-        std::find_if(m_items.begin(), m_items.end(), [&](const wxDataViewItem& p) {
-            if(p.GetID() == item.GetID()) { return true; }
-            ++index;
-            return false;
-        });
-    return iter == m_items.end() ? wxNOT_FOUND : index;
+    clRowEntry::Vec_t items;
+    m_model.GetItems(m_firstItemOnScreen, GetNumLineCanFitOnScreen(), items);
+    return items;
 }
 
-wxDataViewItem clDataViewListCtrl::RowToItem(int row) const
+int clDataViewListCtrl::GetRange() const { return m_model.size(); }
+
+bool clDataViewListCtrl::IsEmpty() const { return m_model.empty(); }
+
+void clDataViewListCtrl::AppendItem(const wxVector<wxVariant>& values, wxUIntPtr data)
 {
-    if((row >= (int)m_items.size()) || (row < 0)) { return wxDataViewItem(); }
-    return wxDataViewItem(m_items[row]);
+    clRowEntry* child = new clRowEntry(this, "", wxNOT_FOUND, wxNOT_FOUND);
+    child->SetClientData(data);
+    for(size_t i = 0; i < values.size(); ++i) {
+        const wxVariant& v = values[i];
+        if(v.GetType() == "bool") {
+            child->SetLabel((v.GetBool() ? "Yes" : "No"), i);
+        } else if(v.GetType() == "string") {
+            child->SetLabel(v.GetString(), i);
+        }
+    }
+    m_model.Add(child);
+}
+
+wxDataViewColumn* clDataViewListCtrl::AppendIconTextColumn(const wxString& label, wxDataViewCellMode mode, int width,
+                                                           wxAlignment align, int flags)
+{
+    wxUnusedVar(mode);
+    wxUnusedVar(align);
+    wxUnusedVar(flags);
+    GetHeader().Add(label).SetWidth(width);
+    return nullptr;
+}
+
+wxDataViewColumn* clDataViewListCtrl::AppendProgressColumn(const wxString& label, wxDataViewCellMode mode, int width,
+                                                           wxAlignment align, int flags)
+{
+    wxUnusedVar(mode);
+    wxUnusedVar(align);
+    wxUnusedVar(flags);
+    GetHeader().Add(label).SetWidth(width);
+    return nullptr;
+}
+
+wxDataViewColumn* clDataViewListCtrl::AppendTextColumn(const wxString& label, wxDataViewCellMode mode, int width,
+                                                       wxAlignment align, int flags)
+{
+    wxUnusedVar(mode);
+    wxUnusedVar(align);
+    wxUnusedVar(flags);
+    GetHeader().Add(label).SetWidth(width);
+    return nullptr;
 }

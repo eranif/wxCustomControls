@@ -16,11 +16,9 @@ class clScrollBar;
 class WXDLLIMPEXP_SDK clTreeCtrl : public clControlWithItems
 {
     clTreeCtrlModel m_model;
-    long m_treeStyle = 0;
     wxDirection m_lastScrollDir = wxDOWN;
 
 private:
-    wxPoint DoFixPoint(const wxPoint& pt);
     wxTreeItemId DoGetSiblingVisibleItem(const wxTreeItemId& item, bool next) const;
     bool IsItemVisible(clRowEntry* item) const;
     void EnsureItemVisible(clRowEntry* item, bool fromTop);
@@ -44,8 +42,7 @@ public:
     //===--------------------
 
     // For internal use, dont use these two methods
-    const clTreeCtrlModel& GetModel() const { return m_model; }
-    clTreeCtrlModel& GetModel() { return m_model; }
+    clTreeCtrlModel* GetModel() { return &m_model; }
 
     /**
      * @brief set a sorting function for this tree. The function returns true if the first element should be placed
@@ -59,36 +56,14 @@ public:
     virtual void SetBitmaps(const std::vector<wxBitmap>& bitmaps);
 
     /**
-     * @brief return the tree style
-     */
-    long GetTreeStyle() const { return m_treeStyle; }
-
-    /**
      * @brief is the root hidden?
      */
-    bool IsRootHidden() const { return m_treeStyle & wxTR_HIDE_ROOT; }
+    bool IsRootHidden() const { return HasControlStyle(wxTR_HIDE_ROOT); }
 
     /**
      * @brief enable style on the tree
      */
     void EnableStyle(int style, bool enable, bool refresh = true);
-
-    /**
-     * @brief does the tree has 'style' enabled?
-     */
-    bool HasStyle(int style) const { return m_treeStyle & style; }
-    
-    /**
-     * @brief Calculates which (if any) item is under the given point, returning the tree item id at this point plus
-     *  extra information flags.
-     *  flags is a bitlist of the following:
-     *  wxTREE_HITTEST_NOWHERE: In the client area but below the last item.
-     *  wxTREE_HITTEST_ONITEMBUTTON: On the button associated with an item.
-     *  wxTREE_HITTEST_ONITEMICON: On the bitmap associated with an item.
-     *  wxTREE_HITTEST_ONITEMLABEL: On the label (string) associated with an item.
-     * wxTREE_HITTEST_ONITEM
-     */
-    wxTreeItemId HitTest(const wxPoint& point, int& flags) const;
 
     /**
      * @brief ppends an item to the end of the branch identified by parent, return a new item id.
@@ -289,6 +264,8 @@ public:
      * @brief is item selected?
      */
     bool IsSelected(const wxTreeItemId& item) const;
+
+    clRowEntry::Vec_t GetOnScreenItems() const { return m_model.GetOnScreenItems(); }
 
 protected:
     virtual bool DoKeyDown(const wxKeyEvent& event);

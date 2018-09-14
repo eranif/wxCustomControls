@@ -7,9 +7,12 @@
 #ifndef _CLTREECTRL_CLTREECTRL_WXCRAFTER_BASE_CLASSES_H
 #define _CLTREECTRL_CLTREECTRL_WXCRAFTER_BASE_CLASSES_H
 
+#include "clDataViewListCtrl.h"
+#include "clTreeCtrl.h"
 #include <map>
 #include <wx/artprov.h>
 #include <wx/bitmap.h>
+#include <wx/dataview.h>
 #include <wx/frame.h>
 #include <wx/icon.h>
 #include <wx/iconbndl.h>
@@ -19,6 +22,7 @@
 #include <wx/settings.h>
 #include <wx/sizer.h>
 #include <wx/textctrl.h>
+#include <wx/treectrl.h>
 #include <wx/xrc/xh_bmp.h>
 #include <wx/xrc/xmlres.h>
 #if wxVERSION_NUMBER >= 2900
@@ -55,6 +59,8 @@ public:
 
 protected:
     wxPanel* m_mainPanel;
+    clTreeCtrl* m_treeCtrl;
+    clDataViewListCtrl* m_dataView;
     wxTextCtrl* m_textCtrlLog;
     wxMenuBar* m_myMenuBar;
     wxMenu* File;
@@ -100,6 +106,8 @@ protected:
     virtual void OnHideHeaders(wxCommandEvent& event) { event.Skip(); }
 
 public:
+    clTreeCtrl* GetTreeCtrl() { return m_treeCtrl; }
+    clDataViewListCtrl* GetDataView() { return m_dataView; }
     wxTextCtrl* GetTextCtrlLog() { return m_textCtrlLog; }
     wxPanel* GetMainPanel() { return m_mainPanel; }
     wxMenuBar* GetMyMenuBar() { return m_myMenuBar; }

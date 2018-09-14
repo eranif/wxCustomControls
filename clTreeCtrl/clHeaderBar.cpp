@@ -5,7 +5,7 @@
 #include <wx/settings.h>
 
 #ifdef __WXMSW__
-#define PEN_STYLE wxPENSTYLE_SHORT_DASH
+#define PEN_STYLE wxPENSTYLE_DOT
 #else
 #define PEN_STYLE wxPENSTYLE_DOT
 #endif
@@ -108,4 +108,22 @@ void clHeaderBar::ScrollToColumn(int firstColumn)
 {
     m_firstColumn = firstColumn;
     DoUpdateSize();
+}
+
+const clHeaderItem& clHeaderBar::Last() const
+{
+    if(IsEmpty()) {
+        static clHeaderItem emptyItem;
+        return emptyItem;
+    }
+    return m_columns.back();
+}
+
+clHeaderItem& clHeaderBar::Last()
+{
+    if(IsEmpty()) {
+        static clHeaderItem emptyItem;
+        return emptyItem;
+    }
+    return m_columns.back();
 }
