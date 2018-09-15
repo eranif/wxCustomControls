@@ -72,7 +72,7 @@ public:
     /**
      * @brief enable style on the tree
      */
-    void EnableStyle(int style, bool enable, bool refresh = true);
+    virtual void EnableStyle(int style, bool enable, bool refresh = true);
 
     /**
      * @brief does the tree has 'style' enabled?

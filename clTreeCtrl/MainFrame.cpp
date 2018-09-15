@@ -111,6 +111,46 @@ MainFrame::MainFrame(wxWindow* parent)
                   wxID_OPEN);
         m_treeCtrl->PopupMenu(&menu);
     });
+
+    // Data view events
+    m_dataView->Bind(wxEVT_DATAVIEW_ITEM_ACTIVATED, [&](wxDataViewEvent& event) {
+        event.Skip();
+        wxDataViewItemArray items;
+        if(m_dataView->GetSelections(items)) {
+            for(size_t i = 0; i < items.size(); ++i) {
+                LogMessage(wxString() << "DV item activated: " << m_dataView->GetItemText(items.Item(i)));
+            }
+        }
+    });
+
+    m_dataView->Bind(wxEVT_DATAVIEW_SELECTION_CHANGED, [&](wxDataViewEvent& event) {
+        event.Skip();
+        wxDataViewItem item = m_dataView->GetSelection();
+        LogMessage(wxString() << "DV selection changed: " << m_dataView->GetItemText(item));
+    });
+
+    m_dataView->Bind(wxEVT_DATAVIEW_ITEM_BEGIN_DRAG, [&](wxDataViewEvent& event) {
+        event.Skip();
+        LogMessage("DV DnD started: ");
+        wxDataViewItemArray items;
+        if(m_dataView->GetSelections(items)) {
+            for(size_t i = 0; i < items.size(); ++i) {
+                LogMessage(wxString() << "DV DnD Item: " << m_dataView->GetItemText(items.Item(i)));
+            }
+        }
+    });
+
+    m_dataView->Bind(wxEVT_DATAVIEW_ITEM_DROP, [&](wxDataViewEvent& event) {
+        event.Skip();
+        LogMessage("DV DnD dropped: ");
+        LogMessage(wxString() << "DV DnD Item: " << m_dataView->GetItemText(event.GetItem()));
+    });
+    
+    m_dataView->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, [&](wxDataViewEvent& event) {
+        event.Skip();
+        LogMessage("DV Context menu dropped: ");
+        LogMessage(wxString() << "Context menu on item: " << m_dataView->GetItemText(event.GetItem()));
+    });
 }
 
 MainFrame::~MainFrame() {}
@@ -132,11 +172,7 @@ void MainFrame::OnAbout(wxCommandEvent& event)
     ::wxAboutBox(info);
 }
 
-void MainFrame::LogMessage(const wxString& message)
-{
-    static int counter = 0;
-    wxLogMessage(wxString() << (++counter) << ": " << message);
-}
+void MainFrame::LogMessage(const wxString& message) { wxLogMessage(message); }
 
 void MainFrame::OnOpenFolder(wxCommandEvent& event)
 {
@@ -239,9 +275,11 @@ void MainFrame::OnToggleTheme(wxCommandEvent& event)
 {
     if(m_selectedColours == 0) {
         m_treeCtrl->SetColours(m_coloursArr[1]);
+        m_dataView->SetColours(m_coloursArr[1]);
         m_selectedColours = 1;
     } else {
         m_treeCtrl->SetColours(m_coloursArr[0]);
+        m_dataView->SetColours(m_coloursArr[0]);
         m_selectedColours = 0;
     }
     m_treeCtrl->Refresh();
@@ -249,13 +287,19 @@ void MainFrame::OnToggleTheme(wxCommandEvent& event)
 
 void MainFrame::OnZebraColouring(wxCommandEvent& event)
 {
-    m_treeCtrl->EnableStyle(wxTR_ROW_LINES, !m_treeCtrl->HasStyle(wxTR_ROW_LINES));
+    m_treeCtrl->EnableStyle(wxTR_ROW_LINES, event.IsChecked());
+    m_dataView->EnableStyle(wxDV_ROW_LINES, event.IsChecked());
 }
+
 void MainFrame::OnHideRoot(wxCommandEvent& event) { m_treeCtrl->EnableStyle(wxTR_HIDE_ROOT, event.IsChecked()); }
 
 void MainFrame::OnSingleSelection(wxCommandEvent& event) { m_treeCtrl->EnableStyle(wxTR_MULTIPLE, !event.IsChecked()); }
 void MainFrame::OnShowSBOnFocus(wxCommandEvent& event) { m_treeCtrl->SetShowScrollBarOnFocus(event.IsChecked()); }
-void MainFrame::OnHideHeaders(wxCommandEvent& event) { m_treeCtrl->SetShowHeader(!event.IsChecked()); }
+void MainFrame::OnHideHeaders(wxCommandEvent& event)
+{
+    m_treeCtrl->SetShowHeader(!event.IsChecked());
+    m_dataView->SetShowHeader(!event.IsChecked());
+}
 void MainFrame::OnDeleteAllItems(wxCommandEvent& event)
 {
     m_treeCtrl->DeleteAllItems();

@@ -42,7 +42,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     boxSizer71->Add(m_treeCtrl, 1, wxALL | wxEXPAND, WXC_FROM_DIP(1));
 
     m_dataView = new clDataViewListCtrl(m_mainPanel, wxID_ANY, wxDefaultPosition,
-                                        wxDLG_UNIT(m_mainPanel, wxSize(-1, -1)), wxDV_ROW_LINES | wxDV_SINGLE);
+                                        wxDLG_UNIT(m_mainPanel, wxSize(-1, -1)), wxDV_SINGLE);
 
     boxSizer71->Add(m_dataView, 1, wxALL | wxEXPAND, WXC_FROM_DIP(1));
 
@@ -107,7 +107,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     menu_clTreeCtrl->Append(m_menuItemExit);
 
     menu_clDataViewListCtrl = new wxMenu();
-    m_myMenuBar->Append(menu_clDataViewListCtrl, _("Menu"));
+    m_myMenuBar->Append(menu_clDataViewListCtrl, _("clDataViewListCtrl"));
 
     m_menuItem83 = new wxMenuItem(menu_clDataViewListCtrl, ID_DV_OPEN_FOLDER, _("Open folder"), wxT(""), wxITEM_NORMAL);
     menu_clDataViewListCtrl->Append(m_menuItem83);

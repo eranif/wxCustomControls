@@ -3,6 +3,7 @@
 
 #include "clTreeCtrl.h"
 #include <wx/dataview.h>
+#include <unordered_map>
 
 /**
  * @brief a thin wrapper around clTreeCtrl which provides basic compatiblity API (such as adding columns)
@@ -12,6 +13,8 @@ class WXDLLIMPEXP_SDK clDataViewListCtrl : public clTreeCtrl
 {
     bool m_needToClearDefaultHeader = true;
     wxDataViewListCtrl m_dummy; // Needed for generating wxDV compatible events
+
+    static std::unordered_map<int, int> m_stylesMap;
 
 protected:
     void DoAddHeader(const wxString& label, int width);
@@ -52,7 +55,7 @@ public:
                                        int width = -1, wxAlignment align = wxALIGN_LEFT,
                                        int flags = wxDATAVIEW_COL_RESIZABLE);
 
-    wxDataViewItem GetSelection() const { return wxDataViewItem(GetSelection().GetID()); }
+    wxDataViewItem GetSelection() const { return wxDataViewItem(clTreeCtrl::GetSelection().GetID()); }
     wxDataViewItem GetCurrentItem() const { return wxDataViewItem(GetFocusedItem().GetID()); }
     int GetSelections(wxDataViewItemArray& sel) const;
     int GetSelectedItemsCount() const;
@@ -74,6 +77,8 @@ public:
 
     void SetItemFont(const wxDataViewItem& item, const wxFont& font, size_t col = 0);
     wxFont GetItemFont(const wxDataViewItem& item, size_t col = 0) const;
+    
+    virtual void EnableStyle(int style, bool enable, bool refresh = true);
 };
 
 #endif // CLDATAVIEWLISTCTRL_H

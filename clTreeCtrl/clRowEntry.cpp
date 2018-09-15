@@ -4,6 +4,7 @@
 #include "clTreeCtrl.h"
 #include <algorithm>
 #include <functional>
+#include <wx/dataview.h>
 #include <wx/dc.h>
 #include <wx/settings.h>
 
@@ -197,7 +198,7 @@ void clRowEntry::ClearRects()
 void clRowEntry::Render(wxWindow* win, wxDC& dc, const clColours& c, int row_index)
 {
     wxRect rowRect = GetItemRect();
-    bool zebraColouring = (m_tree->GetTreeStyle() & wxTR_ROW_LINES);
+    bool zebraColouring = (m_tree->HasStyle(wxTR_ROW_LINES) || m_tree->HasStyle(wxDV_ROW_LINES));
     bool even_row = ((row_index % 2) == 0);
 
     // Not cell related

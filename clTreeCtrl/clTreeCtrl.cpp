@@ -664,6 +664,7 @@ void clTreeCtrl::SetItemText(const wxTreeItemId& item, const wxString& text, siz
     clRowEntry* node = m_model.ToPtr(item);
     CHECK_PTR_RET(node);
     node->SetLabel(text, col);
+    DoUpdateHeader(item);
     Refresh();
 }
 

@@ -7,12 +7,18 @@
 #define DV_ITEM(tree_item) wxDataViewItem(tree_item.GetID())
 #define TREE_ITEM(dv_item) wxTreeItemId(dv_item.GetID())
 
+std::unordered_map<int, int> clDataViewListCtrl::m_stylesMap;
 clDataViewListCtrl::clDataViewListCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size,
                                        long style)
     : clTreeCtrl(parent, id, pos, size, 0)
 {
     // Map clDataViewListCtrl to clTreeCtrl style
     SetShowHeader(true);
+    if(m_stylesMap.empty()) {
+        m_stylesMap.insert({ wxDV_ROW_LINES, wxTR_ROW_LINES });
+        m_stylesMap.insert({ wxDV_MULTIPLE, wxTR_MULTIPLE });
+    }
+
     int my_style = 0;
     if(style & wxDV_ROW_LINES) { my_style |= wxTR_ROW_LINES; }
     if(style & wxDV_MULTIPLE) { my_style |= wxTR_MULTIPLE; }
@@ -222,4 +228,10 @@ void clDataViewListCtrl::SetItemFont(const wxDataViewItem& item, const wxFont& f
 wxFont clDataViewListCtrl::GetItemFont(const wxDataViewItem& item, size_t col) const
 {
     return clTreeCtrl::GetItemFont(TREE_ITEM(item), col);
+}
+
+void clDataViewListCtrl::EnableStyle(int style, bool enable, bool refresh)
+{
+    if(m_stylesMap.count(style) == 0) { return; }
+    clTreeCtrl::EnableStyle(m_stylesMap[style], enable, refresh);
 }
