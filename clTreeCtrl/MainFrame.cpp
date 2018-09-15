@@ -268,3 +268,33 @@ void MainFrame::DoAddRoot()
     m_treeCtrl->SetItemText(root, "??", 1);
     m_treeCtrl->SetItemText(root, "0KB", 2);
 }
+
+void MainFrame::OnDVOpenFolder(wxCommandEvent& event)
+{
+    wxString path = ::wxDirSelector();
+    if(path.IsEmpty()) { return; }
+    m_dataView->DeleteAllItems();
+    // load the folders
+    wxDir dir(path);
+    if(dir.IsOpened()) {
+        wxString filename;
+        bool cont = dir.GetFirst(&filename);
+        while(cont) {
+            wxFileName fn(path, filename);
+            if(wxDirExists(fn.GetFullPath())) {
+                // A directory
+                wxDataViewItem folderItem = m_dataView->AppendItem(filename, 0, 1);
+                m_dataView->SetItemText(folderItem, "Folder", 1);
+                m_dataView->SetItemText(folderItem, "0KB", 2);
+            } else {
+                // A file
+                wxDataViewItem fileItem = m_dataView->AppendItem(filename, 2, 2);
+                m_dataView->SetItemText(fileItem, "File", 1);
+                wxString t;
+                t << std::ceil((double)fn.GetSize().ToDouble() / 1024.0) << "KB";
+                m_dataView->SetItemText(fileItem, t, 2);
+            }
+            cont = dir.GetNext(&filename);
+        }
+    }
+}

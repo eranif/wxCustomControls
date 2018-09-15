@@ -47,14 +47,15 @@ public:
     enum {
         ID_TOGGLE_THEMES = 10001,
         ID_ZEBRA = 10002,
-        ID_SINGLE_SELECTION = 10003,
-        ID_HIDE_ROOT = 10004,
-        ID_PREV_SIBLING = 10005,
-        ID_SHOW_SB_ON_FOCUS = 10006,
-        ID_NEXT_SIBLING = 10007,
-        ID_SELECT_CHILDREN = 10008,
-        ID_EXPAND_ALL = 10009,
-        ID_OPEN_FOLDER = 10010,
+        ID_DV_OPEN_FOLDER = 10003,
+        ID_SINGLE_SELECTION = 10004,
+        ID_HIDE_ROOT = 10005,
+        ID_PREV_SIBLING = 10006,
+        ID_SHOW_SB_ON_FOCUS = 10007,
+        ID_NEXT_SIBLING = 10008,
+        ID_SELECT_CHILDREN = 10009,
+        ID_EXPAND_ALL = 10010,
+        ID_OPEN_FOLDER = 10011,
     };
 
 protected:
@@ -63,7 +64,7 @@ protected:
     clDataViewListCtrl* m_dataView;
     wxTextCtrl* m_textCtrlLog;
     wxMenuBar* m_myMenuBar;
-    wxMenu* File;
+    wxMenu* menu_clTreeCtrl;
     wxMenuItem* m_menuItem13;
     wxMenuItem* m_separator1;
     wxMenuItem* m_menuItemExpandAll;
@@ -77,6 +78,8 @@ protected:
     wxMenuItem* m_menuItemDeleteAllItems;
     wxMenuItem* m_separator2;
     wxMenuItem* m_menuItemExit;
+    wxMenu* menu_clDataViewListCtrl;
+    wxMenuItem* m_menuItem83;
     wxMenu* m_menu53;
     wxMenuItem* m_menuItemZebra;
     wxMenuItem* m_menuItemThemes;
@@ -98,6 +101,7 @@ protected:
     virtual void OnPrevSibling(wxCommandEvent& event) { event.Skip(); }
     virtual void OnDeleteAllItems(wxCommandEvent& event) { event.Skip(); }
     virtual void OnExit(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnDVOpenFolder(wxCommandEvent& event) { event.Skip(); }
     virtual void OnZebraColouring(wxCommandEvent& event) { event.Skip(); }
     virtual void OnToggleTheme(wxCommandEvent& event) { event.Skip(); }
     virtual void OnHideRoot(wxCommandEvent& event) { event.Skip(); }

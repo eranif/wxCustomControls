@@ -60,45 +60,57 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     m_myMenuBar = new wxMenuBar(0);
     this->SetMenuBar(m_myMenuBar);
 
-    File = new wxMenu();
-    m_myMenuBar->Append(File, _("File"));
+    menu_clTreeCtrl = new wxMenu();
+    m_myMenuBar->Append(menu_clTreeCtrl, _("clTreeCtrl"));
 
-    m_menuItem13 = new wxMenuItem(File, ID_OPEN_FOLDER, _("Open folder..."), wxT(""), wxITEM_NORMAL);
-    File->Append(m_menuItem13);
+    m_menuItem13 = new wxMenuItem(menu_clTreeCtrl, ID_OPEN_FOLDER, _("Open folder..."), wxT(""), wxITEM_NORMAL);
+    menu_clTreeCtrl->Append(m_menuItem13);
 
-    File->AppendSeparator();
+    menu_clTreeCtrl->AppendSeparator();
 
-    m_menuItemExpandAll = new wxMenuItem(File, wxID_ANY, _("Expand All"), wxT(""), wxITEM_NORMAL);
-    File->Append(m_menuItemExpandAll);
+    m_menuItemExpandAll = new wxMenuItem(menu_clTreeCtrl, wxID_ANY, _("Expand All"), wxT(""), wxITEM_NORMAL);
+    menu_clTreeCtrl->Append(m_menuItemExpandAll);
 
-    m_menuItemCollapseAll = new wxMenuItem(File, wxID_ANY, _("Collapse All"), wxT(""), wxITEM_NORMAL);
-    File->Append(m_menuItemCollapseAll);
+    m_menuItemCollapseAll = new wxMenuItem(menu_clTreeCtrl, wxID_ANY, _("Collapse All"), wxT(""), wxITEM_NORMAL);
+    menu_clTreeCtrl->Append(m_menuItemCollapseAll);
 
-    m_menuItemFirstVisible = new wxMenuItem(File, wxID_ANY, _("First Visible Item\tShift-F4"), wxT(""), wxITEM_NORMAL);
-    File->Append(m_menuItemFirstVisible);
+    m_menuItemFirstVisible =
+        new wxMenuItem(menu_clTreeCtrl, wxID_ANY, _("First Visible Item\tShift-F4"), wxT(""), wxITEM_NORMAL);
+    menu_clTreeCtrl->Append(m_menuItemFirstVisible);
 
-    m_menuItemNextVisibleItem = new wxMenuItem(File, wxID_ANY, _("Next Visible Item\tF4"), wxT(""), wxITEM_NORMAL);
-    File->Append(m_menuItemNextVisibleItem);
+    m_menuItemNextVisibleItem =
+        new wxMenuItem(menu_clTreeCtrl, wxID_ANY, _("Next Visible Item\tF4"), wxT(""), wxITEM_NORMAL);
+    menu_clTreeCtrl->Append(m_menuItemNextVisibleItem);
 
-    m_menuItemEnsureVisible = new wxMenuItem(File, wxID_ANY, _("Ensure Item Visible"), wxT(""), wxITEM_NORMAL);
-    File->Append(m_menuItemEnsureVisible);
+    m_menuItemEnsureVisible =
+        new wxMenuItem(menu_clTreeCtrl, wxID_ANY, _("Ensure Item Visible"), wxT(""), wxITEM_NORMAL);
+    menu_clTreeCtrl->Append(m_menuItemEnsureVisible);
 
-    m_menuItemSelectChildren = new wxMenuItem(File, ID_SELECT_CHILDREN, _("Select Children"), wxT(""), wxITEM_NORMAL);
-    File->Append(m_menuItemSelectChildren);
+    m_menuItemSelectChildren =
+        new wxMenuItem(menu_clTreeCtrl, ID_SELECT_CHILDREN, _("Select Children"), wxT(""), wxITEM_NORMAL);
+    menu_clTreeCtrl->Append(m_menuItemSelectChildren);
 
-    m_menuItemNextSibling = new wxMenuItem(File, ID_NEXT_SIBLING, _("Next Sibling\tF2"), wxT(""), wxITEM_NORMAL);
-    File->Append(m_menuItemNextSibling);
+    m_menuItemNextSibling =
+        new wxMenuItem(menu_clTreeCtrl, ID_NEXT_SIBLING, _("Next Sibling\tF2"), wxT(""), wxITEM_NORMAL);
+    menu_clTreeCtrl->Append(m_menuItemNextSibling);
 
-    m_menuItemPrevSibling = new wxMenuItem(File, ID_PREV_SIBLING, _("Prev Sibling\tShift-F2"), wxT(""), wxITEM_NORMAL);
-    File->Append(m_menuItemPrevSibling);
+    m_menuItemPrevSibling =
+        new wxMenuItem(menu_clTreeCtrl, ID_PREV_SIBLING, _("Prev Sibling\tShift-F2"), wxT(""), wxITEM_NORMAL);
+    menu_clTreeCtrl->Append(m_menuItemPrevSibling);
 
-    m_menuItemDeleteAllItems = new wxMenuItem(File, wxID_ANY, _("Delete All Items"), wxT(""), wxITEM_NORMAL);
-    File->Append(m_menuItemDeleteAllItems);
+    m_menuItemDeleteAllItems = new wxMenuItem(menu_clTreeCtrl, wxID_ANY, _("Delete All Items"), wxT(""), wxITEM_NORMAL);
+    menu_clTreeCtrl->Append(m_menuItemDeleteAllItems);
 
-    File->AppendSeparator();
+    menu_clTreeCtrl->AppendSeparator();
 
-    m_menuItemExit = new wxMenuItem(File, wxID_EXIT, _("Exit\tAlt-X"), _("Quit"), wxITEM_NORMAL);
-    File->Append(m_menuItemExit);
+    m_menuItemExit = new wxMenuItem(menu_clTreeCtrl, wxID_EXIT, _("Exit\tAlt-X"), _("Quit"), wxITEM_NORMAL);
+    menu_clTreeCtrl->Append(m_menuItemExit);
+
+    menu_clDataViewListCtrl = new wxMenu();
+    m_myMenuBar->Append(menu_clDataViewListCtrl, _("Menu"));
+
+    m_menuItem83 = new wxMenuItem(menu_clDataViewListCtrl, ID_DV_OPEN_FOLDER, _("Open folder"), wxT(""), wxITEM_NORMAL);
+    menu_clDataViewListCtrl->Append(m_menuItem83);
 
     m_menu53 = new wxMenu();
     m_myMenuBar->Append(m_menu53, _("Style"));
@@ -163,6 +175,8 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
                   wxCommandEventHandler(MainFrameBaseClass::OnDeleteAllItems), NULL, this);
     this->Connect(m_menuItemExit->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                   wxCommandEventHandler(MainFrameBaseClass::OnExit), NULL, this);
+    this->Connect(m_menuItem83->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                  wxCommandEventHandler(MainFrameBaseClass::OnDVOpenFolder), NULL, this);
     this->Connect(m_menuItemZebra->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                   wxCommandEventHandler(MainFrameBaseClass::OnZebraColouring), NULL, this);
     this->Connect(m_menuItemThemes->GetId(), wxEVT_COMMAND_MENU_SELECTED,
@@ -201,6 +215,8 @@ MainFrameBaseClass::~MainFrameBaseClass()
                      wxCommandEventHandler(MainFrameBaseClass::OnDeleteAllItems), NULL, this);
     this->Disconnect(m_menuItemExit->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                      wxCommandEventHandler(MainFrameBaseClass::OnExit), NULL, this);
+    this->Disconnect(m_menuItem83->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                     wxCommandEventHandler(MainFrameBaseClass::OnDVOpenFolder), NULL, this);
     this->Disconnect(m_menuItemZebra->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                      wxCommandEventHandler(MainFrameBaseClass::OnZebraColouring), NULL, this);
     this->Disconnect(m_menuItemThemes->GetId(), wxEVT_COMMAND_MENU_SELECTED,

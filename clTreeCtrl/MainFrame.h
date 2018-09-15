@@ -43,6 +43,7 @@ private:
     void DoAddRoot();
 
 protected:
+    virtual void OnDVOpenFolder(wxCommandEvent& event);
     virtual void OnDeleteAllItems(wxCommandEvent& event);
     virtual void OnHideHeaders(wxCommandEvent& event);
     virtual void OnShowSBOnFocus(wxCommandEvent& event);

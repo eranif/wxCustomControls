@@ -15,6 +15,7 @@
 class clScrollBar;
 class WXDLLIMPEXP_SDK clTreeCtrl : public clControlWithItems
 {
+protected:
     clTreeCtrlModel m_model;
     long m_treeStyle = 0;
     wxDirection m_lastScrollDir = wxDOWN;
@@ -77,7 +78,7 @@ public:
      * @brief does the tree has 'style' enabled?
      */
     bool HasStyle(int style) const { return m_treeStyle & style; }
-    
+
     /**
      * @brief Calculates which (if any) item is under the given point, returning the tree item id at this point plus
      *  extra information flags.
@@ -279,7 +280,7 @@ public:
     /**
      * @brief delete all items in tree
      */
-    void DeleteAllItems() { Delete(GetRootItem()); }
+    virtual void DeleteAllItems() { Delete(GetRootItem()); }
 
     /**
      * @brief is this item visible?
