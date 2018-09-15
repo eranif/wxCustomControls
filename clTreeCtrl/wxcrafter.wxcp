@@ -462,7 +462,7 @@
                "m_properties": [{
                  "type": "string",
                  "m_label": "Name:",
-                 "m_value": "Type"
+                 "m_value": "Kind"
                 }, {
                  "type": "string",
                  "m_label": "Width:",
@@ -504,7 +504,7 @@
                "m_properties": [{
                  "type": "string",
                  "m_label": "Name:",
-                 "m_value": "Size"
+                 "m_value": "File size"
                 }, {
                  "type": "string",
                  "m_label": "Width:",

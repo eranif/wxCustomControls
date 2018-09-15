@@ -34,8 +34,8 @@
 clTreeCtrl::clTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
     : clControlWithItems(parent, wxID_ANY, pos, size, wxWANTS_CHARS)
     , m_model(this)
+    , m_treeStyle(style)
 {
-    SetControlStyle(style);
     wxSize textSize = GetTextSize("Tp");
     SetLineHeight(clRowEntry::Y_SPACER + textSize.GetHeight() + clRowEntry::Y_SPACER);
     SetIndent(GetLineHeight());
@@ -171,8 +171,8 @@ void clTreeCtrl::OnMouseLeftDown(wxMouseEvent& event)
     event.Skip();
     CHECK_ROOT_RET();
     int flags = 0;
-    wxPoint pt = event.GetPosition();
-    wxTreeItemId where(HitTest(pt, flags));
+    wxPoint pt = DoFixPoint(event.GetPosition());
+    wxTreeItemId where = HitTest(pt, flags);
     if(where.IsOk()) {
         if(flags & wxTREE_HITTEST_ONITEMBUTTON) {
             if(IsExpanded(where)) {
@@ -182,7 +182,7 @@ void clTreeCtrl::OnMouseLeftDown(wxMouseEvent& event)
             }
         } else {
             clRowEntry* pNode = m_model.ToPtr(where);
-            if(HasControlStyle(wxTR_MULTIPLE)) {
+            if(HasStyle(wxTR_MULTIPLE)) {
                 if(event.ControlDown()) {
                     // Toggle the selection
                     m_model.SelectItem(where, !pNode->IsSelected(), true);
@@ -222,7 +222,7 @@ void clTreeCtrl::OnMouseLeftUp(wxMouseEvent& event)
 {
     event.Skip();
     int flags = 0;
-    wxPoint pt = event.GetPosition();
+    wxPoint pt = DoFixPoint(event.GetPosition());
     wxTreeItemId where = HitTest(pt, flags);
     if(where.IsOk() && (flags & wxTREE_HITTEST_ONITEM)) {
         bool has_multiple_selection = (m_model.GetSelectionsCount() > 1);
@@ -235,11 +235,38 @@ void clTreeCtrl::OnMouseLeftUp(wxMouseEvent& event)
     }
 }
 
+wxTreeItemId clTreeCtrl::HitTest(const wxPoint& point, int& flags) const
+{
+    if(!m_model.GetRoot()) { return wxTreeItemId(); }
+    flags = 0;
+    for(size_t i = 0; i < m_model.GetOnScreenItems().size(); ++i) {
+        const clRowEntry* item = m_model.GetOnScreenItems()[i];
+        wxRect buttonRect = item->GetButtonRect();
+        // Adjust the coordiantes incase we got h-scroll
+        buttonRect.SetX(buttonRect.GetX() - GetFirstColumn());
+        if(buttonRect.Contains(point)) {
+            flags |= wxTREE_HITTEST_ONITEMBUTTON;
+            return wxTreeItemId(const_cast<clRowEntry*>(item));
+        }
+        if(item->GetItemRect().Contains(point)) {
+            flags |= wxTREE_HITTEST_ONITEM;
+            return wxTreeItemId(const_cast<clRowEntry*>(item));
+        }
+    }
+    return wxTreeItemId();
+}
+
 void clTreeCtrl::UnselectAll()
 {
     if(!m_model.GetRoot()) { return; }
     m_model.UnselectAll();
     Refresh();
+}
+
+wxPoint clTreeCtrl::DoFixPoint(const wxPoint& pt)
+{
+    wxPoint point = pt;
+    return point;
 }
 
 void clTreeCtrl::EnsureVisible(const wxTreeItemId& item)
@@ -268,7 +295,7 @@ void clTreeCtrl::OnMouseLeftDClick(wxMouseEvent& event)
     CHECK_ROOT_RET();
 
     int flags = 0;
-    wxPoint pt = event.GetPosition();
+    wxPoint pt = DoFixPoint(event.GetPosition());
     wxTreeItemId where = HitTest(pt, flags);
     if(where.IsOk()) {
         SelectItem(where, true);
@@ -433,7 +460,7 @@ void clTreeCtrl::SetBitmaps(const std::vector<wxBitmap>& bitmaps)
 
 void clTreeCtrl::ProcessIdle()
 {
-    if(HasControlStyle(wxTR_FULL_ROW_HIGHLIGHT)) {
+    if(HasStyle(wxTR_FULL_ROW_HIGHLIGHT)) {
         CHECK_ROOT_RET();
         int flags = 0;
         wxPoint pt = ScreenToClient(::wxGetMousePosition());
@@ -552,11 +579,6 @@ bool clTreeCtrl::DoKeyDown(const wxKeyEvent& event)
             Expand(selectedItem);
             return true;
         }
-        //    } else if(event.GetKeyCode() == WXK_NUMPAD_DELETE || event.GetKeyCode() == WXK_DELETE) {
-        //        // Delete the item (this will also fire
-        //        // wxEVT_TREE_DELETE_ITEM
-        //        Delete(selectedItem);
-        //        return true;
     } else if(event.GetKeyCode() == WXK_RETURN || event.GetKeyCode() == WXK_NUMPAD_ENTER) {
         wxTreeEvent evt(wxEVT_TREE_ITEM_ACTIVATED);
         evt.SetEventObject(this);
@@ -604,7 +626,7 @@ void clTreeCtrl::SetItemData(const wxTreeItemId& item, wxTreeItemData* data)
 {
     clRowEntry* node = m_model.ToPtr(item);
     CHECK_PTR_RET(node);
-    node->SetClientObject(data);
+    node->SetClientData(data);
 }
 
 void clTreeCtrl::SetItemBackgroundColour(const wxTreeItemId& item, const wxColour& colour, size_t col)
@@ -695,7 +717,7 @@ void clTreeCtrl::OnRightDown(wxMouseEvent& event)
     event.Skip();
     CHECK_ROOT_RET();
     int flags = 0;
-    wxPoint pt = event.GetPosition();
+    wxPoint pt = DoFixPoint(event.GetPosition());
     wxTreeItemId where = HitTest(pt, flags);
     if(where.IsOk()) {
         wxTreeEvent evt(wxEVT_TREE_ITEM_RIGHT_CLICK);
@@ -753,7 +775,7 @@ void clTreeCtrl::ScrollRows(int steps, wxDirection direction)
         fromTop = (direction == wxUP);
     }
 
-    if(::wxGetKeyState(WXK_SHIFT) && HasControlStyle(wxTR_MULTIPLE)) {
+    if(::wxGetKeyState(WXK_SHIFT) && HasStyle(wxTR_MULTIPLE)) {
         m_model.AddSelection(nextSelection);
     } else {
         SelectItem(nextSelection);
@@ -766,7 +788,7 @@ void clTreeCtrl::ScrollRows(int steps, wxDirection direction)
 void clTreeCtrl::SelectChildren(const wxTreeItemId& item)
 {
     CHECK_ITEM_RET(item);
-    if(!(HasControlStyle(wxTR_MULTIPLE))) {
+    if(!(GetTreeStyle() & wxTR_MULTIPLE)) {
         // Can only be used with multiple selection trees
         return;
     }
@@ -809,7 +831,11 @@ wxTreeItemId clTreeCtrl::DoScrollLines(int numLines, bool up, wxTreeItemId from,
 void clTreeCtrl::EnableStyle(int style, bool enable, bool refresh)
 {
     if(!m_model.GetRoot()) { return; }
-    EnableControlStyle(style, enable);
+    if(enable) {
+        m_treeStyle |= style;
+    } else {
+        m_treeStyle &= ~style;
+    }
 
     // When changing the wxTR_HIDE_ROOT style
     // we need to fix the indentation for each node in the tree

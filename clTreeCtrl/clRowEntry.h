@@ -3,7 +3,6 @@
 
 #include "clCellValue.h"
 #include "clColours.h"
-#include "clItemModelBase.h"
 #include "codelite_exports.h"
 #include <vector>
 #include <wx/colour.h>
@@ -12,7 +11,9 @@
 #include <wx/string.h>
 #include <wx/treebase.h>
 
-enum clRowEntryFlags {
+class clTreeCtrlModel;
+class clTreeCtrl;
+enum clTreeCtrlNodeFlags {
     kNF_FontBold = (1 << 0),
     kNF_FontItalic = (1 << 1),
     kNF_SortItems = (1 << 2),
@@ -21,17 +22,18 @@ enum clRowEntryFlags {
     kNF_Hovered = (1 << 5),
     kNF_Hidden = (1 << 6),
 };
-class clControlWithItems;
+
 class WXDLLIMPEXP_SDK clRowEntry
 {
+
 public:
     typedef std::vector<clRowEntry*> Vec_t;
     static const int Y_SPACER = 1;
     static const int X_SPACER = 3;
 
 protected:
-    clControlWithItems* m_control = nullptr;
-    clItemModelBase* m_model = nullptr;
+    clTreeCtrl* m_tree = nullptr;
+    clTreeCtrlModel* m_model = nullptr;
     clCellValue::Vect_t m_cells;
     size_t m_flags = 0;
     wxTreeItemData* m_clientObject = nullptr;
@@ -45,7 +47,7 @@ protected:
     wxRect m_buttonRect;
 
 protected:
-    void SetFlag(clRowEntryFlags flag, bool b)
+    void SetFlag(clTreeCtrlNodeFlags flag, bool b)
     {
         if(b) {
             m_flags |= flag;
@@ -54,7 +56,7 @@ protected:
         }
     }
 
-    bool HasFlag(clRowEntryFlags flag) const { return m_flags & flag; }
+    bool HasFlag(clTreeCtrlNodeFlags flag) const { return m_flags & flag; }
 
     /**
      * @brief return the nth visible item
@@ -67,7 +69,7 @@ public:
     clRowEntry* GetLastChild() const;
     clRowEntry* GetFirstChild() const;
 
-    clRowEntry(clControlWithItems* control, const wxString& label, int bitmapIndex = wxNOT_FOUND,
+    clRowEntry(clTreeCtrl* tree, const wxString& label, int bitmapIndex = wxNOT_FOUND,
                int bitmapSelectedIndex = wxNOT_FOUND);
     ~clRowEntry();
 
@@ -77,6 +79,9 @@ public:
     void SetHidden(bool b);
     bool IsHidden() const { return HasFlag(kNF_Hidden); }
 
+    void SetData(wxUIntPtr data) { this->m_data = data; }
+    wxUIntPtr GetData() { return m_data; }
+    
     /**
      * @brief using wxDC, calculate the item's width
      */
@@ -146,20 +151,11 @@ public:
     void SetParent(clRowEntry* parent);
     clRowEntry* GetParent() const { return m_parent; }
     bool HasChildren() const { return !m_children.empty(); }
-    /**
-     * @brief set client object. the object is deleted by _this_ class
-     */
-    void SetClientObject(wxTreeItemData* clientObject)
+    void SetClientData(wxTreeItemData* clientData)
     {
         wxDELETE(m_clientObject);
-        this->m_clientObject = clientObject;
+        this->m_clientObject = clientData;
     }
-
-    /**
-     * @brief set client data. The data will be deleted by the user!
-     */
-    void SetClientData(wxUIntPtr data) { this->m_data = data; }
-
     size_t GetChildrenCount(bool recurse) const;
     int GetExpandedLines() const;
     void GetNextItems(int count, clRowEntry::Vec_t& items);

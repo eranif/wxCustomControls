@@ -56,7 +56,11 @@ public:
     /**
      * @brief add new column to the header bar
      */
-    void Add(const clHeaderItem& item) { push_back(item); }
+    clHeaderItem& Add(const clHeaderItem& item)
+    {
+        push_back(item);
+        return Last();
+    }
     /**
      * @brief add new column to the header bar
      */
@@ -65,7 +69,8 @@ public:
         push_back(clHeaderItem(label, bitmap));
         return Last();
     }
-
+    
+    void Clear();
     const clHeaderItem& Last() const;
     clHeaderItem& Last();
     /**

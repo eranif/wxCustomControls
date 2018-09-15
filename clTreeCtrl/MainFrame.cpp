@@ -19,14 +19,12 @@ MainFrame::MainFrame(wxWindow* parent)
     m_coloursArr[1] = colours;
 
     m_treeCtrl->SetColours(m_coloursArr[m_selectedColours]);
-    m_dataView->SetColours(m_coloursArr[m_selectedColours]);
 
     clHeaderBar header;
     header.Add("Path");
     header.Add("Kind");
     header.Add("Size");
     m_treeCtrl->SetHeader(header);
-    m_dataView->SetHeader(header);
     DoAddRoot();
 
     wxLog::SetActiveTarget(new wxLogTextCtrl(m_textCtrlLog));
@@ -51,7 +49,6 @@ MainFrame::MainFrame(wxWindow* parent)
     bitmaps.push_back(images.Bitmap("folder_open"));
     bitmaps.push_back(images.Bitmap("file"));
     m_treeCtrl->SetBitmaps(bitmaps);
-    m_dataView->SetBitmaps(bitmaps);
 
     m_treeCtrl->Bind(wxEVT_TREE_ITEM_EXPANDING, &MainFrame::OnItemExpanding, this);
     m_treeCtrl->Bind(wxEVT_TREE_DELETE_ITEM, &MainFrame::OnItemDeleted, this);
@@ -238,25 +235,22 @@ void MainFrame::OnPrevSibling(wxCommandEvent& event)
     m_treeCtrl->SelectItem(m_treeCtrl->GetPrevSibling(m_treeCtrl->GetFocusedItem()));
     m_treeCtrl->EnsureVisible(m_treeCtrl->GetFocusedItem());
 }
-
 void MainFrame::OnToggleTheme(wxCommandEvent& event)
 {
     if(m_selectedColours == 0) {
         m_treeCtrl->SetColours(m_coloursArr[1]);
-        m_dataView->SetColours(m_coloursArr[1]);
         m_selectedColours = 1;
     } else {
         m_treeCtrl->SetColours(m_coloursArr[0]);
-        m_dataView->SetColours(m_coloursArr[0]);
         m_selectedColours = 0;
     }
+    m_treeCtrl->Refresh();
 }
 
 void MainFrame::OnZebraColouring(wxCommandEvent& event)
 {
-    m_treeCtrl->EnableStyle(wxTR_ROW_LINES, !m_treeCtrl->HasControlStyle(wxTR_ROW_LINES));
+    m_treeCtrl->EnableStyle(wxTR_ROW_LINES, !m_treeCtrl->HasStyle(wxTR_ROW_LINES));
 }
-
 void MainFrame::OnHideRoot(wxCommandEvent& event) { m_treeCtrl->EnableStyle(wxTR_HIDE_ROOT, event.IsChecked()); }
 
 void MainFrame::OnSingleSelection(wxCommandEvent& event) { m_treeCtrl->EnableStyle(wxTR_MULTIPLE, !event.IsChecked()); }

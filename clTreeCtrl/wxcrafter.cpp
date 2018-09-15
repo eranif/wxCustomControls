@@ -48,9 +48,9 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
 
     m_dataView->AppendIconTextColumn(_("Path"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT,
                                      wxDATAVIEW_COL_RESIZABLE);
-    m_dataView->AppendTextColumn(_("Type"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT,
+    m_dataView->AppendTextColumn(_("Kind"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT,
                                  wxDATAVIEW_COL_RESIZABLE);
-    m_dataView->AppendTextColumn(_("Size"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT,
+    m_dataView->AppendTextColumn(_("File size"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT,
                                  wxDATAVIEW_COL_RESIZABLE);
     m_textCtrlLog = new wxTextCtrl(m_mainPanel, wxID_ANY, wxT(""), wxDefaultPosition,
                                    wxDLG_UNIT(m_mainPanel, wxSize(-1, 100)), wxTE_RICH | wxTE_MULTILINE);

@@ -5,7 +5,7 @@
 #include <wx/settings.h>
 
 #ifdef __WXMSW__
-#define PEN_STYLE wxPENSTYLE_DOT
+#define PEN_STYLE wxPENSTYLE_SHORT_DASH
 #else
 #define PEN_STYLE wxPENSTYLE_DOT
 #endif
@@ -127,3 +127,5 @@ clHeaderItem& clHeaderBar::Last()
     }
     return m_columns.back();
 }
+
+void clHeaderBar::Clear() { m_columns.clear(); }

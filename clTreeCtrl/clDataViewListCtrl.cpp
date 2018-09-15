@@ -1,63 +1,28 @@
 #include "clDataViewListCtrl.h"
-#include <algorithm>
+#include "clHeaderItem.h"
+#include <wx/dataview.h>
 #include <wx/dcbuffer.h>
 #include <wx/dcgraph.h>
 
 clDataViewListCtrl::clDataViewListCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size,
                                        long style)
-    : clControlWithItems(parent, id, pos, size, style)
+    : clTreeCtrl(parent, id, pos, size, 0)
 {
-    Bind(wxEVT_PAINT, &clDataViewListCtrl::OnPaint, this);
-    Bind(wxEVT_ERASE_BACKGROUND, [](wxEraseEvent& event) { wxUnusedVar(event); });
+    // Map clDataViewListCtrl to clTreeCtrl style
+    SetShowHeader(true);
+    if(style & wxDV_ROW_LINES) { EnableStyle(wxTR_ROW_LINES, true, false); }
+    if(style & wxDV_MULTIPLE) { EnableStyle(wxTR_MULTIPLE, true, false); }
+    if(style & wxDV_NO_HEADER) { SetShowHeader(false); }
+    EnableStyle(wxTR_HIDE_ROOT, true);
 }
 
-clDataViewListCtrl::~clDataViewListCtrl() { Unbind(wxEVT_PAINT, &clDataViewListCtrl::OnPaint, this); }
-
-void clDataViewListCtrl::ScrollRows(int steps, wxDirection direction) {}
-
-void clDataViewListCtrl::ScrollToRow(int firstLine) {}
-
-void clDataViewListCtrl::ProcessIdle() {}
-
-void clDataViewListCtrl::OnPaint(wxPaintEvent& event)
-{
-    wxUnusedVar(event);
-    wxBufferedPaintDC dc(this);
-    PrepareDC(dc);
-    wxGCDC gcdc(dc);
-
-    // Call the parent's Render method
-    // this will render the background + header
-    Render(dc);
-
-    // Get list of items to draw
-    clRowEntry::Vec_t items;
-
-    // Draw the items
-    RenderItems(dc, items);
-}
-
-int clDataViewListCtrl::ItemToRow(const wxDataViewItem& item) const { return m_model.ItemToRow(item); }
-
-wxDataViewItem clDataViewListCtrl::RowToItem(int row) const { return m_model.RowToItem(row); }
-
-int clDataViewListCtrl::GetFirstItemPosition() const { return m_firstItemOnScreen; }
-
-clRowEntry::Vec_t clDataViewListCtrl::GetOnScreenItems() const
-{
-    clRowEntry::Vec_t items;
-    m_model.GetItems(m_firstItemOnScreen, GetNumLineCanFitOnScreen(), items);
-    return items;
-}
-
-int clDataViewListCtrl::GetRange() const { return m_model.size(); }
-
-bool clDataViewListCtrl::IsEmpty() const { return m_model.empty(); }
+clDataViewListCtrl::~clDataViewListCtrl() {}
 
 void clDataViewListCtrl::AppendItem(const wxVector<wxVariant>& values, wxUIntPtr data)
 {
     clRowEntry* child = new clRowEntry(this, "", wxNOT_FOUND, wxNOT_FOUND);
-    child->SetClientData(data);
+    child->SetData(data);
+    wxTreeItemId item = clTreeCtrl::AppendItem(GetRootItem(), "", -1, -1, nullptr);
     for(size_t i = 0; i < values.size(); ++i) {
         const wxVariant& v = values[i];
         if(v.GetType() == "bool") {
@@ -65,8 +30,8 @@ void clDataViewListCtrl::AppendItem(const wxVector<wxVariant>& values, wxUIntPtr
         } else if(v.GetType() == "string") {
             child->SetLabel(v.GetString(), i);
         }
+        SetItemText(item, child->GetLabel(i), i);
     }
-    m_model.Add(child);
 }
 
 wxDataViewColumn* clDataViewListCtrl::AppendIconTextColumn(const wxString& label, wxDataViewCellMode mode, int width,
@@ -75,7 +40,7 @@ wxDataViewColumn* clDataViewListCtrl::AppendIconTextColumn(const wxString& label
     wxUnusedVar(mode);
     wxUnusedVar(align);
     wxUnusedVar(flags);
-    GetHeader().Add(label).SetWidth(width);
+    DoAddHeader(label, width);
     return nullptr;
 }
 
@@ -85,7 +50,7 @@ wxDataViewColumn* clDataViewListCtrl::AppendProgressColumn(const wxString& label
     wxUnusedVar(mode);
     wxUnusedVar(align);
     wxUnusedVar(flags);
-    GetHeader().Add(label).SetWidth(width);
+    DoAddHeader(label, width);
     return nullptr;
 }
 
@@ -95,6 +60,16 @@ wxDataViewColumn* clDataViewListCtrl::AppendTextColumn(const wxString& label, wx
     wxUnusedVar(mode);
     wxUnusedVar(align);
     wxUnusedVar(flags);
-    GetHeader().Add(label).SetWidth(width);
+    DoAddHeader(label, width);
     return nullptr;
+}
+
+void clDataViewListCtrl::DoAddHeader(const wxString& label, int width)
+{
+    if(m_needToClearDefaultHeader) {
+        m_needToClearDefaultHeader = false;
+        GetHeader().Clear();
+    }
+    clHeaderItem& col = GetHeader().Add(label);
+    if(width > 0) { col.SetWidth(width); }
 }

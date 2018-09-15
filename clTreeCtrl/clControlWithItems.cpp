@@ -82,6 +82,10 @@ int clControlWithItems::GetNumLineCanFitOnScreen() const
     return max_lines_on_screen;
 }
 
+clRowEntry* clControlWithItems::GetFirstItemOnScreen() { return m_firstItemOnScreen; }
+
+void clControlWithItems::SetFirstItemOnScreen(clRowEntry* item) { m_firstItemOnScreen = item; }
+
 void clControlWithItems::UpdateScrollBar()
 {
     {
@@ -91,7 +95,7 @@ void clControlWithItems::UpdateScrollBar()
         int pageSize = (thumbSize - 1);
         int rangeSize = GetRange();
         int position = GetFirstItemPosition();
-        if(position != wxNOT_FOUND) { UpdateVScrollBar(position, thumbSize, rangeSize, pageSize); }
+        UpdateVScrollBar(position, thumbSize, rangeSize, pageSize);
     }
     {
         // H-scrollbar
@@ -99,7 +103,7 @@ void clControlWithItems::UpdateScrollBar()
         int pageSize = (thumbSize - 1);
         int rangeSize = IsEmpty() ? 0 : m_viewHeader.GetWidth();
         int position = m_firstColumn;
-        if(position != wxNOT_FOUND) { UpdateHScrollBar(position, thumbSize, rangeSize, pageSize); }
+        UpdateHScrollBar(position, thumbSize, rangeSize, pageSize);
     }
 }
 
@@ -192,26 +196,4 @@ void clControlWithItems::OnMouseScroll(wxMouseEvent& event)
     if(new_row < 0) { going_up = 0; }
     if(new_row >= range) { new_row = range - 1; }
     ScrollToRow(new_row);
-}
-
-clRowEntry* clControlWithItems::HitTest(const wxPoint& point, int& flags) const
-{
-    if(IsEmpty()) { return nullptr; }
-    flags = 0;
-    const clRowEntry::Vec_t& onScreenItems = GetOnScreenItems();
-    for(size_t i = 0; i < onScreenItems.size(); ++i) {
-        const clRowEntry* item = onScreenItems[i];
-        wxRect buttonRect = item->GetButtonRect();
-        // Adjust the coordiantes incase we got h-scroll
-        buttonRect.SetX(buttonRect.GetX() - GetFirstColumn());
-        if(buttonRect.Contains(point)) {
-            flags |= wxTREE_HITTEST_ONITEMBUTTON;
-            return const_cast<clRowEntry*>(item);
-        }
-        if(item->GetItemRect().Contains(point)) {
-            flags |= wxTREE_HITTEST_ONITEM;
-            return const_cast<clRowEntry*>(item);
-        }
-    }
-    return nullptr;
 }

@@ -1,7 +1,6 @@
 #ifndef CLTREECTRLMODEL_H
 #define CLTREECTRLMODEL_H
 
-#include "clItemModelBase.h"
 #include "clRowEntry.h"
 #include "codelite_exports.h"
 #include <functional>
@@ -12,7 +11,11 @@
 #include <wx/treebase.h>
 
 class clTreeCtrl;
-class WXDLLIMPEXP_SDK clTreeCtrlModel : public clItemModelBase
+struct WXDLLIMPEXP_SDK clTreeItemIdValue {
+    int nextItem = 0;
+};
+
+class WXDLLIMPEXP_SDK clTreeCtrlModel
 {
     clTreeCtrl* m_tree = nullptr;
     clRowEntry* m_root = nullptr;
@@ -31,7 +34,7 @@ protected:
 
 public:
     clTreeCtrlModel(clTreeCtrl* tree);
-    virtual ~clTreeCtrlModel();
+    ~clTreeCtrlModel();
 
     void SetFirstItemOnScreen(clRowEntry* firstItemOnScreen) { this->m_firstItemOnScreen = firstItemOnScreen; }
     clRowEntry* GetFirstItemOnScreen() const { return m_firstItemOnScreen; }

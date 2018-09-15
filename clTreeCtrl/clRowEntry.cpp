@@ -1,7 +1,7 @@
 #include "clCellValue.h"
-#include "clControlWithItems.h"
 #include "clHeaderItem.h"
 #include "clRowEntry.h"
+#include "clTreeCtrl.h"
 #include <algorithm>
 #include <functional>
 #include <wx/dc.h>
@@ -13,13 +13,13 @@
 #define PEN_STYLE wxPENSTYLE_DOT
 #endif
 
-clRowEntry::clRowEntry(clControlWithItems* control, const wxString& label, int bitmapIndex, int bitmapSelectedIndex)
-    : m_control(control)
-    , m_model(control ? control->GetModel() : nullptr)
+clRowEntry::clRowEntry(clTreeCtrl* tree, const wxString& label, int bitmapIndex, int bitmapSelectedIndex)
+    : m_tree(tree)
+    , m_model(tree ? &tree->GetModel() : nullptr)
 {
     // Fill the verctor with items constructed using the _non_ default constructor
     // to makes sure that IsOk() returns TRUE
-    m_cells.resize(m_control->GetHeader().empty() ? 1 : m_control->GetHeader().size(),
+    m_cells.resize(m_tree->GetHeader().empty() ? 1 : m_tree->GetHeader().size(),
                    clCellValue("", -1, -1)); // at least one column
     clCellValue cv(label, bitmapIndex, bitmapSelectedIndex);
     m_cells[0] = cv;
@@ -197,7 +197,7 @@ void clRowEntry::ClearRects()
 void clRowEntry::Render(wxWindow* win, wxDC& dc, const clColours& c, int row_index)
 {
     wxRect rowRect = GetItemRect();
-    bool zebraColouring = m_control->HasControlStyle(wxTR_ROW_LINES);
+    bool zebraColouring = (m_tree->GetTreeStyle() & wxTR_ROW_LINES);
     bool even_row = ((row_index % 2) == 0);
 
     // Not cell related
@@ -237,9 +237,9 @@ void clRowEntry::Render(wxWindow* win, wxDC& dc, const clColours& c, int row_ind
         dc.SetFont(f);
         wxColour buttonColour = IsSelected() ? colours.GetSelbuttonColour() : colours.GetButtonColour();
         wxSize textSize = dc.GetTextExtent(cell.GetText());
-        int textY = rowRect.GetY() + (m_control->GetLineHeight() - textSize.GetHeight()) / 2;
+        int textY = rowRect.GetY() + (m_tree->GetLineHeight() - textSize.GetHeight()) / 2;
         // Draw the button
-        wxRect cellRect = m_control->GetHeader().empty() ? rowRect : m_control->GetHeader().Item(i).GetRect();
+        wxRect cellRect = m_tree->GetHeader().empty() ? rowRect : m_tree->GetHeader().Item(i).GetRect();
         cellRect.SetY(rowRect.GetY());
         int textXOffset = cellRect.GetX();
         if(i == 0) {
@@ -269,14 +269,14 @@ void clRowEntry::Render(wxWindow* win, wxDC& dc, const clColours& c, int row_ind
                 textXOffset += rowRect.GetHeight();
             }
         }
-        int itemIndent = (GetIndentsCount() * m_control->GetIndent());
+        int itemIndent = (GetIndentsCount() * m_tree->GetIndent());
         int bitmapIndex = cell.GetBitmapIndex();
         if(IsExpanded() && HasChildren() && cell.GetBitmapSelectedIndex() != wxNOT_FOUND) {
             bitmapIndex = cell.GetBitmapSelectedIndex();
         }
 
         if(bitmapIndex != wxNOT_FOUND) {
-            const wxBitmap& bmp = m_control->GetBitmap(bitmapIndex);
+            const wxBitmap& bmp = m_tree->GetBitmap(bitmapIndex);
             if(bmp.IsOk()) {
                 textXOffset += X_SPACER;
                 int bitmapY = rowRect.GetY() + ((rowRect.GetHeight() - bmp.GetScaledHeight()) / 2);
@@ -373,7 +373,7 @@ int clRowEntry::CalcItemWidth(wxDC& dc, int rowHeight, size_t col)
     }
 
     if(bitmapIndex != wxNOT_FOUND) {
-        const wxBitmap& bmp = m_control->GetBitmap(bitmapIndex);
+        const wxBitmap& bmp = m_tree->GetBitmap(bitmapIndex);
         if(bmp.IsOk()) {
             item_width += X_SPACER;
             item_width += bmp.GetScaledWidth();
@@ -381,7 +381,7 @@ int clRowEntry::CalcItemWidth(wxDC& dc, int rowHeight, size_t col)
         }
     }
     if(col == 0) {
-        int itemIndent = (GetIndentsCount() * m_control->GetIndent());
+        int itemIndent = (GetIndentsCount() * m_tree->GetIndent());
         item_width += itemIndent;
     }
     item_width += textSize.GetWidth();
