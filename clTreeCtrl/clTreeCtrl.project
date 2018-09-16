@@ -2,7 +2,7 @@
 <CodeLite_Project Name="clTreeCtrl" Version="10.0.0" InternalType="GUI">
   <Plugins>
     <Plugin Name="qmake">
-      <![CDATA[00070001N0005Debug0000000000000001N0011Debug_Linux0000000000000001N0016Debug_Linux_GTK30000000000000001N0009OSX_Debug0000000000000001N0011OSX_Release0000000000000001N0007Release0000000000000001N0013Release_Linux000000000000]]>
+      <![CDATA[00080001N0005Debug0000000000000001N0011Debug_Linux0000000000000001N0016Debug_Linux_GTK30000000000000001N0009OSX_Debug0000000000000001N0011OSX_Release0000000000000001N0007Release0000000000000001N0013Release_Linux0000000000000001N0018Release_Linux_GTK3000000000000]]>
     </Plugin>
   </Plugins>
   <Description/>
@@ -327,6 +327,48 @@ WX_CONFIG=/usr/local/lib/wx/config/gtk3-unicode-3.1]]>
       <PostBuild>
         <Command Enabled="yes">cp $(ProjectPath)/cl*.cpp $(CL_HOME)/Plugin/</Command>
         <Command Enabled="yes">cp $(ProjectPath)/cl*.h $(CL_HOME)/Plugin/</Command>
+      </PostBuild>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="no" EnableCpp14="no">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
+    <Configuration Name="Release_Linux_GTK3" CompilerType="g++-64" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-O2;-std=c++11;-Wall;$(shell $(WX_CONFIG) --cflags);`pkg-config gtk+-3.0 --cflags`" C_Options="--O2;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+        <IncludePath Value="."/>
+      </Compiler>
+      <Linker Options="$(shell $(WX_CONFIG) --libs std,stc);`pkg-config gtk+-3.0 --libs`" Required="yes"/>
+      <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug_GTK3" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[CL_HOME=/home/eran/devl/codelite
+WX_CONFIG=/usr/local/lib/wx/config/gtk3-unicode-3.1]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+        <DebuggerSearchPaths/>
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild>
+        <Command Enabled="yes"/>
       </PostBuild>
       <CustomBuild Enabled="no">
         <RebuildCommand/>

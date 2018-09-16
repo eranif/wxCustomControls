@@ -25,7 +25,13 @@ public:
     clDataViewListCtrl(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
                        const wxSize& size = wxDefaultSize, long style = 0);
     virtual ~clDataViewListCtrl();
-
+    
+    /**
+     * @brief how many items can scroll in the view?
+     */
+    int GetRange() const { return GetItemCount(); }
+    bool IsEmpty() const { return GetItemCount() == 0; }
+    
     ///===--------------------
     /// wxDV compatilibty API
     ///===--------------------
@@ -79,6 +85,14 @@ public:
     wxFont GetItemFont(const wxDataViewItem& item, size_t col = 0) const;
     
     virtual void EnableStyle(int style, bool enable, bool refresh = true);
+    
+    clHeaderItem* GetColumn(size_t index);
+    size_t GetItemCount() const;
+    
+    /**
+     * @brief return item at a given row. This function is executed in O(1)
+     */
+    wxDataViewItem RowToItem(size_t row) const;
 };
 
 #endif // CLDATAVIEWLISTCTRL_H

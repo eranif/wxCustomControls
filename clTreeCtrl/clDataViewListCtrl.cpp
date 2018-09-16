@@ -41,6 +41,8 @@ clDataViewListCtrl::clDataViewListCtrl(wxWindow* parent, wxWindowID id, const wx
     Bind(wxEVT_TREE_SEL_CHANGED, &clDataViewListCtrl::OnConvertEvent, this);
     Bind(wxEVT_TREE_ITEM_ACTIVATED, &clDataViewListCtrl::OnConvertEvent, this);
     Bind(wxEVT_TREE_ITEM_MENU, &clDataViewListCtrl::OnConvertEvent, this);
+    
+    AddRoot("Hidden Root", -1, -1, nullptr);
 }
 
 clDataViewListCtrl::~clDataViewListCtrl()
@@ -54,18 +56,28 @@ clDataViewListCtrl::~clDataViewListCtrl()
 
 void clDataViewListCtrl::AppendItem(const wxVector<wxVariant>& values, wxUIntPtr data)
 {
-    clRowEntry* child = new clRowEntry(this, "", wxNOT_FOUND, wxNOT_FOUND);
-    child->SetData(data);
     wxTreeItemId item = clTreeCtrl::AppendItem(GetRootItem(), "", -1, -1, nullptr);
+    clRowEntry* child = m_model.ToPtr(item);
+    child->SetData(data);
     for(size_t i = 0; i < values.size(); ++i) {
         const wxVariant& v = values[i];
-        if(v.GetType() == "bool") {
+        wxString variantType = v.GetType();
+        if(variantType == "bool") {
             child->SetLabel((v.GetBool() ? "Yes" : "No"), i);
-        } else if(v.GetType() == "string") {
+        } else if(variantType == "string") {
             child->SetLabel(v.GetString(), i);
+        } else if(variantType == "wxDataViewIconText") {
+            wxDataViewIconText iconText;
+            iconText << v;
+            child->SetLabel(iconText.GetText(), i);
+        } else if(variantType == "double") {
+            child->SetLabel(wxString() << v.GetDouble(), i);
+        } else if(variantType == "datetime") {
+            child->SetLabel(v.GetDateTime().FormatDate(), i);
         }
         clTreeCtrl::SetItemText(item, child->GetLabel(i), i);
     }
+    UpdateScrollBar();
 }
 
 wxDataViewColumn* clDataViewListCtrl::AppendIconTextColumn(const wxString& label, wxDataViewCellMode mode, int width,
@@ -160,6 +172,7 @@ wxDataViewItem clDataViewListCtrl::AppendItem(const wxString& text, int image, i
     wxTreeItemId child = clTreeCtrl::AppendItem(GetRootItem(), text, image, selImage, nullptr);
     wxDataViewItem dvItem = DV_ITEM(child);
     SetItemData(dvItem, data);
+    UpdateScrollBar();
     return dvItem;
 }
 
@@ -234,4 +247,27 @@ void clDataViewListCtrl::EnableStyle(int style, bool enable, bool refresh)
 {
     if(m_stylesMap.count(style) == 0) { return; }
     clTreeCtrl::EnableStyle(m_stylesMap[style], enable, refresh);
+}
+
+clHeaderItem* clDataViewListCtrl::GetColumn(size_t index)
+{
+    if(index >= GetHeader().size()) { return nullptr; }
+    return &GetHeader().Item(index);
+}
+
+size_t clDataViewListCtrl::GetItemCount() const
+{
+    clRowEntry* root = m_model.GetRoot();
+    if(!root) { return 0; }
+    return root->GetChildrenCount(false);
+}
+
+wxDataViewItem clDataViewListCtrl::RowToItem(size_t row) const
+{
+    // Since a clDataViewListCtrl is basically a tree with a single hidden node (the root)
+    // A row is simply a child at a given index
+    clRowEntry* root = m_model.GetRoot();
+    if(!root) { return wxDataViewItem(); }
+    if(row >= root->GetChildren().size()) { return wxDataViewItem(); }
+    return wxDataViewItem(root->GetChildren()[row]);
 }

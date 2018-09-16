@@ -125,10 +125,10 @@ int clRowEntry::GetExpandedLines() const
 void clRowEntry::GetNextItems(int count, clRowEntry::Vec_t& items)
 {
     items.reserve(count);
-    items.push_back(this);
+    if(!this->IsHidden()) { items.push_back(this); }
     clRowEntry* next = GetNext();
     while(next) {
-        if(next->IsVisible()) { items.push_back(next); }
+        if(next->IsVisible() && !next->IsHidden()) { items.push_back(next); }
         if((int)items.size() == count) { return; }
         next = next->GetNext();
     }
@@ -137,10 +137,10 @@ void clRowEntry::GetNextItems(int count, clRowEntry::Vec_t& items)
 void clRowEntry::GetPrevItems(int count, clRowEntry::Vec_t& items)
 {
     items.reserve(count);
-    items.insert(items.begin(), this);
+    if(!this->IsHidden()) { items.insert(items.begin(), this); }
     clRowEntry* prev = GetPrev();
     while(prev) {
-        if(prev->IsVisible()) { items.insert(items.begin(), prev); }
+        if(prev->IsVisible() && !prev->IsHidden()) { items.insert(items.begin(), prev); }
         if((int)items.size() == count) { return; }
         prev = prev->GetPrev();
     }
@@ -314,6 +314,7 @@ size_t clRowEntry::GetChildrenCount(bool recurse) const
 
 bool clRowEntry::IsVisible() const
 {
+    if(IsHidden()) { return false; }
     clRowEntry* parent = GetParent();
     while(parent) {
         if(!parent->IsExpanded()) { return false; }

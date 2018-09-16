@@ -202,7 +202,7 @@ wxTreeItemId clTreeCtrlModel::GetItemBefore(const wxTreeItemId& item, bool visib
     if(!p) { return wxTreeItemId(); }
     p = p->GetPrev();
     while(p) {
-        if(visibleItem && (!p->IsVisible() || p->IsHidden())) {
+        if(visibleItem && !p->IsVisible()) {
             p = p->GetPrev();
             continue;
         }

@@ -16,8 +16,8 @@ clControlWithItems::clControlWithItems(wxWindow* parent, wxWindowID id, const wx
 
 clControlWithItems::~clControlWithItems()
 {
-    Bind(wxEVT_SIZE, &clControlWithItems::OnSize, this);
-    Bind(wxEVT_MOUSEWHEEL, &clControlWithItems::OnMouseScroll, this);
+    Unbind(wxEVT_SIZE, &clControlWithItems::OnSize, this);
+    Unbind(wxEVT_MOUSEWHEEL, &clControlWithItems::OnMouseScroll, this);
 }
 
 void clControlWithItems::SetHeader(const clHeaderBar& header)
@@ -93,7 +93,7 @@ void clControlWithItems::UpdateScrollBar()
         // V-scrollbar
         wxRect rect = GetItemsRect();
         int thumbSize = (rect.GetHeight() / m_lineHeight); // Number of lines can be drawn
-        int pageSize = (thumbSize - 1);
+        int pageSize = (thumbSize);
         int rangeSize = GetRange();
         int position = GetFirstItemPosition();
         UpdateVScrollBar(position, thumbSize, rangeSize, pageSize);
@@ -160,7 +160,7 @@ void clControlWithItems::DoUpdateHeader(clRowEntry* row)
 {
     // do we have header?
     if(GetHeader().empty()) { return; }
-    if(!row) { return; }
+    if(!row || row->IsHidden()) { return; }
     wxDC& dc = GetTempDC();
 
     // Use bold font, to get the maximum width needed
@@ -194,7 +194,7 @@ void clControlWithItems::OnMouseScroll(wxMouseEvent& event)
     int range = GetRange();
     bool going_up = (event.GetWheelRotation() > 0);
     int new_row = GetFirstItemPosition() + (going_up ? -GetScrollTick() : GetScrollTick());
-    if(new_row < 0) { going_up = 0; }
+    if(new_row < 0) { new_row = 0; }
     if(new_row >= range) { new_row = range - 1; }
     ScrollToRow(new_row);
 }
