@@ -20,7 +20,7 @@ MainFrame::MainFrame(wxWindow* parent)
 
     m_treeCtrl->SetColours(m_coloursArr[m_selectedColours]);
 
-    clHeaderBar header;
+    clHeaderBar header(m_treeCtrl);
     header.Add("Path");
     header.Add("Kind");
     header.Add("Size");
@@ -341,4 +341,13 @@ void MainFrame::OnDVOpenFolder(wxCommandEvent& event)
             cont = dir.GetNext(&filename);
         }
     }
+}
+
+void MainFrame::OnNativeHeader(wxCommandEvent& event)
+{
+    m_treeCtrl->GetHeader().SetNative(event.IsChecked());
+    m_treeCtrl->Refresh();
+    
+    m_dataView->GetHeader().SetNative(event.IsChecked());
+    m_dataView->Refresh();
 }

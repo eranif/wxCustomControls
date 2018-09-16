@@ -51,11 +51,12 @@ public:
         ID_SINGLE_SELECTION = 10004,
         ID_HIDE_ROOT = 10005,
         ID_PREV_SIBLING = 10006,
-        ID_SHOW_SB_ON_FOCUS = 10007,
-        ID_NEXT_SIBLING = 10008,
-        ID_SELECT_CHILDREN = 10009,
-        ID_EXPAND_ALL = 10010,
-        ID_OPEN_FOLDER = 10011,
+        ID_NATIVE_HEADER = 10007,
+        ID_SHOW_SB_ON_FOCUS = 10008,
+        ID_NEXT_SIBLING = 10009,
+        ID_SELECT_CHILDREN = 10010,
+        ID_EXPAND_ALL = 10011,
+        ID_OPEN_FOLDER = 10012,
     };
 
 protected:
@@ -80,7 +81,7 @@ protected:
     wxMenuItem* m_menuItemExit;
     wxMenu* menu_clDataViewListCtrl;
     wxMenuItem* m_menuItem83;
-    wxMenu* m_menu53;
+    wxMenu* menu_Style;
     wxMenuItem* m_menuItemZebra;
     wxMenuItem* m_menuItemThemes;
     wxMenuItem* m_menuItemHideRoot;
@@ -88,6 +89,7 @@ protected:
     wxMenuItem* m_menuItemSingleSelection;
     wxMenuItem* m_menuItemShowSBOnFocus;
     wxMenuItem* m_menuItemHideHeaders;
+    wxMenuItem* m_menuItemNativeHeader;
 
 protected:
     virtual void OnOpenFolder(wxCommandEvent& event) { event.Skip(); }
@@ -108,6 +110,7 @@ protected:
     virtual void OnSingleSelection(wxCommandEvent& event) { event.Skip(); }
     virtual void OnShowSBOnFocus(wxCommandEvent& event) { event.Skip(); }
     virtual void OnHideHeaders(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnNativeHeader(wxCommandEvent& event) { event.Skip(); }
 
 public:
     clTreeCtrl* GetTreeCtrl() { return m_treeCtrl; }

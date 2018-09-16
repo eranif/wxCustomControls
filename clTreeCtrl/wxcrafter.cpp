@@ -112,30 +112,34 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     m_menuItem83 = new wxMenuItem(menu_clDataViewListCtrl, ID_DV_OPEN_FOLDER, _("Open folder"), wxT(""), wxITEM_NORMAL);
     menu_clDataViewListCtrl->Append(m_menuItem83);
 
-    m_menu53 = new wxMenu();
-    m_myMenuBar->Append(m_menu53, _("Style"));
+    menu_Style = new wxMenu();
+    m_myMenuBar->Append(menu_Style, _("Style"));
 
-    m_menuItemZebra = new wxMenuItem(m_menu53, ID_ZEBRA, _("Zebra Colouring..."), wxT(""), wxITEM_CHECK);
-    m_menu53->Append(m_menuItemZebra);
+    m_menuItemZebra = new wxMenuItem(menu_Style, ID_ZEBRA, _("Zebra Colouring..."), wxT(""), wxITEM_CHECK);
+    menu_Style->Append(m_menuItemZebra);
 
-    m_menuItemThemes = new wxMenuItem(m_menu53, ID_TOGGLE_THEMES, _("Toggle Themes"), wxT(""), wxITEM_NORMAL);
-    m_menu53->Append(m_menuItemThemes);
+    m_menuItemThemes = new wxMenuItem(menu_Style, ID_TOGGLE_THEMES, _("Toggle Themes"), wxT(""), wxITEM_NORMAL);
+    menu_Style->Append(m_menuItemThemes);
 
-    m_menuItemHideRoot = new wxMenuItem(m_menu53, ID_HIDE_ROOT, _("Hide Root"), wxT(""), wxITEM_CHECK);
-    m_menu53->Append(m_menuItemHideRoot);
+    m_menuItemHideRoot = new wxMenuItem(menu_Style, ID_HIDE_ROOT, _("Hide Root"), wxT(""), wxITEM_CHECK);
+    menu_Style->Append(m_menuItemHideRoot);
 
-    m_menu53->AppendSeparator();
+    menu_Style->AppendSeparator();
 
     m_menuItemSingleSelection =
-        new wxMenuItem(m_menu53, ID_SINGLE_SELECTION, _("Single Selection Tree"), wxT(""), wxITEM_CHECK);
-    m_menu53->Append(m_menuItemSingleSelection);
+        new wxMenuItem(menu_Style, ID_SINGLE_SELECTION, _("Single Selection Tree"), wxT(""), wxITEM_CHECK);
+    menu_Style->Append(m_menuItemSingleSelection);
 
     m_menuItemShowSBOnFocus =
-        new wxMenuItem(m_menu53, ID_SHOW_SB_ON_FOCUS, _("Show Scrollbar when focused Only"), wxT(""), wxITEM_CHECK);
-    m_menu53->Append(m_menuItemShowSBOnFocus);
+        new wxMenuItem(menu_Style, ID_SHOW_SB_ON_FOCUS, _("Show Scrollbar when focused Only"), wxT(""), wxITEM_CHECK);
+    menu_Style->Append(m_menuItemShowSBOnFocus);
 
-    m_menuItemHideHeaders = new wxMenuItem(m_menu53, wxID_ANY, _("Hide Header"), wxT(""), wxITEM_CHECK);
-    m_menu53->Append(m_menuItemHideHeaders);
+    m_menuItemHideHeaders = new wxMenuItem(menu_Style, wxID_ANY, _("Hide Header"), wxT(""), wxITEM_CHECK);
+    menu_Style->Append(m_menuItemHideHeaders);
+
+    m_menuItemNativeHeader =
+        new wxMenuItem(menu_Style, ID_NATIVE_HEADER, _("Draw native header"), wxT(""), wxITEM_CHECK);
+    menu_Style->Append(m_menuItemNativeHeader);
 
     SetName(wxT("MainFrameBaseClass"));
     SetSize(wxDLG_UNIT(this, wxSize(500, 300)));
@@ -189,6 +193,8 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
                   wxCommandEventHandler(MainFrameBaseClass::OnShowSBOnFocus), NULL, this);
     this->Connect(m_menuItemHideHeaders->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                   wxCommandEventHandler(MainFrameBaseClass::OnHideHeaders), NULL, this);
+    this->Connect(m_menuItemNativeHeader->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                  wxCommandEventHandler(MainFrameBaseClass::OnNativeHeader), NULL, this);
 }
 
 MainFrameBaseClass::~MainFrameBaseClass()
@@ -229,6 +235,8 @@ MainFrameBaseClass::~MainFrameBaseClass()
                      wxCommandEventHandler(MainFrameBaseClass::OnShowSBOnFocus), NULL, this);
     this->Disconnect(m_menuItemHideHeaders->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                      wxCommandEventHandler(MainFrameBaseClass::OnHideHeaders), NULL, this);
+    this->Disconnect(m_menuItemNativeHeader->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                     wxCommandEventHandler(MainFrameBaseClass::OnNativeHeader), NULL, this);
 }
 
 MyImages::MyImages()

@@ -56,7 +56,7 @@ clTreeCtrl::clTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
     GetColours().InitDefaults();
 
     // There is always a header
-    clHeaderBar header;
+    clHeaderBar header(this);
     header.Add("");
     SetHeader(header);
     SetShowHeader(false);

@@ -2,6 +2,7 @@
 #include "clScrolledPanel.h"
 #include <wx/dcmemory.h>
 #include <wx/font.h>
+#include <wx/renderer.h>
 #include <wx/settings.h>
 
 #ifdef __WXMSW__
@@ -10,7 +11,10 @@
 #define PEN_STYLE wxPENSTYLE_DOT
 #endif
 
-clHeaderBar::clHeaderBar() {}
+clHeaderBar::clHeaderBar(wxWindow* parent)
+    : m_parent(parent)
+{
+}
 
 clHeaderBar::~clHeaderBar() {}
 
@@ -57,12 +61,16 @@ void clHeaderBar::Render(wxDC& dc, const wxRect& rect, const clColours& colours)
     clColours _colours = colours;
     _colours.SetBgColour(_colours.GetHeaderBgColour());
 
-    dc.SetPen(_colours.GetBgColour());
-    dc.SetBrush(_colours.GetBgColour());
-    dc.DrawRectangle(rect);
+    if(m_flags & kHeaderNative) {
+        wxRendererNative::Get().DrawHeaderButton(m_parent, dc, rect, wxCONTROL_NONE);
+    } else {
+        dc.SetPen(_colours.GetBgColour());
+        dc.SetBrush(_colours.GetBgColour());
+        dc.DrawRectangle(rect);
+    }
     for(size_t i = 0; i < size(); ++i) {
         bool is_first = (i == 0);
-        Item(i).Render(dc, _colours);
+        Item(i).Render(dc, _colours, m_flags);
         if(!is_first) {
             dc.SetPen(wxPen(_colours.GetHeaderVBorderColour(), 1, PEN_STYLE));
             dc.DrawLine(Item(i).GetRect().GetTopLeft(), Item(i).GetRect().GetBottomLeft());

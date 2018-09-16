@@ -4,6 +4,7 @@
 clControlWithItems::clControlWithItems(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size,
                                        long style)
     : clScrolledPanel(parent, id, pos, size, style)
+    , m_viewHeader(this)
 {
     SetBackgroundStyle(wxBG_STYLE_PAINT);
     Bind(wxEVT_SIZE, &clControlWithItems::OnSize, this);
