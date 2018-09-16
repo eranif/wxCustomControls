@@ -54,6 +54,11 @@ public:
 
     void SetScrollTick(int scrollTick) { this->m_scrollTick = scrollTick; }
     int GetScrollTick() const { return m_scrollTick; }
+        
+    /**
+     * @brief use native header drawings
+     */
+    void SetNativeHeader(bool b);
     
     /**
      * @brief return bitmap at a given index

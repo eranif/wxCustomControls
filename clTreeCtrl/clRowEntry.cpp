@@ -229,6 +229,7 @@ void clRowEntry::Render(wxWindow* win, wxDC& dc, const clColours& c, int row_ind
 
     // Per cell drawings
     for(size_t i = 0; i < m_cells.size(); ++i) {
+        bool last_cell = (i == (m_cells.size() - 1));
         colours = c; // reset the colours
         wxFont f = clScrolledPanel::GetDefaultFont();
         clCellValue& cell = GetColumn(i);
@@ -291,9 +292,9 @@ void clRowEntry::Render(wxWindow* win, wxDC& dc, const clColours& c, int row_ind
         // Draw the indentation only for the first cell
         dc.DrawText(cell.GetText(), (i == 0 ? itemIndent : clHeaderItem::X_SPACER) + textXOffset, textY);
 
-        if(i > 0) {
+        if(!last_cell) {
             dc.SetPen(wxPen(colours.GetHeaderVBorderColour(), 1, PEN_STYLE));
-            dc.DrawLine(cellRect.GetTopLeft(), cellRect.GetBottomLeft());
+            dc.DrawLine(cellRect.GetTopRight(), cellRect.GetBottomRight());
         }
     }
 }

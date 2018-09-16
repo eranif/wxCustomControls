@@ -345,9 +345,6 @@ void MainFrame::OnDVOpenFolder(wxCommandEvent& event)
 
 void MainFrame::OnNativeHeader(wxCommandEvent& event)
 {
-    m_treeCtrl->GetHeader().SetNative(event.IsChecked());
-    m_treeCtrl->Refresh();
-    
-    m_dataView->GetHeader().SetNative(event.IsChecked());
-    m_dataView->Refresh();
+    m_treeCtrl->SetNativeHeader(event.IsChecked());
+    m_dataView->SetNativeHeader(event.IsChecked());
 }

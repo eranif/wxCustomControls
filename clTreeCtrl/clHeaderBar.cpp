@@ -61,7 +61,8 @@ void clHeaderBar::Render(wxDC& dc, const wxRect& rect, const clColours& colours)
     clColours _colours = colours;
     _colours.SetBgColour(_colours.GetHeaderBgColour());
 
-    if(m_flags & kHeaderNative) {
+    bool useNativeHeader = m_flags & kHeaderNative;
+    if(useNativeHeader) {
         wxRendererNative::Get().DrawHeaderButton(m_parent, dc, rect, wxCONTROL_NONE);
     } else {
         dc.SetPen(_colours.GetBgColour());
@@ -69,21 +70,23 @@ void clHeaderBar::Render(wxDC& dc, const wxRect& rect, const clColours& colours)
         dc.DrawRectangle(rect);
     }
     for(size_t i = 0; i < size(); ++i) {
-        bool is_first = (i == 0);
+        bool is_last = (i == (size() - 1));
         Item(i).Render(dc, _colours, m_flags);
-        if(!is_first) {
+        if(!is_last && !useNativeHeader) {
             dc.SetPen(wxPen(_colours.GetHeaderVBorderColour(), 1, PEN_STYLE));
-            dc.DrawLine(Item(i).GetRect().GetTopLeft(), Item(i).GetRect().GetBottomLeft());
+            dc.DrawLine(Item(i).GetRect().GetTopRight(), Item(i).GetRect().GetBottomRight());
         }
     }
 
-    // The horizontal header line should be _all_ visible
-    // incase we got h-scrolling we need to adjust the rect to cover the visibile area
-    wxRect fixedRect = rect;
-    wxPoint deviceOrigin = dc.GetDeviceOrigin();
-    fixedRect.SetX(-deviceOrigin.x);
-    dc.SetPen(_colours.GetHeaderHBorderColour());
-    dc.DrawLine(fixedRect.GetBottomLeft(), fixedRect.GetBottomRight());
+    if(!useNativeHeader) {
+        // The horizontal header line should be _all_ visible
+        // incase we got h-scrolling we need to adjust the rect to cover the visibile area
+        wxRect fixedRect = rect;
+        wxPoint deviceOrigin = dc.GetDeviceOrigin();
+        fixedRect.SetX(-deviceOrigin.x);
+        dc.SetPen(_colours.GetHeaderHBorderColour());
+        dc.DrawLine(fixedRect.GetBottomLeft(), fixedRect.GetBottomRight());
+    }
 }
 
 void clHeaderBar::UpdateColWidthIfNeeded(size_t col, size_t width, bool force)

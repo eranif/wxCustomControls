@@ -198,3 +198,9 @@ void clControlWithItems::OnMouseScroll(wxMouseEvent& event)
     if(new_row >= range) { new_row = range - 1; }
     ScrollToRow(new_row);
 }
+
+void clControlWithItems::SetNativeHeader(bool b)
+{
+    m_viewHeader.SetNative(b);
+    Refresh();
+}
