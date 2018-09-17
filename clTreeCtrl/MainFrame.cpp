@@ -8,6 +8,16 @@
 #include <wx/numdlg.h>
 #include <wx/utils.h>
 
+static wxVariant MakeIconText(const wxString& text, const wxBitmap& bmp)
+{
+    wxIcon icn;
+    icn.CopyFromBitmap(bmp);
+    wxDataViewIconText ict(text, icn);
+    wxVariant v;
+    v << ict;
+    return v;
+}
+
 MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
 {
@@ -145,7 +155,7 @@ MainFrame::MainFrame(wxWindow* parent)
         LogMessage("DV DnD dropped: ");
         LogMessage(wxString() << "DV DnD Item: " << m_dataView->GetItemText(event.GetItem()));
     });
-    
+
     m_dataView->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, [&](wxDataViewEvent& event) {
         event.Skip();
         LogMessage("DV Context menu dropped: ");
@@ -318,6 +328,11 @@ void MainFrame::OnDVOpenFolder(wxCommandEvent& event)
     wxString path = ::wxDirSelector();
     if(path.IsEmpty()) { return; }
     m_dataView->DeleteAllItems();
+
+    MyImages images;
+    const wxBitmap& file_bmp = images.Bitmap("file");
+    const wxBitmap& folder_bmp = images.Bitmap("folder");
+
     // load the folders
     wxDir dir(path);
     if(dir.IsOpened()) {
@@ -325,19 +340,23 @@ void MainFrame::OnDVOpenFolder(wxCommandEvent& event)
         bool cont = dir.GetFirst(&filename);
         while(cont) {
             wxFileName fn(path, filename);
+            wxVector<wxVariant> cols;
             if(wxDirExists(fn.GetFullPath())) {
                 // A directory
-                wxDataViewItem folderItem = m_dataView->AppendItem(filename, 0, 1);
-                m_dataView->SetItemText(folderItem, "Folder", 1);
-                m_dataView->SetItemText(folderItem, "0KB", 2);
+                cols.push_back(filename);
+                cols.push_back(MakeIconText("Folder", folder_bmp));
+                cols.push_back("0KB");
+                
             } else {
                 // A file
-                wxDataViewItem fileItem = m_dataView->AppendItem(filename, 2, 2);
-                m_dataView->SetItemText(fileItem, "File", 1);
                 wxString t;
                 t << std::ceil((double)fn.GetSize().ToDouble() / 1024.0) << "KB";
-                m_dataView->SetItemText(fileItem, t, 2);
+                
+                cols.push_back(filename);
+                cols.push_back(MakeIconText("File", file_bmp));
+                cols.push_back(t);
             }
+            m_dataView->AppendItem(cols);
             cont = dir.GetNext(&filename);
         }
     }
