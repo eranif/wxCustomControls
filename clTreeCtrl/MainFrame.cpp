@@ -7,6 +7,8 @@
 #include <wx/msgdlg.h>
 #include <wx/numdlg.h>
 #include <wx/utils.h>
+#include <wx/wupdlock.h>
+#include <wx/stopwatch.h>
 
 static wxVariant MakeIconText(const wxString& text, const wxBitmap& bmp)
 {
@@ -366,4 +368,27 @@ void MainFrame::OnNativeHeader(wxCommandEvent& event)
 {
     m_treeCtrl->SetNativeHeader(event.IsChecked());
     m_dataView->SetNativeHeader(event.IsChecked());
+}
+void MainFrame::OnFillWith500Entries(wxCommandEvent& event)
+{
+    wxWindowUpdateLocker locker(m_dataView);
+    wxBusyCursor bc;
+    m_dataView->DeleteAllItems();
+    
+    // We can use wxVector<wxVariant> to fill the 10,000 items here
+    // however, it will take x2 slower because of the un-needed string
+    // allocations
+    wxStopWatch sw;
+    sw.Start();
+    size_t itemCount = 10000;
+    wxString file_name = "A file name";
+    wxString file_type = "File";
+    wxString file_size = "100KB";
+    for(size_t i=0; i<itemCount; ++i) {
+        wxDataViewItem item = m_dataView->AppendItem(file_name);
+        m_dataView->SetItemText(item, file_type, 1);
+        m_dataView->SetItemText(item, file_size, 2);
+    }
+    long timepassed = sw.Time();
+    LogMessage(wxString() << "Added " << itemCount << " entries in: " << timepassed << "ms");
 }

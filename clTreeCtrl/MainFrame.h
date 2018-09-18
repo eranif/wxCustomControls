@@ -43,6 +43,7 @@ private:
     void DoAddRoot();
 
 protected:
+    virtual void OnFillWith500Entries(wxCommandEvent& event);
     virtual void OnNativeHeader(wxCommandEvent& event);
     virtual void OnDVOpenFolder(wxCommandEvent& event);
     virtual void OnDeleteAllItems(wxCommandEvent& event);

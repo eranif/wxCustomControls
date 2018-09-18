@@ -27,13 +27,12 @@ clDataViewListCtrl::clDataViewListCtrl(wxWindow* parent, wxWindowID id, const wx
     m_treeStyle = my_style;
 
     // Ignore these events
-    Bind(wxEVT_TREE_ITEM_EXPANDING, [](wxTreeEvent& e) { e.Skip(); });
-    Bind(wxEVT_TREE_ITEM_EXPANDED, [](wxTreeEvent& e) { e.Skip(); });
-    Bind(wxEVT_TREE_ITEM_COLLAPSING, [](wxTreeEvent& e) { e.Skip(); });
-    Bind(wxEVT_TREE_ITEM_COLLAPSED, [](wxTreeEvent& e) { e.Skip(); });
-    Bind(wxEVT_TREE_DELETE_ITEM, [](wxTreeEvent& e) { e.Skip(); });
-    Bind(wxEVT_TREE_DELETE_ITEM, [](wxTreeEvent& e) { e.Skip(); });
-    Bind(wxEVT_TREE_ITEM_RIGHT_CLICK, [](wxTreeEvent& e) { e.Skip(); });
+    Bind(wxEVT_TREE_ITEM_EXPANDING, [](wxTreeEvent& e) { wxUnusedVar(e); });
+    Bind(wxEVT_TREE_ITEM_EXPANDED, [](wxTreeEvent& e) { wxUnusedVar(e); });
+    Bind(wxEVT_TREE_ITEM_COLLAPSING, [](wxTreeEvent& e) { wxUnusedVar(e); });
+    Bind(wxEVT_TREE_ITEM_COLLAPSED, [](wxTreeEvent& e) { wxUnusedVar(e); });
+    Bind(wxEVT_TREE_DELETE_ITEM, [](wxTreeEvent& e) { wxUnusedVar(e); });
+    Bind(wxEVT_TREE_ITEM_RIGHT_CLICK, [](wxTreeEvent& e) { wxUnusedVar(e); });
 
     // Translate the following events to wxDVC events
     Bind(wxEVT_TREE_BEGIN_DRAG, &clDataViewListCtrl::OnConvertEvent, this);
@@ -63,30 +62,7 @@ void clDataViewListCtrl::AppendItem(const wxVector<wxVariant>& values, wxUIntPtr
     child->SetData(data);
     for(size_t i = 0; i < values.size(); ++i) {
         const wxVariant& v = values[i];
-        wxString variantType = v.GetType();
-        if(variantType == "bool") {
-            child->SetLabel((v.GetBool() ? "Yes" : "No"), i);
-        } else if(variantType == "string") {
-            child->SetLabel(v.GetString(), i);
-        } else if(variantType == "wxDataViewIconText") {
-
-            // Extract the iamge + text from the wxDataViewIconText class
-            wxDataViewIconText iconText;
-            iconText << v;
-            wxBitmap bmp(iconText.GetIcon());
-            GetBitmaps().push_back(bmp);
-            int imgIdx = (GetBitmaps().size() - 1);
-
-            //  update the row with the icon + text
-            child->SetLabel(iconText.GetText(), i);
-            child->SetBitmapIndex(imgIdx, i);
-
-        } else if(variantType == "double") {
-            child->SetLabel(wxString() << v.GetDouble(), i);
-        } else if(variantType == "datetime") {
-            child->SetLabel(v.GetDateTime().FormatDate(), i);
-        }
-        clTreeCtrl::SetItemText(item, child->GetLabel(i), i);
+        DoSetCellValue(child, i, v);
     }
     UpdateScrollBar();
 }
@@ -285,4 +261,48 @@ wxDataViewItem clDataViewListCtrl::RowToItem(size_t row) const
     if(!root) { return wxDataViewItem(); }
     if(row >= root->GetChildren().size()) { return wxDataViewItem(); }
     return wxDataViewItem(root->GetChildren()[row]);
+}
+
+void clDataViewListCtrl::DeleteItem(size_t row)
+{
+    wxDataViewItem item = RowToItem(row);
+    if(!item.IsOk()) { return; }
+    Delete(TREE_ITEM(item));
+}
+
+void clDataViewListCtrl::SetValue(const wxVariant& value, size_t row, size_t col)
+{
+    wxDataViewItem item = RowToItem(row);
+    if(!item.IsOk()) { return; }
+    clRowEntry* r = m_model.ToPtr(TREE_ITEM(item));
+    DoSetCellValue(r, col, value);
+}
+
+void clDataViewListCtrl::DoSetCellValue(clRowEntry* row, size_t col, const wxVariant& value)
+{
+    wxString variantType = value.GetType();
+    if(variantType == "bool") {
+        row->SetLabel((value.GetBool() ? "Yes" : "No"), col);
+    } else if(variantType == "string") {
+        row->SetLabel(value.GetString(), col);
+    } else if(variantType == "wxDataViewIconText") {
+
+        // Extract the iamge + text from the wxDataViewIconText class
+        wxDataViewIconText iconText;
+        iconText << value;
+        wxBitmap bmp(iconText.GetIcon());
+        int imgIdx = AddBitmap(bmp);
+
+        //  update the row with the icon + text
+        row->SetLabel(iconText.GetText(), col);
+        row->SetBitmapIndex(imgIdx, col);
+
+    } else if(variantType == "double") {
+        row->SetLabel(wxString() << value.GetDouble(), col);
+    } else if(variantType == "datetime") {
+        row->SetLabel(value.GetDateTime().FormatDate(), col);
+    }
+
+    // Call this to update the view + update the header bar
+    clTreeCtrl::SetItemText(wxTreeItemId(row), row->GetLabel(col), col);
 }

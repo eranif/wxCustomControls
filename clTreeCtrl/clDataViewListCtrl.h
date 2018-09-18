@@ -2,8 +2,8 @@
 #define CLDATAVIEWLISTCTRL_H
 
 #include "clTreeCtrl.h"
-#include <wx/dataview.h>
 #include <unordered_map>
+#include <wx/dataview.h>
 
 /**
  * @brief a thin wrapper around clTreeCtrl which provides basic compatiblity API (such as adding columns)
@@ -20,18 +20,19 @@ protected:
     void DoAddHeader(const wxString& label, int width);
     void OnConvertEvent(wxTreeEvent& event);
     bool SendDataViewEvent(const wxEventType& type, wxTreeEvent& treeEvent);
+    void DoSetCellValue(clRowEntry* row, size_t col, const wxVariant& value);
 
 public:
     clDataViewListCtrl(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
                        const wxSize& size = wxDefaultSize, long style = 0);
     virtual ~clDataViewListCtrl();
-    
+
     /**
      * @brief how many items can scroll in the view?
      */
     int GetRange() const { return GetItemCount(); }
     bool IsEmpty() const { return GetItemCount() == 0; }
-    
+
     ///===--------------------
     /// wxDV compatilibty API
     ///===--------------------
@@ -83,16 +84,25 @@ public:
 
     void SetItemFont(const wxDataViewItem& item, const wxFont& font, size_t col = 0);
     wxFont GetItemFont(const wxDataViewItem& item, size_t col = 0) const;
-    
+
     virtual void EnableStyle(int style, bool enable, bool refresh = true);
-    
+
     clHeaderItem* GetColumn(size_t index);
     size_t GetItemCount() const;
-    
+
     /**
      * @brief return item at a given row. This function is executed in O(1)
      */
     wxDataViewItem RowToItem(size_t row) const;
+
+    /**
+     * @brief Delete the row at position row.
+     */
+    void DeleteItem(size_t row);
+    /**
+     * @brief Sets the value of a given row/col (i.e. cell)
+     */
+    void SetValue(const wxVariant& value, size_t row, size_t col);
 };
 
 #endif // CLDATAVIEWLISTCTRL_H
