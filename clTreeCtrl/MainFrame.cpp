@@ -10,11 +10,9 @@
 #include <wx/utils.h>
 #include <wx/wupdlock.h>
 
-static wxVariant MakeIconText(const wxString& text, const wxBitmap& bmp)
+static wxVariant MakeIconText(const wxString& text, int bmp_index)
 {
-    wxIcon icn;
-    icn.CopyFromBitmap(bmp);
-    wxDataViewIconText ict(text, icn);
+    clDataViewTextBitmap ict(text, bmp_index);
     wxVariant v;
     v << ict;
     return v;
@@ -331,10 +329,6 @@ void MainFrame::OnDVOpenFolder(wxCommandEvent& event)
     if(path.IsEmpty()) { return; }
     m_dataView->DeleteAllItems();
 
-    MyImages images;
-    const wxBitmap& file_bmp = images.Bitmap("file");
-    const wxBitmap& folder_bmp = images.Bitmap("folder");
-
     // load the folders
     wxDir dir(path);
     if(dir.IsOpened()) {
@@ -346,7 +340,7 @@ void MainFrame::OnDVOpenFolder(wxCommandEvent& event)
             if(wxDirExists(fn.GetFullPath())) {
                 // A directory
                 cols.push_back(filename);
-                cols.push_back(MakeIconText("Folder", folder_bmp));
+                cols.push_back(MakeIconText("Folder", 1));
                 cols.push_back("0KB");
 
             } else {
@@ -355,7 +349,7 @@ void MainFrame::OnDVOpenFolder(wxCommandEvent& event)
                 t << std::ceil((double)fn.GetSize().ToDouble() / 1024.0) << "KB";
 
                 cols.push_back(filename);
-                cols.push_back(MakeIconText("File", file_bmp));
+                cols.push_back(MakeIconText("File", 0));
                 cols.push_back(t);
             }
             m_dataView->AppendItem(cols);
@@ -374,22 +368,30 @@ void MainFrame::OnFillWith500Entries(wxCommandEvent& event)
     wxBusyCursor bc;
     m_dataView->DeleteAllItems();
 
-    // We can use wxVector<wxVariant> to fill the 10,000 items here
-    // however, it will take x2 slower because of the un-needed string
-    // allocations
     wxStopWatch sw;
     sw.Start();
     size_t itemCount = 10000;
     wxString file_name = "A file name";
     wxString file_type = "File";
     wxString file_size = "100KB";
-
+    
+    MyImages images;
+    const wxBitmap& file_bmp = images.Bitmap("file");
+    const wxBitmap& folder_bmp = images.Bitmap("folder");
+    
+    std::vector<wxBitmap> bitmaps;
+    bitmaps.push_back(file_bmp);
+    bitmaps.push_back(folder_bmp);
+    m_dataView->SetBitmaps(bitmaps);
+    
     // A nice trick to boost performance: remove the sorting method
     m_dataView->SetSortFunction(nullptr);
     for(size_t i = 0; i < itemCount; ++i) {
-        wxDataViewItem item = m_dataView->AppendItem(wxString() << file_name << i);
-        m_dataView->SetItemText(item, file_type, 1);
-        m_dataView->SetItemText(item, file_size, 2);
+        wxVector<wxVariant> cols;
+        cols.push_back(MakeIconText(wxString() << "File #" << i, 0));
+        cols.push_back("File");
+        cols.push_back("0KB");
+        m_dataView->AppendItem(cols);
     }
 
     // Now that we got all the items populated, set a sorting function

@@ -64,6 +64,7 @@ public:
 
     wxDataViewItem GetSelection() const { return wxDataViewItem(clTreeCtrl::GetSelection().GetID()); }
     wxDataViewItem GetCurrentItem() const { return wxDataViewItem(GetFocusedItem().GetID()); }
+    void Select(const wxDataViewItem& item);
     int GetSelections(wxDataViewItemArray& sel) const;
     int GetSelectedItemsCount() const;
     void DeleteAllItems();
@@ -94,7 +95,12 @@ public:
      * @brief return item at a given row. This function is executed in O(1)
      */
     wxDataViewItem RowToItem(size_t row) const;
-
+    
+    /**
+     * @brief return row number from item. This function is executed in O(N)
+     */
+    int ItemToRow(const wxDataViewItem& item) const;
+    
     /**
      * @brief Delete the row at position row.
      */
@@ -109,5 +115,52 @@ public:
      */
     void SetSortFunction(const clSortFunc_t& CompareFunc);
 };
+
+// Helper class passing bitmap index + text
+class WXDLLIMPEXP_SDK clDataViewTextBitmap : public wxObject
+{
+private:
+    wxString m_text;
+    int      m_bitmapIndex;
+    
+public:
+    clDataViewTextBitmap( const wxString &text = wxEmptyString,
+                        int bitmapIndex = wxNOT_FOUND )
+        : m_text(text),
+          m_bitmapIndex(bitmapIndex)
+    { }
+
+    clDataViewTextBitmap( const clDataViewTextBitmap &other )
+        : wxObject(),
+          m_text(other.m_text),
+          m_bitmapIndex(other.m_bitmapIndex)
+    { }
+    
+    virtual ~clDataViewTextBitmap() {}
+    
+    void SetText( const wxString &text ) { m_text = text; }
+    wxString GetText() const             { return m_text; }
+    void SetBitmapIndex(int index) { m_bitmapIndex = index; }
+    int GetBitmapIndex() const { return m_bitmapIndex; }
+
+    bool IsSameAs(const clDataViewTextBitmap& other) const
+    {
+        return m_text == other.m_text && m_bitmapIndex == other.m_bitmapIndex;
+    }
+
+    bool operator==(const clDataViewTextBitmap& other) const
+    {
+        return IsSameAs(other);
+    }
+
+    bool operator!=(const clDataViewTextBitmap& other) const
+    {
+        return !IsSameAs(other);
+    }
+
+    wxDECLARE_DYNAMIC_CLASS(clDataViewTextBitmap);
+};
+
+DECLARE_VARIANT_OBJECT_EXPORTED(clDataViewTextBitmap, WXDLLIMPEXP_SDK)
 
 #endif // CLDATAVIEWLISTCTRL_H
