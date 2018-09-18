@@ -103,6 +103,11 @@ public:
      * @brief Sets the value of a given row/col (i.e. cell)
      */
     void SetValue(const wxVariant& value, size_t row, size_t col);
+    
+    /**
+     * @brief set sorting function AND apply it
+     */
+    void SetSortFunction(const clSortFunc_t& CompareFunc);
 };
 
 #endif // CLDATAVIEWLISTCTRL_H

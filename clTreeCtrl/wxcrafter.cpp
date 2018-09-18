@@ -112,9 +112,13 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     m_menuItem83 = new wxMenuItem(menu_clDataViewListCtrl, ID_DV_OPEN_FOLDER, _("Open folder"), wxT(""), wxITEM_NORMAL);
     menu_clDataViewListCtrl->Append(m_menuItem83);
 
-    m_menuItem87 = new wxMenuItem(menu_clDataViewListCtrl, ID_FILL_WITH_5000_ENTRIES, _("Add 10,000 items"), wxT(""),
-                                  wxITEM_NORMAL);
+    m_menuItem87 = new wxMenuItem(menu_clDataViewListCtrl, ID_FILL_WITH_5000_ENTRIES,
+                                  _("Create view with 10,000 items"), wxT(""), wxITEM_NORMAL);
     menu_clDataViewListCtrl->Append(m_menuItem87);
+
+    m_menuItem89 =
+        new wxMenuItem(menu_clDataViewListCtrl, ID_DV_DELETE_ALL_ITEMS, _("Delete All Items"), wxT(""), wxITEM_NORMAL);
+    menu_clDataViewListCtrl->Append(m_menuItem89);
 
     menu_Style = new wxMenu();
     m_myMenuBar->Append(menu_Style, _("Style"));
@@ -187,6 +191,8 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
                   wxCommandEventHandler(MainFrameBaseClass::OnDVOpenFolder), NULL, this);
     this->Connect(m_menuItem87->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                   wxCommandEventHandler(MainFrameBaseClass::OnFillWith500Entries), NULL, this);
+    this->Connect(m_menuItem89->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                  wxCommandEventHandler(MainFrameBaseClass::OnDVDeleteAllItems), NULL, this);
     this->Connect(m_menuItemZebra->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                   wxCommandEventHandler(MainFrameBaseClass::OnZebraColouring), NULL, this);
     this->Connect(m_menuItemThemes->GetId(), wxEVT_COMMAND_MENU_SELECTED,
@@ -231,6 +237,8 @@ MainFrameBaseClass::~MainFrameBaseClass()
                      wxCommandEventHandler(MainFrameBaseClass::OnDVOpenFolder), NULL, this);
     this->Disconnect(m_menuItem87->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                      wxCommandEventHandler(MainFrameBaseClass::OnFillWith500Entries), NULL, this);
+    this->Disconnect(m_menuItem89->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                     wxCommandEventHandler(MainFrameBaseClass::OnDVDeleteAllItems), NULL, this);
     this->Disconnect(m_menuItemZebra->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                      wxCommandEventHandler(MainFrameBaseClass::OnZebraColouring), NULL, this);
     this->Disconnect(m_menuItemThemes->GetId(), wxEVT_COMMAND_MENU_SELECTED,

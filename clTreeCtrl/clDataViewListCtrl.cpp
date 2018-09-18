@@ -149,8 +149,8 @@ bool clDataViewListCtrl::SendDataViewEvent(const wxEventType& type, wxTreeEvent&
 
 void clDataViewListCtrl::DeleteAllItems()
 {
-    // DVC must allways have the hidden root
     clTreeCtrl::DeleteAllItems();
+    // DVC must allways have the hidden root
     AddRoot("Hidden Root", -1, -1, nullptr);
 }
 
@@ -305,4 +305,41 @@ void clDataViewListCtrl::DoSetCellValue(clRowEntry* row, size_t col, const wxVar
 
     // Call this to update the view + update the header bar
     clTreeCtrl::SetItemText(wxTreeItemId(row), row->GetLabel(col), col);
+}
+
+void clDataViewListCtrl::SetSortFunction(const clSortFunc_t& CompareFunc)
+{
+    clRowEntry* root = m_model.GetRoot();
+    if(!root) { return; }
+    
+    if(!CompareFunc) { 
+        m_model.SetSortFunction(nullptr);
+        return;
+    }
+    // Disconnect the current function, if any
+    m_model.SetSortFunction(nullptr);
+    // This list ctrl is composed of a hidden root + its children
+    // Step 1:
+    clRowEntry::Vec_t& children = root->GetChildren();
+    for(size_t i=0; i<children.size(); ++i) {
+        clRowEntry* child = children[i];
+        child->SetNext(nullptr);
+        child->SetPrev(nullptr);
+    }
+    
+    // Step 2: disconect the root
+    root->SetNext(nullptr);
+    
+    // Step 3: sort the children
+    std::sort(children.begin(), children.end(), CompareFunc);
+    
+    // Now, reconnect the children, starting with the root
+    clRowEntry* prev = root;
+    for(size_t i=0; i<children.size(); ++i) {
+        clRowEntry* child = children[i];
+        prev->SetNext(child);
+        child->SetPrev(prev);
+        prev = child;
+    }
+    Refresh();
 }

@@ -6,9 +6,9 @@
 #include <wx/dirdlg.h>
 #include <wx/msgdlg.h>
 #include <wx/numdlg.h>
+#include <wx/stopwatch.h>
 #include <wx/utils.h>
 #include <wx/wupdlock.h>
-#include <wx/stopwatch.h>
 
 static wxVariant MakeIconText(const wxString& text, const wxBitmap& bmp)
 {
@@ -348,12 +348,12 @@ void MainFrame::OnDVOpenFolder(wxCommandEvent& event)
                 cols.push_back(filename);
                 cols.push_back(MakeIconText("Folder", folder_bmp));
                 cols.push_back("0KB");
-                
+
             } else {
                 // A file
                 wxString t;
                 t << std::ceil((double)fn.GetSize().ToDouble() / 1024.0) << "KB";
-                
+
                 cols.push_back(filename);
                 cols.push_back(MakeIconText("File", file_bmp));
                 cols.push_back(t);
@@ -371,10 +371,9 @@ void MainFrame::OnNativeHeader(wxCommandEvent& event)
 }
 void MainFrame::OnFillWith500Entries(wxCommandEvent& event)
 {
-    wxWindowUpdateLocker locker(m_dataView);
     wxBusyCursor bc;
     m_dataView->DeleteAllItems();
-    
+
     // We can use wxVector<wxVariant> to fill the 10,000 items here
     // however, it will take x2 slower because of the un-needed string
     // allocations
@@ -384,11 +383,20 @@ void MainFrame::OnFillWith500Entries(wxCommandEvent& event)
     wxString file_name = "A file name";
     wxString file_type = "File";
     wxString file_size = "100KB";
-    for(size_t i=0; i<itemCount; ++i) {
-        wxDataViewItem item = m_dataView->AppendItem(file_name);
+
+    // A nice trick to boost performance: remove the sorting method
+    m_dataView->SetSortFunction(nullptr);
+    for(size_t i = 0; i < itemCount; ++i) {
+        wxDataViewItem item = m_dataView->AppendItem(wxString() << file_name << i);
         m_dataView->SetItemText(item, file_type, 1);
         m_dataView->SetItemText(item, file_size, 2);
     }
+
+    // Now that we got all the items populated, set a sorting function
+    auto SortFunc = [&](clRowEntry* a, clRowEntry* b) { return a->GetLabel(0).CmpNoCase(b->GetLabel(0)) < 0; };
     long timepassed = sw.Time();
+    m_dataView->SetSortFunction(SortFunc);
     LogMessage(wxString() << "Added " << itemCount << " entries in: " << timepassed << "ms");
 }
+
+void MainFrame::OnDVDeleteAllItems(wxCommandEvent& event) { m_dataView->DeleteAllItems(); }
