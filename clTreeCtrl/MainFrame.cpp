@@ -39,11 +39,10 @@ MainFrame::MainFrame(wxWindow* parent)
 
     wxLog::SetActiveTarget(new wxLogTextCtrl(m_textCtrlLog));
     // Provide a sorting function to the tree
-    std::function<bool(const wxTreeItemId& a, const wxTreeItemId& b)> SortFunc = [&](const wxTreeItemId& a,
-                                                                                     const wxTreeItemId& b) {
+    clSortFunc_t SortFunc = [&](clRowEntry* a, clRowEntry* b) {
         // Compare based on item type and then by label
-        MyItemData* cd_a = dynamic_cast<MyItemData*>(m_treeCtrl->GetItemData(a));
-        MyItemData* cd_b = dynamic_cast<MyItemData*>(m_treeCtrl->GetItemData(b));
+        MyItemData* cd_a = dynamic_cast<MyItemData*>(a->GetClientObject());
+        MyItemData* cd_b = dynamic_cast<MyItemData*>(b->GetClientObject());
         if(cd_a->IsFolder() && !cd_b->IsFolder()) {
             return true;
         } else if(!cd_a->IsFolder() && cd_b->IsFolder()) {
@@ -86,7 +85,7 @@ MainFrame::MainFrame(wxWindow* parent)
     });
     m_treeCtrl->Bind(wxEVT_TREE_KEY_DOWN, [&](wxTreeEvent& evt) {
         evt.Skip();
-        LogMessage(wxString() << "Key down. selection is: " << m_treeCtrl->GetItemText(evt.GetItem()));
+        // LogMessage(wxString() << "Key down. selection is: " << m_treeCtrl->GetItemText(evt.GetItem()));
     });
 
     m_treeCtrl->Bind(wxEVT_TREE_ITEM_RIGHT_CLICK, [&](wxTreeEvent& evt) {
@@ -303,7 +302,12 @@ void MainFrame::OnZebraColouring(wxCommandEvent& event)
 
 void MainFrame::OnHideRoot(wxCommandEvent& event) { m_treeCtrl->EnableStyle(wxTR_HIDE_ROOT, event.IsChecked()); }
 
-void MainFrame::OnSingleSelection(wxCommandEvent& event) { m_treeCtrl->EnableStyle(wxTR_MULTIPLE, !event.IsChecked()); }
+void MainFrame::OnSingleSelection(wxCommandEvent& event) 
+{ 
+    m_treeCtrl->EnableStyle(wxTR_MULTIPLE, !event.IsChecked()); 
+    m_dataView->EnableStyle(wxDV_MULTIPLE, !event.IsChecked()); 
+}
+
 void MainFrame::OnShowSBOnFocus(wxCommandEvent& event) { m_treeCtrl->SetShowScrollBarOnFocus(event.IsChecked()); }
 void MainFrame::OnHideHeaders(wxCommandEvent& event)
 {
@@ -374,16 +378,16 @@ void MainFrame::OnFillWith500Entries(wxCommandEvent& event)
     wxString file_name = "A file name";
     wxString file_type = "File";
     wxString file_size = "100KB";
-    
+
     MyImages images;
     const wxBitmap& file_bmp = images.Bitmap("file");
     const wxBitmap& folder_bmp = images.Bitmap("folder");
-    
+
     std::vector<wxBitmap> bitmaps;
     bitmaps.push_back(file_bmp);
     bitmaps.push_back(folder_bmp);
     m_dataView->SetBitmaps(bitmaps);
-    
+
     // A nice trick to boost performance: remove the sorting method
     m_dataView->SetSortFunction(nullptr);
     for(size_t i = 0; i < itemCount; ++i) {

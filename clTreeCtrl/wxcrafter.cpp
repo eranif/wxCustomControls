@@ -42,7 +42,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     boxSizer71->Add(m_treeCtrl, 1, wxALL | wxEXPAND, WXC_FROM_DIP(1));
 
     m_dataView = new clDataViewListCtrl(m_mainPanel, wxID_ANY, wxDefaultPosition,
-                                        wxDLG_UNIT(m_mainPanel, wxSize(-1, -1)), wxDV_SINGLE);
+                                        wxDLG_UNIT(m_mainPanel, wxSize(-1, -1)), wxDV_ROW_LINES | wxDV_SINGLE);
 
     boxSizer71->Add(m_dataView, 1, wxALL | wxEXPAND, WXC_FROM_DIP(1));
 
@@ -125,6 +125,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
 
     m_menuItemZebra = new wxMenuItem(menu_Style, ID_ZEBRA, _("Zebra Colouring..."), wxT(""), wxITEM_CHECK);
     menu_Style->Append(m_menuItemZebra);
+    m_menuItemZebra->Check();
 
     m_menuItemThemes = new wxMenuItem(menu_Style, ID_TOGGLE_THEMES, _("Toggle Themes"), wxT(""), wxITEM_NORMAL);
     menu_Style->Append(m_menuItemThemes);
@@ -137,6 +138,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     m_menuItemSingleSelection =
         new wxMenuItem(menu_Style, ID_SINGLE_SELECTION, _("Single Selection Tree"), wxT(""), wxITEM_CHECK);
     menu_Style->Append(m_menuItemSingleSelection);
+    m_menuItemSingleSelection->Check();
 
     m_menuItemShowSBOnFocus =
         new wxMenuItem(menu_Style, ID_SHOW_SB_ON_FOCUS, _("Show Scrollbar when focused Only"), wxT(""), wxITEM_CHECK);

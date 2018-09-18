@@ -349,7 +349,7 @@
              "border": 1,
              "gbSpan": "1,1",
              "gbPosition": "0,0",
-             "m_styles": ["wxDV_SINGLE"],
+             "m_styles": ["wxDV_ROW_LINES", "wxDV_SINGLE"],
              "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
              "m_properties": [{
                "type": "winid",
@@ -1591,7 +1591,7 @@
           }, {
            "type": "bool",
            "m_label": "Checked",
-           "m_value": false
+           "m_value": true
           }],
          "m_events": [{
            "m_eventName": "wxEVT_COMMAND_MENU_SELECTED",
@@ -1788,7 +1788,7 @@
           }, {
            "type": "bool",
            "m_label": "Checked",
-           "m_value": false
+           "m_value": true
           }],
          "m_events": [{
            "m_eventName": "wxEVT_COMMAND_MENU_SELECTED",
