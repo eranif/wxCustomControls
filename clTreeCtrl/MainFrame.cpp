@@ -10,6 +10,17 @@
 #include <wx/utils.h>
 #include <wx/wupdlock.h>
 
+class MyDvData
+{
+public:
+    wxString m_path;
+    MyDvData(const wxString& path)
+        : m_path(path)
+    {
+    }
+    ~MyDvData() {}
+};
+
 static wxVariant MakeIconText(const wxString& text, int bmp_index)
 {
     clDataViewTextBitmap ict(text, bmp_index);
@@ -302,10 +313,10 @@ void MainFrame::OnZebraColouring(wxCommandEvent& event)
 
 void MainFrame::OnHideRoot(wxCommandEvent& event) { m_treeCtrl->EnableStyle(wxTR_HIDE_ROOT, event.IsChecked()); }
 
-void MainFrame::OnSingleSelection(wxCommandEvent& event) 
-{ 
-    m_treeCtrl->EnableStyle(wxTR_MULTIPLE, !event.IsChecked()); 
-    m_dataView->EnableStyle(wxDV_MULTIPLE, !event.IsChecked()); 
+void MainFrame::OnSingleSelection(wxCommandEvent& event)
+{
+    m_treeCtrl->EnableStyle(wxTR_MULTIPLE, !event.IsChecked());
+    m_dataView->EnableStyle(wxDV_MULTIPLE, !event.IsChecked());
 }
 
 void MainFrame::OnShowSBOnFocus(wxCommandEvent& event) { m_treeCtrl->SetShowScrollBarOnFocus(event.IsChecked()); }
@@ -331,6 +342,10 @@ void MainFrame::OnDVOpenFolder(wxCommandEvent& event)
 {
     wxString path = ::wxDirSelector();
     if(path.IsEmpty()) { return; }
+    for(size_t i=0; i<m_dataView->GetItemCount(); ++i) {
+        MyDvData* d = reinterpret_cast<MyDvData*>(m_dataView->GetItemData(m_dataView->RowToItem(i)));
+        wxDELETE(d);
+    }
     m_dataView->DeleteAllItems();
 
     // load the folders
@@ -341,6 +356,7 @@ void MainFrame::OnDVOpenFolder(wxCommandEvent& event)
         while(cont) {
             wxFileName fn(path, filename);
             wxVector<wxVariant> cols;
+            MyDvData* d = new MyDvData(fn.GetFullPath());
             if(wxDirExists(fn.GetFullPath())) {
                 // A directory
                 cols.push_back(filename);
@@ -356,7 +372,7 @@ void MainFrame::OnDVOpenFolder(wxCommandEvent& event)
                 cols.push_back(MakeIconText("File", 0));
                 cols.push_back(t);
             }
-            m_dataView->AppendItem(cols);
+            m_dataView->AppendItem(cols, (wxUIntPtr)d);
             cont = dir.GetNext(&filename);
         }
     }
