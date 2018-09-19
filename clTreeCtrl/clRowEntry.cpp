@@ -253,7 +253,7 @@ void clRowEntry::ClearRects()
     m_rowRect = wxRect();
 }
 
-void clRowEntry::Render(wxWindow* win, wxDC& dc, const clColours& c, int row_index)
+void clRowEntry::Render(wxWindow* win, wxDC& dc, const clColours& c, int row_index, clSearchText* searcher)
 {
     wxRect rowRect = GetItemRect();
     bool zebraColouring = (m_tree->HasStyle(wxTR_ROW_LINES) || m_tree->HasStyle(wxDV_ROW_LINES));
@@ -344,11 +344,14 @@ void clRowEntry::Render(wxWindow* win, wxDC& dc, const clColours& c, int row_ind
             }
         }
 
-        dc.SetTextForeground(IsSelected() ? colours.GetSelItemTextColour() : colours.GetItemTextColour());
+        if(m_tree->HasStyle(wxTR_ENABLE_SEARCH)) {
+            searcher->RenderText(dc, colours, cell.GetText(),
+                                 (i == 0 ? itemIndent : clHeaderItem::X_SPACER) + textXOffset, textY, this);
 
-        // Draw the indentation only for the first cell
-        dc.DrawText(cell.GetText(), (i == 0 ? itemIndent : clHeaderItem::X_SPACER) + textXOffset, textY);
-
+        } else {
+            searcher->RenderTextSimple(dc, colours, cell.GetText(),
+                                       (i == 0 ? itemIndent : clHeaderItem::X_SPACER) + textXOffset, textY, this);
+        }
         if(!last_cell) {
             cellRect.SetHeight(rowRect.GetHeight());
             dc.SetPen(wxPen(colours.GetHeaderVBorderColour(), 1, PEN_STYLE));

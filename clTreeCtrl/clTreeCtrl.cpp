@@ -34,7 +34,25 @@
 clTreeCtrl::clTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
     : clControlWithItems(parent, wxID_ANY, pos, size, wxWANTS_CHARS)
     , m_model(this)
-    , m_treeStyle(style)
+{
+    m_treeStyle = style;
+    DoInitialize();
+}
+
+clTreeCtrl::clTreeCtrl()
+    : m_model(this)
+{
+}
+
+bool clTreeCtrl::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
+{
+    m_treeStyle = style;
+    if(!clControlWithItems::Create(parent, id, pos, size, wxWANTS_CHARS)) { return false; }
+    DoInitialize();
+    return true;
+}
+
+void clTreeCtrl::DoInitialize()
 {
     wxSize textSize = GetTextSize("Tp");
     SetLineHeight(clRowEntry::Y_SPACER + textSize.GetHeight() + clRowEntry::Y_SPACER);
@@ -574,6 +592,8 @@ size_t clTreeCtrl::GetSelections(wxArrayTreeItemIds& selections) const
 
 bool clTreeCtrl::DoKeyDown(const wxKeyEvent& event)
 {
+    clControlWithItems::DoKeyDown(event);
+
     if(!m_model.GetRoot()) {
         // we didnt process this event, carry on
         return true;
@@ -870,6 +890,8 @@ void clTreeCtrl::EnableStyle(int style, bool enable, bool refresh)
         V.Visit(m_model.GetRoot(), false, UpdateIndentsFunc);
         wxTreeItemId newRoot(m_model.GetRoot()->GetFirstChild());
         if(newRoot) { DoUpdateHeader(newRoot); }
+    } else if(style == wxTR_ENABLE_SEARCH) {
+        GetSearch().Reset();
     }
     if(refresh) { Refresh(); }
 }
@@ -922,3 +944,7 @@ void clTreeCtrl::DeleteAllItems()
     m_model.EnableEvents(true);
     DoUpdateHeader(nullptr);
 }
+
+wxTreeItemId clTreeCtrl::GetNextItem(const wxTreeItemId& item) const { return m_model.GetItemAfter(item, true); }
+
+wxTreeItemId clTreeCtrl::GetPrevItem(const wxTreeItemId& item) const { return m_model.GetItemBefore(item, true); }

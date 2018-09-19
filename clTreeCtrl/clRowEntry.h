@@ -11,6 +11,7 @@
 #include <wx/string.h>
 #include <wx/treebase.h>
 
+class clSearchText;
 class clTreeCtrlModel;
 class clTreeCtrl;
 enum clTreeCtrlNodeFlags {
@@ -81,7 +82,7 @@ public:
     clRowEntry* GetPrev() const { return m_prev; }
     void SetNext(clRowEntry* next) { this->m_next = next; }
     void SetPrev(clRowEntry* prev) { this->m_prev = prev; }
-    
+
     void SetHidden(bool b);
     bool IsHidden() const { return HasFlag(kNF_Hidden); }
 
@@ -110,7 +111,7 @@ public:
      * @brief remove all children items
      */
     void DeleteAllChildren();
-    void Render(wxWindow* win, wxDC& dc, const clColours& colours, int row_index);
+    void Render(wxWindow* win, wxDC& dc, const clColours& colours, int row_index, clSearchText* searcher);
     void SetHovered(bool b) { SetFlag(kNF_Hovered, b); }
     bool IsHovered() const { return m_flags & kNF_Hovered; }
 

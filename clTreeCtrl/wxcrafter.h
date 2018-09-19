@@ -94,6 +94,7 @@ protected:
     wxMenuItem* m_menuItemShowSBOnFocus;
     wxMenuItem* m_menuItemHideHeaders;
     wxMenuItem* m_menuItemNativeHeader;
+    wxMenuItem* m_menuItemSupportSearch;
 
 protected:
     virtual void OnOpenFolder(wxCommandEvent& event) { event.Skip(); }
@@ -117,6 +118,7 @@ protected:
     virtual void OnShowSBOnFocus(wxCommandEvent& event) { event.Skip(); }
     virtual void OnHideHeaders(wxCommandEvent& event) { event.Skip(); }
     virtual void OnNativeHeader(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnMenuitemsupportsearchMenuSelected(wxCommandEvent& event) { event.Skip(); }
 
 public:
     clTreeCtrl* GetTreeCtrl() { return m_treeCtrl; }

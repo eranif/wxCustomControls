@@ -20,6 +20,7 @@ clDataViewListCtrl::clDataViewListCtrl(wxWindow* parent, wxWindowID id, const wx
     if(m_stylesMap.empty()) {
         m_stylesMap.insert({ wxDV_ROW_LINES, wxTR_ROW_LINES });
         m_stylesMap.insert({ wxDV_MULTIPLE, wxTR_MULTIPLE });
+        m_stylesMap.insert({ wxDV_ENABLE_SEARCH, wxTR_ENABLE_SEARCH });
     }
 
     int my_style = 0;

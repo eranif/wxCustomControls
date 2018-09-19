@@ -6,6 +6,23 @@ clControlWithItems::clControlWithItems(wxWindow* parent, wxWindowID id, const wx
     : clScrolledPanel(parent, id, pos, size, style)
     , m_viewHeader(this)
 {
+    DoInitialize();
+}
+
+clControlWithItems::clControlWithItems()
+    : m_viewHeader(this)
+{
+}
+
+bool clControlWithItems::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
+{
+    if(!clScrolledPanel::Create(parent, id, pos, size, style)) { return false; }
+    DoInitialize();
+    return true;
+}
+
+void clControlWithItems::DoInitialize()
+{
     SetBackgroundStyle(wxBG_STYLE_PAINT);
     Bind(wxEVT_SIZE, &clControlWithItems::OnSize, this);
     Bind(wxEVT_MOUSEWHEEL, &clControlWithItems::OnMouseScroll, this);
@@ -71,7 +88,7 @@ void clControlWithItems::RenderItems(wxDC& dc, const clRowEntry::Vec_t& items)
             buttonRect = wxRect((curitem->GetIndentsCount() * GetIndent()), y, m_lineHeight, m_lineHeight);
         }
         curitem->SetRects(itemRect, buttonRect);
-        curitem->Render(this, dc, m_colours, i);
+        curitem->Render(this, dc, m_colours, i, &GetSearch());
         y += m_lineHeight;
     }
 }
@@ -214,4 +231,101 @@ void clControlWithItems::SetNativeHeader(bool b)
 {
     m_viewHeader.SetNative(b);
     Refresh();
+}
+
+bool clControlWithItems::DoKeyDown(const wxKeyEvent& event)
+{
+    m_search.OnKeyDown(event, this);
+    return false; // continue processing
+}
+
+//===---------------------------------------------------
+// clSearchText
+//===---------------------------------------------------
+clSearchText::clSearchText() {}
+
+clSearchText::~clSearchText() {}
+
+void clSearchText::OnKeyDown(const wxKeyEvent& event, clControlWithItems* control)
+{
+    if(event.GetKeyCode() == WXK_ESCAPE) {
+        Reset();
+        control->Refresh();
+    } else if(event.GetKeyCode() == WXK_BACK) {
+        m_findWhat.RemoveLast();
+        control->Refresh();
+    } else if(event.GetKeyCode() == WXK_BACK && event.ControlDown()) {
+        Reset();
+        control->Refresh();
+    } else if(wxIsprint(event.GetUnicodeKey())) {
+        m_findWhat << event.GetUnicodeKey();
+        control->Refresh();
+    }
+}
+
+void clSearchText::Reset() { m_findWhat.Clear(); }
+
+void clSearchText::RenderTextSimple(wxDC& dc, const clColours& colours, const wxString& text, int x, int y,
+                                    clRowEntry* row)
+{
+    dc.SetTextForeground(row->IsSelected() ? colours.GetSelItemTextColour() : colours.GetItemTextColour());
+    dc.DrawText(text, x, y);
+}
+
+void clSearchText::RenderText(wxDC& dc, const clColours& colours, const wxString& text, int x, int y, clRowEntry* row)
+{
+    // Draw the indentation only for the first cell
+    std::vector<std::pair<wxChar, bool> > V;
+    if(!SplitText(text, V)) {
+        V.clear();
+        std::for_each(text.begin(), text.end(), [&](wxChar ch) { V.push_back({ ch, false }); });
+    }
+
+    // Always draw the text using this method (char by char)
+    const wxColour& defaultTextColour =
+        row->IsSelected() ? colours.GetSelItemTextColour() : colours.GetItemTextColour();
+    const wxColour& matchBgColour = colours.GetMatchedItemBgText();
+    const wxColour& matchTextColour = colours.GetMatchedItemText();
+    int xx = x;
+    wxRect rowRect = row->GetItemRect();
+    for(size_t i = 0; i < V.size(); ++i) {
+        const std::pair<wxChar, bool>& p = V[i];
+        wxString ch = p.first;
+        bool is_match = p.second;
+        wxSize sz = dc.GetTextExtent(ch);
+        rowRect.SetX(xx);
+        rowRect.SetWidth(sz.GetWidth());
+        if(is_match) {
+            // draw a match rectangle
+            dc.SetPen(matchBgColour);
+            dc.SetBrush(matchBgColour);
+            dc.SetTextForeground(matchTextColour);
+            dc.DrawRectangle(rowRect);
+        } else {
+            dc.SetTextForeground(defaultTextColour);
+        }
+        dc.DrawText(ch, xx, y);
+        xx += sz.GetWidth();
+    }
+}
+
+bool clSearchText::SplitText(const wxString& text, std::vector<std::pair<wxChar, bool> >& V)
+{
+    if(m_findWhat.IsEmpty()) { return false; }
+
+    wxString lc_text = text.Lower();
+    wxString lc_find_what = m_findWhat.Lower();
+    wxString::iterator iter = lc_find_what.begin();
+    for(size_t i = 0; i < lc_text.Length(); ++i) {
+        wxChar ch = lc_text[i];
+        if(iter != lc_find_what.end() && (*iter) == ch) {
+            V.push_back({ text[i], true });
+            ++iter;
+        } else {
+            V.push_back({ text[i], false });
+        }
+    }
+
+    // we return true only if all chars were matched
+    return (iter == lc_find_what.end());
 }

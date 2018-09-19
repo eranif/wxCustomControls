@@ -422,3 +422,9 @@ void MainFrame::OnFillWith500Entries(wxCommandEvent& event)
 }
 
 void MainFrame::OnDVDeleteAllItems(wxCommandEvent& event) { m_dataView->DeleteAllItems(); }
+
+void MainFrame::OnMenuitemsupportsearchMenuSelected(wxCommandEvent& event)
+{
+    m_treeCtrl->EnableStyle(wxTR_ENABLE_SEARCH, event.IsChecked(), true);
+    m_dataView->EnableStyle(wxDV_ENABLE_SEARCH, event.IsChecked(), true);
+}

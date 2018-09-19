@@ -12,7 +12,25 @@
 #define SCROLL_TICK 2
 #endif
 
+class clControlWithItems;
 class clRowEntry;
+class WXDLLIMPEXP_SDK clSearchText
+{
+    wxString m_findWhat;
+
+protected:
+    bool SplitText(const wxString& text, std::vector<std::pair<wxChar, bool> >& V);
+
+public:
+    void OnKeyDown(const wxKeyEvent& event, clControlWithItems* control);
+    void Reset();
+    void RenderText(wxDC& dc, const clColours& colours, const wxString& text, int x, int y, clRowEntry* row);
+    void RenderTextSimple(wxDC& dc, const clColours& colours, const wxString& text, int x, int y, clRowEntry* row);
+
+    clSearchText();
+    virtual ~clSearchText();
+};
+
 class WXDLLIMPEXP_SDK clControlWithItems : public clScrolledPanel
 {
 private:
@@ -24,8 +42,10 @@ private:
     int m_indent = 0;
     std::vector<wxBitmap> m_bitmaps;
     int m_scrollTick = SCROLL_TICK;
+    clSearchText m_search;
 
 protected:
+    void DoInitialize();
     int GetNumLineCanFitOnScreen() const;
     virtual clRowEntry* GetFirstItemOnScreen();
     virtual void SetFirstItemOnScreen(clRowEntry* item);
@@ -35,12 +55,16 @@ protected:
     void DoUpdateHeader(clRowEntry* row);
     wxSize GetTextSize(const wxString& label) const;
     virtual void OnMouseScroll(wxMouseEvent& event);
+    virtual bool DoKeyDown(const wxKeyEvent& event);
+    clSearchText& GetSearch() { return m_search; }
 
 public:
     clControlWithItems(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
                        const wxSize& size = wxDefaultSize, long style = 0);
     virtual ~clControlWithItems();
-
+    clControlWithItems();
+    bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
+                const wxSize& size = wxDefaultSize, long style = 0);
     virtual int GetIndent() const { return m_indent; }
 
     virtual void SetFirstColumn(int firstColumn) { this->m_firstColumn = firstColumn; }
@@ -55,12 +79,12 @@ public:
 
     void SetScrollTick(int scrollTick) { this->m_scrollTick = scrollTick; }
     int GetScrollTick() const { return m_scrollTick; }
-        
+
     /**
      * @brief use native header drawings
      */
     void SetNativeHeader(bool b);
-    
+
     /**
      * @brief return bitmap at a given index
      */
