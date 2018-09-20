@@ -592,6 +592,13 @@ size_t clTreeCtrl::GetSelections(wxArrayTreeItemIds& selections) const
 
 bool clTreeCtrl::DoKeyDown(const wxKeyEvent& event)
 {
+    // Let the user chance to process this first
+    wxTreeEvent evt(wxEVT_TREE_KEY_DOWN);
+    evt.SetEventObject(this);
+    evt.SetKeyEvent(event);
+    evt.SetItem(GetSelection()); // can be an invalid item
+    if(GetEventHandler()->ProcessEvent(evt)) { return true; }
+
     clControlWithItems::DoKeyDown(event);
 
     if(!m_model.GetRoot()) {
@@ -600,13 +607,6 @@ bool clTreeCtrl::DoKeyDown(const wxKeyEvent& event)
     }
     wxTreeItemId selectedItem = GetSelection();
     if(!selectedItem.IsOk()) { return true; }
-
-    // Let the user chance to process this first
-    wxTreeEvent evt(wxEVT_TREE_KEY_DOWN);
-    evt.SetEventObject(this);
-    evt.SetKeyEvent(event);
-    evt.SetItem(selectedItem);
-    if(GetEventHandler()->ProcessEvent(evt)) { return true; }
 
     if(event.GetKeyCode() == WXK_LEFT) {
         if(m_model.ToPtr(selectedItem)->IsExpanded()) {
@@ -879,7 +879,7 @@ void clTreeCtrl::EnableStyle(int style, bool enable, bool refresh)
         GetSearch().Reset();
         GetSearch().SetEnabled(enable);
     }
-    
+
     // From this point on, we require a root item
     if(!m_model.GetRoot()) { return; }
 
