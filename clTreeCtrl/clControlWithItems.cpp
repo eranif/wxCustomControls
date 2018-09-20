@@ -251,6 +251,7 @@ clSearchText::~clSearchText() {}
 
 void clSearchText::OnKeyDown(const wxKeyEvent& event, clControlWithItems* control)
 {
+    if(!IsEnabled()) { return; }
     if((event.GetKeyCode() == WXK_ESCAPE) || (event.GetKeyCode() == WXK_BACK && event.ControlDown())) {
         Reset();
         // Notify about search clear

@@ -29,6 +29,7 @@ class clRowEntry;
 class WXDLLIMPEXP_SDK clSearchText
 {
     wxString m_findWhat;
+    bool m_enabled = false;
 
 protected:
     bool SplitText(const wxString& text, std::vector<std::pair<wxChar, bool> >& V);
@@ -41,6 +42,8 @@ public:
 
     clSearchText();
     virtual ~clSearchText();
+    void SetEnabled(bool enabled) { this->m_enabled = enabled; }
+    bool IsEnabled() const { return m_enabled; }
 };
 
 class WXDLLIMPEXP_SDK clControlWithItems : public clScrolledPanel

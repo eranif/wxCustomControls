@@ -892,6 +892,7 @@ void clTreeCtrl::EnableStyle(int style, bool enable, bool refresh)
         if(newRoot) { DoUpdateHeader(newRoot); }
     } else if(style == wxTR_ENABLE_SEARCH) {
         GetSearch().Reset();
+        GetSearch().SetEnabled(enable);
     }
     if(refresh) { Refresh(); }
 }
