@@ -54,17 +54,16 @@ public:
         wxPanel* mainPanel = new wxPanel(this);
         GetSizer()->Add(mainPanel, 1, wxEXPAND);
         mainPanel->SetSizer(new wxBoxSizer(wxVERTICAL));
-        m_textCtrl =
-            new wxTextCtrl(mainPanel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_RICH | wxTE_PROCESS_ENTER);
+        m_textCtrl = new wxTextCtrl(mainPanel, wxID_ANY, "", wxDefaultPosition,
+                                    wxSize(GetParent()->GetSize().GetWidth(), -1), wxTE_RICH | wxTE_PROCESS_ENTER);
         mainPanel->GetSizer()->Add(m_textCtrl, 0, wxEXPAND);
         m_textCtrl->CallAfter(&wxTextCtrl::SetFocus);
         m_textCtrl->Bind(wxEVT_TEXT, &clSearchControl::OnTextUpdated, this);
         m_textCtrl->Bind(wxEVT_KEY_DOWN, &clSearchControl::OnKeyDown, this);
-        SetSize(GetParent()->GetSize().GetWidth(), -1);
         wxPoint parentPt = GetParent()->GetScreenPosition();
         GetSizer()->Fit(this);
         CenterOnParent();
-        SetPosition(wxPoint(GetPosition().x, parentPt.y));
+        SetPosition(wxPoint(GetPosition().x, parentPt.y - m_textCtrl->GetSize().GetHeight()));
     }
 
     virtual ~clSearchControl()
@@ -169,6 +168,7 @@ void clControlWithItems::DoInitialize()
 
 clControlWithItems::~clControlWithItems()
 {
+    wxDELETE(m_searchControl);
     Unbind(wxEVT_SIZE, &clControlWithItems::OnSize, this);
     Unbind(wxEVT_MOUSEWHEEL, &clControlWithItems::OnMouseScroll, this);
 }
