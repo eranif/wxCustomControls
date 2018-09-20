@@ -242,6 +242,12 @@ bool clControlWithItems::DoKeyDown(const wxKeyEvent& event)
     return false; // continue processing
 }
 
+void clControlWithItems::SetFindWhat(const wxString& what) { GetSearch().SetFindWhat(what); }
+
+const wxString& clControlWithItems::GetFindWhat() const { return GetSearch().GetFindWhat(); }
+
+void clControlWithItems::ClearFindWhat() { GetSearch().Clear(); }
+
 //===---------------------------------------------------
 // clSearchText
 //===---------------------------------------------------
@@ -279,26 +285,6 @@ void clSearchText::OnKeyDown(const wxKeyEvent& event, clControlWithItems* contro
 
 void clSearchText::Reset() { m_findWhat.Clear(); }
 
-bool clSearchText::SplitText(const wxString& text, std::vector<std::pair<wxChar, bool> >& V)
-{
-    if(m_findWhat.IsEmpty()) { return false; }
-    wxString lc_text = text.Lower();
-    wxString lc_find_what = m_findWhat.Lower();
-    wxString::iterator iter = lc_find_what.begin();
-    for(size_t i = 0; i < lc_text.Length(); ++i) {
-        wxChar ch = lc_text[i];
-        if(iter != lc_find_what.end() && (*iter) == ch) {
-            V.push_back({ text[i], true });
-            ++iter;
-        } else {
-            V.push_back({ text[i], false });
-        }
-    }
-
-    // we return true only if all chars were matched
-    return (iter == lc_find_what.end());
-}
-
 bool clSearchText::Matches(const wxString& findWhat, size_t col, const wxString& text, size_t searchFlags,
                            clMatchResult* matches)
 {
@@ -335,3 +321,7 @@ bool clSearchText::Matches(const wxString& findWhat, size_t col, const wxString&
     }
     return false;
 }
+
+void clSearchText::Clear() { m_findWhat.Clear(); }
+
+const wxString& clSearchText::GetFindWhat() const { return m_findWhat; }

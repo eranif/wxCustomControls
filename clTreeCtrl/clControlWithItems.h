@@ -31,9 +31,6 @@ class WXDLLIMPEXP_SDK clSearchText
     wxString m_findWhat;
     bool m_enabled = false;
 
-protected:
-    bool SplitText(const wxString& text, std::vector<std::pair<wxChar, bool> >& V);
-
 public:
     void OnKeyDown(const wxKeyEvent& event, clControlWithItems* control);
     void Reset();
@@ -44,6 +41,9 @@ public:
     virtual ~clSearchText();
     void SetEnabled(bool enabled) { this->m_enabled = enabled; }
     bool IsEnabled() const { return m_enabled; }
+    void Clear();
+    const wxString& GetFindWhat() const;
+    void SetFindWhat(const wxString& findWhat) { this->m_findWhat = findWhat; }
 };
 
 class WXDLLIMPEXP_SDK clControlWithItems : public clScrolledPanel
@@ -72,14 +72,19 @@ protected:
     virtual void OnMouseScroll(wxMouseEvent& event);
     virtual bool DoKeyDown(const wxKeyEvent& event);
     clSearchText& GetSearch() { return m_search; }
+    const clSearchText& GetSearch() const { return m_search; }
 
 public:
     clControlWithItems(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
                        const wxSize& size = wxDefaultSize, long style = 0);
     virtual ~clControlWithItems();
     clControlWithItems();
+
     bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
                 const wxSize& size = wxDefaultSize, long style = 0);
+    void SetFindWhat(const wxString& what);
+    const wxString& GetFindWhat() const;
+    void ClearFindWhat();
     virtual int GetIndent() const { return m_indent; }
 
     virtual void SetFirstColumn(int firstColumn) { this->m_firstColumn = firstColumn; }

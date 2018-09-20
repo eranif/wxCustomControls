@@ -870,12 +870,18 @@ wxTreeItemId clTreeCtrl::DoScrollLines(int numLines, bool up, wxTreeItemId from,
 
 void clTreeCtrl::EnableStyle(int style, bool enable, bool refresh)
 {
-    if(!m_model.GetRoot()) { return; }
     if(enable) {
         m_treeStyle |= style;
     } else {
         m_treeStyle &= ~style;
     }
+    if(style == wxTR_ENABLE_SEARCH) {
+        GetSearch().Reset();
+        GetSearch().SetEnabled(enable);
+    }
+    
+    // From this point on, we require a root item
+    if(!m_model.GetRoot()) { return; }
 
     // When changing the wxTR_HIDE_ROOT style
     // we need to fix the indentation for each node in the tree
@@ -890,9 +896,6 @@ void clTreeCtrl::EnableStyle(int style, bool enable, bool refresh)
         V.Visit(m_model.GetRoot(), false, UpdateIndentsFunc);
         wxTreeItemId newRoot(m_model.GetRoot()->GetFirstChild());
         if(newRoot) { DoUpdateHeader(newRoot); }
-    } else if(style == wxTR_ENABLE_SEARCH) {
-        GetSearch().Reset();
-        GetSearch().SetEnabled(enable);
     }
     if(refresh) { Refresh(); }
 }
