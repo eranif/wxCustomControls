@@ -4,12 +4,13 @@
 #include <wx/aboutdlg.h>
 #include <wx/dir.h>
 #include <wx/dirdlg.h>
+#include <wx/minifram.h>
 #include <wx/msgdlg.h>
 #include <wx/numdlg.h>
+#include <wx/popupwin.h>
 #include <wx/stopwatch.h>
 #include <wx/textdlg.h>
 #include <wx/utils.h>
-#include <wx/wupdlock.h>
 
 class MyDvData
 {
@@ -29,6 +30,26 @@ static wxVariant MakeIconText(const wxString& text, int bmp_index)
     v << ict;
     return v;
 }
+
+class MyPopupWindow : public wxMiniFrame
+{
+public:
+    MyPopupWindow(wxWindow* parent)
+        : wxMiniFrame(parent, wxID_ANY, "Mini Frame", wxDefaultPosition, wxDefaultSize,
+                      wxFRAME_FLOAT_ON_PARENT | wxBORDER_SIMPLE)
+    {
+        SetSizer(new wxBoxSizer(wxVERTICAL));
+        wxPanel* mainPanel = new wxPanel(this);
+        GetSizer()->Add(mainPanel, 1, wxEXPAND);
+        mainPanel->SetSizer(new wxBoxSizer(wxVERTICAL));
+        wxTextCtrl* text = new wxTextCtrl(mainPanel, wxID_ANY, "Value");
+        mainPanel->GetSizer()->Add(text, 0, wxEXPAND);
+        GetSizer()->Fit(this);
+        text->CallAfter(&wxTextCtrl::SetFocus);
+        CenterOnParent();
+    }
+    virtual ~MyPopupWindow() {}
+};
 
 MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
@@ -434,18 +455,22 @@ void MainFrame::OnMenuitemsupportsearchMenuSelected(wxCommandEvent& event)
 
 void MainFrame::OnTreeFind(wxCommandEvent& event)
 {
-    wxString findwhat = wxGetTextFromUser("Text to search", "Find");
-    if(findwhat.IsEmpty()) { return; }
+    MyPopupWindow* w = new MyPopupWindow(this);
+    w->Show();
 
-    m_treeCtrl->ClearAllHighlights();
-    wxTreeItemId where =
-        m_treeCtrl->FindNext(m_treeCtrl->GetSelection().IsOk() ? m_treeCtrl->GetSelection() : wxTreeItemId(), findwhat,
-                             0, wxTR_SEARCH_DEFAULT);
-    if(where.IsOk()) {
-        m_treeCtrl->SelectItem(where);
-        m_treeCtrl->EnsureVisible(where);
-        m_treeCtrl->HighlightText(where, true);
-    }
+    //    wxString findwhat = wxGetTextFromUser("Text to search", "Find");
+    //    if(findwhat.IsEmpty()) { return; }
+    //
+    //    m_treeCtrl->ClearAllHighlights();
+    //    wxTreeItemId where =
+    //        m_treeCtrl->FindNext(m_treeCtrl->GetSelection().IsOk() ? m_treeCtrl->GetSelection() : wxTreeItemId(),
+    //        findwhat,
+    //                             0, wxTR_SEARCH_DEFAULT);
+    //    if(where.IsOk()) {
+    //        m_treeCtrl->SelectItem(where);
+    //        m_treeCtrl->EnsureVisible(where);
+    //        m_treeCtrl->HighlightText(where, true);
+    //    }
 }
 
 void MainFrame::OnIncrementalSearch(wxTreeEvent& event)
