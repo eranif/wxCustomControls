@@ -124,11 +124,13 @@ public:
         } else if(event.GetKeyCode() == WXK_UP) {
             SelectPrev();
         } else if(event.GetKeyCode() == WXK_RETURN || event.GetKeyCode() == WXK_NUMPAD_ENTER) {
-            if(event.ShiftDown()) {
-                SelectPrev();
-            } else {
-                SelectNext();
-            }
+            // Activate the item
+            clTreeCtrl* tree = dynamic_cast<clTreeCtrl*>(GetParent());
+            wxTreeEvent evt(wxEVT_TREE_ITEM_ACTIVATED);
+            evt.SetEventObject(tree);
+            evt.SetItem(tree->GetSelection());
+            tree->GetEventHandler()->ProcessEvent(evt);
+            Dismiss();
         } else {
             event.Skip();
         }
