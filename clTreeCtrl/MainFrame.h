@@ -43,6 +43,7 @@ private:
     void DoAddRoot();
 
 protected:
+    virtual void OnTreeFind(wxCommandEvent& event);
     virtual void OnMenuitemsupportsearchMenuSelected(wxCommandEvent& event);
     virtual void OnDVDeleteAllItems(wxCommandEvent& event);
     virtual void OnFillWith500Entries(wxCommandEvent& event);

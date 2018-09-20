@@ -79,6 +79,8 @@ protected:
     wxMenuItem* m_menuItemNextSibling;
     wxMenuItem* m_menuItemPrevSibling;
     wxMenuItem* m_menuItemDeleteAllItems;
+    wxMenuItem* m_separator3;
+    wxMenuItem* m_menuItemFind;
     wxMenuItem* m_separator2;
     wxMenuItem* m_menuItemExit;
     wxMenu* menu_clDataViewListCtrl;
@@ -107,6 +109,7 @@ protected:
     virtual void OnNextSibling(wxCommandEvent& event) { event.Skip(); }
     virtual void OnPrevSibling(wxCommandEvent& event) { event.Skip(); }
     virtual void OnDeleteAllItems(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnTreeFind(wxCommandEvent& event) { event.Skip(); }
     virtual void OnExit(wxCommandEvent& event) { event.Skip(); }
     virtual void OnDVOpenFolder(wxCommandEvent& event) { event.Skip(); }
     virtual void OnFillWith500Entries(wxCommandEvent& event) { event.Skip(); }
@@ -127,7 +130,7 @@ public:
     wxPanel* GetMainPanel() { return m_mainPanel; }
     wxMenuBar* GetMyMenuBar() { return m_myMenuBar; }
     MainFrameBaseClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("My Frame"),
-                       const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500, 300),
+                       const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1, -1),
                        long style = wxCAPTION | wxRESIZE_BORDER | wxMAXIMIZE_BOX | wxMINIMIZE_BOX | wxSYSTEM_MENU |
                                     wxCLOSE_BOX);
     virtual ~MainFrameBaseClass();

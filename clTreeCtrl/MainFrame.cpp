@@ -7,6 +7,7 @@
 #include <wx/msgdlg.h>
 #include <wx/numdlg.h>
 #include <wx/stopwatch.h>
+#include <wx/textdlg.h>
 #include <wx/utils.h>
 #include <wx/wupdlock.h>
 
@@ -342,7 +343,7 @@ void MainFrame::OnDVOpenFolder(wxCommandEvent& event)
 {
     wxString path = ::wxDirSelector();
     if(path.IsEmpty()) { return; }
-    for(size_t i=0; i<m_dataView->GetItemCount(); ++i) {
+    for(size_t i = 0; i < m_dataView->GetItemCount(); ++i) {
         MyDvData* d = reinterpret_cast<MyDvData*>(m_dataView->GetItemData(m_dataView->RowToItem(i)));
         wxDELETE(d);
     }
@@ -427,4 +428,20 @@ void MainFrame::OnMenuitemsupportsearchMenuSelected(wxCommandEvent& event)
 {
     m_treeCtrl->EnableStyle(wxTR_ENABLE_SEARCH, event.IsChecked(), true);
     m_dataView->EnableStyle(wxDV_ENABLE_SEARCH, event.IsChecked(), true);
+}
+
+void MainFrame::OnTreeFind(wxCommandEvent& event)
+{
+    wxString findwhat = wxGetTextFromUser("Text to search", "Find");
+    if(findwhat.IsEmpty()) { return; }
+    
+    m_treeCtrl->ClearAllHighlights();
+    wxTreeItemId where =
+        m_treeCtrl->FindNext(m_treeCtrl->GetSelection().IsOk() ? m_treeCtrl->GetSelection() : wxTreeItemId(), findwhat,
+                             0, wxTR_SEARCH_DEFAULT);
+    if(where.IsOk()) {
+        m_treeCtrl->SelectItem(where);
+        m_treeCtrl->EnsureVisible(where);
+        m_treeCtrl->HighlightText(where, true);
+    }
 }

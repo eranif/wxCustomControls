@@ -103,6 +103,11 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
 
     menu_clTreeCtrl->AppendSeparator();
 
+    m_menuItemFind = new wxMenuItem(menu_clTreeCtrl, wxID_FIND, _("Find Item...\tCtrl-F"), wxT(""), wxITEM_NORMAL);
+    menu_clTreeCtrl->Append(m_menuItemFind);
+
+    menu_clTreeCtrl->AppendSeparator();
+
     m_menuItemExit = new wxMenuItem(menu_clTreeCtrl, wxID_EXIT, _("Exit\tAlt-X"), _("Quit"), wxITEM_NORMAL);
     menu_clTreeCtrl->Append(m_menuItemExit);
 
@@ -155,7 +160,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     menu_Style->Append(m_menuItemSupportSearch);
 
     SetName(wxT("MainFrameBaseClass"));
-    SetSize(wxDLG_UNIT(this, wxSize(500, 300)));
+    SetSize(wxDLG_UNIT(this, wxSize(-1, -1)));
     if(GetSizer()) { GetSizer()->Fit(this); }
     if(GetParent()) {
         CentreOnParent(wxBOTH);
@@ -190,6 +195,8 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
                   wxCommandEventHandler(MainFrameBaseClass::OnPrevSibling), NULL, this);
     this->Connect(m_menuItemDeleteAllItems->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                   wxCommandEventHandler(MainFrameBaseClass::OnDeleteAllItems), NULL, this);
+    this->Connect(m_menuItemFind->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                  wxCommandEventHandler(MainFrameBaseClass::OnTreeFind), NULL, this);
     this->Connect(m_menuItemExit->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                   wxCommandEventHandler(MainFrameBaseClass::OnExit), NULL, this);
     this->Connect(m_menuItem83->GetId(), wxEVT_COMMAND_MENU_SELECTED,
@@ -238,6 +245,8 @@ MainFrameBaseClass::~MainFrameBaseClass()
                      wxCommandEventHandler(MainFrameBaseClass::OnPrevSibling), NULL, this);
     this->Disconnect(m_menuItemDeleteAllItems->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                      wxCommandEventHandler(MainFrameBaseClass::OnDeleteAllItems), NULL, this);
+    this->Disconnect(m_menuItemFind->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                     wxCommandEventHandler(MainFrameBaseClass::OnTreeFind), NULL, this);
     this->Disconnect(m_menuItemExit->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                      wxCommandEventHandler(MainFrameBaseClass::OnExit), NULL, this);
     this->Disconnect(m_menuItem83->GetId(), wxEVT_COMMAND_MENU_SELECTED,

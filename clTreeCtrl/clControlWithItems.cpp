@@ -265,54 +265,9 @@ void clSearchText::OnKeyDown(const wxKeyEvent& event, clControlWithItems* contro
 
 void clSearchText::Reset() { m_findWhat.Clear(); }
 
-void clSearchText::RenderTextSimple(wxDC& dc, const clColours& colours, const wxString& text, int x, int y,
-                                    clRowEntry* row)
-{
-    dc.SetTextForeground(row->IsSelected() ? colours.GetSelItemTextColour() : colours.GetItemTextColour());
-    dc.DrawText(text, x, y);
-}
-
-void clSearchText::RenderText(wxDC& dc, const clColours& colours, const wxString& text, int x, int y, clRowEntry* row)
-{
-    // Draw the indentation only for the first cell
-    std::vector<std::pair<wxChar, bool> > V;
-    if(!SplitText(text, V)) {
-        V.clear();
-        std::for_each(text.begin(), text.end(), [&](wxChar ch) { V.push_back({ ch, false }); });
-    }
-
-    // Always draw the text using this method (char by char)
-    const wxColour& defaultTextColour =
-        row->IsSelected() ? colours.GetSelItemTextColour() : colours.GetItemTextColour();
-    const wxColour& matchBgColour = colours.GetMatchedItemBgText();
-    const wxColour& matchTextColour = colours.GetMatchedItemText();
-    int xx = x;
-    wxRect rowRect = row->GetItemRect();
-    for(size_t i = 0; i < V.size(); ++i) {
-        const std::pair<wxChar, bool>& p = V[i];
-        wxString ch = p.first;
-        bool is_match = p.second;
-        wxSize sz = dc.GetTextExtent(ch);
-        rowRect.SetX(xx);
-        rowRect.SetWidth(sz.GetWidth());
-        if(is_match) {
-            // draw a match rectangle
-            dc.SetPen(matchBgColour);
-            dc.SetBrush(matchBgColour);
-            dc.SetTextForeground(matchTextColour);
-            dc.DrawRectangle(rowRect);
-        } else {
-            dc.SetTextForeground(defaultTextColour);
-        }
-        dc.DrawText(ch, xx, y);
-        xx += sz.GetWidth();
-    }
-}
-
 bool clSearchText::SplitText(const wxString& text, std::vector<std::pair<wxChar, bool> >& V)
 {
     if(m_findWhat.IsEmpty()) { return false; }
-
     wxString lc_text = text.Lower();
     wxString lc_find_what = m_findWhat.Lower();
     wxString::iterator iter = lc_find_what.begin();
@@ -328,4 +283,41 @@ bool clSearchText::SplitText(const wxString& text, std::vector<std::pair<wxChar,
 
     // we return true only if all chars were matched
     return (iter == lc_find_what.end());
+}
+
+bool clSearchText::Matches(const wxString& findWhat, size_t col, const wxString& text, size_t searchFlags,
+                           clMatchResult* matches)
+{
+    wxString haystack = searchFlags & wxTR_SEARCH_ICASE ? text.Lower() : text;
+    wxString needle = searchFlags & wxTR_SEARCH_ICASE ? findWhat.Lower() : findWhat;
+    if(!matches) {
+        if(searchFlags & wxTR_SEARCH_METHOD_CONTAINS) {
+            return haystack.Contains(needle);
+        } else {
+            return (haystack == needle);
+        }
+    } else {
+        if(searchFlags & wxTR_SEARCH_METHOD_CONTAINS) {
+            int where = haystack.Find(needle);
+            if(where == wxNOT_FOUND) { return false; }
+            Str3Arr_t arr;
+            arr[0] = text.Mid(0, where);
+            arr[1] = text.Mid(where, needle.length());
+            arr[2] = text.Mid(where + needle.length());
+            matches->Add(col, arr);
+            return true;
+        } else {
+            if(haystack == needle) {
+                Str3Arr_t arr;
+                arr[0] = "";
+                arr[1] = text;
+                arr[2] = "";
+                matches->Add(col, arr);
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+    return false;
 }

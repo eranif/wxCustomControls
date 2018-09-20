@@ -4,6 +4,7 @@
 #include "clCellValue.h"
 #include "clColours.h"
 #include "codelite_exports.h"
+#include <unordered_map>
 #include <vector>
 #include <wx/colour.h>
 #include <wx/gdicmn.h>
@@ -23,6 +24,26 @@ enum clTreeCtrlNodeFlags {
     kNF_Hovered = (1 << 5),
     kNF_Hidden = (1 << 6),
     kNF_LisItem = (1 << 7),
+    kNF_HighlightText = (1 << 8),
+};
+
+typedef std::array<wxString, 3> Str3Arr_t;
+struct WXDLLIMPEXP_SDK clMatchResult {
+    std::unordered_map<size_t, Str3Arr_t> matches;
+
+    bool Get(size_t col, Str3Arr_t& arr) const
+    {
+        if(matches.count(col) == 0) { return false; }
+        arr = matches.find(col)->second;
+        return true;
+    }
+    void Add(size_t col, const Str3Arr_t& arr)
+    {
+        matches.erase(col);
+        matches[col] = arr;
+    }
+
+    void Clear() { matches.clear(); }
 };
 
 class WXDLLIMPEXP_SDK clRowEntry
@@ -47,6 +68,7 @@ protected:
     int m_indentsCount = 0;
     wxRect m_rowRect;
     wxRect m_buttonRect;
+    clMatchResult m_higlightInfo;
 
 protected:
     void SetFlag(clTreeCtrlNodeFlags flag, bool b)
@@ -69,6 +91,8 @@ protected:
     void DrawSelection(bool focused, wxDC& dc, const wxRect& rect, const clColours& colours);
     void DrawSimpleSelection(bool focused, wxDC& dc, const wxRect& rect, const clColours& colours);
     void DrawNativeSelection(bool focused, wxDC& dc, const wxRect& rect, const clColours& colours);
+    void RenderText(wxDC& dc, const clColours& colours, const wxString& text, int x, int y, size_t col);
+    void RenderTextSimple(wxDC& dc, const clColours& colours, const wxString& text, int x, int y, size_t col);
 
 public:
     clRowEntry* GetLastChild() const;
@@ -82,10 +106,12 @@ public:
     clRowEntry* GetPrev() const { return m_prev; }
     void SetNext(clRowEntry* next) { this->m_next = next; }
     void SetPrev(clRowEntry* prev) { this->m_prev = prev; }
-
+    void SetHighlightInfo(const clMatchResult& info) { m_higlightInfo = info; }
+    const clMatchResult& GetHighlightInfo() const { return m_higlightInfo; }
     void SetHidden(bool b);
     bool IsHidden() const { return HasFlag(kNF_Hidden); }
-
+    void SetHighlight(bool b) { SetFlag(kNF_HighlightText, b); }
+    bool IsHighlight() const { return HasFlag(kNF_HighlightText); }
     void SetData(wxUIntPtr data) { this->m_data = data; }
     wxUIntPtr GetData() { return m_data; }
 

@@ -5,6 +5,7 @@
 #include "clHeaderBar.h"
 #include "clRowEntry.h"
 #include "clScrolledPanel.h"
+#include <array>
 
 #ifdef __WXOSX__
 #define SCROLL_TICK 2
@@ -14,6 +15,14 @@
 
 class clControlWithItems;
 class clRowEntry;
+
+// Search flags
+#define wxTR_SEARCH_METHOD_EXACT (1 << 0)    // Use an exact string comparison method
+#define wxTR_SEARCH_METHOD_CONTAINS (1 << 1) // Compare using wxString::Contains method
+#define wxTR_SEARCH_VISIBLE_ITEMS (1 << 2)   // Search reachable items (i.e. they can be visible if scrolled enough)
+#define wxTR_SEARCH_ICASE (1 << 3)           // Search incase-sensitive
+#define wxTR_SEARCH_DEFAULT (wxTR_SEARCH_METHOD_CONTAINS | wxTR_SEARCH_VISIBLE_ITEMS | wxTR_SEARCH_ICASE)
+
 class WXDLLIMPEXP_SDK clSearchText
 {
     wxString m_findWhat;
@@ -24,8 +33,8 @@ protected:
 public:
     void OnKeyDown(const wxKeyEvent& event, clControlWithItems* control);
     void Reset();
-    void RenderText(wxDC& dc, const clColours& colours, const wxString& text, int x, int y, clRowEntry* row);
-    void RenderTextSimple(wxDC& dc, const clColours& colours, const wxString& text, int x, int y, clRowEntry* row);
+    static bool Matches(const wxString& findWhat, size_t col, const wxString& text,
+                        size_t searchFlags = wxTR_SEARCH_DEFAULT, clMatchResult* matches = nullptr);
 
     clSearchText();
     virtual ~clSearchText();

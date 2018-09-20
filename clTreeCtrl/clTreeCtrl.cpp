@@ -31,6 +31,7 @@
 #define CHECK_ROOT_RET() \
     if(!m_model.GetRoot()) { return; }
 
+wxDEFINE_EVENT(wxEVT_TREE_SEARCH_TEXT, wxTreeEvent);
 clTreeCtrl::clTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
     : clControlWithItems(parent, wxID_ANY, pos, size, wxWANTS_CHARS)
     , m_model(this)
@@ -948,3 +949,64 @@ void clTreeCtrl::DeleteAllItems()
 wxTreeItemId clTreeCtrl::GetNextItem(const wxTreeItemId& item) const { return m_model.GetItemAfter(item, true); }
 
 wxTreeItemId clTreeCtrl::GetPrevItem(const wxTreeItemId& item) const { return m_model.GetItemBefore(item, true); }
+
+wxTreeItemId clTreeCtrl::FindNext(const wxTreeItemId& from, const wxString& what, size_t col, size_t searchFlags)
+{
+    return wxTreeItemId(DoFind(m_model.ToPtr(from), what, col, searchFlags, true));
+}
+
+wxTreeItemId clTreeCtrl::FindPrev(const wxTreeItemId& from, const wxString& what, size_t col, size_t searchFlags)
+{
+    return wxTreeItemId(DoFind(m_model.ToPtr(from), what, col, searchFlags, false));
+}
+
+void clTreeCtrl::HighlightText(const wxTreeItemId& item, bool b)
+{
+    if(!item.IsOk()) { return; }
+    m_model.ToPtr(item)->SetHighlight(true);
+}
+
+void clTreeCtrl::ClearHighlight(const wxTreeItemId& item)
+{
+    if(!item.IsOk()) { return; }
+    clRowEntry* row = m_model.ToPtr(item);
+    row->SetHighlight(false);
+    row->SetHighlightInfo({});
+    Refresh();
+}
+
+clRowEntry* clTreeCtrl::DoFind(clRowEntry* from, const wxString& what, size_t col, size_t searchFlags, bool next)
+{
+    clRowEntry* curp = nullptr;
+    if(!from) {
+        curp = m_model.GetRoot();
+    } else {
+        curp = next ? m_model.GetRowAfter(m_model.ToPtr(from), searchFlags & wxTR_SEARCH_VISIBLE_ITEMS)
+                    : m_model.GetRowBefore(m_model.ToPtr(from), searchFlags & wxTR_SEARCH_VISIBLE_ITEMS);
+    }
+    while(curp) {
+        const wxString& haystack = curp->GetLabel(col);
+        clMatchResult res;
+        if(clSearchText::Matches(what, col, haystack, searchFlags, &res)) {
+            curp->SetHighlightInfo(res);
+            curp->SetHighlight(true);
+            return curp;
+        }
+        curp = next ? m_model.GetRowAfter(curp, searchFlags & wxTR_SEARCH_VISIBLE_ITEMS)
+                    : m_model.GetRowBefore(curp, searchFlags & wxTR_SEARCH_VISIBLE_ITEMS);
+    }
+    return nullptr;
+}
+
+void clTreeCtrl::ClearAllHighlights()
+{
+    clTreeNodeVisitor V;
+    std::function<bool(clRowEntry*, bool)> Foo = [&](clRowEntry* r, bool visible) {
+        wxUnusedVar(visible);
+        r->SetHighlightInfo({});
+        r->SetHighlight(false);
+        return true;
+    };
+    V.Visit(m_model.GetRoot(), false, Foo);
+    Refresh();
+}

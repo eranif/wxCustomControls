@@ -21,7 +21,7 @@ protected:
     clTreeCtrlModel m_model;
     long m_treeStyle = 0;
     wxDirection m_lastScrollDir = wxDOWN;
-    
+
 private:
     wxPoint DoFixPoint(const wxPoint& pt);
     wxTreeItemId DoGetSiblingVisibleItem(const wxTreeItemId& item, bool next) const;
@@ -42,6 +42,7 @@ private:
     void DoUpdateHeader(const wxTreeItemId& item);
 
     void DoInitialize();
+    clRowEntry* DoFind(clRowEntry* from, const wxString& what, size_t col, size_t searchFlags, bool next);
 
 public:
     virtual int GetFirstItemPosition() const;
@@ -52,6 +53,39 @@ public:
     virtual ~clTreeCtrl();
     bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
                 const wxSize& size = wxDefaultSize, long style = 0);
+
+    //===--------------------
+    // Search support
+    //===--------------------
+    /**
+     * @brief search for an item from pos that matches the "what" string.
+     * Pass an invalid item to start the search from the root
+     */
+    wxTreeItemId FindNext(const wxTreeItemId& from, const wxString& what, size_t col = 0,
+                          size_t searchFlags = wxTR_SEARCH_DEFAULT);
+    /**
+     * @brief search for an item from pos that matches the "what" string.
+     * Pass an invalid item to start the search from the root
+     */
+    wxTreeItemId FindPrev(const wxTreeItemId& from, const wxString& what, size_t col = 0,
+                          size_t searchFlags = wxTR_SEARCH_DEFAULT);
+
+    /**
+     * @brief highlight matched string of an item. This call should be called after a successfull call to
+     * FindNext or FindPrev
+     */
+    void HighlightText(const wxTreeItemId& item, bool b);
+
+    /**
+     * @brief clear highlighted text
+     */
+    void ClearHighlight(const wxTreeItemId& item);
+
+    /**
+     * @brief clear all highlighted text from all the items
+     */
+    void ClearAllHighlights();
+    
     //===--------------------
     // table view support
     //===--------------------
@@ -337,5 +371,7 @@ protected:
 
     wxTreeItemId GetRow(const wxPoint& pt) const;
 };
+
+wxDECLARE_EXPORTED_EVENT(WXDLLIMPEXP_SDK, wxEVT_TREE_SEARCH_TEXT, wxTreeEvent);
 
 #endif // CLTREECTRL_H
