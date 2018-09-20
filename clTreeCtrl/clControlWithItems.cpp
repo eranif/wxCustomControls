@@ -1,6 +1,9 @@
 #include "clControlWithItems.h"
 #include <wx/settings.h>
 
+wxDEFINE_EVENT(wxEVT_TREE_SEARCH_TEXT, wxTreeEvent);
+wxDEFINE_EVENT(wxEVT_TREE_CLEAR_SEARCH, wxTreeEvent);
+
 clControlWithItems::clControlWithItems(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size,
                                        long style)
     : clScrolledPanel(parent, id, pos, size, style)
@@ -248,18 +251,28 @@ clSearchText::~clSearchText() {}
 
 void clSearchText::OnKeyDown(const wxKeyEvent& event, clControlWithItems* control)
 {
-    if(event.GetKeyCode() == WXK_ESCAPE) {
+    if((event.GetKeyCode() == WXK_ESCAPE) || (event.GetKeyCode() == WXK_BACK && event.ControlDown())) {
         Reset();
+        // Notify about search clear
         control->Refresh();
+        wxTreeEvent e(wxEVT_TREE_CLEAR_SEARCH);
+        e.SetEventObject(control);
+        control->GetEventHandler()->QueueEvent(e.Clone());
     } else if(event.GetKeyCode() == WXK_BACK) {
         m_findWhat.RemoveLast();
         control->Refresh();
-    } else if(event.GetKeyCode() == WXK_BACK && event.ControlDown()) {
-        Reset();
-        control->Refresh();
+        wxTreeEvent e(m_findWhat.IsEmpty() ? wxEVT_TREE_CLEAR_SEARCH : wxEVT_TREE_SEARCH_TEXT);
+        e.SetEventObject(control);
+        e.SetString(m_findWhat);
+        control->GetEventHandler()->QueueEvent(e.Clone());
+
     } else if(wxIsprint(event.GetUnicodeKey())) {
         m_findWhat << event.GetUnicodeKey();
         control->Refresh();
+        wxTreeEvent e(wxEVT_TREE_SEARCH_TEXT);
+        e.SetEventObject(control);
+        e.SetString(m_findWhat);
+        control->GetEventHandler()->QueueEvent(e.Clone());
     }
 }
 

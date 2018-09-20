@@ -372,6 +372,4 @@ protected:
     wxTreeItemId GetRow(const wxPoint& pt) const;
 };
 
-wxDECLARE_EXPORTED_EVENT(WXDLLIMPEXP_SDK, wxEVT_TREE_SEARCH_TEXT, wxTreeEvent);
-
 #endif // CLTREECTRL_H

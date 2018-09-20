@@ -31,7 +31,6 @@
 #define CHECK_ROOT_RET() \
     if(!m_model.GetRoot()) { return; }
 
-wxDEFINE_EVENT(wxEVT_TREE_SEARCH_TEXT, wxTreeEvent);
 clTreeCtrl::clTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
     : clControlWithItems(parent, wxID_ANY, pos, size, wxWANTS_CHARS)
     , m_model(this)
@@ -981,8 +980,12 @@ clRowEntry* clTreeCtrl::DoFind(clRowEntry* from, const wxString& what, size_t co
     if(!from) {
         curp = m_model.GetRoot();
     } else {
-        curp = next ? m_model.GetRowAfter(m_model.ToPtr(from), searchFlags & wxTR_SEARCH_VISIBLE_ITEMS)
-                    : m_model.GetRowBefore(m_model.ToPtr(from), searchFlags & wxTR_SEARCH_VISIBLE_ITEMS);
+        if(searchFlags & wxTR_SEARCH_INCLUDE_CURRENT_ITEM) {
+            curp = from;
+        } else {
+            curp = next ? m_model.GetRowAfter(m_model.ToPtr(from), searchFlags & wxTR_SEARCH_VISIBLE_ITEMS)
+                        : m_model.GetRowBefore(m_model.ToPtr(from), searchFlags & wxTR_SEARCH_VISIBLE_ITEMS);
+        }
     }
     while(curp) {
         const wxString& haystack = curp->GetLabel(col);

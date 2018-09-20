@@ -172,6 +172,8 @@ MainFrame::MainFrame(wxWindow* parent)
         LogMessage("DV Context menu dropped: ");
         LogMessage(wxString() << "Context menu on item: " << m_dataView->GetItemText(event.GetItem()));
     });
+    m_treeCtrl->Bind(wxEVT_TREE_SEARCH_TEXT, &MainFrame::OnIncrementalSearch, this);
+    m_treeCtrl->Bind(wxEVT_TREE_CLEAR_SEARCH, &MainFrame::OnResetSearch, this);
 }
 
 MainFrame::~MainFrame() {}
@@ -434,7 +436,7 @@ void MainFrame::OnTreeFind(wxCommandEvent& event)
 {
     wxString findwhat = wxGetTextFromUser("Text to search", "Find");
     if(findwhat.IsEmpty()) { return; }
-    
+
     m_treeCtrl->ClearAllHighlights();
     wxTreeItemId where =
         m_treeCtrl->FindNext(m_treeCtrl->GetSelection().IsOk() ? m_treeCtrl->GetSelection() : wxTreeItemId(), findwhat,
@@ -444,4 +446,25 @@ void MainFrame::OnTreeFind(wxCommandEvent& event)
         m_treeCtrl->EnsureVisible(where);
         m_treeCtrl->HighlightText(where, true);
     }
+}
+
+void MainFrame::OnIncrementalSearch(wxTreeEvent& event)
+{
+    wxString findWhat = event.GetString();
+    m_treeCtrl->ClearHighlight(m_matchedItem);
+    m_matchedItem = m_treeCtrl->FindNext(m_treeCtrl->GetSelection(), findWhat, 0, wxTR_SEARCH_DEFAULT);
+    if(m_matchedItem.IsOk()) {
+        // Select the item
+        m_treeCtrl->SelectItem(m_matchedItem);
+        // Make sure its visible
+        m_treeCtrl->EnsureVisible(m_matchedItem);
+        // Highlight the result
+        m_treeCtrl->HighlightText(m_matchedItem, true);
+    }
+}
+
+void MainFrame::OnResetSearch(wxTreeEvent& event)
+{
+    m_treeCtrl->ClearAllHighlights();
+    m_matchedItem = wxTreeItemId();
 }

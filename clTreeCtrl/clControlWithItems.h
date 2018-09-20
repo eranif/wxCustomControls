@@ -21,7 +21,10 @@ class clRowEntry;
 #define wxTR_SEARCH_METHOD_CONTAINS (1 << 1) // Compare using wxString::Contains method
 #define wxTR_SEARCH_VISIBLE_ITEMS (1 << 2)   // Search reachable items (i.e. they can be visible if scrolled enough)
 #define wxTR_SEARCH_ICASE (1 << 3)           // Search incase-sensitive
-#define wxTR_SEARCH_DEFAULT (wxTR_SEARCH_METHOD_CONTAINS | wxTR_SEARCH_VISIBLE_ITEMS | wxTR_SEARCH_ICASE)
+#define wxTR_SEARCH_INCLUDE_CURRENT_ITEM \
+    (1 << 4) // When calling the search API, FindNext/FindPrev include the 'starting' item
+#define wxTR_SEARCH_DEFAULT \
+    (wxTR_SEARCH_METHOD_CONTAINS | wxTR_SEARCH_VISIBLE_ITEMS | wxTR_SEARCH_ICASE | wxTR_SEARCH_INCLUDE_CURRENT_ITEM)
 
 class WXDLLIMPEXP_SDK clSearchText
 {
@@ -174,5 +177,8 @@ public:
      */
     virtual int GetFirstItemPosition() const = 0;
 };
+
+wxDECLARE_EXPORTED_EVENT(WXDLLIMPEXP_SDK, wxEVT_TREE_SEARCH_TEXT, wxTreeEvent);
+wxDECLARE_EXPORTED_EVENT(WXDLLIMPEXP_SDK, wxEVT_TREE_CLEAR_SEARCH, wxTreeEvent);
 
 #endif // CLCONTROLWITHITEMS_H
