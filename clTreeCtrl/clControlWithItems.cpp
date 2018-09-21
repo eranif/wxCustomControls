@@ -19,7 +19,7 @@ private:
     void DoSelect(bool next)
     {
         clTreeCtrl* tree = dynamic_cast<clTreeCtrl*>(GetParent());
-        if(!tree) { return; }
+        if(!tree || m_textCtrl->IsEmpty()) { return; }
         wxTreeItemId where = next ? tree->FindNext(tree->GetSelection(), m_textCtrl->GetValue(), 0,
                                                    wxTR_SEARCH_DEFAULT & ~wxTR_SEARCH_INCLUDE_CURRENT_ITEM)
                                   : tree->FindPrev(tree->GetSelection(), m_textCtrl->GetValue(), 0,
@@ -47,7 +47,7 @@ private:
 
 public:
     clSearchControl(clControlWithItems* parent)
-        : wxMiniFrame(parent, wxID_ANY, "Mini Frame", wxDefaultPosition, wxDefaultSize,
+        : wxMiniFrame(parent, wxID_ANY, "Find", wxDefaultPosition, wxDefaultSize,
                       wxFRAME_FLOAT_ON_PARENT | wxBORDER_SIMPLE)
     {
         SetSizer(new wxBoxSizer(wxVERTICAL));
