@@ -44,7 +44,10 @@ private:
 
     void DoInitialize();
     clRowEntry* DoFind(clRowEntry* from, const wxString& what, size_t col, size_t searchFlags, bool next);
-
+    
+protected:
+    void UpdateScrollBar();
+    
 public:
     virtual int GetFirstItemPosition() const;
     virtual int GetRange() const;

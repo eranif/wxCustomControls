@@ -146,7 +146,7 @@ public:
      * @brief update the scrollbar with the current view status
      * subclass should call this method whenver the view changes (re-sized, items are expanding, collapsing etc)
      */
-    void UpdateScrollBar();
+    virtual void UpdateScrollBar();
 
     void SetColours(const clColours& colours)
     {

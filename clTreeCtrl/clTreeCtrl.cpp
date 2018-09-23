@@ -467,6 +467,7 @@ void clTreeCtrl::DoMouseScroll(const wxMouseEvent& event)
     }
     if(!nextItem.IsOk()) {
         // No more items to draw
+        m_scrollLines = 0;
         return;
     }
 
@@ -476,7 +477,7 @@ void clTreeCtrl::DoMouseScroll(const wxMouseEvent& event)
     int remainder = m_scrollLines % event.GetWheelDelta();
 
     if(lines != 0) { m_scrollLines = remainder; }
-
+    else { return; }
     if(event.GetWheelRotation() > 0) { // Scrolling up
         m_model.GetPrevItems(GetFirstItemOnScreen(), std::abs((double)lines), items, false);
         if(items.empty()) { return; }
@@ -979,6 +980,7 @@ void clTreeCtrl::DeleteAllItems()
     Delete(GetRootItem());
     m_model.EnableEvents(true);
     DoUpdateHeader(nullptr);
+    m_scrollLines = 0;
 }
 
 wxTreeItemId clTreeCtrl::GetNextItem(const wxTreeItemId& item) const { return m_model.GetItemAfter(item, true); }
@@ -1048,4 +1050,10 @@ void clTreeCtrl::ClearAllHighlights()
     };
     V.Visit(m_model.GetRoot(), false, Foo);
     Refresh();
+}
+
+void clTreeCtrl::UpdateScrollBar()
+{
+    clControlWithItems::UpdateScrollBar();
+    m_scrollLines = 0;
 }
