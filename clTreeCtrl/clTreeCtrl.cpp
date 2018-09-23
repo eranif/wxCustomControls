@@ -134,7 +134,6 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
         needToUpdateScrollbar = true;
     }
 
-    wxRect clientRect = GetItemsRect();
     // So we increased the list to display as much as items as we can.
     // However, if the last item on that list is selected OR it is the last item in general, it must be *fully*
     // displayed
@@ -150,6 +149,9 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
     SetFirstItemOnScreen(firstItem);
 
     // Draw the items
+    wxRect clientRect = GetItemsRect();
+    // Set the width of the clipping region to match the header's width
+    clientRect.SetWidth(wxMax(GetHeader().GetWidth(), clientRect.GetWidth()));
     dc.SetClippingRegion(clientRect);
     RenderItems(dc, items);
     dc.DestroyClippingRegion();
