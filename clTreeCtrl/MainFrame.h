@@ -38,6 +38,7 @@ class MainFrame : public MainFrameBaseClass
     std::array<clColours, 2> m_coloursArr;
     int m_selectedColours = 0;
     wxTreeItemId m_matchedItem;
+    wxDataViewItem m_dvMatchedItem;
 
 private:
     void LogMessage(const wxString& message);
@@ -70,6 +71,8 @@ protected:
     void OnItemDeleted(wxTreeEvent& event);
     void OnIncrementalSearch(wxTreeEvent& event);
     void OnResetSearch(wxTreeEvent& event);
+    void OnDVIncrementalSearch(wxDataViewEvent& event);
+    void OnDVResetSearch(wxDataViewEvent& event);
 
 public:
     MainFrame(wxWindow* parent);

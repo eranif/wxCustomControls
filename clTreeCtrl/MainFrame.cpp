@@ -175,6 +175,8 @@ MainFrame::MainFrame(wxWindow* parent)
     });
     m_treeCtrl->Bind(wxEVT_TREE_SEARCH_TEXT, &MainFrame::OnIncrementalSearch, this);
     m_treeCtrl->Bind(wxEVT_TREE_CLEAR_SEARCH, &MainFrame::OnResetSearch, this);
+    m_dataView->Bind(wxEVT_DATAVIEW_SEARCH_TEXT, &MainFrame::OnDVIncrementalSearch, this);
+    m_dataView->Bind(wxEVT_DATAVIEW_CLEAR_SEARCH, &MainFrame::OnDVResetSearch, this);
 }
 
 MainFrame::~MainFrame() {}
@@ -468,4 +470,25 @@ void MainFrame::OnResetSearch(wxTreeEvent& event)
 {
     m_treeCtrl->ClearAllHighlights();
     m_matchedItem = wxTreeItemId();
+}
+
+void MainFrame::OnDVIncrementalSearch(wxDataViewEvent& event)
+{
+    wxString findWhat = event.GetString();
+    m_dataView->ClearHighlight(m_dvMatchedItem);
+    m_dvMatchedItem = m_dataView->FindNext(m_dataView->GetSelection(), findWhat, 0, wxTR_SEARCH_DEFAULT);
+    if(m_dvMatchedItem.IsOk()) {
+        // Select the item
+        m_dataView->Select(m_dvMatchedItem);
+        // Make sure its visible
+        m_dataView->EnsureVisible(m_dvMatchedItem);
+        // Highlight the result
+        m_dataView->HighlightText(m_dvMatchedItem, true);
+    }
+}
+
+void MainFrame::OnDVResetSearch(wxDataViewEvent& event)
+{
+    m_dataView->ClearAllHighlights();
+    m_dvMatchedItem = wxDataViewItem();
 }
