@@ -11,6 +11,7 @@
 #include <wx/sharedptr.h>
 #include <wx/string.h>
 #include <wx/treebase.h>
+#include <array>
 
 class clSearchText;
 class clTreeCtrlModel;
