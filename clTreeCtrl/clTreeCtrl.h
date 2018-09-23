@@ -20,7 +20,7 @@ class WXDLLIMPEXP_SDK clTreeCtrl : public clControlWithItems
 protected:
     clTreeCtrlModel m_model;
     long m_treeStyle = 0;
-    wxDirection m_lastScrollDir = wxDOWN;
+    int m_scrollLines = 0;
     
 private:
     wxPoint DoFixPoint(const wxPoint& pt);
@@ -361,7 +361,7 @@ protected:
     void OnMouseLeftUp(wxMouseEvent& event);
     void OnRightDown(wxMouseEvent& event);
     void OnMouseLeftDClick(wxMouseEvent& event);
-    void OnMouseScroll(wxMouseEvent& event);
+    void DoMouseScroll(const wxMouseEvent& event);
     void ProcessIdle();
     void OnLeaveWindow(wxMouseEvent& event);
     void OnEnterWindow(wxMouseEvent& event);

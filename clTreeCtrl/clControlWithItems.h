@@ -67,6 +67,7 @@ protected:
     wxSize GetTextSize(const wxString& label) const;
     virtual void OnMouseScroll(wxMouseEvent& event);
     virtual bool DoKeyDown(const wxKeyEvent& event);
+    virtual void DoMouseScroll(const wxMouseEvent& event);
     clSearchText& GetSearch() { return m_search; }
     const clSearchText& GetSearch() const { return m_search; }
 
@@ -177,7 +178,7 @@ public:
      * @brief return the row number of the first visible item in the view
      */
     virtual int GetFirstItemPosition() const = 0;
-    
+
     void SearchControlDismissed();
 };
 
