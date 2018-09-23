@@ -410,3 +410,5 @@ void clDataViewListCtrl::HighlightText(const wxDataViewItem& item, bool b)
 void clDataViewListCtrl::ClearHighlight(const wxDataViewItem& item) { clTreeCtrl::ClearHighlight(TREE_ITEM(item)); }
 
 void clDataViewListCtrl::EnsureVisible(const wxDataViewItem& item) { clTreeCtrl::EnsureVisible(TREE_ITEM(item)); }
+
+void clDataViewListCtrl::ClearColumns() { GetHeader().Clear(); }

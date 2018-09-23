@@ -158,6 +158,11 @@ public:
      * @brief set sorting function AND apply it
      */
     void SetSortFunction(const clSortFunc_t& CompareFunc);
+    
+    /**
+     * @brief remove all columns from the control
+     */
+    void ClearColumns();
 };
 
 // Helper class passing bitmap index + text
