@@ -65,12 +65,12 @@ MainFrame::MainFrame(wxWindow* parent)
         }
     };
     m_treeCtrl->SetSortFunction(SortFunc);
-    std::vector<wxBitmap> bitmaps;
+
     MyImages images;
-    bitmaps.push_back(images.Bitmap("folder"));
-    bitmaps.push_back(images.Bitmap("folder_open"));
-    bitmaps.push_back(images.Bitmap("file"));
-    m_treeCtrl->SetBitmaps(bitmaps);
+    m_bitmaps.push_back(images.Bitmap("folder"));
+    m_bitmaps.push_back(images.Bitmap("folder_open"));
+    m_bitmaps.push_back(images.Bitmap("file"));
+    m_treeCtrl->SetBitmaps(&m_bitmaps);
 
     m_treeCtrl->Bind(wxEVT_TREE_ITEM_EXPANDING, &MainFrame::OnItemExpanding, this);
     m_treeCtrl->Bind(wxEVT_TREE_DELETE_ITEM, &MainFrame::OnItemDeleted, this);
@@ -401,14 +401,7 @@ void MainFrame::OnFillWith500Entries(wxCommandEvent& event)
     wxString file_type = "File";
     wxString file_size = "100KB";
 
-    MyImages images;
-    const wxBitmap& file_bmp = images.Bitmap("file");
-    const wxBitmap& folder_bmp = images.Bitmap("folder");
-
-    std::vector<wxBitmap> bitmaps;
-    bitmaps.push_back(file_bmp);
-    bitmaps.push_back(folder_bmp);
-    m_dataView->SetBitmaps(bitmaps);
+    m_dataView->SetBitmaps(&m_bitmaps);
 
     // A nice trick to boost performance: remove the sorting method
     m_dataView->SetSortFunction(nullptr);

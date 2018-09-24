@@ -3,6 +3,8 @@
 #include "clRowEntry.h"
 #include "wxcrafter.h"
 #include <array>
+#include <vector>
+#include <wx/bitmap.h>
 
 class clTreeCtrl;
 class MyItemData : public wxTreeItemData
@@ -39,6 +41,7 @@ class MainFrame : public MainFrameBaseClass
     int m_selectedColours = 0;
     wxTreeItemId m_matchedItem;
     wxDataViewItem m_dvMatchedItem;
+    std::vector<wxBitmap> m_bitmaps;
 
 private:
     void LogMessage(const wxString& message);
