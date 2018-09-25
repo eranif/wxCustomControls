@@ -37,12 +37,13 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     boxSizer11->Add(boxSizer71, 1, wxEXPAND, WXC_FROM_DIP(5));
 
     m_treeCtrl = new clTreeCtrl(m_mainPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainPanel, wxSize(-1, -1)),
-                                wxTR_DEFAULT_STYLE | wxTR_ROW_LINES);
+                                wxTR_DEFAULT_STYLE | wxTR_ROW_LINES | wxBORDER_THEME);
 
     boxSizer71->Add(m_treeCtrl, 1, wxALL | wxEXPAND, WXC_FROM_DIP(1));
 
-    m_dataView = new clDataViewListCtrl(m_mainPanel, wxID_ANY, wxDefaultPosition,
-                                        wxDLG_UNIT(m_mainPanel, wxSize(-1, -1)), wxDV_ROW_LINES | wxDV_SINGLE);
+    m_dataView =
+        new clDataViewListCtrl(m_mainPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainPanel, wxSize(-1, -1)),
+                               wxDV_ROW_LINES | wxDV_SINGLE | wxBORDER_THEME);
 
     boxSizer71->Add(m_dataView, 1, wxALL | wxEXPAND, WXC_FROM_DIP(1));
 

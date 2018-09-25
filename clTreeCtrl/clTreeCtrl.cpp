@@ -33,10 +33,10 @@
     if(!m_model.GetRoot()) { return; }
 
 clTreeCtrl::clTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
-    : clControlWithItems(parent, wxID_ANY, pos, size, wxWANTS_CHARS)
+    : clControlWithItems(parent, wxID_ANY, pos, size, style | wxWANTS_CHARS)
     , m_model(this)
 {
-    m_treeStyle = style;
+    m_treeStyle = style & ~wxWINDOW_STYLE_MASK; // remove the non window style
     DoInitialize();
 }
 
@@ -47,8 +47,8 @@ clTreeCtrl::clTreeCtrl()
 
 bool clTreeCtrl::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
 {
-    m_treeStyle = style;
-    if(!clControlWithItems::Create(parent, id, pos, size, wxWANTS_CHARS)) { return false; }
+    m_treeStyle = style & ~wxWINDOW_STYLE_MASK;
+    if(!clControlWithItems::Create(parent, id, pos, size, style | wxWANTS_CHARS)) { return false; }
     DoInitialize();
     return true;
 }
@@ -129,19 +129,25 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
     // Always try to get maximum entries to draw on the canvas
     if(items.empty()) { return; }
     bool canScrollDown = GetVScrollBar()->CanScollDown();
-    while((canScrollDown &&
-           (items.size() < maxItems)) || // While can move the scroll thumb a bit further down, increase the list size
-          (!canScrollDown && (items.size() < (maxItems - 1)))) { // the scroll thumb cant be moved further down, so it
-                                                                 // makes no sense on hiding the last item (we wont be
-                                                                 // able to reach it), so make sure we extend the list
-                                                                 // up to max-items -1, this means that the last item is
-                                                                 // always fully visible
-        firstItem = m_model.GetRowBefore(firstItem, true);
-        if(!firstItem) { break; }
-        items.insert(items.begin(), firstItem);
-        needToUpdateScrollbar = true;
+    
+    // An action took that requires us to try to maximimze the list
+    if(m_maxList) {
+        while(
+            (canScrollDown &&
+             (items.size() < maxItems)) || // While can move the scroll thumb a bit further down, increase the list size
+            (!canScrollDown &&
+             (items.size() < (maxItems - 1)))) { // the scroll thumb cant be moved further down, so it
+                                                 // makes no sense on hiding the last item (we wont be
+                                                 // able to reach it), so make sure we extend the list
+                                                 // up to max-items -1, this means that the last item is
+                                                 // always fully visible
+            firstItem = m_model.GetRowBefore(firstItem, true);
+            if(!firstItem) { break; }
+            items.insert(items.begin(), firstItem);
+            needToUpdateScrollbar = true;
+        }
     }
-
+    m_maxList = false;
     // So we increased the list to display as much as items as we can.
     // However, if the last item in the view is not visible, make it so
     clRowEntry* lastRow = items.back();
@@ -214,6 +220,7 @@ void clTreeCtrl::Collapse(const wxTreeItemId& item)
     clRowEntry* child = m_model.ToPtr(item);
     if(!child) return;
     child->SetExpanded(false);
+    m_maxList = true;
     UpdateScrollBar();
     DoUpdateHeader(item);
     Refresh();
