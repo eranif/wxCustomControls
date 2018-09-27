@@ -2188,7 +2188,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "../bitmaps/24-file-regular.png"
+       "m_path": "../bitmaps/16-mime-txt@2x.png"
       }],
      "m_events": [],
      "m_children": []

@@ -348,18 +348,6 @@ MyImages::MyImages()
             m_bitmaps.insert(std::make_pair(wxT("file"), bmp));
         }
     }
-    {
-        wxBitmap bmp;
-        wxIcon icn;
-        bmp = wxXmlResource::Get()->LoadBitmap(wxT("file@2x"));
-        if(bmp.IsOk()) {
-            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())) {
-                icn.CopyFromBitmap(bmp);
-                this->Add(icn);
-            }
-            m_bitmaps.insert(std::make_pair(wxT("file@2x"), bmp));
-        }
-    }
 }
 
 MyImages::~MyImages() {}
