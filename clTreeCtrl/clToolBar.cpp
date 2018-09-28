@@ -136,11 +136,6 @@ void clToolBar::RenderGroup(int& xx, clToolBar::ToolVect_t& G, wxDC& gcdc)
         }
         xx += buttonSize.GetWidth();
     });
-
-    //gcdc.SetPen(colours.GetFillColour().ChangeLightness(95));
-    //gcdc.SetBrush(*wxTRANSPARENT_BRUSH);
-    //bgRect.Deflate(1);
-    //gcdc.DrawRectangle(bgRect);
 }
 
 void clToolBar::OnEraseBackground(wxEraseEvent& event)
