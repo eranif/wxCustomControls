@@ -107,11 +107,11 @@ void clToolBar::RenderGroup(int& xx, clToolBar::ToolVect_t& G, wxDC& gcdc)
 
         gcdc.SetBrush(colours.GetFillColour());
         gcdc.SetPen(colours.IsLightTheme() ? colours.GetBorderColour() : colours.GetBorderColour());
-        gcdc.DrawRoundedRectangle(bgRect, 0.0);
+        gcdc.DrawRectangle(bgRect);
 
         gcdc.SetBrush(colours.IsLightTheme() ? bgColour.ChangeLightness(150) : bgColour.ChangeLightness(95));
         gcdc.SetPen(*wxTRANSPARENT_PEN);
-        gcdc.DrawRoundedRectangle(topRect, 0.0);
+        gcdc.DrawRectangle(topRect);
     }
 
     // Now draw the buttons
@@ -137,7 +137,7 @@ void clToolBar::RenderGroup(int& xx, clToolBar::ToolVect_t& G, wxDC& gcdc)
         clColours& colours = DrawingUtils::GetColours();
         gcdc.SetBrush(*wxTRANSPARENT_BRUSH);
         gcdc.SetPen(colours.IsLightTheme() ? *wxWHITE : colours.GetFillColour());
-        gcdc.DrawRoundedRectangle(bgRect, 0.0);
+        gcdc.DrawRectangle(bgRect);
     }
 }
 
@@ -373,24 +373,35 @@ void clToolBar::ToggleTool(wxWindowID buttonID, bool toggle)
 void clToolBar::UpdateWindowUI(long flags)
 {
     // Call update UI event per button
-    if(flags & wxUPDATE_UI_FROMIDLE) { DoIdleUpdate(); }
+    if(flags & wxUPDATE_UI_FROMIDLE) { 
+        DoIdleUpdate(); 
+    }
 
     wxPanel::UpdateWindowUI(flags);
 }
 
 void clToolBar::DoIdleUpdate()
 {
+    bool refreshNeeded = false;
     for(size_t i = 0; i < m_visibleButtons.size(); ++i) {
         clToolBarButtonBase* button = m_visibleButtons[i];
         wxUpdateUIEvent event(button->GetId());
         event.Enable(true);
         if(button->IsToggle()) { event.Check(button->IsChecked()); }
         if(GetEventHandler()->ProcessEvent(event)) {
+            bool oldCheck = button->IsChecked();
+            bool oldEnabled = button->IsEnabled();
             if(button->IsToggle()) { button->Check(event.GetChecked()); }
             button->Enable(event.GetEnabled());
+            
+            if(!refreshNeeded) {
+                refreshNeeded = (oldCheck != button->IsChecked()) || (oldEnabled != button->IsEnabled());
+            }
         }
     }
-    Refresh();
+    if(refreshNeeded) {
+        Refresh();
+    }
 }
 
 void clToolBar::DoShowOverflowMenu()

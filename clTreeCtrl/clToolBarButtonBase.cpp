@@ -40,7 +40,7 @@ void clToolBarButtonBase::Render(wxDC& dc, const wxRect& rect)
         
         dc.SetBrush(bgColour);
         dc.SetPen(penColour);
-        dc.DrawRoundedRectangle(highlightRect, 0.0);
+        dc.DrawRectangle(highlightRect);
         textColour = DrawingUtils::GetColours().GetSelItemTextColour();
     } else if(!IsEnabled()) {
         // A disabled button
