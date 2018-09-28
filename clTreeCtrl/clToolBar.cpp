@@ -13,6 +13,7 @@
 #include <wx/renderer.h>
 #include <wx/settings.h>
 #include <wx/xrc/xmlres.h>
+#include <wx/log.h>
 
 wxDEFINE_EVENT(wxEVT_TOOLBAR_CUSTOMISE, wxCommandEvent);
 clToolBar::clToolBar(wxWindow* parent, wxWindowID winid, const wxPoint& pos, const wxSize& size, long style,
@@ -51,6 +52,7 @@ clToolBar::~clToolBar()
 
 void clToolBar::OnPaint(wxPaintEvent& event)
 {
+    wxLogMessage("clToolbar::OnPaint is called");
     wxBufferedPaintDC dc(this);
     PrepareDC(dc);
     wxGCDC gcdc(dc);
@@ -89,11 +91,11 @@ void clToolBar::RenderGroup(int& xx, clToolBar::ToolVect_t& G, wxDC& gcdc)
     wxRect clientRect = GetClientRect();
 
     // Calculate the group size
-    int groupWidth = 0;
-    std::for_each(G.begin(), G.end(), [&](clToolBarButtonBase* button) {
-        wxSize buttonSize = button->CalculateSize(gcdc);
-        groupWidth += buttonSize.GetWidth();
-    });
+    //int groupWidth = 0;
+    //std::for_each(G.begin(), G.end(), [&](clToolBarButtonBase* button) {
+    //    wxSize buttonSize = button->CalculateSize(gcdc);
+    //    groupWidth += buttonSize.GetWidth();
+    //});
 
     // Draw a rectangle
     wxRect bgRect = wxRect(wxPoint(xx, 0), wxSize(groupWidth, clientRect.GetHeight()));
@@ -113,7 +115,6 @@ void clToolBar::RenderGroup(int& xx, clToolBar::ToolVect_t& G, wxDC& gcdc)
         gcdc.SetPen(*wxTRANSPARENT_PEN);
         gcdc.DrawRectangle(topRect);
     }
-
     // Now draw the buttons
     std::for_each(G.begin(), G.end(), [&](clToolBarButtonBase* button) {
         wxSize buttonSize = button->CalculateSize(gcdc);
@@ -246,7 +247,9 @@ void clToolBar::OnMotion(wxMouseEvent& event)
             button->ClearRenderFlags();
         }
     }
-    if(refreshNeeded) { Refresh(); }
+    if(refreshNeeded) { 
+        Refresh(); 
+    }
 }
 
 void clToolBar::OnEnterWindow(wxMouseEvent& event) { OnMotion(event); }
