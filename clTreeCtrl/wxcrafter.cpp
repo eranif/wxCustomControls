@@ -32,6 +32,32 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     wxBoxSizer* boxSizer11 = new wxBoxSizer(wxVERTICAL);
     m_mainPanel->SetSizer(boxSizer11);
 
+    m_toolbar97 =
+        new clToolBar(m_mainPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainPanel, wxSize(-1, -1)), wxTB_FLAT);
+    m_toolbar97->SetToolBitmapSize(wxSize(16, 16));
+
+    boxSizer11->Add(m_toolbar97, 0, wxEXPAND, WXC_FROM_DIP(5));
+
+    m_toolbar97->AddTool(wxID_OPEN, _("Open"), wxXmlResource::Get()->LoadBitmap(wxT("16-folder-open-regular@2x")),
+                         wxNullBitmap, wxITEM_DROPDOWN, wxT(""), wxT(""), NULL);
+
+    m_toolbar97->AddTool(wxID_NEW, _("Tool Label"), wxXmlResource::Get()->LoadBitmap(wxT("16-mime-txt@2x")),
+                         wxNullBitmap, wxITEM_NORMAL, wxT(""), wxT(""), NULL);
+
+    m_toolbar97->AddSeparator();
+
+    m_toolbar97->AddTool(wxID_BOOKMARK, _("Tool Label"), wxXmlResource::Get()->LoadBitmap(wxT("16-bookmark-yellow@2x")),
+                         wxNullBitmap, wxITEM_CHECK, wxT(""), wxT(""), NULL);
+
+    m_toolbar97->AddTool(wxID_COLOURS, _("Tool Label"), wxXmlResource::Get()->LoadBitmap(wxT("16-colour-pallette@2x")),
+                         wxNullBitmap, wxITEM_CHECK, wxT(""), wxT(""), NULL);
+
+    m_toolbar97->AddTool(wxID_ANY, _("Another Tool"), wxXmlResource::Get()->LoadBitmap(wxT("16-file-regular@2x")),
+                         wxNullBitmap, wxITEM_CHECK, wxT(""), wxT(""), NULL);
+
+    m_toolbar97->AddSeparator();
+    m_toolbar97->Realize();
+
     wxBoxSizer* boxSizer71 = new wxBoxSizer(wxHORIZONTAL);
 
     boxSizer11->Add(boxSizer71, 1, wxEXPAND, WXC_FROM_DIP(5));
@@ -176,6 +202,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     }
 #endif
     // Connect events
+    this->Connect(wxID_OPEN, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(MainFrameBaseClass::OnOpen), NULL, this);
     this->Connect(m_menuItem13->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                   wxCommandEventHandler(MainFrameBaseClass::OnOpenFolder), NULL, this);
     this->Connect(m_menuItemExpandAll->GetId(), wxEVT_COMMAND_MENU_SELECTED,
@@ -226,6 +253,8 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
 
 MainFrameBaseClass::~MainFrameBaseClass()
 {
+    this->Disconnect(wxID_OPEN, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(MainFrameBaseClass::OnOpen), NULL,
+                     this);
     this->Disconnect(m_menuItem13->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                      wxCommandEventHandler(MainFrameBaseClass::OnOpenFolder), NULL, this);
     this->Disconnect(m_menuItemExpandAll->GetId(), wxEVT_COMMAND_MENU_SELECTED,

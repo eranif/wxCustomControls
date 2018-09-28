@@ -5,33 +5,61 @@
       <![CDATA[00080001N0005Debug0000000000000001N0011Debug_Linux0000000000000001N0016Debug_Linux_GTK30000000000000001N0009OSX_Debug0000000000000001N0011OSX_Release0000000000000001N0007Release0000000000000001N0013Release_Linux0000000000000001N0018Release_Linux_GTK3000000000000]]>
     </Plugin>
   </Plugins>
+  <VirtualDirectory Name="Controls">
+    <VirtualDirectory Name="Common">
+      <File Name="drawingutils.h"/>
+      <File Name="drawingutils.cpp"/>
+      <File Name="clScrolledPanel.h"/>
+      <File Name="clScrolledPanel.cpp"/>
+      <File Name="clScrollBar.h"/>
+      <File Name="clScrollBar.cpp"/>
+      <File Name="clRowEntry.h"/>
+      <File Name="clRowEntry.cpp"/>
+      <File Name="clHeaderItem.h"/>
+      <File Name="clHeaderItem.cpp"/>
+      <File Name="clHeaderBar.h"/>
+      <File Name="clHeaderBar.cpp"/>
+      <File Name="clControlWithItems.h"/>
+      <File Name="clControlWithItems.cpp"/>
+      <File Name="clColours.h"/>
+      <File Name="clColours.cpp"/>
+      <File Name="clCellValue.h"/>
+      <File Name="clCellValue.cpp"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="DataViewListCtrl">
+      <File Name="clDataViewListCtrl.h"/>
+      <File Name="clDataViewListCtrl.cpp"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="Tree">
+      <File Name="clTreeNodeVisitor.h"/>
+      <File Name="clTreeNodeVisitor.cpp"/>
+      <File Name="clTreeCtrlModel.h"/>
+      <File Name="clTreeCtrlModel.cpp"/>
+      <File Name="clTreeCtrl.h"/>
+      <File Name="clTreeCtrl.cpp"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="ToolBar">
+      <File Name="clToolBarToggleButton.h"/>
+      <File Name="clToolBarToggleButton.cpp"/>
+      <File Name="clToolBarSpacer.h"/>
+      <File Name="clToolBarSpacer.cpp"/>
+      <File Name="clToolBarSeparator.h"/>
+      <File Name="clToolBarSeparator.cpp"/>
+      <File Name="clToolBarMenuButton.h"/>
+      <File Name="clToolBarMenuButton.cpp"/>
+      <File Name="cLToolBarControl.h"/>
+      <File Name="cLToolBarControl.cpp"/>
+      <File Name="clToolBarButtonBase.h"/>
+      <File Name="clToolBarButtonBase.cpp"/>
+      <File Name="clToolBarButton.h"/>
+      <File Name="clToolBarButton.cpp"/>
+      <File Name="clToolBar.h"/>
+      <File Name="clToolBar.cpp"/>
+    </VirtualDirectory>
+  </VirtualDirectory>
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
-    <File Name="clControlWithItems.cpp"/>
-    <File Name="clControlWithItems.h"/>
-    <File Name="clDataViewListCtrl.cpp"/>
-    <File Name="clDataViewListCtrl.h"/>
-    <File Name="clRowEntry.h"/>
-    <File Name="clRowEntry.cpp"/>
-    <File Name="clCellValue.cpp"/>
-    <File Name="clCellValue.h"/>
-    <File Name="clHeaderBar.cpp"/>
-    <File Name="clHeaderBar.h"/>
-    <File Name="clColours.cpp"/>
-    <File Name="clColours.h"/>
-    <File Name="clHeaderItem.cpp"/>
-    <File Name="clHeaderItem.h"/>
-    <File Name="clScrolledPanel.cpp"/>
-    <File Name="clScrolledPanel.h"/>
-    <File Name="clScrollBar.cpp"/>
-    <File Name="clScrollBar.h"/>
-    <File Name="clTreeNodeVisitor.cpp"/>
-    <File Name="clTreeNodeVisitor.h"/>
-    <File Name="clTreeCtrlModel.cpp"/>
-    <File Name="clTreeCtrlModel.h"/>
-    <File Name="clTreeCtrl.cpp"/>
-    <File Name="clTreeCtrl.h"/>
     <File Name="main.cpp"/>
     <File Name="MainFrame.cpp"/>
     <File Name="wxcrafter.cpp"/>

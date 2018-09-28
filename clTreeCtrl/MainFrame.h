@@ -48,6 +48,8 @@ private:
     void DoAddRoot();
 
 protected:
+    virtual void OnOpen(wxCommandEvent& event);
+    virtual void OnOpenMenu(wxCommandEvent& event);
     virtual void OnTreeFind(wxCommandEvent& event);
     virtual void OnMenuitemsupportsearchMenuSelected(wxCommandEvent& event);
     virtual void OnDVDeleteAllItems(wxCommandEvent& event);

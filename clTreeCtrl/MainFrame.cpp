@@ -177,6 +177,10 @@ MainFrame::MainFrame(wxWindow* parent)
     m_treeCtrl->Bind(wxEVT_TREE_CLEAR_SEARCH, &MainFrame::OnResetSearch, this);
     m_dataView->Bind(wxEVT_DATAVIEW_SEARCH_TEXT, &MainFrame::OnDVIncrementalSearch, this);
     m_dataView->Bind(wxEVT_DATAVIEW_CLEAR_SEARCH, &MainFrame::OnDVResetSearch, this);
+
+    // Toolbar
+    m_toolbar97->Bind(wxEVT_TOOL_DROPDOWN, &MainFrame::OnOpenMenu, this, wxID_OPEN);
+    m_toolbar97->Bind(wxEVT_TOOL, &MainFrame::OnOpen, this, wxID_OPEN);
 }
 
 MainFrame::~MainFrame() {}
@@ -484,4 +488,12 @@ void MainFrame::OnDVResetSearch(wxDataViewEvent& event)
 {
     m_dataView->ClearAllHighlights();
     m_dvMatchedItem = wxDataViewItem();
+}
+void MainFrame::OnOpen(wxCommandEvent& event) { wxMessageBox("Open button clicked!"); }
+void MainFrame::OnOpenMenu(wxCommandEvent& event)
+{
+    wxMenu m;
+    m.Append(XRCID("item_1"), _("Open file 1"));
+    m.Append(XRCID("item_1"), _("Open file 2"));
+    m_toolbar97->ShowMenuForButton(event.GetId(), &m);
 }

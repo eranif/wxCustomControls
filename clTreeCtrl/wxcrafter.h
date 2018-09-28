@@ -8,6 +8,7 @@
 #define _CLTREECTRL_CLTREECTRL_WXCRAFTER_BASE_CLASSES_H
 
 #include "clDataViewListCtrl.h"
+#include "clToolBar.h"
 #include "clTreeCtrl.h"
 #include <map>
 #include <wx/artprov.h>
@@ -22,6 +23,7 @@
 #include <wx/settings.h>
 #include <wx/sizer.h>
 #include <wx/textctrl.h>
+#include <wx/toolbar.h>
 #include <wx/treectrl.h>
 #include <wx/xrc/xh_bmp.h>
 #include <wx/xrc/xmlres.h>
@@ -59,10 +61,13 @@ public:
         ID_SELECT_CHILDREN = 10012,
         ID_EXPAND_ALL = 10013,
         ID_OPEN_FOLDER = 10014,
+        wxID_COLOURS = 10015,
+        wxID_BOOKMARK = 10016,
     };
 
 protected:
     wxPanel* m_mainPanel;
+    clToolBar* m_toolbar97;
     clTreeCtrl* m_treeCtrl;
     clDataViewListCtrl* m_dataView;
     wxTextCtrl* m_textCtrlLog;
@@ -99,6 +104,7 @@ protected:
     wxMenuItem* m_menuItemSupportSearch;
 
 protected:
+    virtual void OnOpen(wxCommandEvent& event) { event.Skip(); }
     virtual void OnOpenFolder(wxCommandEvent& event) { event.Skip(); }
     virtual void OnExpandAll(wxCommandEvent& event) { event.Skip(); }
     virtual void OnCollapseAll(wxCommandEvent& event) { event.Skip(); }
@@ -124,6 +130,7 @@ protected:
     virtual void OnMenuitemsupportsearchMenuSelected(wxCommandEvent& event) { event.Skip(); }
 
 public:
+    clToolBar* GetToolbar97() { return m_toolbar97; }
     clTreeCtrl* GetTreeCtrl() { return m_treeCtrl; }
     clDataViewListCtrl* GetDataView() { return m_dataView; }
     wxTextCtrl* GetTextCtrlLog() { return m_textCtrlLog; }
