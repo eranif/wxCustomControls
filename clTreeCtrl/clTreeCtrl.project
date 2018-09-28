@@ -313,6 +313,7 @@ WX_CONFIG=/usr/local/lib/wx/config/gtk3-unicode-3.1]]>
       <PostBuild>
         <Command Enabled="yes">cp $(ProjectPath)\cl*.cpp $(CL_HOME)/Plugin</Command>
         <Command Enabled="yes">cp $(ProjectPath)\cl*.h $(CL_HOME)/Plugin</Command>
+        <Command Enabled="yes">cp $(ProjectPath)\drawingutils.* $(CL_HOME)/Plugin</Command>
       </PostBuild>
       <CustomBuild Enabled="no">
         <RebuildCommand/>

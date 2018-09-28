@@ -20,13 +20,14 @@ private:
     bool m_popupShown = false;
     size_t m_flags = 0;
     wxRect m_chevronRect;
+    int m_groupSpacing = 30;
 
 public:
     enum eFlags {
         kShowLabels = (1 << 0),
         kThemedColour = (1 << 1),
         kShowCustomiseMenu = (1 << 2),
-        kMiniToolBar = ( 1 << 3),
+        kMiniToolBar = (1 << 3),
     };
 
 protected:
@@ -85,6 +86,10 @@ public:
     bool IsShowLabels() const { return m_flags & kShowLabels; }
     void EnableCustomisation(bool b) { EnableFlag(kShowCustomiseMenu, b); }
     bool IsCustomisationEnabled() const { return HasFlag(kShowCustomiseMenu); }
+    void SetMiniToolBar(bool b) { EnableFlag(kMiniToolBar, b); }
+    bool IsMiniToolBar() const { return HasFlag(kMiniToolBar); }
+    void SetGroupSapcing(int spacing) { m_groupSpacing = spacing; }
+    int GetGroupSapcing() const { return m_groupSpacing; }
 
     /**
      * @brief add toolbar button
