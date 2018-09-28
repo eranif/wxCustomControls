@@ -100,11 +100,11 @@ void clToolBar::RenderGroup(int& xx, clToolBar::ToolVect_t& G, wxDC& gcdc)
     wxRect bgRect = wxRect(wxPoint(xx, 0), wxSize(groupWidth, clientRect.GetHeight()));
     clColours& colours = DrawingUtils::GetColours();
     wxColour bgColour = colours.GetFillColour();
-    wxColour endColour = colours.IsLightTheme() ? bgColour.ChangeLightness(180) : bgColour.ChangeLightness(110);
     {
-        gcdc.GradientFillLinear(bgRect, bgColour, endColour, wxNORTH);
+        gcdc.GradientFillLinear(bgRect, bgColour, *wxWHITE, wxNORTH);
         gcdc.SetBrush(*wxTRANSPARENT_BRUSH);
-        gcdc.SetPen(endColour);
+        wxColour penColour = colours.IsLightTheme() ? bgColour.ChangeLightness(140) : bgColour.ChangeLightness(110);
+        gcdc.SetPen(penColour);
         gcdc.DrawRectangle(bgRect);
     }
     
