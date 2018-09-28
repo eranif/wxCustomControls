@@ -513,7 +513,14 @@
                "m_label": "Construct the Dropdown Menu:",
                "m_value": true
               }],
-             "m_events": [],
+             "m_events": [{
+               "m_eventName": "wxEVT_UPDATE_UI",
+               "m_eventClass": "wxUpdateUIEvent",
+               "m_eventHandler": "wxUpdateUIEventHandler",
+               "m_functionNameAndSignature": "OnColoursUI(wxUpdateUIEvent& event)",
+               "m_description": "Process a wxEVT_UPDATE_UI event",
+               "m_noBody": false
+              }],
              "m_children": []
             }, {
              "m_type": 4462,

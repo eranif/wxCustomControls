@@ -52,8 +52,7 @@ clToolBar::~clToolBar()
 
 void clToolBar::OnPaint(wxPaintEvent& event)
 {
-    wxLogMessage("clToolbar::OnPaint is called");
-    wxBufferedPaintDC dc(this);
+    wxAutoBufferedPaintDC dc(this);
     PrepareDC(dc);
     wxGCDC gcdc(dc);
 
@@ -91,29 +90,22 @@ void clToolBar::RenderGroup(int& xx, clToolBar::ToolVect_t& G, wxDC& gcdc)
     wxRect clientRect = GetClientRect();
 
     // Calculate the group size
-    //int groupWidth = 0;
-    //std::for_each(G.begin(), G.end(), [&](clToolBarButtonBase* button) {
-    //    wxSize buttonSize = button->CalculateSize(gcdc);
-    //    groupWidth += buttonSize.GetWidth();
-    //});
+    int groupWidth = 0;
+    std::for_each(G.begin(), G.end(), [&](clToolBarButtonBase* button) {
+        wxSize buttonSize = button->CalculateSize(gcdc);
+        groupWidth += buttonSize.GetWidth();
+    });
 
     // Draw a rectangle
     wxRect bgRect = wxRect(wxPoint(xx, 0), wxSize(groupWidth, clientRect.GetHeight()));
     {
         clColours& colours = DrawingUtils::GetColours();
         wxColour bgColour = colours.GetFillColour();
-
-        wxRect topRect(bgRect);
-        topRect.Deflate(1);
-        topRect.SetHeight(topRect.GetHeight() / 2);
-
-        gcdc.SetBrush(colours.GetFillColour());
-        gcdc.SetPen(colours.IsLightTheme() ? colours.GetBorderColour() : colours.GetBorderColour());
+        wxColour endColour = colours.IsLightTheme() ? bgColour.ChangeLightness(150) : bgColour.ChangeLightness(95);
+        gcdc.GradientFillLinear(bgRect, bgColour, endColour, wxNORTH);
+        gcdc.SetBrush(*wxTRANSPARENT_BRUSH);
+        gcdc.SetPen(colours.GetBorderColour());
         gcdc.DrawRectangle(bgRect);
-
-        gcdc.SetBrush(colours.IsLightTheme() ? bgColour.ChangeLightness(150) : bgColour.ChangeLightness(95));
-        gcdc.SetPen(*wxTRANSPARENT_PEN);
-        gcdc.DrawRectangle(topRect);
     }
     // Now draw the buttons
     std::for_each(G.begin(), G.end(), [&](clToolBarButtonBase* button) {
@@ -131,15 +123,6 @@ void clToolBar::RenderGroup(int& xx, clToolBar::ToolVect_t& G, wxDC& gcdc)
         }
         xx += buttonSize.GetWidth();
     });
-
-    // Draw a rectangle
-    {
-        bgRect.Deflate(1);
-        clColours& colours = DrawingUtils::GetColours();
-        gcdc.SetBrush(*wxTRANSPARENT_BRUSH);
-        gcdc.SetPen(colours.IsLightTheme() ? *wxWHITE : colours.GetFillColour());
-        gcdc.DrawRectangle(bgRect);
-    }
 }
 
 void clToolBar::OnEraseBackground(wxEraseEvent& event) { wxUnusedVar(event); }
@@ -387,7 +370,7 @@ void clToolBar::DoIdleUpdate()
 {
     bool refreshNeeded = false;
     for(size_t i = 0; i < m_visibleButtons.size(); ++i) {
-        clToolBarButtonBase* button = m_visibleButtons[i];
+        clToolBarButtonBase* button = m_visibleButtons.at(i);
         wxUpdateUIEvent event(button->GetId());
         event.Enable(true);
         if(button->IsToggle()) { event.Check(button->IsChecked()); }

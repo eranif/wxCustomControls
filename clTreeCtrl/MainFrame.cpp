@@ -497,3 +497,7 @@ void MainFrame::OnOpenMenu(wxCommandEvent& event)
     m.Append(XRCID("item_1"), _("Open file 2"));
     m_toolbar97->ShowMenuForButton(event.GetId(), &m);
 }
+void MainFrame::OnColoursUI(wxUpdateUIEvent& event)
+{
+    event.Enable(false);
+}
