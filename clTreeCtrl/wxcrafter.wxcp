@@ -255,7 +255,7 @@
            "border": 5,
            "gbSpan": "1,1",
            "gbPosition": "0,0",
-           "m_styles": [],
+           "m_styles": ["wxTB_FLAT"],
            "m_sizerFlags": ["wxEXPAND"],
            "m_properties": [{
              "type": "winid",

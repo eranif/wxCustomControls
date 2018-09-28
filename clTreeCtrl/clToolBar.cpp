@@ -129,7 +129,7 @@ void clToolBar::RenderGroup(int& xx, clToolBar::ToolVect_t& G, wxDC& gcdc)
             m_overflowButtons.push_back(button);
         } else {
             wxRect r(xx, 0, buttonSize.GetWidth(), clientRect.GetHeight());
-            //r.Deflate(1);
+            r.Deflate(1, 2);
             r = r.CenterIn(clientRect, wxVERTICAL);
             button->Render(gcdc, r);
             m_visibleButtons.push_back(button);
