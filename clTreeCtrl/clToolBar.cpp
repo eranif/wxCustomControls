@@ -98,15 +98,16 @@ void clToolBar::RenderGroup(int& xx, clToolBar::ToolVect_t& G, wxDC& gcdc)
 
     // Draw a rectangle
     wxRect bgRect = wxRect(wxPoint(xx, 0), wxSize(groupWidth, clientRect.GetHeight()));
+    clColours& colours = DrawingUtils::GetColours();
+    wxColour bgColour = colours.GetFillColour();
+    wxColour endColour = colours.IsLightTheme() ? bgColour.ChangeLightness(180) : bgColour.ChangeLightness(110);
     {
-        clColours& colours = DrawingUtils::GetColours();
-        wxColour bgColour = colours.GetFillColour();
-        wxColour endColour = colours.IsLightTheme() ? bgColour.ChangeLightness(150) : bgColour.ChangeLightness(95);
         gcdc.GradientFillLinear(bgRect, bgColour, endColour, wxNORTH);
         gcdc.SetBrush(*wxTRANSPARENT_BRUSH);
-        gcdc.SetPen(colours.GetBorderColour());
+        gcdc.SetPen(endColour);
         gcdc.DrawRectangle(bgRect);
     }
+    
     // Now draw the buttons
     std::for_each(G.begin(), G.end(), [&](clToolBarButtonBase* button) {
         wxSize buttonSize = button->CalculateSize(gcdc);
@@ -118,11 +119,17 @@ void clToolBar::RenderGroup(int& xx, clToolBar::ToolVect_t& G, wxDC& gcdc)
             m_overflowButtons.push_back(button);
         } else {
             wxRect r(xx, 0, buttonSize.GetWidth(), clientRect.GetHeight());
+            r.Deflate(1);
             button->Render(gcdc, r);
             m_visibleButtons.push_back(button);
         }
         xx += buttonSize.GetWidth();
     });
+    
+    gcdc.SetPen(colours.GetBorderColour());
+    gcdc.SetBrush(*wxTRANSPARENT_BRUSH);
+    bgRect.Deflate(1);
+    gcdc.DrawRoundedRectangle(bgRect, 1.0);
 }
 
 void clToolBar::OnEraseBackground(wxEraseEvent& event) { wxUnusedVar(event); }

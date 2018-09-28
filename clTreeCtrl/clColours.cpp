@@ -31,8 +31,8 @@ void clColours::InitDefaults()
     selItemBgColourNoFocus = wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION);
     matchedItemBgText = wxColour("#FF6F00");
     matchedItemText = wxColour("BLACK");
-    borderColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DSHADOW);
     fillColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE);
+    borderColour = DrawingUtils::IsDark(fillColour) ? fillColour.ChangeLightness(120) : fillColour.ChangeLightness(90);
 }
 
 void clColours::InitDarkDefaults()
