@@ -22,6 +22,7 @@ clToolBar::clToolBar(wxWindow* parent, wxWindowID winid, const wxPoint& pos, con
     , m_popupShown(false)
     , m_flags(0)
 {
+    SetBackgroundStyle(wxBG_STYLE_PAINT);
     if(style & wxTB_FLAT) {
         m_flags |= kMiniToolBar;
     }
