@@ -87,7 +87,7 @@ void clToolBar::OnPaint(wxPaintEvent& event)
         m_chevronRect = chevronRect;
     }
 }
-
+#define GROUP_RADIUS 3.0
 void clToolBar::RenderGroup(int& xx, clToolBar::ToolVect_t& G, wxDC& gcdc)
 {
     wxRect clientRect = GetClientRect();
@@ -102,29 +102,47 @@ void clToolBar::RenderGroup(int& xx, clToolBar::ToolVect_t& G, wxDC& gcdc)
     // Draw a rectangle
     if(!HasFlag(kMiniToolBar)) {
         wxRect bgRect = wxRect(wxPoint(xx, 0), wxSize(groupWidth, clientRect.GetHeight() - 2));
-        //clColours& colours = DrawingUtils::GetColours();
         bool isLight = !DrawingUtils::IsDark(wxSystemSettings::GetColour(wxSYS_COLOUR_MENUBAR));
         wxColour bgColour = wxSystemSettings::GetColour(wxSYS_COLOUR_MENUBAR);
         if(isLight) {
-            wxColour fill_colour = bgColour.ChangeLightness(130);
-            wxColour inner_pen_colour = fill_colour.ChangeLightness(80);
-            wxColour pen_colour = bgColour.ChangeLightness(160);
-            gcdc.SetBrush(fill_colour);
-            gcdc.SetPen(pen_colour);
-            bgRect = bgRect.CenterIn(clientRect, wxVERTICAL);
-            gcdc.DrawRoundedRectangle(bgRect, 1.0);
+            wxColour fill_colour = bgColour.ChangeLightness(150);
+            wxColour dark_pen = bgColour.ChangeLightness(70);
+            wxColour light_pen = bgColour.ChangeLightness(160);
             bgRect.Deflate(1);
-            gcdc.SetBrush(*wxTRANSPARENT_BRUSH);
-            gcdc.SetPen(inner_pen_colour);
-            gcdc.DrawRoundedRectangle(bgRect, 1.0);
-
-        } else {
-            wxColour fill_colour = bgColour.ChangeLightness(110);
-            wxColour pen_colour = bgColour.ChangeLightness(80);
-            gcdc.SetBrush(fill_colour);
-            gcdc.SetPen(pen_colour);
             bgRect = bgRect.CenterIn(clientRect, wxVERTICAL);
-            gcdc.DrawRoundedRectangle(bgRect, 1.0);
+            
+            gcdc.SetPen(light_pen);
+            gcdc.SetBrush(fill_colour);
+            bgRect.Offset(1, 1);
+            gcdc.DrawRoundedRectangle(bgRect, GROUP_RADIUS);
+            
+            bgRect.Offset(-1, -1);
+            gcdc.SetBrush(fill_colour);
+            gcdc.SetPen(dark_pen);
+            gcdc.DrawRoundedRectangle(bgRect, GROUP_RADIUS);
+            
+        } else {
+//            wxColour fill_colour = bgColour.ChangeLightness(110);
+//            wxColour pen_colour = bgColour.ChangeLightness(80);
+//            gcdc.SetBrush(fill_colour);
+//            gcdc.SetPen(pen_colour);
+//            bgRect = bgRect.CenterIn(clientRect, wxVERTICAL);
+//            gcdc.DrawRoundedRectangle(bgRect, 1.0);
+            wxColour fill_colour = bgColour.ChangeLightness(110);
+            wxColour dark_pen = bgColour.ChangeLightness(70);
+            wxColour light_pen = bgColour.ChangeLightness(110);
+            bgRect.Deflate(1);
+            bgRect = bgRect.CenterIn(clientRect, wxVERTICAL);
+            
+            gcdc.SetPen(light_pen);
+            gcdc.SetBrush(fill_colour);
+            bgRect.Offset(1, 1);
+            gcdc.DrawRoundedRectangle(bgRect, GROUP_RADIUS);
+            
+            bgRect.Offset(-1, -1);
+            gcdc.SetBrush(fill_colour);
+            gcdc.SetPen(dark_pen);
+            gcdc.DrawRoundedRectangle(bgRect, GROUP_RADIUS);
         }
     }
 

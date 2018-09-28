@@ -181,6 +181,7 @@ MainFrame::MainFrame(wxWindow* parent)
     // Toolbar
     m_toolbar97->Bind(wxEVT_TOOL_DROPDOWN, &MainFrame::OnOpenMenu, this, wxID_OPEN);
     m_toolbar97->Bind(wxEVT_TOOL, &MainFrame::OnOpen, this, wxID_OPEN);
+    m_toolbar97->SetMiniToolBar(false);
 }
 
 MainFrame::~MainFrame() {}
