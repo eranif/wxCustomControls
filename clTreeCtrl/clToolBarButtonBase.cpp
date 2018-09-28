@@ -35,19 +35,19 @@ void clToolBarButtonBase::Render(wxDC& dc, const wxRect& rect)
 #endif
 
     const wxRect clientRect = m_toolbar->GetClientRect();
+    const wxColour bgColour = m_toolbar->HasFlag(clToolBar::kMiniToolBar)
+                            ? colours.GetFillColour()
+                            : wxSystemSettings::GetColour(wxSYS_COLOUR_MENUBAR);
     if(IsEnabled() && (IsPressed() || IsChecked())) {
-        wxColour bgColour = m_toolbar->HasFlag(clToolBar::kMiniToolBar)
-                                ? colours.GetFillColour()
-                                : wxSystemSettings::GetColour(wxSYS_COLOUR_MENUBAR);
-        bgColour = bgColour.ChangeLightness(90);
+        wxColour pressBgColour = bgColour.ChangeLightness(90);
         wxRect highlightRect = m_buttonRect;
-        penColour = bgColour;
+        penColour = pressBgColour;
 
         // Adjust the highlight rect so it wont be drawn over the group border
         highlightRect.Deflate(GROUP_RADIUS/2);
         highlightRect.CenterIn(clientRect, wxVERTICAL);
         highlightRect.SetX(highlightRect.GetX() + GROUP_RADIUS / 2);
-        dc.SetBrush(bgColour);
+        dc.SetBrush(pressBgColour);
         dc.SetPen(penColour);
         dc.DrawRectangle(highlightRect);
         textColour = colours.GetSelItemTextColour();
@@ -58,8 +58,13 @@ void clToolBarButtonBase::Render(wxDC& dc, const wxRect& rect)
         textColour = wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT);
         buttonColour = textColour;
     } else {
+        // Default
+        if(DrawingUtils::IsDark(bgColour)) {
+            buttonColour = colours.GetSelbuttonColour();
+        } else {
+            buttonColour = colours.GetButtonColour();
+        }
         textColour = colours.GetItemTextColour();
-        buttonColour = colours.GetButtonColour();
     }
     wxCoord xx = m_buttonRect.GetX();
     wxCoord yy = 0;
