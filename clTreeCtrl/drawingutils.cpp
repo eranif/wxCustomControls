@@ -300,15 +300,13 @@ wxColour DrawingUtils::GetMenuTextColour() { return wxSystemSettings::GetColour(
 
 wxColour DrawingUtils::GetMenuBarBgColour() { return wxSystemSettings::GetColour(wxSYS_COLOUR_MENUBAR); }
 
-void DrawingUtils::FillMenuBarBgColour(wxDC& dc, const wxRect& rect, bool themed)
+void DrawingUtils::FillMenuBarBgColour(wxDC& dc, const wxRect& rect, bool miniToolbar)
 {
-    wxUnusedVar(themed);
-    wxColour lineColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DSHADOW);
-    dc.SetPen(GetPanelBgColour());
-    dc.SetBrush(GetPanelBgColour());
+    wxUnusedVar(miniToolbar);
+    wxColour bgColour = miniToolbar ? wxSystemSettings::GetColour(wxSYS_COLOUR_3DSHADOW) : wxSystemSettings::GetColour(wxSYS_COLOUR_MENUBAR);
+    dc.SetPen(bgColour);
+    dc.SetBrush(bgColour);
     dc.DrawRectangle(rect);
-    //dc.SetPen(lineColour);
-    //dc.DrawLine(rect.GetBottomLeft(), rect.GetBottomRight());
 }
 
 wxColour DrawingUtils::GetMenuBarTextColour() { return wxSystemSettings::GetColour(wxSYS_COLOUR_MENUTEXT); }

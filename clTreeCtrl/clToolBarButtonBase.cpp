@@ -5,7 +5,7 @@
 // Button base
 // -----------------------------------------------
 clToolBarButtonBase::clToolBarButtonBase(clToolBar* parent, wxWindowID id, const wxBitmap& bmp, const wxString& label,
-                                         size_t flags)
+        size_t flags)
     : m_toolbar(parent)
     , m_id(id)
     , m_bmp(bmp)
@@ -16,7 +16,10 @@ clToolBarButtonBase::clToolBarButtonBase(clToolBar* parent, wxWindowID id, const
 {
 }
 
-clToolBarButtonBase::~clToolBarButtonBase() { wxDELETE(m_menu); }
+clToolBarButtonBase::~clToolBarButtonBase()
+{
+    wxDELETE(m_menu);
+}
 
 void clToolBarButtonBase::Render(wxDC& dc, const wxRect& rect)
 {
@@ -30,14 +33,19 @@ void clToolBarButtonBase::Render(wxDC& dc, const wxRect& rect)
     penColour = bgHighlightColour;
 #else
     wxColour bgHighlightColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
-    if(DrawingUtils::IsDark(bgHighlightColour)) { bgHighlightColour = bgHighlightColour.ChangeLightness(140); }
+    if(DrawingUtils::IsDark(bgHighlightColour)) {
+        bgHighlightColour = bgHighlightColour.ChangeLightness(140);
+    }
 #endif
-
+    
+    const clColours& colours = DrawingUtils::GetColours();
     if(IsEnabled() && (IsPressed() || IsChecked())) {
-        wxColour bgColour = DrawingUtils::GetColours().GetBorderColour();
+        wxColour bgColour = m_toolbar->HasFlag(clToolBar::kMiniToolBar) ? 
+            colours.GetFillColour() : wxSystemSettings::GetColour(wxSYS_COLOUR_MENUBAR);
+        bgColour = bgColour.ChangeLightness(90);
         wxRect highlightRect = m_buttonRect;
         penColour = bgColour;
-        
+
         dc.SetBrush(bgColour);
         dc.SetPen(penColour);
         dc.DrawRectangle(highlightRect);
@@ -52,7 +60,9 @@ void clToolBarButtonBase::Render(wxDC& dc, const wxRect& rect)
 
     if(m_bmp.IsOk()) {
         wxBitmap bmp(m_bmp);
-        if(!IsEnabled()) { bmp = DrawingUtils::CreateDisabledBitmap(m_bmp); }
+        if(!IsEnabled()) {
+            bmp = DrawingUtils::CreateDisabledBitmap(m_bmp);
+        }
         yy = (m_buttonRect.GetHeight() - bmp.GetScaledHeight()) / 2 + m_buttonRect.GetY();
         dc.DrawBitmap(bmp, wxPoint(xx, yy));
         xx += bmp.GetScaledWidth();

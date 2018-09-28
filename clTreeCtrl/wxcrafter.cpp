@@ -33,7 +33,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     wxBoxSizer* boxSizer11 = new wxBoxSizer(wxVERTICAL);
     m_mainPanel->SetSizer(boxSizer11);
 
-    m_toolbar97 = new clToolBar(m_mainPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainPanel, wxSize(-1,-1)), wxTB_FLAT);
+    m_toolbar97 = new clToolBar(m_mainPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainPanel, wxSize(-1,-1)), wxTB_HORIZONTAL|wxNO_BORDER);
     m_toolbar97->SetToolBitmapSize(wxSize(16,16));
 
     boxSizer11->Add(m_toolbar97, 0, wxEXPAND, WXC_FROM_DIP(5));

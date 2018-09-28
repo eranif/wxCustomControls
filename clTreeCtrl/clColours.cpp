@@ -7,12 +7,12 @@ clColours::clColours() {}
 
 void clColours::InitDefaults()
 {
-    itemTextColour = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT);
+    itemTextColour = wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOXTEXT);
     selItemTextColour = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT);
     selItemBgColour = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
-    bgColour = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
-    if(DrawingUtils::IsDark(bgColour)) {
-        alternateColour = bgColour.ChangeLightness(105);
+    bgColour = wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOX);
+    if(IsLightTheme()) {
+        alternateColour = bgColour.ChangeLightness(95);
         hoverBgColour = bgColour.ChangeLightness(110);
         headerBgColour = bgColour.ChangeLightness(113);
         headerHBorderColour = alternateColour;
@@ -20,7 +20,7 @@ void clColours::InitDefaults()
     } else {
         alternateColour = bgColour.ChangeLightness(95);
         hoverBgColour = bgColour.ChangeLightness(90);
-        headerBgColour = *wxWHITE;
+        headerBgColour = bgColour.ChangeLightness(113);
         headerHBorderColour = wxColour("#D0D3D4");
         headerVBorderColour = wxColour("#D0D3D4");
     }
@@ -30,16 +30,17 @@ void clColours::InitDefaults()
     itemBgColour = bgColour;
     selItemBgColourNoFocus = wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION);
     matchedItemBgText = wxColour("#FF6F00");
-    matchedItemText = wxColour("BLACK");
+    matchedItemText = wxColour("#17202A");
     fillColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE);
-    borderColour = DrawingUtils::IsDark(fillColour) ? fillColour.ChangeLightness(120) : fillColour.ChangeLightness(90);
+    borderColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DSHADOW);
+    darkBorderColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW);
 }
 
 void clColours::InitDarkDefaults()
 {
     bgColour = wxColour("#5F6A6A");
     itemTextColour = wxColour("#F4F6F6");
-    selItemTextColour = *wxWHITE;
+    selItemTextColour = wxColour("#FDFEFE");
     selItemBgColour = wxColour("#6D7B8D");
     selbuttonColour = selItemTextColour;
     buttonColour = itemTextColour;
@@ -51,9 +52,10 @@ void clColours::InitDarkDefaults()
     headerVBorderColour = wxColour("#BFC9CA");
     selItemBgColourNoFocus = wxColour("#707B7C");
     matchedItemBgText = wxColour("#8BC34A");
-    matchedItemText = wxColour("WHITE");
+    matchedItemText = wxColour("#FDFEFE");
     borderColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DSHADOW);
     fillColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE);
+    darkBorderColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW);
 }
 
-bool clColours::IsLightTheme() const { return !DrawingUtils::IsDark(GetBgColour()); }
+bool clColours::IsLightTheme() const { return !DrawingUtils::IsDark(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE)); }

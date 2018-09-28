@@ -26,6 +26,7 @@ public:
         kShowLabels = (1 << 0),
         kThemedColour = (1 << 1),
         kShowCustomiseMenu = (1 << 2),
+        kMiniToolBar = ( 1 << 3),
     };
 
 protected:
