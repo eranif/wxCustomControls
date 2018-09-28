@@ -34,12 +34,19 @@ static wxVariant MakeIconText(const wxString& text, int bmp_index)
 MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
 {
+    // Create some themes so we can toggle through them
     clColours colours;
     colours.InitDefaults();
     m_coloursArr[0] = colours;
 
-    colours.InitDarkDefaults();
+    colours.InitFromColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE));
     m_coloursArr[1] = colours;
+
+    colours.InitFromColour(wxColour("WHITE"));
+    m_coloursArr[2] = colours;
+    
+    colours.InitFromColour(wxColour("#424242"));
+    m_coloursArr[3] = colours;
 
     m_treeCtrl->SetColours(m_coloursArr[m_selectedColours]);
 
@@ -304,16 +311,13 @@ void MainFrame::OnPrevSibling(wxCommandEvent& event)
 }
 void MainFrame::OnToggleTheme(wxCommandEvent& event)
 {
-    if(m_selectedColours == 0) {
-        m_treeCtrl->SetColours(m_coloursArr[1]);
-        m_dataView->SetColours(m_coloursArr[1]);
-        m_selectedColours = 1;
-    } else {
-        m_treeCtrl->SetColours(m_coloursArr[0]);
-        m_dataView->SetColours(m_coloursArr[0]);
-        m_selectedColours = 0;
-    }
+    ++m_selectedColours;
+    if(m_selectedColours >= m_coloursArr.size()) { m_selectedColours = 0; }
+    
+    m_treeCtrl->SetColours(m_coloursArr[m_selectedColours]);
+    m_dataView->SetColours(m_coloursArr[m_selectedColours]);
     m_treeCtrl->Refresh();
+    m_dataView->Refresh();
 }
 
 void MainFrame::OnZebraColouring(wxCommandEvent& event)

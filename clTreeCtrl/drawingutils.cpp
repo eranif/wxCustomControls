@@ -298,16 +298,46 @@ wxColour DrawingUtils::GetTextCtrlTextColour() { return wxSystemSettings::GetCol
 
 wxColour DrawingUtils::GetMenuTextColour() { return wxSystemSettings::GetColour(wxSYS_COLOUR_MENUTEXT); }
 
-wxColour DrawingUtils::GetMenuBarBgColour() { return wxSystemSettings::GetColour(wxSYS_COLOUR_MENUBAR); }
+wxColour DrawingUtils::GetMenuBarBgColour()
+{
+#ifdef __WXMSW__
+    return wxColour("rgb(245,246,247)");
+#else
+    return wxSystemSettings::GetColour(wxSYS_COLOUR_MENUBAR);
+#endif
+}
 
 void DrawingUtils::FillMenuBarBgColour(wxDC& dc, const wxRect& rect, bool miniToolbar)
 {
+#ifdef __WXMSW__
+    if(miniToolbar && false) {
+        wxColour bgColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE);
+        dc.SetPen(bgColour);
+        dc.SetBrush(bgColour);
+        dc.DrawRectangle(rect);
+    } else {
+        wxColour topColour(*wxWHITE);
+        wxColour brushColour(GetMenuBarBgColour());
+        wxColour bottomColour("rgb(232,233,234)");
+
+        dc.SetPen(brushColour);
+        dc.SetBrush(brushColour);
+        dc.DrawRectangle(rect);
+
+        dc.SetPen(topColour);
+        dc.DrawLine(rect.GetTopLeft(), rect.GetTopRight());
+
+        dc.SetPen(bottomColour);
+        dc.DrawLine(rect.GetBottomLeft(), rect.GetBottomRight());
+    }
+#else
     wxUnusedVar(miniToolbar);
     wxColour bgColour = miniToolbar ? wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE)
                                     : wxSystemSettings::GetColour(wxSYS_COLOUR_MENUBAR);
     dc.SetPen(bgColour);
     dc.SetBrush(bgColour);
     dc.DrawRectangle(rect);
+#endif
 }
 
 wxColour DrawingUtils::GetMenuBarTextColour() { return wxSystemSettings::GetColour(wxSYS_COLOUR_MENUTEXT); }

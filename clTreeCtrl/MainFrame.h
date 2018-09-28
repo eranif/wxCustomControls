@@ -37,8 +37,8 @@ public:
 class MainFrame : public MainFrameBaseClass
 {
     wxString m_path;
-    std::array<clColours, 2> m_coloursArr;
-    int m_selectedColours = 0;
+    std::array<clColours, 4> m_coloursArr;
+    size_t m_selectedColours = 0;
     wxTreeItemId m_matchedItem;
     wxDataViewItem m_dvMatchedItem;
     std::vector<wxBitmap> m_bitmaps;
