@@ -174,6 +174,9 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
     // Keep the visible items
     m_model.SetOnScreenItems(items); // Keep track of the visible items
     if(needToUpdateScrollbar) { CallAfter(&clTreeCtrl::UpdateScrollBar); }
+
+    // Update the header as well
+    if(GetHeader() && GetHeader()->IsShown()) { GetHeader()->Update(); }
 }
 
 wxTreeItemId clTreeCtrl::InsertItem(const wxTreeItemId& parent, const wxTreeItemId& previous, const wxString& text,

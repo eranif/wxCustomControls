@@ -76,7 +76,6 @@ protected:
     
     void DoPositionHScrollbar();
     void DoPositionVScrollbar();
-    void RenderView();
     
 public:
     clControlWithItems(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,

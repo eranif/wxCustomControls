@@ -5,6 +5,7 @@
 #include <wx/dcgraph.h>
 #include <wx/dcmemory.h>
 #include <wx/font.h>
+#include <wx/log.h>
 #include <wx/renderer.h>
 #include <wx/settings.h>
 
@@ -86,9 +87,11 @@ void clHeaderBar::Render(wxDC& dc, const clColours& colours)
     _colours.SetBgColour(_colours.GetHeaderBgColour());
 
     bool useNativeHeader = (m_flags & kHeaderNative);
-    if(useNativeHeader) {
-        wxRendererNative::Get().DrawHeaderButton(m_parent, dc, rect, wxCONTROL_NONE);
-    }
+    if(useNativeHeader) { wxRendererNative::Get().DrawHeaderButton(m_parent, dc, rect, wxCONTROL_NONE); }
+
+    // Set the DC origin to reflect the h-scrollbar
+    clControlWithItems* parent = dynamic_cast<clControlWithItems*>(GetParent());
+    dc.SetDeviceOrigin(-parent->GetFirstColumn(), 0);
     for(size_t i = 0; i < size(); ++i) {
         bool is_last = (i == (size() - 1));
         Item(i).Render(dc, _colours, m_flags);
@@ -98,6 +101,8 @@ void clHeaderBar::Render(wxDC& dc, const clColours& colours)
         }
     }
 
+    // Restore the DC origin
+    dc.SetDeviceOrigin(0, 0);
     if(!useNativeHeader) {
         dc.SetPen(_colours.GetHeaderHBorderColour());
         dc.DrawLine(rect.GetBottomLeft(), rect.GetBottomRight());

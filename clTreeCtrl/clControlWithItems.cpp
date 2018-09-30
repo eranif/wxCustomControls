@@ -214,7 +214,7 @@ void clControlWithItems::SetShowHeader(bool b)
 {
     m_viewHeader->Show(b);
     DoPositionVScrollbar(); // Adjust the vertical scrollbar if needed
-    CallAfter(&clControlWithItems::RenderView);
+    Refresh();
 }
 
 bool clControlWithItems::IsHeaderVisible() const { return m_viewHeader->IsShown(); }
@@ -448,14 +448,6 @@ void clControlWithItems::DoPositionVScrollbar()
 }
 
 void clControlWithItems::DoPositionHScrollbar() { clScrolledPanel::DoPositionHScrollbar(); }
-
-void clControlWithItems::RenderView()
-{
-    if(m_viewHeader->IsShown()) {
-        m_viewHeader->Update();
-    }
-    Refresh();
-}
 
 //===---------------------------------------------------
 // clSearchText
