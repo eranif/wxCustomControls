@@ -6,6 +6,7 @@
 #include <vector>
 #include <wx/menu.h>
 #include <wx/panel.h>
+#include <wx/timer.h>
 
 class clToolBarButtonBase;
 class WXDLLIMPEXP_SDK clToolBar : public wxPanel
@@ -21,7 +22,8 @@ private:
     size_t m_flags = 0;
     wxRect m_chevronRect;
     int m_groupSpacing = 30;
-
+    wxTimer* m_timer = nullptr;
+    
 public:
     enum eFlags {
         kShowLabels = (1 << 0),
@@ -40,13 +42,13 @@ protected:
     void OnLeaveWindow(wxMouseEvent& event);
     void OnOverflowItem(wxCommandEvent& event);
     void OnSize(wxSizeEvent& event);
-    virtual void UpdateWindowUI(long flags = wxUPDATE_UI_NONE) override;
     void DoIdleUpdate();
     wxRect CalculateRect(wxDC& dc) const;
     void DoShowOverflowMenu();
     void SplitGroups(std::vector<ToolVect_t>& G);
     void RenderGroup(int& xx, clToolBar::ToolVect_t& G, wxDC& gcdc);
-
+    void OnTimer(wxTimerEvent &event);
+    
 public:
     clToolBar(wxWindow* parent, wxWindowID winid = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
               const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL | wxNO_BORDER,

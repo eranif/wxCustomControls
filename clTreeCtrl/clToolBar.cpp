@@ -17,88 +17,96 @@
 
 wxDEFINE_EVENT(wxEVT_TOOLBAR_CUSTOMISE, wxCommandEvent);
 clToolBar::clToolBar(wxWindow* parent, wxWindowID winid, const wxPoint& pos, const wxSize& size, long style,
-                     const wxString& name)
-    : wxPanel(parent, winid, pos, size, style, name)
-    , m_popupShown(false)
-    , m_flags(0)
+	     const wxString& name)
+: wxPanel(parent, winid, pos, size, style, name)
+, m_popupShown(false)
+, m_flags(0)
 {
-    SetBackgroundStyle(wxBG_STYLE_PAINT);
-    SetMiniToolBar(true);
+SetBackgroundStyle(wxBG_STYLE_PAINT);
+SetMiniToolBar(true);
 
-    Bind(wxEVT_PAINT, &clToolBar::OnPaint, this);
-    Bind(wxEVT_ERASE_BACKGROUND, &clToolBar::OnEraseBackground, this);
-    Bind(wxEVT_LEFT_UP, &clToolBar::OnLeftUp, this);
-    Bind(wxEVT_LEFT_DOWN, &clToolBar::OnLeftDown, this);
-    Bind(wxEVT_MOTION, &clToolBar::OnMotion, this);
-    Bind(wxEVT_ENTER_WINDOW, &clToolBar::OnEnterWindow, this);
-    Bind(wxEVT_LEAVE_WINDOW, &clToolBar::OnLeaveWindow, this);
-    Bind(wxEVT_SIZE, &clToolBar::OnSize, this);
+Bind(wxEVT_PAINT, &clToolBar::OnPaint, this);
+Bind(wxEVT_ERASE_BACKGROUND, &clToolBar::OnEraseBackground, this);
+Bind(wxEVT_LEFT_UP, &clToolBar::OnLeftUp, this);
+Bind(wxEVT_LEFT_DOWN, &clToolBar::OnLeftDown, this);
+Bind(wxEVT_MOTION, &clToolBar::OnMotion, this);
+Bind(wxEVT_ENTER_WINDOW, &clToolBar::OnEnterWindow, this);
+Bind(wxEVT_LEAVE_WINDOW, &clToolBar::OnLeaveWindow, this);
+Bind(wxEVT_SIZE, &clToolBar::OnSize, this);
+m_timer = new wxTimer(this, wxID_ANY);
+m_timer->Start(150);
+Bind(wxEVT_TIMER, &clToolBar::OnTimer, this, m_timer->GetId());
 }
 
 clToolBar::~clToolBar()
 {
-    Unbind(wxEVT_PAINT, &clToolBar::OnPaint, this);
-    Unbind(wxEVT_ERASE_BACKGROUND, &clToolBar::OnEraseBackground, this);
-    Unbind(wxEVT_LEFT_UP, &clToolBar::OnLeftUp, this);
-    Unbind(wxEVT_MOTION, &clToolBar::OnMotion, this);
-    Unbind(wxEVT_ENTER_WINDOW, &clToolBar::OnEnterWindow, this);
-    Unbind(wxEVT_LEAVE_WINDOW, &clToolBar::OnLeaveWindow, this);
-    Unbind(wxEVT_LEFT_DOWN, &clToolBar::OnLeftDown, this);
-    Unbind(wxEVT_SIZE, &clToolBar::OnSize, this);
+Unbind(wxEVT_PAINT, &clToolBar::OnPaint, this);
+Unbind(wxEVT_ERASE_BACKGROUND, &clToolBar::OnEraseBackground, this);
+Unbind(wxEVT_LEFT_UP, &clToolBar::OnLeftUp, this);
+Unbind(wxEVT_MOTION, &clToolBar::OnMotion, this);
+Unbind(wxEVT_ENTER_WINDOW, &clToolBar::OnEnterWindow, this);
+Unbind(wxEVT_LEAVE_WINDOW, &clToolBar::OnLeaveWindow, this);
+Unbind(wxEVT_LEFT_DOWN, &clToolBar::OnLeftDown, this);
+Unbind(wxEVT_SIZE, &clToolBar::OnSize, this);
 
-    for(size_t i = 0; i < m_buttons.size(); ++i) {
-        delete m_buttons[i];
-    }
-    m_buttons.clear();
+// Stop the timer
+m_timer->Stop();
+Unbind(wxEVT_TIMER, &clToolBar::OnTimer, this, m_timer->GetId());
+wxDELETE(m_timer);
+
+for(size_t i = 0; i < m_buttons.size(); ++i) {
+delete m_buttons[i];
+}
+m_buttons.clear();
 }
 #define CL_TOOL_BAR_CHEVRON_SIZE 16
 
 void clToolBar::OnPaint(wxPaintEvent& event)
 {
-    wxAutoBufferedPaintDC dc(this);
-    PrepareDC(dc);
-    wxGCDC gcdc(dc);
+wxAutoBufferedPaintDC dc(this);
+PrepareDC(dc);
+wxGCDC gcdc(dc);
 
-    m_overflowButtons.clear();
-    m_visibleButtons.clear();
-    m_chevronRect = wxRect();
+m_overflowButtons.clear();
+m_visibleButtons.clear();
+m_chevronRect = wxRect();
 
-    wxRect clientRect = GetClientRect();
-    DrawingUtils::FillMenuBarBgColour(gcdc, clientRect, HasFlag(kMiniToolBar));
-    clientRect.SetWidth(clientRect.GetWidth() - CL_TOOL_BAR_CHEVRON_SIZE);
-    DrawingUtils::FillMenuBarBgColour(gcdc, clientRect, HasFlag(kMiniToolBar));
-    std::vector<ToolVect_t> groups;
-    SplitGroups(groups);
+wxRect clientRect = GetClientRect();
+DrawingUtils::FillMenuBarBgColour(gcdc, clientRect, HasFlag(kMiniToolBar));
+clientRect.SetWidth(clientRect.GetWidth() - CL_TOOL_BAR_CHEVRON_SIZE);
+DrawingUtils::FillMenuBarBgColour(gcdc, clientRect, HasFlag(kMiniToolBar));
+std::vector<ToolVect_t> groups;//= {m_buttons};
+SplitGroups(groups);
 
-    int xx = 0;
-    for(size_t i = 0; i < groups.size(); ++i) {
-        RenderGroup(xx, groups[i], gcdc);
-        // Use a spacer of 10 pixels between groups
-        xx += GetGroupSapcing();
-    }
+int xx = 0;
+for(size_t i = 0; i < groups.size(); ++i) {
+RenderGroup(xx, groups[i], gcdc);
+// Use a spacer of 10 pixels between groups
+xx += GetGroupSapcing();
+}
 
-    wxRect chevronRect = GetClientRect();
-    chevronRect.SetX(chevronRect.GetX() + (chevronRect.GetWidth() - CL_TOOL_BAR_CHEVRON_SIZE));
-    chevronRect.SetWidth(CL_TOOL_BAR_CHEVRON_SIZE);
+wxRect chevronRect = GetClientRect();
+chevronRect.SetX(chevronRect.GetX() + (chevronRect.GetWidth() - CL_TOOL_BAR_CHEVRON_SIZE));
+chevronRect.SetWidth(CL_TOOL_BAR_CHEVRON_SIZE);
 
-    // If we have overflow buttons, draw an arrow to the right
-    if(!m_overflowButtons.empty() || IsCustomisationEnabled()) {
-        DrawingUtils::DrawDropDownArrow(this, gcdc, chevronRect, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
-        m_chevronRect = chevronRect;
-    }
+// If we have overflow buttons, draw an arrow to the right
+if(!m_overflowButtons.empty() || IsCustomisationEnabled()) {
+DrawingUtils::DrawDropDownArrow(this, gcdc, chevronRect, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
+m_chevronRect = chevronRect;
+}
 }
 void clToolBar::RenderGroup(int& xx, clToolBar::ToolVect_t& G, wxDC& gcdc)
 {
-    wxRect clientRect = GetClientRect();
+wxRect clientRect = GetClientRect();
 
-    // Calculate the group size
-    int groupWidth = 0;
-    std::for_each(G.begin(), G.end(), [&](clToolBarButtonBase* button) {
-        wxSize buttonSize = button->CalculateSize(gcdc);
-        groupWidth += buttonSize.GetWidth();
-    });
+// Calculate the group size
+int groupWidth = 0;
+std::for_each(G.begin(), G.end(), [&](clToolBarButtonBase* button) {
+wxSize buttonSize = button->CalculateSize(gcdc);
+groupWidth += buttonSize.GetWidth();
+});
 
-    // Draw a rectangle
+// Draw a rectangle
 #ifdef __WXMSW__
     bool hasGrouping = false;
 #else
@@ -399,14 +407,6 @@ void clToolBar::ToggleTool(wxWindowID buttonID, bool toggle)
     if(button) { button->Check(toggle); }
 }
 
-void clToolBar::UpdateWindowUI(long flags)
-{
-    // Call update UI event per button
-    if(flags & wxUPDATE_UI_FROMIDLE) { DoIdleUpdate(); }
-
-    wxPanel::UpdateWindowUI(flags);
-}
-
 void clToolBar::DoIdleUpdate()
 {
     bool refreshNeeded = false;
@@ -549,4 +549,10 @@ void clToolBar::SplitGroups(std::vector<ToolVect_t>& G)
     }
 
     if(!curG.empty()) { G.push_back(curG); }
+}
+
+void clToolBar::OnTimer(wxTimerEvent &event)
+{
+    event.Skip();
+    DoIdleUpdate();
 }
