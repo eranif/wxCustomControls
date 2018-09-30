@@ -50,11 +50,9 @@ MainFrame::MainFrame(wxWindow* parent)
 
     m_treeCtrl->SetColours(m_coloursArr[m_selectedColours]);
 
-    clHeaderBar header(m_treeCtrl);
-    header.Add("Path");
-    header.Add("Kind");
-    header.Add("Size");
-    m_treeCtrl->SetHeader(header);
+    m_treeCtrl->AddHeader("Path");
+    m_treeCtrl->AddHeader("Kind");
+    m_treeCtrl->AddHeader("Size");
     DoAddRoot();
 
     wxLog::SetActiveTarget(new wxLogTextCtrl(m_textCtrlLog));
