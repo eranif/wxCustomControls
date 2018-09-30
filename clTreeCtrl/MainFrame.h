@@ -42,6 +42,7 @@ class MainFrame : public MainFrameBaseClass
     wxTreeItemId m_matchedItem;
     wxDataViewItem m_dvMatchedItem;
     std::vector<wxBitmap> m_bitmaps;
+    clTreeCtrl* m_treeCtrl = nullptr;
 
 private:
     void LogMessage(const wxString& message);

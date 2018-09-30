@@ -35,6 +35,10 @@ MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
 {
     // Create some themes so we can toggle through them
+    m_treeCtrl = new clTreeCtrl();
+    m_treeCtrl->Create(m_panelControls, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_ROW_LINES | wxBORDER_THEME);
+    m_panelControls->GetSizer()->Insert(0, m_treeCtrl, 1, wxEXPAND | wxALL, 2);
+
     clColours colours;
     colours.InitDefaults();
     m_coloursArr[0] = colours;
@@ -44,7 +48,7 @@ MainFrame::MainFrame(wxWindow* parent)
 
     colours.InitFromColour(wxColour("WHITE"));
     m_coloursArr[2] = colours;
-    
+
     colours.InitFromColour(wxColour("#424242"));
     m_coloursArr[3] = colours;
 
@@ -312,7 +316,7 @@ void MainFrame::OnToggleTheme(wxCommandEvent& event)
 {
     ++m_selectedColours;
     if(m_selectedColours >= m_coloursArr.size()) { m_selectedColours = 0; }
-    
+
     m_treeCtrl->SetColours(m_coloursArr[m_selectedColours]);
     m_dataView->SetColours(m_coloursArr[m_selectedColours]);
     m_treeCtrl->Refresh();
@@ -501,7 +505,4 @@ void MainFrame::OnOpenMenu(wxCommandEvent& event)
     m.Append(XRCID("item_1"), _("Open file 2"));
     m_toolbar97->ShowMenuForButton(event.GetId(), &m);
 }
-void MainFrame::OnColoursUI(wxUpdateUIEvent& event)
-{
-    event.Enable(false);
-}
+void MainFrame::OnColoursUI(wxUpdateUIEvent& event) { event.Enable(false); }

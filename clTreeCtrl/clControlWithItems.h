@@ -124,11 +124,11 @@ public:
      * @brief draw the header + items
      */
     void Render(wxDC& dc);
-
+    
     /**
-     * @brief return the header bar (relevant when using columns)
+     * @brief Get a pointer to the header, create one if needed
      */
-    clHeaderBar* GetHeader();
+    clHeaderBar* GetHeader() const;
 
     /**
      * @param header

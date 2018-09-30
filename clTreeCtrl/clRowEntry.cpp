@@ -295,7 +295,7 @@ void clRowEntry::Render(wxWindow* win, wxDC& dc, const clColours& c, int row_ind
         wxSize textSize = dc.GetTextExtent(cell.GetText());
         int textY = rowRect.GetY() + (m_tree->GetLineHeight() - textSize.GetHeight()) / 2;
         // Draw the button
-        bool hasHeader = !m_tree->GetHeader()->empty();
+        bool hasHeader = (m_tree->GetHeader() && !m_tree->GetHeader()->empty());
         wxRect cellRect = hasHeader ? m_tree->GetHeader()->Item(i).GetRect() : rowRect;
 
         // Make sure that the cellRect has all the correct attributes of the row

@@ -7,30 +7,28 @@
 #ifndef _CLTREECTRL_CLTREECTRL_WXCRAFTER_BASE_CLASSES_H
 #define _CLTREECTRL_CLTREECTRL_WXCRAFTER_BASE_CLASSES_H
 
-#include <wx/settings.h>
-#include <wx/xrc/xmlres.h>
-#include <wx/xrc/xh_bmp.h>
-#include <wx/frame.h>
-#include <wx/iconbndl.h>
-#include <wx/artprov.h>
-#include <wx/sizer.h>
-#include <wx/panel.h>
-#include <wx/toolbar.h>
-#include "clToolBar.h"
-#include <wx/treectrl.h>
-#include "clTreeCtrl.h"
-#include <wx/dataview.h>
 #include "clDataViewListCtrl.h"
-#include <wx/textctrl.h>
-#include <wx/menu.h>
-#include <wx/imaglist.h>
-#include <wx/bitmap.h>
+#include "clToolBar.h"
 #include <map>
+#include <wx/artprov.h>
+#include <wx/bitmap.h>
+#include <wx/dataview.h>
+#include <wx/frame.h>
 #include <wx/icon.h>
+#include <wx/iconbndl.h>
+#include <wx/imaglist.h>
+#include <wx/menu.h>
+#include <wx/panel.h>
+#include <wx/settings.h>
+#include <wx/sizer.h>
+#include <wx/textctrl.h>
+#include <wx/toolbar.h>
+#include <wx/xrc/xh_bmp.h>
+#include <wx/xrc/xmlres.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
-#include <wx/persist/toplevel.h>
 #include <wx/persist/bookctrl.h>
+#include <wx/persist/toplevel.h>
 #include <wx/persist/treebook.h>
 #endif
 
@@ -43,32 +41,32 @@
 #define WXC_FROM_DIP(x) x
 #endif
 
-
 class MainFrameBaseClass : public wxFrame
 {
 public:
     enum {
-        ID_NATIVE_HEADER = 10001,
-        ID_SINGLE_SELECTION = 10002,
-        ID_HIDE_ROOT = 10003,
-        ID_ZEBRA = 10004,
-        ID_DV_DELETE_ALL_ITEMS = 10005,
-        ID_FILL_WITH_5000_ENTRIES = 10006,
-        ID_DV_OPEN_FOLDER = 10007,
+        ID_TOGGLE_THEMES = 10001,
+        ID_ZEBRA = 10002,
+        ID_DV_DELETE_ALL_ITEMS = 10003,
+        ID_FILL_WITH_5000_ENTRIES = 10004,
+        ID_DV_OPEN_FOLDER = 10005,
+        ID_SINGLE_SELECTION = 10006,
+        ID_HIDE_ROOT = 10007,
         ID_PREV_SIBLING = 10008,
-        ID_NEXT_SIBLING = 10009,
-        ID_SELECT_CHILDREN = 10010,
-        ID_SHOW_SB_ON_FOCUS = 10011,
-        ID_EXPAND_ALL = 10012,
-        ID_OPEN_FOLDER = 10013,
-        wxID_COLOURS = 10014,
-        ID_TOGGLE_THEMES = 10015,
+        ID_NATIVE_HEADER = 10009,
+        ID_SHOW_SB_ON_FOCUS = 10010,
+        ID_NEXT_SIBLING = 10011,
+        ID_SELECT_CHILDREN = 10012,
+        ID_EXPAND_ALL = 10013,
+        ID_OPEN_FOLDER = 10014,
+        wxID_COLOURS = 10015,
         wxID_BOOKMARK = 10016,
     };
+
 protected:
     wxPanel* m_mainPanel;
     clToolBar* m_toolbar97;
-    clTreeCtrl* m_treeCtrl;
+    wxPanel* m_panelControls;
     clDataViewListCtrl* m_dataView;
     wxTextCtrl* m_textCtrlLog;
     wxMenuBar* m_myMenuBar;
@@ -104,132 +102,44 @@ protected:
     wxMenuItem* m_menuItemSupportSearch;
 
 protected:
-    virtual void OnColoursUI(wxUpdateUIEvent& event)
-    {
-        event.Skip();
-    }
-    virtual void OnOpenFolder(wxCommandEvent& event)
-    {
-        event.Skip();
-    }
-    virtual void OnExpandAll(wxCommandEvent& event)
-    {
-        event.Skip();
-    }
-    virtual void OnCollapseAll(wxCommandEvent& event)
-    {
-        event.Skip();
-    }
-    virtual void OnFirstVisible(wxCommandEvent& event)
-    {
-        event.Skip();
-    }
-    virtual void OnNextVisible(wxCommandEvent& event)
-    {
-        event.Skip();
-    }
-    virtual void OnEnsureItemVisible(wxCommandEvent& event)
-    {
-        event.Skip();
-    }
-    virtual void OnSelectChildren(wxCommandEvent& event)
-    {
-        event.Skip();
-    }
-    virtual void OnNextSibling(wxCommandEvent& event)
-    {
-        event.Skip();
-    }
-    virtual void OnPrevSibling(wxCommandEvent& event)
-    {
-        event.Skip();
-    }
-    virtual void OnDeleteAllItems(wxCommandEvent& event)
-    {
-        event.Skip();
-    }
-    virtual void OnTreeFind(wxCommandEvent& event)
-    {
-        event.Skip();
-    }
-    virtual void OnExit(wxCommandEvent& event)
-    {
-        event.Skip();
-    }
-    virtual void OnDVOpenFolder(wxCommandEvent& event)
-    {
-        event.Skip();
-    }
-    virtual void OnFillWith500Entries(wxCommandEvent& event)
-    {
-        event.Skip();
-    }
-    virtual void OnDVDeleteAllItems(wxCommandEvent& event)
-    {
-        event.Skip();
-    }
-    virtual void OnZebraColouring(wxCommandEvent& event)
-    {
-        event.Skip();
-    }
-    virtual void OnToggleTheme(wxCommandEvent& event)
-    {
-        event.Skip();
-    }
-    virtual void OnHideRoot(wxCommandEvent& event)
-    {
-        event.Skip();
-    }
-    virtual void OnSingleSelection(wxCommandEvent& event)
-    {
-        event.Skip();
-    }
-    virtual void OnShowSBOnFocus(wxCommandEvent& event)
-    {
-        event.Skip();
-    }
-    virtual void OnHideHeaders(wxCommandEvent& event)
-    {
-        event.Skip();
-    }
-    virtual void OnNativeHeader(wxCommandEvent& event)
-    {
-        event.Skip();
-    }
-    virtual void OnMenuitemsupportsearchMenuSelected(wxCommandEvent& event)
-    {
-        event.Skip();
-    }
+    virtual void OnColoursUI(wxUpdateUIEvent& event) { event.Skip(); }
+    virtual void OnOpenFolder(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnExpandAll(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnCollapseAll(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnFirstVisible(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnNextVisible(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnEnsureItemVisible(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnSelectChildren(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnNextSibling(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnPrevSibling(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnDeleteAllItems(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnTreeFind(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnExit(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnDVOpenFolder(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnFillWith500Entries(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnDVDeleteAllItems(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnZebraColouring(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnToggleTheme(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnHideRoot(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnSingleSelection(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnShowSBOnFocus(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnHideHeaders(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnNativeHeader(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnMenuitemsupportsearchMenuSelected(wxCommandEvent& event) { event.Skip(); }
 
 public:
-    clToolBar* GetToolbar97()
-    {
-        return m_toolbar97;
-    }
-    clTreeCtrl* GetTreeCtrl()
-    {
-        return m_treeCtrl;
-    }
-    clDataViewListCtrl* GetDataView()
-    {
-        return m_dataView;
-    }
-    wxTextCtrl* GetTextCtrlLog()
-    {
-        return m_textCtrlLog;
-    }
-    wxPanel* GetMainPanel()
-    {
-        return m_mainPanel;
-    }
-    wxMenuBar* GetMyMenuBar()
-    {
-        return m_myMenuBar;
-    }
-    MainFrameBaseClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("My Frame"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxCAPTION|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxSYSTEM_MENU|wxCLOSE_BOX);
+    clToolBar* GetToolbar97() { return m_toolbar97; }
+    clDataViewListCtrl* GetDataView() { return m_dataView; }
+    wxPanel* GetPanelControls() { return m_panelControls; }
+    wxTextCtrl* GetTextCtrlLog() { return m_textCtrlLog; }
+    wxPanel* GetMainPanel() { return m_mainPanel; }
+    wxMenuBar* GetMyMenuBar() { return m_myMenuBar; }
+    MainFrameBaseClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("My Frame"),
+                       const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1, -1),
+                       long style = wxCAPTION | wxRESIZE_BORDER | wxMAXIMIZE_BOX | wxMINIMIZE_BOX | wxSYSTEM_MENU |
+                                    wxCLOSE_BOX);
     virtual ~MainFrameBaseClass();
 };
-
 
 class MyImages : public wxImageList
 {
@@ -241,22 +151,16 @@ protected:
     int m_imagesWidth;
     int m_imagesHeight;
 
-
 protected:
-
 public:
     MyImages();
-    const wxBitmap& Bitmap(const wxString &name) const
+    const wxBitmap& Bitmap(const wxString& name) const
     {
-        if ( !m_bitmaps.count(name + m_resolution) )
-            return wxNullBitmap;
+        if(!m_bitmaps.count(name + m_resolution)) return wxNullBitmap;
         return m_bitmaps.find(name + m_resolution)->second;
     }
 
-    void SetBitmapResolution(const wxString &res = wxEmptyString)
-    {
-        m_resolution = res;
-    }
+    void SetBitmapResolution(const wxString& res = wxEmptyString) { m_resolution = res; }
 
     virtual ~MyImages();
 };

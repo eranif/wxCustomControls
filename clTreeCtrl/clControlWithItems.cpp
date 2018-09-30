@@ -212,12 +212,14 @@ clControlWithItems::~clControlWithItems()
 
 void clControlWithItems::SetShowHeader(bool b)
 {
-    m_viewHeader->Show(b);
-    DoPositionVScrollbar(); // Adjust the vertical scrollbar if needed
-    Refresh();
+    if(GetHeader()) {
+        GetHeader()->Show(b);
+        DoPositionVScrollbar(); // Adjust the vertical scrollbar if needed
+        Refresh();
+    }
 }
 
-bool clControlWithItems::IsHeaderVisible() const { return m_viewHeader->IsShown(); }
+bool clControlWithItems::IsHeaderVisible() const { return GetHeader() && GetHeader()->IsShown(); }
 
 wxRect clControlWithItems::GetItemsRect() const
 {
@@ -419,11 +421,8 @@ void clControlWithItems::DoMouseScroll(const wxMouseEvent& event)
     ScrollToRow(new_row);
 }
 
-clHeaderBar* clControlWithItems::GetHeader()
+clHeaderBar* clControlWithItems::GetHeader() const
 {
-    if(!m_viewHeader) {
-        m_viewHeader = new clHeaderBar(this, m_colours); 
-    }
     return m_viewHeader;
 }
 
@@ -438,8 +437,8 @@ void clControlWithItems::DoPositionVScrollbar()
         if(GetHScrollBar() && GetHScrollBar()->IsShown()) { height -= GetHScrollBar()->GetSize().GetHeight(); }
         int width = vsbSize.GetWidth();
         int x = clientRect.GetWidth() - vsbSize.GetWidth();
-        int y = GetHeader()->GetHeight();
-        height -= GetHeader()->GetHeight();
+        int y = (GetHeader() ? GetHeader()->GetHeight() : 0);
+        height -= (GetHeader() ? GetHeader()->GetHeight() : 0);
         if(height < 0) { height = 0; }
         GetVScrollBar()->SetSize(width, height);
         GetVScrollBar()->Move(x, y);
