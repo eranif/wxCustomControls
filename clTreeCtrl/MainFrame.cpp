@@ -53,6 +53,7 @@ MainFrame::MainFrame(wxWindow* parent)
     m_treeCtrl->AddHeader("Path");
     m_treeCtrl->AddHeader("Kind");
     m_treeCtrl->AddHeader("Size");
+    m_treeCtrl->SetShowHeader(true);
     DoAddRoot();
 
     wxLog::SetActiveTarget(new wxLogTextCtrl(m_textCtrlLog));

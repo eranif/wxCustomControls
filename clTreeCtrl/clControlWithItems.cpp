@@ -419,9 +419,11 @@ void clControlWithItems::DoMouseScroll(const wxMouseEvent& event)
     ScrollToRow(new_row);
 }
 
-clHeaderBar* clControlWithItems::GetHeader() const
+clHeaderBar* clControlWithItems::GetHeader()
 {
-    wxASSERT_MSG(!m_viewHeader, "Null header bar. Did you call Create()?");
+    if(!m_viewHeader) {
+        m_viewHeader = new clHeaderBar(this, m_colours); 
+    }
     return m_viewHeader;
 }
 

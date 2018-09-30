@@ -128,7 +128,7 @@ public:
     /**
      * @brief return the header bar (relevant when using columns)
      */
-    clHeaderBar* GetHeader() const;
+    clHeaderBar* GetHeader();
 
     /**
      * @param header
