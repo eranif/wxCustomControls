@@ -22,6 +22,7 @@ clToolBar::clToolBar(wxWindow* parent, wxWindowID winid, const wxPoint& pos, con
     , m_popupShown(false)
     , m_flags(0)
 {
+    SetGroupSapcing(20);
     SetBackgroundStyle(wxBG_STYLE_PAINT);
     SetMiniToolBar(true);
 
@@ -74,7 +75,7 @@ void clToolBar::OnPaint(wxPaintEvent& event)
 
     int xx = 0;
     for(size_t i = 0; i < groups.size(); ++i) {
-        RenderGroup(xx, groups[i], gcdc);
+        RenderGroup(xx, groups[i], gcdc, (i == (groups.size() - 1)));
         // Use a spacer of 10 pixels between groups
         xx += GetGroupSapcing();
     }
@@ -89,7 +90,7 @@ void clToolBar::OnPaint(wxPaintEvent& event)
         m_chevronRect = chevronRect;
     }
 }
-void clToolBar::RenderGroup(int& xx, clToolBar::ToolVect_t& G, wxDC& gcdc)
+void clToolBar::RenderGroup(int& xx, const clToolBar::ToolVect_t& G, wxDC& gcdc, bool isLastGroup)
 {
     wxRect clientRect = GetClientRect();
 
@@ -100,9 +101,7 @@ void clToolBar::RenderGroup(int& xx, clToolBar::ToolVect_t& G, wxDC& gcdc)
         groupWidth += buttonSize.GetWidth();
     });
 
-    // Draw a rectangle
-    bool hasGrouping = !HasFlag(clToolBar::kMiniToolBar);
-    if(hasGrouping) {
+    if(!isLastGroup) {
         wxRect bgRect = wxRect(wxPoint(xx, 0), wxSize(groupWidth, clientRect.GetHeight()));
         bgRect.SetWidth(bgRect.GetWidth() + GetGroupSapcing() / 2);
         {
@@ -119,7 +118,6 @@ void clToolBar::RenderGroup(int& xx, clToolBar::ToolVect_t& G, wxDC& gcdc)
             gcdc.DrawLine(bgRect.GetTopRight(), bgRect.GetBottomRight());
         }
     }
-
     // Now draw the buttons
     std::for_each(G.begin(), G.end(), [&](clToolBarButtonBase* button) {
         wxSize buttonSize = button->CalculateSize(gcdc);
