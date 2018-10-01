@@ -2,6 +2,7 @@
 #include "clTreeCtrl.h"
 #include <cmath>
 #include <wx/aboutdlg.h>
+#include <wx/checkbox.h>
 #include <wx/dir.h>
 #include <wx/dirdlg.h>
 #include <wx/minifram.h>
@@ -189,9 +190,11 @@ MainFrame::MainFrame(wxWindow* parent)
     m_dataView->Bind(wxEVT_DATAVIEW_CLEAR_SEARCH, &MainFrame::OnDVResetSearch, this);
 
     // Toolbar
-    m_toolbar97->Bind(wxEVT_TOOL_DROPDOWN, &MainFrame::OnOpenMenu, this, wxID_OPEN);
-    m_toolbar97->Bind(wxEVT_TOOL, &MainFrame::OnOpen, this, wxID_OPEN);
-    m_toolbar97->SetMiniToolBar(false);
+    m_toolbar->Bind(wxEVT_TOOL_DROPDOWN, &MainFrame::OnOpenMenu, this, wxID_OPEN);
+    m_toolbar->Bind(wxEVT_TOOL, &MainFrame::OnOpen, this, wxID_OPEN);
+    m_toolbar->AddControl(new wxCheckBox(m_toolbar, wxID_ANY, _("My Checkbox")));
+    m_toolbar->SetMiniToolBar(false);
+    m_toolbar->Realize();
 }
 
 MainFrame::~MainFrame() {}
@@ -503,6 +506,6 @@ void MainFrame::OnOpenMenu(wxCommandEvent& event)
     wxMenu m;
     m.Append(XRCID("item_1"), _("Open file 1"));
     m.Append(XRCID("item_1"), _("Open file 2"));
-    m_toolbar97->ShowMenuForButton(event.GetId(), &m);
+    m_toolbar->ShowMenuForButton(event.GetId(), &m);
 }
 void MainFrame::OnColoursUI(wxUpdateUIEvent& event) { event.Enable(false); }

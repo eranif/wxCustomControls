@@ -56,7 +56,7 @@ public:
     static wxColour GetOutputPaneFgColour();
     static wxColour GetOutputPaneBgColour();
     static wxColour GetMenuTextColour();
-    static wxColour GetMenuBarBgColour();
+    static wxColour GetMenuBarBgColour(bool miniToolbar = true);
     static wxColour GetMenuBarTextColour();
     static void FillMenuBarBgColour(wxDC& dc, const wxRect& rect, bool miniToolbar = true);
     static void TruncateText(const wxString& text, int maxWidth, wxDC& dc, wxString& fixedText);

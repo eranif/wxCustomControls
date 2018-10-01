@@ -268,7 +268,7 @@
             }, {
              "type": "string",
              "m_label": "Name:",
-             "m_value": "m_toolbar97"
+             "m_value": "m_toolbar"
             }, {
              "type": "string",
              "m_label": "Tooltip:",

@@ -65,7 +65,7 @@ public:
 
 protected:
     wxPanel* m_mainPanel;
-    clToolBar* m_toolbar97;
+    clToolBar* m_toolbar;
     wxPanel* m_panelControls;
     clDataViewListCtrl* m_dataView;
     wxTextCtrl* m_textCtrlLog;
@@ -128,7 +128,7 @@ protected:
     virtual void OnMenuitemsupportsearchMenuSelected(wxCommandEvent& event) { event.Skip(); }
 
 public:
-    clToolBar* GetToolbar97() { return m_toolbar97; }
+    clToolBar* GetToolbar() { return m_toolbar; }
     clDataViewListCtrl* GetDataView() { return m_dataView; }
     wxPanel* GetPanelControls() { return m_panelControls; }
     wxTextCtrl* GetTextCtrlLog() { return m_textCtrlLog; }

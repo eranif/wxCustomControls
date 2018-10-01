@@ -101,49 +101,18 @@ void clToolBar::RenderGroup(int& xx, clToolBar::ToolVect_t& G, wxDC& gcdc)
     });
 
     // Draw a rectangle
-#if defined(__WXOSX__)||defined(__WXMSW__)
-    bool hasGrouping = false;
-#else
     bool hasGrouping = !HasFlag(clToolBar::kMiniToolBar);
-#endif
-
     if(hasGrouping) {
-        wxRect bgRect = wxRect(wxPoint(xx, 0), wxSize(groupWidth, clientRect.GetHeight() - 2));
-        bool isLight = !DrawingUtils::IsDark(wxSystemSettings::GetColour(wxSYS_COLOUR_MENUBAR));
-        wxColour bgColour = wxSystemSettings::GetColour(wxSYS_COLOUR_MENUBAR);
-        if(isLight) {
-            wxColour fill_colour = bgColour.ChangeLightness(150);
-            wxColour dark_pen = bgColour.ChangeLightness(70);
-            wxColour light_pen = *wxWHITE;
-            bgRect.Deflate(1);
-            bgRect = bgRect.CenterIn(clientRect, wxVERTICAL);
-
-            gcdc.SetPen(light_pen);
-            gcdc.SetBrush(fill_colour);
-            bgRect.Offset(1, 1);
-            gcdc.DrawRectangle(bgRect);
-
-            bgRect.Offset(-1, -1);
-            gcdc.SetBrush(fill_colour);
-            gcdc.SetPen(dark_pen);
-            gcdc.DrawRectangle(bgRect);
-
-        } else {
-            wxColour fill_colour = bgColour.ChangeLightness(110);
-            wxColour dark_pen = bgColour.ChangeLightness(70);
-            wxColour light_pen = bgColour.ChangeLightness(110);
-            bgRect.Deflate(1);
-            bgRect = bgRect.CenterIn(clientRect, wxVERTICAL);
-
-            gcdc.SetPen(light_pen);
-            gcdc.SetBrush(fill_colour);
-            bgRect.Offset(1, 1);
-            gcdc.DrawRectangle(bgRect);
-
-            bgRect.Offset(-1, -1);
-            gcdc.SetBrush(fill_colour);
-            gcdc.SetPen(dark_pen);
-            gcdc.DrawRectangle(bgRect);
+        wxRect bgRect = wxRect(wxPoint(xx, 0), wxSize(groupWidth, clientRect.GetHeight()));
+        bgRect.SetWidth(bgRect.GetWidth() + GetGroupSapcing() / 2);
+        {
+            gcdc.SetPen(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNSHADOW));
+            gcdc.DrawLine(bgRect.GetTopRight(), bgRect.GetBottomRight());
+        }
+        bgRect.SetWidth(bgRect.GetWidth() + 1);
+        {
+            gcdc.SetPen(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+            gcdc.DrawLine(bgRect.GetTopRight(), bgRect.GetBottomRight());
         }
     }
 
@@ -552,3 +521,7 @@ void clToolBar::SplitGroups(std::vector<ToolVect_t>& G)
 
     if(!curG.empty()) { G.push_back(curG); }
 }
+
+int clToolBar::GetXSpacer() const { return HasFlag(kMiniToolBar) ? 5 : 10; }
+
+int clToolBar::GetYSpacer() const { return HasFlag(kMiniToolBar) ? 5 : 10; }

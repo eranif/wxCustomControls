@@ -32,31 +32,31 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     wxBoxSizer* boxSizer11 = new wxBoxSizer(wxVERTICAL);
     m_mainPanel->SetSizer(boxSizer11);
 
-    m_toolbar97 =
+    m_toolbar =
         new clToolBar(m_mainPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainPanel, wxSize(-1, -1)), wxTB_FLAT);
-    m_toolbar97->SetToolBitmapSize(wxSize(16, 16));
+    m_toolbar->SetToolBitmapSize(wxSize(16, 16));
 
-    boxSizer11->Add(m_toolbar97, 0, wxEXPAND, WXC_FROM_DIP(5));
+    boxSizer11->Add(m_toolbar, 0, wxEXPAND, WXC_FROM_DIP(5));
 
-    m_toolbar97->AddTool(wxID_OPEN, _("Open"), wxXmlResource::Get()->LoadBitmap(wxT("16-folder-open-regular@2x")),
-                         wxNullBitmap, wxITEM_DROPDOWN, wxT(""), wxT(""), NULL);
+    m_toolbar->AddTool(wxID_OPEN, _("Open"), wxXmlResource::Get()->LoadBitmap(wxT("16-folder-open-regular@2x")),
+                       wxNullBitmap, wxITEM_DROPDOWN, wxT(""), wxT(""), NULL);
 
-    m_toolbar97->AddTool(wxID_NEW, _("Tool Label"), wxXmlResource::Get()->LoadBitmap(wxT("16-mime-txt@2x")),
-                         wxNullBitmap, wxITEM_NORMAL, wxT(""), wxT(""), NULL);
+    m_toolbar->AddTool(wxID_NEW, _("Tool Label"), wxXmlResource::Get()->LoadBitmap(wxT("16-mime-txt@2x")), wxNullBitmap,
+                       wxITEM_NORMAL, wxT(""), wxT(""), NULL);
 
-    m_toolbar97->AddSeparator();
+    m_toolbar->AddSeparator();
 
-    m_toolbar97->AddTool(wxID_BOOKMARK, _("Tool Label"), wxXmlResource::Get()->LoadBitmap(wxT("16-bookmark-yellow@2x")),
-                         wxNullBitmap, wxITEM_CHECK, wxT(""), wxT(""), NULL);
+    m_toolbar->AddTool(wxID_BOOKMARK, _("Tool Label"), wxXmlResource::Get()->LoadBitmap(wxT("16-bookmark-yellow@2x")),
+                       wxNullBitmap, wxITEM_CHECK, wxT(""), wxT(""), NULL);
 
-    m_toolbar97->AddTool(wxID_COLOURS, _("Tool Label"), wxXmlResource::Get()->LoadBitmap(wxT("16-colour-pallette@2x")),
-                         wxNullBitmap, wxITEM_CHECK, wxT(""), wxT(""), NULL);
+    m_toolbar->AddTool(wxID_COLOURS, _("Tool Label"), wxXmlResource::Get()->LoadBitmap(wxT("16-colour-pallette@2x")),
+                       wxNullBitmap, wxITEM_CHECK, wxT(""), wxT(""), NULL);
 
-    m_toolbar97->AddTool(wxID_ANY, _("Another Tool"), wxXmlResource::Get()->LoadBitmap(wxT("16-file-regular@2x")),
-                         wxNullBitmap, wxITEM_CHECK, wxT(""), wxT(""), NULL);
+    m_toolbar->AddTool(wxID_ANY, _("Another Tool"), wxXmlResource::Get()->LoadBitmap(wxT("16-file-regular@2x")),
+                       wxNullBitmap, wxITEM_CHECK, wxT(""), wxT(""), NULL);
 
-    m_toolbar97->AddSeparator();
-    m_toolbar97->Realize();
+    m_toolbar->AddSeparator();
+    m_toolbar->Realize();
 
     m_panelControls =
         new wxPanel(m_mainPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainPanel, wxSize(-1, -1)), wxTAB_TRAVERSAL);

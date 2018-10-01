@@ -62,7 +62,10 @@ public:
         }
     }
     bool HasFlag(eFlags flag) const { return m_flags & flag; }
-
+    
+    int GetXSpacer() const;
+    int GetYSpacer() const;
+    
     /**
      * @brief set a drop down menu for a button
      */
