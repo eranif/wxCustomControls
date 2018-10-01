@@ -103,6 +103,10 @@ void clToolBar::RenderGroup(int& xx, const clToolBar::ToolVect_t& G, wxDC& gcdc,
 
     if(!isLastGroup) {
         wxRect bgRect = wxRect(wxPoint(xx, 0), wxSize(groupWidth, clientRect.GetHeight()));
+#ifdef __WXOSX__
+        bgRect.SetHeight(bgRect.GetHeight() - 5);
+        bgRect = bgRect.CenterIn(clientRect, wxVERTICAL);
+#endif
         bgRect.SetWidth(bgRect.GetWidth() + GetGroupSapcing() / 2);
         {
             wxColour lineColour = DrawingUtils::GetMenuBarBgColour(false);
@@ -118,6 +122,7 @@ void clToolBar::RenderGroup(int& xx, const clToolBar::ToolVect_t& G, wxDC& gcdc,
             gcdc.DrawLine(bgRect.GetTopRight(), bgRect.GetBottomRight());
         }
     }
+    
     // Now draw the buttons
     std::for_each(G.begin(), G.end(), [&](clToolBarButtonBase* button) {
         wxSize buttonSize = button->CalculateSize(gcdc);
