@@ -345,6 +345,11 @@ void DrawingUtils::FillMenuBarBgColour(wxDC& dc, const wxRect& rect, bool miniTo
     dc.SetPen(bgColour);
     dc.SetBrush(bgColour);
     dc.DrawRectangle(rect);
+    
+    wxColour lineColour = bgColour;
+    lineColour = lineColour.ChangeLightness(90);
+    dc.SetPen(lineColour);
+    dc.DrawLine(rect.GetBottomLeft(), rect.GetBottomRight());
 #endif
 }
 

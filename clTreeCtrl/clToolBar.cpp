@@ -106,12 +106,16 @@ void clToolBar::RenderGroup(int& xx, clToolBar::ToolVect_t& G, wxDC& gcdc)
         wxRect bgRect = wxRect(wxPoint(xx, 0), wxSize(groupWidth, clientRect.GetHeight()));
         bgRect.SetWidth(bgRect.GetWidth() + GetGroupSapcing() / 2);
         {
-            gcdc.SetPen(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNSHADOW));
+            wxColour lineColour = DrawingUtils::GetMenuBarBgColour(false);
+            lineColour = lineColour.ChangeLightness(90);
+            gcdc.SetPen(lineColour);
             gcdc.DrawLine(bgRect.GetTopRight(), bgRect.GetBottomRight());
         }
         bgRect.SetWidth(bgRect.GetWidth() + 1);
         {
-            gcdc.SetPen(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+            wxColour lineColour = DrawingUtils::GetMenuBarBgColour(false);
+            lineColour = lineColour.ChangeLightness(110);
+            gcdc.SetPen(lineColour);
             gcdc.DrawLine(bgRect.GetTopRight(), bgRect.GetBottomRight());
         }
     }
