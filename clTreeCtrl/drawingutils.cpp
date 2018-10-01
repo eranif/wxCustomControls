@@ -301,7 +301,7 @@ wxColour DrawingUtils::GetMenuTextColour() { return wxSystemSettings::GetColour(
 wxColour DrawingUtils::GetMenuBarBgColour(bool miniToolbar)
 {
 #ifdef __WXMSW__
-    //return miniToolbar ? wxSystemSettings::GetColour(wxSYS_COLOUR_MENUBAR) : wxColour("rgb(245,246,247)");
+    // return miniToolbar ? wxSystemSettings::GetColour(wxSYS_COLOUR_MENUBAR) : wxColour("rgb(245,246,247)");
     return wxColour("rgb(245,246,247)");
 #elif defined(__WXOSX__)
     wxUnusedVar(miniToolbar);
@@ -323,7 +323,9 @@ void DrawingUtils::FillMenuBarBgColour(wxDC& dc, const wxRect& rect, bool miniTo
     } else {
         wxColour topColour(*wxWHITE);
         wxColour brushColour(GetMenuBarBgColour(false));
-        wxColour bottomColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNSHADOW));
+
+        wxColour bottomColour = brushColour;
+        bottomColour = bottomColour.ChangeLightness(90);
 
         dc.SetPen(brushColour);
         dc.SetBrush(brushColour);
@@ -331,7 +333,7 @@ void DrawingUtils::FillMenuBarBgColour(wxDC& dc, const wxRect& rect, bool miniTo
 
         dc.SetPen(topColour);
         dc.DrawLine(rect.GetTopLeft(), rect.GetTopRight());
-        
+
         dc.SetPen(bottomColour);
         dc.DrawLine(rect.GetBottomLeft(), rect.GetBottomRight());
     }
@@ -345,7 +347,7 @@ void DrawingUtils::FillMenuBarBgColour(wxDC& dc, const wxRect& rect, bool miniTo
     dc.SetPen(bgColour);
     dc.SetBrush(bgColour);
     dc.DrawRectangle(rect);
-    
+
     wxColour lineColour = bgColour;
     lineColour = lineColour.ChangeLightness(90);
     dc.SetPen(lineColour);
