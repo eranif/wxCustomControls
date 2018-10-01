@@ -39,6 +39,8 @@
       <File Name="clTreeCtrl.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="ToolBar">
+      <File Name="clToolBarStretchableSpace.cpp"/>
+      <File Name="clToolBarStretchableSpace.h"/>
       <File Name="clToolBarToggleButton.h"/>
       <File Name="clToolBarToggleButton.cpp"/>
       <File Name="clToolBarSpacer.h"/>

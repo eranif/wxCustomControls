@@ -44,6 +44,8 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     m_toolbar->AddTool(wxID_NEW, _("Tool Label"), wxXmlResource::Get()->LoadBitmap(wxT("16-mime-txt@2x")), wxNullBitmap,
                        wxITEM_NORMAL, wxT(""), wxT(""), NULL);
 
+    m_toolbar->AddStretchableSpace();
+
     m_toolbar->AddSeparator();
 
     m_toolbar->AddTool(wxID_BOOKMARK, _("Tool Label"), wxXmlResource::Get()->LoadBitmap(wxT("16-bookmark-yellow@2x")),
@@ -54,8 +56,6 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
 
     m_toolbar->AddTool(wxID_ANY, _("Another Tool"), wxXmlResource::Get()->LoadBitmap(wxT("16-file-regular@2x")),
                        wxNullBitmap, wxITEM_CHECK, wxT(""), wxT(""), NULL);
-
-    m_toolbar->AddSeparator();
     m_toolbar->Realize();
 
     m_panelControls =

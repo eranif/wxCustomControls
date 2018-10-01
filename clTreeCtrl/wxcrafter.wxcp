@@ -1,7 +1,7 @@
 {
  "metadata": {
   "m_generatedFilesDir": ".",
-  "m_objCounter": 121,
+  "m_objCounter": 125,
   "m_includeFiles": [],
   "m_bitmapFunction": "wxC9ED9InitBitmapResources",
   "m_bitmapsFile": "wxcrafter_bitmaps.cpp",
@@ -400,6 +400,26 @@
              "m_events": [],
              "m_children": []
             }, {
+             "m_type": 4517,
+             "proportion": 0,
+             "border": 5,
+             "gbSpan": "1,1",
+             "gbPosition": "0,0",
+             "m_styles": [],
+             "m_sizerFlags": [],
+             "m_properties": [{
+               "type": "string",
+               "m_label": "Name:",
+               "m_value": "m_toolbarSpacer125"
+              }, {
+               "type": "choice",
+               "m_label": "Kind:",
+               "m_selection": 0,
+               "m_options": ["space"]
+              }],
+             "m_events": [],
+             "m_children": []
+            }, {
              "m_type": 4504,
              "proportion": 0,
              "border": 5,
@@ -567,26 +587,6 @@
                "type": "bool",
                "m_label": "Construct the Dropdown Menu:",
                "m_value": true
-              }],
-             "m_events": [],
-             "m_children": []
-            }, {
-             "m_type": 4504,
-             "proportion": 0,
-             "border": 5,
-             "gbSpan": "1,1",
-             "gbPosition": "0,0",
-             "m_styles": [],
-             "m_sizerFlags": [],
-             "m_properties": [{
-               "type": "string",
-               "m_label": "Name:",
-               "m_value": "m_tbSeparator119"
-              }, {
-               "type": "choice",
-               "m_label": "Kind:",
-               "m_selection": 0,
-               "m_options": ["separator"]
               }],
              "m_events": [],
              "m_children": []
