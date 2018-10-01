@@ -34,17 +34,17 @@ void clToolBarButtonBase::Render(wxDC& dc, const wxRect& rect)
     if(DrawingUtils::IsDark(bgHighlightColour)) { bgHighlightColour = bgHighlightColour.ChangeLightness(140); }
 #endif
 
-#if defined(__WXOSX__)||defined(__WXMSW__)
+#if defined(__WXOSX__) || defined(__WXMSW__)
     bool hasGrouping = false;
 #else
     bool hasGrouping = !m_toolbar->HasFlag(clToolBar::kMiniToolBar);
 #endif
     const wxRect clientRect = m_toolbar->GetClientRect();
     const wxColour bgColour = m_toolbar->HasFlag(clToolBar::kMiniToolBar)
-                            ? colours.GetFillColour()
-                            : wxSystemSettings::GetColour(wxSYS_COLOUR_MENUBAR);
+                                  ? colours.GetFillColour()
+                                  : wxSystemSettings::GetColour(wxSYS_COLOUR_MENUBAR);
     if(IsEnabled() && (IsPressed() || IsChecked())) {
-        wxColour pressBgColour = bgColour.ChangeLightness(90);
+        wxColour pressBgColour = bgColour.ChangeLightness(85);
         wxRect highlightRect = m_buttonRect;
         penColour = pressBgColour;
 
@@ -56,7 +56,7 @@ void clToolBarButtonBase::Render(wxDC& dc, const wxRect& rect)
         }
         dc.SetBrush(pressBgColour);
         dc.SetPen(penColour);
-        dc.DrawRectangle(highlightRect);
+        dc.DrawRoundedRectangle(highlightRect, 3.0);
         textColour = colours.GetSelItemTextColour();
         buttonColour = colours.GetSelbuttonColour();
 
@@ -106,7 +106,7 @@ void clToolBarButtonBase::Render(wxDC& dc, const wxRect& rect)
                         wxPoint(xx, m_buttonRect.GetY() + m_buttonRect.GetHeight() - 2));
         }
         xx += CL_TOOL_BAR_X_MARGIN;
-        DrawingUtils::DrawDropDownArrow(nullptr, dc, m_dropDownArrowRect, buttonColour);
+        DrawingUtils::DrawDropDownArrow(nullptr, dc, m_dropDownArrowRect);
         xx += CL_TOOL_BAR_DROPDOWN_ARROW_SIZE;
         xx += CL_TOOL_BAR_X_MARGIN;
     }

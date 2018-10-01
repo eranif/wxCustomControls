@@ -310,8 +310,8 @@ wxColour DrawingUtils::GetMenuBarBgColour()
 void DrawingUtils::FillMenuBarBgColour(wxDC& dc, const wxRect& rect, bool miniToolbar)
 {
 #ifdef __WXMSW__
-    if(miniToolbar && false) {
-        wxColour bgColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE);
+    if(miniToolbar) {
+        wxColour bgColour = wxSystemSettings::GetColour(wxSYS_COLOUR_MENUBAR);
         dc.SetPen(bgColour);
         dc.SetBrush(bgColour);
         dc.DrawRectangle(rect);
@@ -460,20 +460,20 @@ wxBitmap DrawingUtils::CreateDisabledBitmap(const wxBitmap& bmp)
 {
 #ifdef __WXOSX__
     return bmp.ConvertToDisabled(255);
-#elif defined(__WXGTK__)
+#elif defined(__WXGTK__) || defined(__WXMSW__)
     bool bDarkBG = IsDark(GetPanelBgColour());
     return bmp.ConvertToDisabled(bDarkBG ? 20 : 255);
-#else
-    bool bDarkBG = IsDark(GetPanelBgColour());
-    wxImage img = bmp.ConvertToImage();
-    img = img.ConvertToGreyscale();
-    wxBitmap greyBmp(img);
-    if(bDarkBG) {
-        return greyBmp.ConvertToDisabled(20);
-
-    } else {
-        return greyBmp.ConvertToDisabled(255);
-    }
+//#else
+//    bool bDarkBG = IsDark(GetPanelBgColour());
+//    wxImage img = bmp.ConvertToImage();
+//    img = img.ConvertToGreyscale();
+//    wxBitmap greyBmp(img);
+//    if(bDarkBG) {
+//        return greyBmp.ConvertToDisabled(20);
+//
+//    } else {
+//        return greyBmp.ConvertToDisabled(255);
+//    }
 #endif
 }
 
@@ -576,7 +576,7 @@ void DrawingUtils::DrawButton(wxDC& dc, wxWindow* win, const wxRect& rect, const
     if(kind == eButtonKind::kDropDown) {
         dc.SetPen(penColour);
         dc.SetBrush(baseColour);
-        DrawDropDownArrow(win, dc, arrowRect, textColour);
+        DrawDropDownArrow(win, dc, arrowRect);
         dc.SetPen(penColour);
         dc.DrawLine(arrowRect.GetX(), clientRect.GetTopLeft().y, arrowRect.GetX(), clientRect.GetBottomLeft().y);
     }
@@ -642,8 +642,19 @@ void DrawingUtils::DrawDropDownArrow(wxWindow* win, wxDC& dc, const wxRect& rect
     points[2].x = arrowRect.GetBottomLeft().x + (arrowRect.GetWidth() / 2);
     points[2].y = arrowRect.GetBottomLeft().y;
 
-    dc.SetPen(colour);
-    dc.SetBrush(colour);
+    // if a user provided a colour for the button, use it
+    wxColour buttonColour = colour;
+    if(!buttonColour.IsOk()) {
+        // No colour provided, provide one
+        if(DrawingUtils::IsDark(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE))) {
+            buttonColour = wxColour("#FDFEFE");
+        } else {
+            buttonColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW);
+        }
+    }
+    
+    dc.SetPen(buttonColour);
+    dc.SetBrush(buttonColour);
     dc.DrawPolygon(3, points);
 }
 

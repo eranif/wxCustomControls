@@ -29,6 +29,7 @@ clToolBar::clToolBar(wxWindow* parent, wxWindowID winid, const wxPoint& pos, con
     Bind(wxEVT_ERASE_BACKGROUND, &clToolBar::OnEraseBackground, this);
     Bind(wxEVT_LEFT_UP, &clToolBar::OnLeftUp, this);
     Bind(wxEVT_LEFT_DOWN, &clToolBar::OnLeftDown, this);
+    Bind(wxEVT_LEFT_DCLICK, &clToolBar::OnLeftDown, this);
     Bind(wxEVT_MOTION, &clToolBar::OnMotion, this);
     Bind(wxEVT_ENTER_WINDOW, &clToolBar::OnEnterWindow, this);
     Bind(wxEVT_LEAVE_WINDOW, &clToolBar::OnLeaveWindow, this);
@@ -44,6 +45,7 @@ clToolBar::~clToolBar()
     Unbind(wxEVT_ENTER_WINDOW, &clToolBar::OnEnterWindow, this);
     Unbind(wxEVT_LEAVE_WINDOW, &clToolBar::OnLeaveWindow, this);
     Unbind(wxEVT_LEFT_DOWN, &clToolBar::OnLeftDown, this);
+    Unbind(wxEVT_LEFT_DCLICK, &clToolBar::OnLeftDown, this);
     Unbind(wxEVT_SIZE, &clToolBar::OnSize, this);
 
     for(size_t i = 0; i < m_buttons.size(); ++i) {
@@ -83,7 +85,7 @@ void clToolBar::OnPaint(wxPaintEvent& event)
 
     // If we have overflow buttons, draw an arrow to the right
     if(!m_overflowButtons.empty() || IsCustomisationEnabled()) {
-        DrawingUtils::DrawDropDownArrow(this, gcdc, chevronRect, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
+        DrawingUtils::DrawDropDownArrow(this, gcdc, chevronRect);
         m_chevronRect = chevronRect;
     }
 }
@@ -185,7 +187,7 @@ void clToolBar::Realize()
     wxBitmap bmp(1, 1);
     wxMemoryDC dc(bmp);
     wxGCDC gcdc(dc);
-    gcdc.SetFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
+    gcdc.SetFont(DrawingUtils::GetDefaultGuiFont());
     SetSizeHints(CalculateRect(gcdc).GetSize());
     Refresh();
 }

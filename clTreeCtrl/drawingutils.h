@@ -81,8 +81,9 @@ public:
 
     /**
      * @brief draw a drop down arrow
+     * pass an invalid colour to let this function determine the best colour to use
      */
-    static void DrawDropDownArrow(wxWindow* win, wxDC& dc, const wxRect& rect, const wxColour& colour);
+    static void DrawDropDownArrow(wxWindow* win, wxDC& dc, const wxRect& rect, const wxColour& colour = wxColour());
 
     static void DrawNativeChoice(wxWindow* win, wxDC& dc, const wxRect& rect, const wxString& label,
                                  const wxBitmap& bmp = wxNullBitmap,
