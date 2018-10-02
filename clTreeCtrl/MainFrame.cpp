@@ -148,7 +148,11 @@ MainFrame::MainFrame(wxWindow* parent)
         m_treeCtrl->PopupMenu(&menu);
     });
 
+    //===-----------------------------------------------------------------------------
+    //===-----------------------------------------------------------------------------
     // Data view events
+    //===-----------------------------------------------------------------------------
+    //===-----------------------------------------------------------------------------
     m_dataView->Bind(wxEVT_DATAVIEW_ITEM_ACTIVATED, [&](wxDataViewEvent& event) {
         event.Skip();
         wxDataViewItemArray items;
@@ -185,7 +189,8 @@ MainFrame::MainFrame(wxWindow* parent)
     m_dataView->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, [&](wxDataViewEvent& event) {
         event.Skip();
         LogMessage("DV Context menu dropped: ");
-        LogMessage(wxString() << "Context menu on item: " << m_dataView->GetItemText(event.GetItem()));
+        LogMessage(wxString() << "Context menu on item: " << m_dataView->GetItemText(event.GetItem())
+                              << ". Column: " << event.GetColumn());
     });
     m_treeCtrl->Bind(wxEVT_TREE_SEARCH_TEXT, &MainFrame::OnIncrementalSearch, this);
     m_treeCtrl->Bind(wxEVT_TREE_CLEAR_SEARCH, &MainFrame::OnResetSearch, this);
