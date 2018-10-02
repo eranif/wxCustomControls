@@ -10,7 +10,7 @@
       <Environment/>
       <Project Name="clTreeCtrl" ConfigName="Release"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Debug_Linux" Selected="no">
+    <WorkspaceConfiguration Name="Debug_Linux" Selected="yes">
       <Environment/>
       <Project Name="clTreeCtrl" ConfigName="Debug_Linux"/>
     </WorkspaceConfiguration>
@@ -22,7 +22,7 @@
       <Environment/>
       <Project Name="clTreeCtrl" ConfigName="OSX_Release"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="OSX_Debug" Selected="yes">
+    <WorkspaceConfiguration Name="OSX_Debug" Selected="no">
       <Environment/>
       <Project Name="clTreeCtrl" ConfigName="OSX_Debug"/>
     </WorkspaceConfiguration>

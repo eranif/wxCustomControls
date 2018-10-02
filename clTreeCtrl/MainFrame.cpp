@@ -128,7 +128,8 @@ MainFrame::MainFrame(wxWindow* parent)
 
     m_treeCtrl->Bind(wxEVT_TREE_ITEM_MENU, [&](wxTreeEvent& evt) {
         evt.Skip(); // Let the default action take place
-        LogMessage(wxString() << "Context menu for item: " << m_treeCtrl->GetItemText(evt.GetItem()));
+        LogMessage(wxString() << "Context menu for item: " << m_treeCtrl->GetItemText(evt.GetItem())
+                              << ", Column: " << evt.GetInt());
         wxMenu menu;
         menu.Append(wxID_OPEN);
         menu.Bind(wxEVT_MENU,
@@ -137,7 +138,9 @@ MainFrame::MainFrame(wxWindow* parent)
                       if(m_treeCtrl->GetSelections(items)) {
                           for(size_t i = 0; i < items.size(); ++i) {
                               MyItemData* cd = dynamic_cast<MyItemData*>(m_treeCtrl->GetItemData(items[i]));
-                              if(cd) { ::wxLaunchDefaultApplication(cd->GetPath()); }
+                              if(cd) {
+                                  ::wxLaunchDefaultApplication(cd->GetPath());
+                              }
                           }
                       }
                   },
@@ -193,7 +196,7 @@ MainFrame::MainFrame(wxWindow* parent)
     m_toolbar->Bind(wxEVT_TOOL_DROPDOWN, &MainFrame::OnOpenMenu, this, wxID_OPEN);
     m_toolbar->Bind(wxEVT_TOOL, &MainFrame::OnOpen, this, wxID_OPEN);
     m_toolbar->AddControl(new wxCheckBox(m_toolbar, wxID_ANY, _("My Checkbox")));
-    m_toolbar->SetMiniToolBar(false);
+    m_toolbar->SetMiniToolBar(true);
     m_toolbar->Realize();
 }
 
@@ -221,7 +224,9 @@ void MainFrame::LogMessage(const wxString& message) { wxLogMessage(message); }
 void MainFrame::OnOpenFolder(wxCommandEvent& event)
 {
     wxString path = wxDirSelector();
-    if(path.IsEmpty()) { return; }
+    if(path.IsEmpty()) {
+        return;
+    }
 
     m_path = path;
     wxTreeItemId item = m_treeCtrl->AppendItem(m_treeCtrl->GetRootItem(), path, 0, 1, new MyItemData(m_path, true));
@@ -318,7 +323,9 @@ void MainFrame::OnPrevSibling(wxCommandEvent& event)
 void MainFrame::OnToggleTheme(wxCommandEvent& event)
 {
     ++m_selectedColours;
-    if(m_selectedColours >= m_coloursArr.size()) { m_selectedColours = 0; }
+    if(m_selectedColours >= m_coloursArr.size()) {
+        m_selectedColours = 0;
+    }
 
     m_treeCtrl->SetColours(m_coloursArr[m_selectedColours]);
     m_dataView->SetColours(m_coloursArr[m_selectedColours]);
@@ -362,7 +369,9 @@ void MainFrame::DoAddRoot()
 void MainFrame::OnDVOpenFolder(wxCommandEvent& event)
 {
     wxString path = ::wxDirSelector();
-    if(path.IsEmpty()) { return; }
+    if(path.IsEmpty()) {
+        return;
+    }
     for(size_t i = 0; i < m_dataView->GetItemCount(); ++i) {
         MyDvData* d = reinterpret_cast<MyDvData*>(m_dataView->GetItemData(m_dataView->RowToItem(i)));
         wxDELETE(d);
@@ -446,7 +455,9 @@ void MainFrame::OnMenuitemsupportsearchMenuSelected(wxCommandEvent& event)
 void MainFrame::OnTreeFind(wxCommandEvent& event)
 {
     wxString findwhat = wxGetTextFromUser("Text to search", "Find");
-    if(findwhat.IsEmpty()) { return; }
+    if(findwhat.IsEmpty()) {
+        return;
+    }
 
     m_treeCtrl->ClearAllHighlights();
     wxTreeItemId where =
