@@ -59,6 +59,7 @@ MainFrame::MainFrame(wxWindow* parent)
     m_treeCtrl->AddHeader("Kind");
     m_treeCtrl->AddHeader("Size");
     m_treeCtrl->SetShowHeader(true);
+    m_treeCtrl->SetColumnWidth(0, wxCOL_WIDTH_AUTOSIZE);
     DoAddRoot();
 
     wxLog::SetActiveTarget(new wxLogTextCtrl(m_textCtrlLog));
@@ -138,9 +139,7 @@ MainFrame::MainFrame(wxWindow* parent)
                       if(m_treeCtrl->GetSelections(items)) {
                           for(size_t i = 0; i < items.size(); ++i) {
                               MyItemData* cd = dynamic_cast<MyItemData*>(m_treeCtrl->GetItemData(items[i]));
-                              if(cd) {
-                                  ::wxLaunchDefaultApplication(cd->GetPath());
-                              }
+                              if(cd) { ::wxLaunchDefaultApplication(cd->GetPath()); }
                           }
                       }
                   },
@@ -201,7 +200,7 @@ MainFrame::MainFrame(wxWindow* parent)
     m_toolbar->Bind(wxEVT_TOOL_DROPDOWN, &MainFrame::OnOpenMenu, this, wxID_OPEN);
     m_toolbar->Bind(wxEVT_TOOL, &MainFrame::OnOpen, this, wxID_OPEN);
     m_toolbar->AddControl(new wxCheckBox(m_toolbar, wxID_ANY, _("My Checkbox")));
-    m_toolbar->SetMiniToolBar(true);
+    m_toolbar->SetMiniToolBar(false);
     m_toolbar->Realize();
 }
 
@@ -229,9 +228,7 @@ void MainFrame::LogMessage(const wxString& message) { wxLogMessage(message); }
 void MainFrame::OnOpenFolder(wxCommandEvent& event)
 {
     wxString path = wxDirSelector();
-    if(path.IsEmpty()) {
-        return;
-    }
+    if(path.IsEmpty()) { return; }
 
     m_path = path;
     wxTreeItemId item = m_treeCtrl->AppendItem(m_treeCtrl->GetRootItem(), path, 0, 1, new MyItemData(m_path, true));
@@ -328,9 +325,7 @@ void MainFrame::OnPrevSibling(wxCommandEvent& event)
 void MainFrame::OnToggleTheme(wxCommandEvent& event)
 {
     ++m_selectedColours;
-    if(m_selectedColours >= m_coloursArr.size()) {
-        m_selectedColours = 0;
-    }
+    if(m_selectedColours >= m_coloursArr.size()) { m_selectedColours = 0; }
 
     m_treeCtrl->SetColours(m_coloursArr[m_selectedColours]);
     m_dataView->SetColours(m_coloursArr[m_selectedColours]);
@@ -374,9 +369,7 @@ void MainFrame::DoAddRoot()
 void MainFrame::OnDVOpenFolder(wxCommandEvent& event)
 {
     wxString path = ::wxDirSelector();
-    if(path.IsEmpty()) {
-        return;
-    }
+    if(path.IsEmpty()) { return; }
     for(size_t i = 0; i < m_dataView->GetItemCount(); ++i) {
         MyDvData* d = reinterpret_cast<MyDvData*>(m_dataView->GetItemData(m_dataView->RowToItem(i)));
         wxDELETE(d);
@@ -460,9 +453,7 @@ void MainFrame::OnMenuitemsupportsearchMenuSelected(wxCommandEvent& event)
 void MainFrame::OnTreeFind(wxCommandEvent& event)
 {
     wxString findwhat = wxGetTextFromUser("Text to search", "Find");
-    if(findwhat.IsEmpty()) {
-        return;
-    }
+    if(findwhat.IsEmpty()) { return; }
 
     m_treeCtrl->ClearAllHighlights();
     wxTreeItemId where =
@@ -525,3 +516,8 @@ void MainFrame::OnOpenMenu(wxCommandEvent& event)
     m_toolbar->ShowMenuForButton(event.GetId(), &m);
 }
 void MainFrame::OnColoursUI(wxUpdateUIEvent& event) { event.Enable(false); }
+void MainFrame::OnSetTreeColWidth(wxCommandEvent& event)
+{
+    int width = ::wxGetNumberFromUser(_("Set the column width"), _("New width"), _("New width"), 300, -2, 1000, this);
+    m_treeCtrl->SetColumnWidth(0, width);
+}

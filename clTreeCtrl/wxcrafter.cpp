@@ -132,6 +132,10 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     m_menuItemFind = new wxMenuItem(menu_clTreeCtrl, wxID_FIND, _("Find Item...\tCtrl-F"), wxT(""), wxITEM_NORMAL);
     menu_clTreeCtrl->Append(m_menuItemFind);
 
+    m_menuItemSetWidth =
+        new wxMenuItem(menu_clTreeCtrl, wxID_SET_TREE_COL_WIDTH, _("Set Column WIdth..."), wxT(""), wxITEM_NORMAL);
+    menu_clTreeCtrl->Append(m_menuItemSetWidth);
+
     menu_clTreeCtrl->AppendSeparator();
 
     m_menuItemExit = new wxMenuItem(menu_clTreeCtrl, wxID_EXIT, _("Exit\tAlt-X"), _("Quit"), wxITEM_NORMAL);
@@ -224,6 +228,8 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
                   wxCommandEventHandler(MainFrameBaseClass::OnDeleteAllItems), NULL, this);
     this->Connect(m_menuItemFind->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                   wxCommandEventHandler(MainFrameBaseClass::OnTreeFind), NULL, this);
+    this->Connect(m_menuItemSetWidth->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                  wxCommandEventHandler(MainFrameBaseClass::OnSetTreeColWidth), NULL, this);
     this->Connect(m_menuItemExit->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                   wxCommandEventHandler(MainFrameBaseClass::OnExit), NULL, this);
     this->Connect(m_menuItem83->GetId(), wxEVT_COMMAND_MENU_SELECTED,
@@ -276,6 +282,8 @@ MainFrameBaseClass::~MainFrameBaseClass()
                      wxCommandEventHandler(MainFrameBaseClass::OnDeleteAllItems), NULL, this);
     this->Disconnect(m_menuItemFind->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                      wxCommandEventHandler(MainFrameBaseClass::OnTreeFind), NULL, this);
+    this->Disconnect(m_menuItemSetWidth->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                     wxCommandEventHandler(MainFrameBaseClass::OnSetTreeColWidth), NULL, this);
     this->Disconnect(m_menuItemExit->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                      wxCommandEventHandler(MainFrameBaseClass::OnExit), NULL, this);
     this->Disconnect(m_menuItem83->GetId(), wxEVT_COMMAND_MENU_SELECTED,

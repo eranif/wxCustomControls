@@ -45,22 +45,23 @@ class MainFrameBaseClass : public wxFrame
 {
 public:
     enum {
-        ID_TOGGLE_THEMES = 10001,
-        ID_ZEBRA = 10002,
-        ID_DV_DELETE_ALL_ITEMS = 10003,
-        ID_FILL_WITH_5000_ENTRIES = 10004,
-        ID_DV_OPEN_FOLDER = 10005,
-        ID_SINGLE_SELECTION = 10006,
-        ID_HIDE_ROOT = 10007,
-        ID_PREV_SIBLING = 10008,
-        ID_NATIVE_HEADER = 10009,
-        ID_SHOW_SB_ON_FOCUS = 10010,
-        ID_NEXT_SIBLING = 10011,
-        ID_SELECT_CHILDREN = 10012,
-        ID_EXPAND_ALL = 10013,
-        ID_OPEN_FOLDER = 10014,
-        wxID_COLOURS = 10015,
-        wxID_BOOKMARK = 10016,
+        ID_NATIVE_HEADER = 10001,
+        wxID_BOOKMARK = 10002,
+        wxID_COLOURS = 10003,
+        ID_OPEN_FOLDER = 10004,
+        ID_EXPAND_ALL = 10005,
+        ID_SELECT_CHILDREN = 10006,
+        ID_NEXT_SIBLING = 10007,
+        wxID_SET_TREE_COL_WIDTH = 10008,
+        ID_SHOW_SB_ON_FOCUS = 10009,
+        ID_PREV_SIBLING = 10010,
+        ID_HIDE_ROOT = 10011,
+        ID_SINGLE_SELECTION = 10012,
+        ID_DV_OPEN_FOLDER = 10013,
+        ID_FILL_WITH_5000_ENTRIES = 10014,
+        ID_DV_DELETE_ALL_ITEMS = 10015,
+        ID_ZEBRA = 10016,
+        ID_TOGGLE_THEMES = 10017,
     };
 
 protected:
@@ -84,6 +85,7 @@ protected:
     wxMenuItem* m_menuItemDeleteAllItems;
     wxMenuItem* m_separator3;
     wxMenuItem* m_menuItemFind;
+    wxMenuItem* m_menuItemSetWidth;
     wxMenuItem* m_separator2;
     wxMenuItem* m_menuItemExit;
     wxMenu* menu_clDataViewListCtrl;
@@ -114,6 +116,7 @@ protected:
     virtual void OnPrevSibling(wxCommandEvent& event) { event.Skip(); }
     virtual void OnDeleteAllItems(wxCommandEvent& event) { event.Skip(); }
     virtual void OnTreeFind(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnSetTreeColWidth(wxCommandEvent& event) { event.Skip(); }
     virtual void OnExit(wxCommandEvent& event) { event.Skip(); }
     virtual void OnDVOpenFolder(wxCommandEvent& event) { event.Skip(); }
     virtual void OnFillWith500Entries(wxCommandEvent& event) { event.Skip(); }
