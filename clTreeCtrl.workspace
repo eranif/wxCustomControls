@@ -14,7 +14,7 @@
       <Environment/>
       <Project Name="clTreeCtrl" ConfigName="Debug_Linux"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Release_Linux" Selected="yes">
+    <WorkspaceConfiguration Name="Release_Linux" Selected="no">
       <Environment/>
       <Project Name="clTreeCtrl" ConfigName="Release_Linux"/>
     </WorkspaceConfiguration>
