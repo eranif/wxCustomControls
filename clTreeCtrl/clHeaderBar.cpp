@@ -18,8 +18,6 @@
 #define PEN_STYLE wxPENSTYLE_DOT
 #endif
 
-static wxCursor previousCursor = wxCursor();
-
 clHeaderBar::clHeaderBar(clControlWithItems* parent, const clColours& colours)
     : m_colours(colours)
 {
@@ -141,7 +139,7 @@ void clHeaderBar::OnMouseLeftDown(wxMouseEvent& event)
     m_draggedCol = HitBorder(x);
     if(m_draggedCol > wxNOT_FOUND) {
         // Get ready to drag
-        previousCursor = GetCursor();
+        m_previousCursor = GetCursor();
         SetCursor(wxCursor(wxCURSOR_SIZEWE));
         m_isDragging = true;
         CaptureMouse();
@@ -230,7 +228,7 @@ void clHeaderBar::DoCancelDrag()
 {
     m_isDragging = false;
     m_draggedCol = -1;
-    SetCursor(previousCursor);
-    previousCursor = wxCursor();
+    SetCursor(m_previousCursor);
+    m_previousCursor = wxCursor();
     if(HasCapture()) { ReleaseMouse(); }
 }

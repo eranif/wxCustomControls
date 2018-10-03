@@ -14,6 +14,7 @@ class WXDLLIMPEXP_SDK clHeaderBar : public wxPanel
     int m_flags = 0;
     bool m_isDragging = false;
     int m_draggedCol = wxNOT_FOUND;
+    wxCursor m_previousCursor;
 
 protected:
     void DoUpdateSize();
