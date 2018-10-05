@@ -723,6 +723,13 @@ bool clTreeCtrl::IsItemFullyVisible(clRowEntry* item) const
 void clTreeCtrl::EnsureItemVisible(clRowEntry* item, bool fromTop)
 {
     CHECK_PTR_RET(item)
+    if(m_model.GetOnScreenItems().empty()) {
+        // requesting to ensure item visibility before we drawn anyting on the screen
+        // to reduce any strange behaviours (e.g. 1/2 screen is displayed while we can display more items)
+        // turn the m_maxList flag to ON
+        m_maxList = true;
+    }
+    
     if(IsItemFullyVisible(item)) { return; }
     if(fromTop) {
         SetFirstItemOnScreen(item);
