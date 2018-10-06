@@ -74,7 +74,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
 
     m_dataView->AppendIconTextColumn(_("Path"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT,
                                      wxDATAVIEW_COL_RESIZABLE);
-    m_dataView->AppendTextColumn(_("Kind"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT,
+    m_dataView->AppendTextColumn(_("Is file?"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT,
                                  wxDATAVIEW_COL_RESIZABLE);
     m_dataView->AppendTextColumn(_("File size"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT,
                                  wxDATAVIEW_COL_RESIZABLE);

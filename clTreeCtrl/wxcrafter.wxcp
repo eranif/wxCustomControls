@@ -803,7 +803,7 @@
                  "m_properties": [{
                    "type": "string",
                    "m_label": "Name:",
-                   "m_value": "Kind"
+                   "m_value": "Is file?"
                   }, {
                    "type": "string",
                    "m_label": "Width:",

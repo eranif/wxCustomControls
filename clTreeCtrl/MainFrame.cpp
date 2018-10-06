@@ -32,6 +32,14 @@ static wxVariant MakeIconText(const wxString& text, int bmp_index)
     return v;
 }
 
+static wxVariant MakeCheckBox(bool checked, const wxString& text, int bmp_index)
+{
+    clDataViewCheckbox ict(checked, bmp_index, text);
+    wxVariant v;
+    v << ict;
+    return v;
+}
+
 MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
 {
@@ -83,6 +91,7 @@ MainFrame::MainFrame(wxWindow* parent)
     m_bitmaps.push_back(images.Bitmap("folder_open"));
     m_bitmaps.push_back(images.Bitmap("file"));
     m_treeCtrl->SetBitmaps(&m_bitmaps);
+    m_dataView->SetBitmaps(&m_bitmaps);
 
     m_treeCtrl->Bind(wxEVT_TREE_ITEM_EXPANDING, &MainFrame::OnItemExpanding, this);
     m_treeCtrl->Bind(wxEVT_TREE_DELETE_ITEM, &MainFrame::OnItemDeleted, this);
@@ -157,7 +166,10 @@ MainFrame::MainFrame(wxWindow* parent)
         wxDataViewItemArray items;
         if(m_dataView->GetSelections(items)) {
             for(size_t i = 0; i < items.size(); ++i) {
-                LogMessage(wxString() << "DV item activated: " << m_dataView->GetItemText(items.Item(i)));
+                LogMessage(wxString() << "DV item activated: "
+                                      << m_dataView->GetItemText(items.Item(i), event.GetColumn()));
+                LogMessage(wxString() << "DV item state: "
+                                      << m_dataView->IsItemChecked(items.Item(i), event.GetColumn()));
             }
         }
     });
@@ -387,8 +399,8 @@ void MainFrame::OnDVOpenFolder(wxCommandEvent& event)
             MyDvData* d = new MyDvData(fn.GetFullPath());
             if(wxDirExists(fn.GetFullPath())) {
                 // A directory
-                cols.push_back(filename);
-                cols.push_back(MakeIconText("Folder", 1));
+                cols.push_back(MakeCheckBox(false, fn.GetFullName(), 0));
+                cols.push_back(false);
                 cols.push_back("0KB");
 
             } else {
@@ -396,8 +408,8 @@ void MainFrame::OnDVOpenFolder(wxCommandEvent& event)
                 wxString t;
                 t << std::ceil((double)fn.GetSize().ToDouble() / 1024.0) << "KB";
 
-                cols.push_back(filename);
-                cols.push_back(MakeIconText("File", 0));
+                cols.push_back(MakeCheckBox(false, fn.GetFullName(), 2));
+                cols.push_back(true);
                 cols.push_back(t);
             }
             m_dataView->AppendItem(cols, (wxUIntPtr)d);
@@ -422,8 +434,6 @@ void MainFrame::OnFillWith500Entries(wxCommandEvent& event)
     wxString file_name = "A file name";
     wxString file_type = "File";
     wxString file_size = "100KB";
-
-    m_dataView->SetBitmaps(&m_bitmaps);
 
     // A nice trick to boost performance: remove the sorting method
     m_dataView->SetSortFunction(nullptr);
