@@ -12,6 +12,7 @@
 #include <wx/stopwatch.h>
 #include <wx/textdlg.h>
 #include <wx/utils.h>
+#include <wx/stattext.h>
 
 class MyDvData
 {
@@ -212,8 +213,17 @@ MainFrame::MainFrame(wxWindow* parent)
     m_toolbar->Bind(wxEVT_TOOL_DROPDOWN, &MainFrame::OnOpenMenu, this, wxID_OPEN);
     m_toolbar->Bind(wxEVT_TOOL, &MainFrame::OnOpen, this, wxID_OPEN);
     m_toolbar->AddControl(new wxCheckBox(m_toolbar, wxID_ANY, _("My Checkbox")));
-    m_toolbar->SetMiniToolBar(false);
+    m_toolbar->SetMiniToolBar(true);
     m_toolbar->Realize();
+    
+    clToolBar* tb = new clToolBar(this);
+    tb->SetMiniToolBar(true);
+    tb->AddControl(new wxStaticText(this, wxID_ANY, "", wxDefaultPosition, wxSize(250, -1)));
+    tb->AddStretchableSpace();
+    tb->AddTool(wxID_OPEN, _("Open"), images.Bitmap("folder"), "", wxITEM_NORMAL);
+    tb->AddTool(wxID_CLEAR, _("Clear"), images.Bitmap("file"), "", wxITEM_NORMAL);
+    tb->Realize();
+    GetSizer()->Add(tb, 0, wxEXPAND);
 }
 
 MainFrame::~MainFrame() {}
