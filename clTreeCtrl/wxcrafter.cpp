@@ -67,8 +67,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     m_panelControls->SetSizer(boxSizer71);
 
     m_dataView = new clDataViewListCtrl(m_panelControls, wxID_ANY, wxDefaultPosition,
-                                        wxDLG_UNIT(m_panelControls, wxSize(-1, -1)),
-                                        wxDV_ROW_LINES | wxDV_SINGLE | wxBORDER_THEME);
+                                        wxDLG_UNIT(m_panelControls, wxSize(-1, -1)), wxDV_ROW_LINES | wxDV_SINGLE);
 
     boxSizer71->Add(m_dataView, 1, wxALL | wxEXPAND, WXC_FROM_DIP(1));
 
@@ -191,7 +190,9 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
 
     SetName(wxT("MainFrameBaseClass"));
     SetSize(wxDLG_UNIT(this, wxSize(-1, -1)));
-    if(GetSizer()) { GetSizer()->Fit(this); }
+    if(GetSizer()) {
+        GetSizer()->Fit(this);
+    }
     if(GetParent()) {
         CentreOnParent(wxBOTH);
     } else {

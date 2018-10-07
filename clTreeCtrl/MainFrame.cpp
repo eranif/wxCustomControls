@@ -46,7 +46,8 @@ MainFrame::MainFrame(wxWindow* parent)
 {
     // Create some themes so we can toggle through them
     m_treeCtrl = new clTreeCtrl();
-    m_treeCtrl->Create(m_panelControls, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_ROW_LINES | wxBORDER_THEME);
+    m_treeCtrl->Create(m_panelControls, wxID_ANY, wxDefaultPosition, wxDefaultSize,
+                       wxTR_ROW_LINES | wxTR_ENABLE_SEARCH);
     m_panelControls->GetSizer()->Insert(0, m_treeCtrl, 1, wxEXPAND | wxALL, 2);
 
     clColours colours;
