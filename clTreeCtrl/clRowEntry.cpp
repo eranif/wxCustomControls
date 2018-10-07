@@ -396,7 +396,7 @@ void clRowEntry::Render(wxWindow* win, wxDC& dc, const clColours& c, int row_ind
         if(cell.IsBool()) {
             // Render the checkbox
             static int checkboxSize = wxNOT_FOUND;
-            if(checkboxSize == wxNOT_FOUND) { checkboxSize = wxSystemSettings::GetMetric(wxSYS_SMALLICON_X); }
+            if(checkboxSize == wxNOT_FOUND) { checkboxSize = 20; }
             textXOffset += X_SPACER;
             wxRect checkboxRect = wxRect(textXOffset, rowRect.GetY(), checkboxSize, checkboxSize);
             checkboxRect = checkboxRect.CenterIn(rowRect, wxVERTICAL);
