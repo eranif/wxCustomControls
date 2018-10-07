@@ -746,8 +746,8 @@ void clRowEntry::RenderCheckBox(wxWindow* win, wxDC& dc, const clColours& colour
     wxUnusedVar(colours);
     wxRendererNative::Get().DrawCheckBox(win, dc, rect, checked ? wxCONTROL_CHECKED : 0);
 #else
-    dc.SetPen(colours.GetBorderColour());
-    dc.SetBrush(*wxTRANSPARENT_BRUSH);
+    dc.SetPen(wxPen(colours.GetBorderColour(), 2));
+    dc.SetBrush(checked ? colours.GetBorderColour() : *wxTRANSPARENT_BRUSH);
     dc.DrawRoundedRectangle(rect, 2.0);
     if(checked) {
         wxRect innerRect = rect;

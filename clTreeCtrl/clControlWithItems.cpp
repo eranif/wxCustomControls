@@ -272,7 +272,7 @@ void clControlWithItems::UpdateScrollBar()
         int position = m_firstColumn;
         
         int pixels_after = rangeSize - m_firstColumn - thumbSize;
-        if(pixels_after < 0) {
+        if((pixels_after < 0) && (rangeSize > thumbSize)) {
            // m_firstColumn += pixels_after; // reduce it from the left side
             clHeaderItem& column = GetHeader()->Item(GetHeader()->size()-1);
             column.UpdateWidth(column.GetWidth() - pixels_after);
