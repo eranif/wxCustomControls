@@ -748,11 +748,11 @@ void clRowEntry::RenderCheckBox(wxWindow* win, wxDC& dc, const clColours& colour
 #else
     dc.SetPen(colours.GetBorderColour());
     dc.SetBrush(*wxTRANSPARENT_BRUSH);
-    dc.DrawRectangle(rect);
+    dc.DrawRoundedRectangle(rect, 2.0);
     if(checked) {
         wxRect innerRect = rect;
-        innerRect.Deflate(3);
-        const wxColour& penColour = IsSelected() ? colours.GetSelItemTextColour() : colours.GetItemTextColour();
+        innerRect.Deflate(5);
+        const wxColour& penColour = IsSelected() ? colours.GetSelItemTextColour() : colours.GetDarkBorderColour();
         dc.SetPen(wxPen(penColour, 3));
         
         wxPoint p1, p2, p3;
