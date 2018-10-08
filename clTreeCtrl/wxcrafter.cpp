@@ -182,7 +182,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     menu_Style->Append(m_menuItemHideHeaders);
 
     m_menuItemNativeHeader =
-        new wxMenuItem(menu_Style, ID_NATIVE_HEADER, _("Draw native header"), wxT(""), wxITEM_CHECK);
+        new wxMenuItem(menu_Style, ID_NATIVE_HEADER, _("Use Native Drawings"), wxT(""), wxITEM_CHECK);
     menu_Style->Append(m_menuItemNativeHeader);
 
     m_menuItemSupportSearch = new wxMenuItem(menu_Style, wxID_ANY, _("Enable Search"), wxT(""), wxITEM_CHECK);
@@ -190,9 +190,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
 
     SetName(wxT("MainFrameBaseClass"));
     SetSize(wxDLG_UNIT(this, wxSize(-1, -1)));
-    if(GetSizer()) {
-        GetSizer()->Fit(this);
-    }
+    if(GetSizer()) { GetSizer()->Fit(this); }
     if(GetParent()) {
         CentreOnParent(wxBOTH);
     } else {

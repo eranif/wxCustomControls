@@ -2408,7 +2408,7 @@
           }, {
            "type": "string",
            "m_label": "Label:",
-           "m_value": "Draw native header"
+           "m_value": "Use Native Drawings"
           }, {
            "type": "string",
            "m_label": "Shortcut:",

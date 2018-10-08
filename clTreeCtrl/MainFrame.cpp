@@ -439,9 +439,10 @@ void MainFrame::OnDVOpenFolder(wxCommandEvent& event)
 
 void MainFrame::OnNativeHeader(wxCommandEvent& event)
 {
-    m_treeCtrl->SetNativeHeader(event.IsChecked());
-    m_dataView->SetNativeHeader(event.IsChecked());
+    m_treeCtrl->SetNativeTheme(event.IsChecked());
+    m_dataView->SetNativeTheme(event.IsChecked());
 }
+
 void MainFrame::OnFillWith500Entries(wxCommandEvent& event)
 {
     wxBusyCursor bc;
