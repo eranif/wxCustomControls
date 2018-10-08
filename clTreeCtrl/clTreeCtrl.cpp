@@ -96,7 +96,7 @@ clTreeCtrl::~clTreeCtrl()
 
 void clTreeCtrl::OnPaint(wxPaintEvent& event)
 {
-    wxBufferedPaintDC pdc(this);
+    wxAutoBufferedPaintDC pdc(this);
     PrepareDC(pdc);
 
     wxGCDC dc(pdc);

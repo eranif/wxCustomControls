@@ -180,7 +180,7 @@
       <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[CL_HOME=/home/eran/devl/codelite
-WX_CONFIG=/home/eran/devl/wxWidgets/build-debug-gtk3/wx-config]]>
+WX_CONFIG=/home/eran/devl/wxWidgets/build-release-gtk3/wx-config]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
         <DebuggerSearchPaths/>
