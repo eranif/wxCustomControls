@@ -9,10 +9,10 @@
 #include <wx/msgdlg.h>
 #include <wx/numdlg.h>
 #include <wx/popupwin.h>
+#include <wx/stattext.h>
 #include <wx/stopwatch.h>
 #include <wx/textdlg.h>
 #include <wx/utils.h>
-#include <wx/stattext.h>
 
 class MyDvData
 {
@@ -176,6 +176,14 @@ MainFrame::MainFrame(wxWindow* parent)
         }
     });
 
+    m_dataView->Bind(wxEVT_DATAVIEW_ITEM_VALUE_CHANGED, [&](wxDataViewEvent& event) {
+        event.Skip();
+        LogMessage(wxString() << "DV item value changed. Item label: "
+                              << m_dataView->GetItemText(event.GetItem(), event.GetColumn())
+                              << ". Column: " << event.GetColumn()
+                              << ". New value is: " << m_dataView->IsItemChecked(event.GetItem(), event.GetColumn()));
+    });
+    
     m_dataView->Bind(wxEVT_DATAVIEW_SELECTION_CHANGED, [&](wxDataViewEvent& event) {
         event.Skip();
         wxDataViewItem item = m_dataView->GetSelection();
@@ -216,7 +224,7 @@ MainFrame::MainFrame(wxWindow* parent)
     m_toolbar->AddControl(new wxCheckBox(m_toolbar, wxID_ANY, _("My Checkbox")));
     m_toolbar->SetMiniToolBar(false);
     m_toolbar->Realize();
-    
+
     clToolBar* tb = new clToolBar(this);
     tb->SetMiniToolBar(true);
     tb->AddControl(new wxStaticText(tb, wxID_ANY, "", wxDefaultPosition, wxSize(250, -1)));
