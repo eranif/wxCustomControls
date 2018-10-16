@@ -315,28 +315,23 @@ wxColour DrawingUtils::GetMenuBarBgColour(bool miniToolbar)
 void DrawingUtils::FillMenuBarBgColour(wxDC& dc, const wxRect& rect, bool miniToolbar)
 {
 #ifdef __WXMSW__
-    if(miniToolbar && false) {
-        wxColour bgColour = GetMenuBarBgColour(true);
-        dc.SetPen(bgColour);
-        dc.SetBrush(bgColour);
-        dc.DrawRectangle(rect);
-    } else {
-        wxColour topColour(*wxWHITE);
-        wxColour brushColour(GetMenuBarBgColour(false));
 
-        wxColour bottomColour = brushColour;
-        bottomColour = bottomColour.ChangeLightness(90);
+    wxColour topColour(*wxWHITE);
+    wxColour brushColour(GetMenuBarBgColour(false));
 
-        dc.SetPen(brushColour);
-        dc.SetBrush(brushColour);
-        dc.DrawRectangle(rect);
+    wxColour bottomColour = brushColour;
+    bottomColour = bottomColour.ChangeLightness(90);
 
-        dc.SetPen(topColour);
-        dc.DrawLine(rect.GetTopLeft(), rect.GetTopRight());
+    dc.SetPen(brushColour);
+    dc.SetBrush(brushColour);
+    dc.DrawRectangle(rect);
 
-        dc.SetPen(bottomColour);
-        dc.DrawLine(rect.GetBottomLeft(), rect.GetBottomRight());
-    }
+    dc.SetPen(topColour);
+    dc.DrawLine(rect.GetTopLeft(), rect.GetTopRight());
+
+    dc.SetPen(bottomColour);
+    dc.DrawLine(rect.GetBottomLeft(), rect.GetBottomRight());
+
 #elif defined(__WXOSX__)
     wxColour bgColour = GetMenuBarBgColour(false);
     dc.SetPen(bgColour);
@@ -603,31 +598,60 @@ wxColour DrawingUtils::GetButtonBgColour() { return wxSystemSettings::GetColour(
 wxColour DrawingUtils::GetButtonTextColour() { return wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT); }
 
 void DrawingUtils::DrawButtonX(wxDC& dc, wxWindow* win, const wxRect& rect, const wxColour& penColour,
-                               eButtonState state)
+                               const wxColour& bgColouur, eButtonState state)
 {
-    // Calculate the circle radius:
-    wxRect innerRect(rect);
-    wxColour colour = penColour;
-
-    // Default state: "normal"
-    dc.SetBrush(*wxTRANSPARENT_BRUSH);
-
+#if defined(__WXMSW__) || defined(__WXOSX__)
+    size_t flags = 0;
     switch(state) {
     case eButtonState::kHover:
-        colour = colour.ChangeLightness(120);
-        break;
+        flags = wxCONTROL_CURRENT;
         break;
     case eButtonState::kPressed:
-        colour = colour.ChangeLightness(80);
+        flags = wxCONTROL_PRESSED;
+        break;
+    default:
+        break;
+    }
+    wxRendererNative::Get().DrawTitleBarBitmap(win, dc, rect, wxTITLEBAR_BUTTON_CLOSE, flags);
+#ifdef __WXMSW__
+    if(IsDark(bgColouur)) {
+        dc.SetBrush(*wxTRANSPARENT_BRUSH);
+        dc.SetPen(bgColouur);
+        dc.DrawRectangle(rect);
+    }
+#endif
+#else
+    // Calculate the circle radius:
+    wxRect innerRect(rect);
+    wxColour b = bgColouur;
+    wxColour xColour = penColour;
+    switch(state) {
+    case eButtonState::kHover:
+        b = b.ChangeLightness(120);
+        break;
+    case eButtonState::kPressed:
+        b = b.ChangeLightness(70);
+        xColour = b.ChangeLightness(150);
         break;
     default:
         break;
     }
 
-    // Draw the 'x'
-    dc.SetPen(wxPen(colour, 2));
+    // Draw the background
+    if(state != eButtonState::kNormal) {
+        dc.SetPen(b);
+        dc.SetBrush(b);
+        dc.DrawRoundedRectangle(rect, 2.0);
+    }
+
+    // draw the x sign
+    innerRect.Deflate(4);
+    innerRect = innerRect.CenterIn(rect);
+    dc.SetPen(wxPen(xColour, 2));
+    dc.SetBrush(*wxTRANSPARENT_BRUSH);
     dc.DrawLine(innerRect.GetTopLeft(), innerRect.GetBottomRight());
     dc.DrawLine(innerRect.GetTopRight(), innerRect.GetBottomLeft());
+#endif
 }
 
 void DrawingUtils::DrawDropDownArrow(wxWindow* win, wxDC& dc, const wxRect& rect, const wxColour& colour)
@@ -685,7 +709,7 @@ void DrawingUtils::DrawNativeChoice(wxWindow* win, wxDC& dc, const wxRect& rect,
                                     const wxBitmap& bmp, int align)
 {
     wxRect choiceRect = rect;
-#if defined(__WXMSW__)||defined(__WXGTK__)
+#if defined(__WXMSW__) || defined(__WXGTK__)
 #ifdef __WXMSW__
     int width = wxSystemSettings::GetMetric(wxSYS_SMALLICON_X);
 #else
@@ -699,7 +723,7 @@ void DrawingUtils::DrawNativeChoice(wxWindow* win, wxDC& dc, const wxRect& rect,
     wxRendererNative::Get().DrawDropArrow(win, dc, dropDownRect, 0);
 #else
     // Windows & OSX
-    wxRendererNative::Get().DrawChoice(win, dc, rect, 0);
+    wxRendererNative::Get().DrawChoice(win, dc, choiceRect, 0);
 #endif
 
     // Common to all platforms: draw the text + bitmap
@@ -710,9 +734,10 @@ void DrawingUtils::DrawNativeChoice(wxWindow* win, wxDC& dc, const wxRect& rect,
     int xx = textRect.GetX() + X_MARGIN;
     if(bmp.IsOk()) {
         // Draw bitmap first
-        int bmpY = textRect.GetY() + ((textRect.GetHeight() - bmp.GetScaledHeight()) / 2);
-        dc.DrawBitmap(bmp, xx, bmpY);
-        xx += bmp.GetScaledWidth() + X_MARGIN;
+        wxRect bmpRect(xx, textRect.GetY(), bmp.GetScaledWidth(), bmp.GetScaledHeight());
+        bmpRect = bmpRect.CenterIn(choiceRect, wxVERTICAL);
+        dc.DrawBitmap(bmp, bmpRect.GetTopLeft());
+        xx += bmpRect.GetWidth() + X_MARGIN;
     }
     dc.SetFont(GetDefaultGuiFont());
     wxSize textSize = dc.GetTextExtent(label);
