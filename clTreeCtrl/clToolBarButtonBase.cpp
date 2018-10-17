@@ -36,7 +36,8 @@ void clToolBarButtonBase::Render(wxDC& dc, const wxRect& rect)
 
     const wxColour bgColour = DrawingUtils::GetMenuBarBgColour(m_toolbar->HasFlag(clToolBar::kMiniToolBar));
     if(IsEnabled() && (IsPressed() || IsChecked())) {
-        wxColour pressBgColour = bgColour.ChangeLightness(85);
+        wxColour highlightColour = bgColour;
+        wxColour pressBgColour = bgColour.ChangeLightness(70);
         wxRect highlightRect = m_buttonRect;
         penColour = pressBgColour;
         dc.SetBrush(pressBgColour);
@@ -46,11 +47,12 @@ void clToolBarButtonBase::Render(wxDC& dc, const wxRect& rect)
         buttonColour = colours.GetSelbuttonColour();
         
     } else if(IsEnabled() && IsHover()) {
-        wxColour hoverColour = DrawingUtils::IsDark(bgColour) ? bgColour.ChangeLightness(120) : *wxWHITE;
+        wxColour highlightColour = bgColour;
+        wxColour hoverColour = bgColour;
+        penColour = bgColour;
         wxRect highlightRect = m_buttonRect;
-        penColour = hoverColour;
         dc.SetBrush(hoverColour);
-        dc.SetPen(hoverColour);
+        dc.SetPen(penColour);
         dc.DrawRoundedRectangle(highlightRect, 3.0);
         textColour = colours.GetSelItemTextColour();
         buttonColour = colours.GetSelbuttonColour();

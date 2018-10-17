@@ -467,12 +467,8 @@ double wxOSXGetMainScreenContentScaleFactor();
 
 wxBitmap DrawingUtils::CreateDisabledBitmap(const wxBitmap& bmp)
 {
-#ifdef __WXOSX__
-    return bmp.ConvertToDisabled(255);
-#elif defined(__WXGTK__) || defined(__WXMSW__)
     bool bDarkBG = IsDark(GetPanelBgColour());
-    return bmp.ConvertToDisabled(bDarkBG ? 20 : 255);
-#endif
+    return bmp.ConvertToDisabled(bDarkBG ? 69 : 255);
 }
 
 #define DROPDOWN_ARROW_SIZE 20
@@ -676,8 +672,9 @@ void DrawingUtils::DrawDropDownArrow(wxWindow* win, wxDC& dc, const wxRect& rect
     wxColour buttonColour = colour;
     if(!buttonColour.IsOk()) {
         // No colour provided, provide one
-        if(DrawingUtils::IsDark(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE))) {
-            buttonColour = wxColour("#FDFEFE");
+        wxColour buttonFace = wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE);
+        if(DrawingUtils::IsDark(buttonFace)) {
+            buttonColour = buttonFace.ChangeLightness(150);
         } else {
             buttonColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW);
         }
@@ -722,8 +719,23 @@ void DrawingUtils::DrawNativeChoice(wxWindow* win, wxDC& dc, const wxRect& rect,
     wxRendererNative::Get().DrawPushButton(win, dc, choiceRect, 0);
     wxRendererNative::Get().DrawDropArrow(win, dc, dropDownRect, 0);
 #else
-    // Windows & OSX
-    wxRendererNative::Get().DrawChoice(win, dc, choiceRect, 0);
+    // OSX
+    wxColour bgColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE);
+    if(IsDark(bgColour)) {
+        // On Dark theme (Mojave and later)
+        int width = choiceRect.GetHeight();
+        wxRect dropDownRect = wxRect(0, 0, width, width);
+        int x = choiceRect.GetX() + choiceRect.GetWidth() - dropDownRect.GetWidth();
+        dropDownRect.SetX(x);
+        dropDownRect = dropDownRect.CenterIn(choiceRect, wxVERTICAL);
+        wxColour borderColour = wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT);
+        dc.SetBrush(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
+        dc.SetPen(borderColour);
+        dc.DrawRoundedRectangle(choiceRect, 3.0);
+        DrawDropDownArrow(win, dc, dropDownRect);
+    } else {
+        wxRendererNative::Get().DrawChoice(win, dc, choiceRect, 0);
+    }
 #endif
 
     // Common to all platforms: draw the text + bitmap
