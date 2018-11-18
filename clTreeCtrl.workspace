@@ -2,7 +2,7 @@
 <CodeLite_Workspace Name="clTreeCtrl" Database="" Version="10.0.0">
   <Project Name="clTreeCtrl" Path="clTreeCtrl/clTreeCtrl.project" Active="Yes"/>
   <BuildMatrix>
-    <WorkspaceConfiguration Name="Debug" Selected="yes">
+    <WorkspaceConfiguration Name="Debug" Selected="no">
       <Environment/>
       <Project Name="clTreeCtrl" ConfigName="Debug"/>
     </WorkspaceConfiguration>
@@ -26,7 +26,7 @@
       <Environment/>
       <Project Name="clTreeCtrl" ConfigName="OSX_Debug"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Debug_Linux_GTK3" Selected="no">
+    <WorkspaceConfiguration Name="Debug_Linux_GTK3" Selected="yes">
       <Environment/>
       <Project Name="clTreeCtrl" ConfigName="Debug_Linux_GTK3"/>
     </WorkspaceConfiguration>
