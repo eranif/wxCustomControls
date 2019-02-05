@@ -13,6 +13,7 @@
 #include <wx/stopwatch.h>
 #include <wx/textdlg.h>
 #include <wx/utils.h>
+#include <wx/ffile.h>
 
 class MyDvData
 {
@@ -155,6 +156,38 @@ MainFrame::MainFrame(wxWindow* parent)
                       }
                   },
                   wxID_OPEN);
+        menu.Append(wxID_NEW);
+        menu.Bind(wxEVT_MENU,
+                  [&](wxCommandEvent& e) {
+                      wxArrayTreeItemIds items;
+                      m_treeCtrl->GetSelections(items);
+                      MyItemData* cd = dynamic_cast<MyItemData*>(m_treeCtrl->GetItemData(items[0]));
+                      wxString name = ::wxGetTextFromUser("File name:");
+                      if(name.IsEmpty()) { return; }
+                      wxFileName filename(cd->GetPath(), name);
+
+                      // Create the new file
+                      wxFFile fp;
+                      fp.Open(filename.GetFullPath(), "a+");
+                      fp.Close();
+
+                      // Add the file to the tree
+                      wxTreeItemId fileItem = m_treeCtrl->AppendItem(items[0], filename.GetFullName(), 2, 2,
+                                                                     new MyItemData(filename.GetFullPath(), false));
+                      m_treeCtrl->SetItemText(fileItem, "File", 1);
+                      wxString t;
+                      t << std::ceil((double)filename.GetSize().ToDouble() / 1024.0) << "KB";
+                      m_treeCtrl->SetItemText(fileItem, t, 2);
+                      m_treeCtrl->EnsureVisible(fileItem);
+                  },
+                  wxID_NEW);
+        bool enableNew = false;
+        wxArrayTreeItemIds items;
+        if(m_treeCtrl->GetSelections(items) == 1) {
+            MyItemData* cd = dynamic_cast<MyItemData*>(m_treeCtrl->GetItemData(items[0]));
+            enableNew = cd->IsFolder();
+        }
+        menu.Enable(wxID_NEW, enableNew);
         m_treeCtrl->PopupMenu(&menu);
     });
 
@@ -183,7 +216,7 @@ MainFrame::MainFrame(wxWindow* parent)
                               << ". Column: " << event.GetColumn()
                               << ". New value is: " << m_dataView->IsItemChecked(event.GetItem(), event.GetColumn()));
     });
-    
+
     m_dataView->Bind(wxEVT_DATAVIEW_SELECTION_CHANGED, [&](wxDataViewEvent& event) {
         event.Skip();
         wxDataViewItem item = m_dataView->GetSelection();
