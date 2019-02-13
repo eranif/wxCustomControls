@@ -32,7 +32,7 @@ public:
      * @brief can we scroll down or right?
      */
     bool CanScollDown() const { return (GetThumbPosition() + GetThumbSize()) < GetRange(); }
-    virtual void SetColours(const clColours& colours) { wxUnusedVar(colours); }
+    virtual void SetColours(const clColours& colours);
 };
 
 #endif // CLSCROLLBAR_H

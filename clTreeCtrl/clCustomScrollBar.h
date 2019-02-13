@@ -45,9 +45,9 @@ public:
     int GetRange() const { return m_range; }
     int GetThumbPosition() const { return m_thumbPosition; }
     int GetThumbSize() const { return m_thumbSize; }
-    
-    /// Override's parent 
-    void SetColours(const clColours& colours) { m_colours = colours; }
+
+    /// Override's parent
+    virtual void SetColours(const clColours& colours);
 };
 
 #endif // CLCUSTOMSCROLLBAR_H

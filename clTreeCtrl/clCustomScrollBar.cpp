@@ -116,7 +116,7 @@ void clCustomScrollBar::UpdateDrag(const wxPoint& pt)
         pos = (m_range - m_thumbSize);
         if(IsVertical()) { pos += 1; }
     }
-    
+
     wxScrollEvent e(wxEVT_SCROLL_THUMBTRACK);
     e.SetEventObject(this);
     e.SetPosition(pos);
@@ -143,5 +143,11 @@ void clCustomScrollBar::OnMotion(wxMouseEvent& e)
 void clCustomScrollBar::OnSize(wxSizeEvent& e)
 {
     e.Skip();
+    Refresh();
+}
+
+void clCustomScrollBar::SetColours(const clColours& colours)
+{
+    m_colours = colours;
     Refresh();
 }

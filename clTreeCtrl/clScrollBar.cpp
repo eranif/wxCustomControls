@@ -14,3 +14,12 @@ void clScrollBar::SetScrollbar(int position, int thumbSize, int range, int pageS
     m_range_size = range;
     ScrollBarBase::SetScrollbar(position, thumbSize, range, pageSize, refresh);
 }
+
+void clScrollBar::SetColours(const clColours& colours)
+{
+#if defined(__WXMSW__) || defined(__WXGTK__)
+    ScrollBarBase::SetColours(colours);
+#else
+    wxUnusedVar(colours);
+#endif
+}
