@@ -4,8 +4,9 @@
 #include "codelite_exports.h"
 #include <wx/scrolbar.h>
 #include "clCustomScrollBar.h"
+#include "clColours.h"
 
-#if 1
+#if defined(__WXMSW__) || defined(__WXGTK__)
 #define ScrollBarBase clCustomScrollBar
 #else
 #define ScrollBarBase wxScrollBar
@@ -13,6 +14,7 @@
 
 class WXDLLIMPEXP_SDK clScrollBar : public ScrollBarBase
 {
+protected:
     int m_thumb_size = 0;
     int m_range_size = 0;
 
@@ -30,6 +32,7 @@ public:
      * @brief can we scroll down or right?
      */
     bool CanScollDown() const { return (GetThumbPosition() + GetThumbSize()) < GetRange(); }
+    virtual void SetColours(const clColours& colours) { wxUnusedVar(colours); }
 };
 
 #endif // CLSCROLLBAR_H

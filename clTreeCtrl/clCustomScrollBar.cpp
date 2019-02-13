@@ -1,6 +1,7 @@
 #include "clCustomScrollBar.h"
 #include <wx/dcbuffer.h>
 #include <wx/dcgraph.h>
+#include <wx/settings.h>
 
 clCustomScrollBar::clCustomScrollBar(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size,
                                      long style)
@@ -18,6 +19,7 @@ clCustomScrollBar::clCustomScrollBar(wxWindow* parent, wxWindowID id, const wxPo
         SetSizeHints(12, -1);
     }
     Bind(wxEVT_SIZE, &clCustomScrollBar::OnSize, this);
+    m_colours.InitFromColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE));
 }
 
 clCustomScrollBar::~clCustomScrollBar()
@@ -46,8 +48,8 @@ void clCustomScrollBar::OnPaint(wxPaintEvent& e)
     wxRect rect = GetClientRect();
     double major = IsHorizontal() ? rect.GetWidth() : rect.GetHeight();
 
-    dc.SetBrush(*wxCYAN);
-    dc.SetPen(*wxCYAN);
+    dc.SetBrush(m_colours.GetBgColour());
+    dc.SetPen(m_colours.GetBgColour());
     dc.DrawRectangle(rect);
 
     m_thumbRect = wxRect();
@@ -68,8 +70,8 @@ void clCustomScrollBar::OnPaint(wxPaintEvent& e)
             thumbRect.SetHeight(thumbMajor);
         }
         m_thumbRect = thumbRect;
-        dc.SetPen(*wxRED);
-        dc.SetBrush(*wxRED);
+        dc.SetPen(m_colours.GetBorderColour());
+        dc.SetBrush(m_colours.GetBorderColour());
         dc.DrawRoundedRectangle(m_thumbRect, 3.0);
     }
 }

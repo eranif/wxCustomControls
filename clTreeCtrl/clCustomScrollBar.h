@@ -3,6 +3,7 @@
 
 #include "codelite_exports.h"
 #include <wx/panel.h>
+#include "clColours.h"
 
 class WXDLLIMPEXP_SDK clCustomScrollBar : public wxPanel
 {
@@ -15,6 +16,7 @@ class WXDLLIMPEXP_SDK clCustomScrollBar : public wxPanel
     wxPoint m_mouseCapturePoint;
     wxPoint m_thumbCapturePoint;
     bool m_dragging = false;
+    clColours m_colours;
 
 protected:
     void OnPaint(wxPaintEvent& e);
@@ -43,6 +45,9 @@ public:
     int GetRange() const { return m_range; }
     int GetThumbPosition() const { return m_thumbPosition; }
     int GetThumbSize() const { return m_thumbSize; }
+    
+    /// Override's parent 
+    void SetColours(const clColours& colours) { m_colours = colours; }
 };
 
 #endif // CLCUSTOMSCROLLBAR_H
