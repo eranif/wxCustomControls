@@ -111,7 +111,7 @@ void clCustomScrollBar::UpdateDrag(const wxPoint& pt)
     wxScrollEvent e(wxEVT_SCROLL_THUMBTRACK);
     e.SetEventObject(this);
     e.SetPosition(pos);
-    GetEventHandler()->AddPendingEvent(e);
+    GetEventHandler()->ProcessEvent(e);
 }
 
 void clCustomScrollBar::OnMouseLeftUp(wxMouseEvent& e)
