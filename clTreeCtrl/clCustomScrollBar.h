@@ -21,6 +21,7 @@ protected:
     void OnMouseLeftDown(wxMouseEvent& e);
     void OnMouseLeftUp(wxMouseEvent& e);
     void OnMotion(wxMouseEvent& e);
+    void OnSize(wxSizeEvent& e);
     void UpdateDrag(const wxPoint& pt);
 
 public:

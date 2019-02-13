@@ -17,6 +17,7 @@ clCustomScrollBar::clCustomScrollBar(wxWindow* parent, wxWindowID id, const wxPo
     } else {
         SetSizeHints(12, -1);
     }
+    Bind(wxEVT_SIZE, &clCustomScrollBar::OnSize, this);
 }
 
 clCustomScrollBar::~clCustomScrollBar()
@@ -25,6 +26,7 @@ clCustomScrollBar::~clCustomScrollBar()
     Unbind(wxEVT_LEFT_DOWN, &clCustomScrollBar::OnMouseLeftDown, this);
     Unbind(wxEVT_LEFT_UP, &clCustomScrollBar::OnMouseLeftUp, this);
     Unbind(wxEVT_MOTION, &clCustomScrollBar::OnMotion, this);
+    Unbind(wxEVT_SIZE, &clCustomScrollBar::OnSize, this);
 }
 
 void clCustomScrollBar::SetScrollbar(int position, int thumbSize, int range, int pageSize, bool refresh)
@@ -42,7 +44,7 @@ void clCustomScrollBar::OnPaint(wxPaintEvent& e)
     wxGCDC dc(bdc);
 
     wxRect rect = GetClientRect();
-    int major = IsHorizontal() ? rect.GetWidth() : rect.GetHeight();
+    double major = IsHorizontal() ? rect.GetWidth() : rect.GetHeight();
 
     dc.SetBrush(*wxCYAN);
     dc.SetPen(*wxCYAN);
@@ -56,7 +58,7 @@ void clCustomScrollBar::OnPaint(wxPaintEvent& e)
         double ratio = m_thumbSize / m_range;
         int thumbMajor = major * ratio;
         int thumbPos = major * (m_thumbPosition / m_range);
-
+        if(thumbMajor < 10) { thumbMajor = 10; }
         wxRect thumbRect(rect);
         if(IsHorizontal()) {
             thumbRect.SetX(thumbPos);
@@ -106,12 +108,17 @@ void clCustomScrollBar::UpdateDrag(const wxPoint& pt)
         pos = (m_thumbCapturePoint.x * m_range) / rect.GetWidth();
     }
 
+    m_mouseCapturePoint = pt;
     if(pos < 0) { pos = 0; }
-    if((pos + m_thumbSize) > m_range) { pos = (m_range - m_thumbSize) + 1; }
+    if((pos + m_thumbSize) > m_range) {
+        pos = (m_range - m_thumbSize);
+        if(IsVertical()) { pos += 1; }
+    }
+    
     wxScrollEvent e(wxEVT_SCROLL_THUMBTRACK);
     e.SetEventObject(this);
     e.SetPosition(pos);
-    GetEventHandler()->ProcessEvent(e);
+    GetEventHandler()->AddPendingEvent(e);
 }
 
 void clCustomScrollBar::OnMouseLeftUp(wxMouseEvent& e)
@@ -129,4 +136,10 @@ void clCustomScrollBar::OnMotion(wxMouseEvent& e)
 {
     e.Skip();
     if(m_dragging && wxGetMouseState().LeftIsDown()) { UpdateDrag(e.GetPosition()); }
+}
+
+void clCustomScrollBar::OnSize(wxSizeEvent& e)
+{
+    e.Skip();
+    Refresh();
 }

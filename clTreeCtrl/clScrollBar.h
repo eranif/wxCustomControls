@@ -5,7 +5,7 @@
 #include <wx/scrolbar.h>
 #include "clCustomScrollBar.h"
 
-#ifdef __WXMSW__
+#if 1
 #define ScrollBarBase clCustomScrollBar
 #else
 #define ScrollBarBase wxScrollBar
