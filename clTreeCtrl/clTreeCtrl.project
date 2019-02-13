@@ -7,6 +7,8 @@
   </Plugins>
   <VirtualDirectory Name="Controls">
     <VirtualDirectory Name="Common">
+      <File Name="clCustomScrollBar.cpp"/>
+      <File Name="clCustomScrollBar.h"/>
       <File Name="drawingutils.h"/>
       <File Name="drawingutils.cpp"/>
       <File Name="clScrolledPanel.h"/>

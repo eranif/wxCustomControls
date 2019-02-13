@@ -3,8 +3,15 @@
 
 #include "codelite_exports.h"
 #include <wx/scrolbar.h>
+#include "clCustomScrollBar.h"
 
-class WXDLLIMPEXP_SDK clScrollBar : public wxScrollBar
+#ifdef __WXMSW__
+#define ScrollBarBase clCustomScrollBar
+#else
+#define ScrollBarBase wxScrollBar
+#endif
+
+class WXDLLIMPEXP_SDK clScrollBar : public ScrollBarBase
 {
     int m_thumb_size = 0;
     int m_range_size = 0;
