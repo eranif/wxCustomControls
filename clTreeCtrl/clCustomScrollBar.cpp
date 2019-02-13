@@ -14,9 +14,9 @@ clCustomScrollBar::clCustomScrollBar(wxWindow* parent, wxWindowID id, const wxPo
     Bind(wxEVT_LEFT_UP, &clCustomScrollBar::OnMouseLeftUp, this);
     Bind(wxEVT_MOTION, &clCustomScrollBar::OnMotion, this);
     if(style == wxSB_HORIZONTAL) {
-        SetSizeHints(-1, 12);
+        SetSize(-1, 12);
     } else {
-        SetSizeHints(12, -1);
+        SetSize(12, -1);
     }
     Bind(wxEVT_SIZE, &clCustomScrollBar::OnSize, this);
     m_colours.InitFromColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE));
