@@ -14,11 +14,12 @@ class WXDLLIMPEXP_SDK clButtonBase : public wxControl
     clColours m_colours;
     wxString m_text;
     eButtonState m_state = eButtonState::kNormal;
-    enum eDrawingState {
-        kEnabled,
-        kDisabled,
+
+    enum eDrawingFlags {
+        kDrawingFlagEnabled = (1 << 0),
+        kDrawingFlagChecked = (1 << 1),
     };
-    eDrawingState m_drawingState = kEnabled;
+    size_t m_lastPaintFlags = 0;
 
 protected:
     void BindEvents();
@@ -26,7 +27,7 @@ protected:
     void Initialise();
     wxSize GetBestSize() const;
     void PostClickEvent();
-    clButtonBase::eDrawingState GetDrawingState() const;
+    size_t GetDrawingFlags() const;
 
 protected:
     // Event handlers

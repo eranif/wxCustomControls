@@ -63,7 +63,7 @@ void clButtonBase::OnPaint(wxPaintEvent& event)
     wxGCDC dc(abdc);
     PrepareDC(dc);
     Render(dc);
-    m_drawingState = GetDrawingState();
+    m_lastPaintFlags = GetDrawingFlags();
     if(HasFocus()) {
         wxRect clientRect = GetClientRect();
         wxRect focusRect = clientRect.Deflate(3);
@@ -212,11 +212,16 @@ void clButtonBase::PostClickEvent()
 void clButtonBase::OnIdle(wxIdleEvent& event)
 {
     event.Skip();
-    eDrawingState ds = GetDrawingState();
-    if(ds != m_drawingState) {
+    size_t flags = GetDrawingFlags();
+    if(flags != m_lastPaintFlags) {
         // We need to refresh the window
         Refresh();
     }
 }
 
-clButtonBase::eDrawingState clButtonBase::GetDrawingState() const { return IsEnabled() ? kEnabled : kDisabled; }
+size_t clButtonBase::GetDrawingFlags() const
+{
+    size_t flags = 0;
+    if(IsEnabled()) { flags |= kDrawingFlagEnabled; }
+    return flags;
+}
