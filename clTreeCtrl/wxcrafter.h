@@ -19,9 +19,9 @@
 #include "clToolBar.h"
 #include <wx/dataview.h>
 #include "clDataViewListCtrl.h"
-#include <wx/textctrl.h>
 #include <wx/button.h>
 #include "clButton.h"
+#include <wx/textctrl.h>
 #include <wx/menu.h>
 #include <wx/imaglist.h>
 #include <wx/bitmap.h>
@@ -71,11 +71,11 @@ protected:
     clToolBar* m_toolbar;
     wxPanel* m_panelControls;
     clDataViewListCtrl* m_dataView;
-    wxTextCtrl* m_textCtrlLog;
     wxPanel* m_panelButtons;
     clButton* m_buttonOne;
     clButton* m_buttonTwo;
     clButton* m_buttonDisabled;
+    wxTextCtrl* m_textCtrlLog;
     wxMenuBar* m_myMenuBar;
     wxMenu* menu_clTreeCtrl;
     wxMenuItem* m_menuItem13;
@@ -111,6 +111,8 @@ protected:
 
 protected:
     virtual void OnColoursUI(wxUpdateUIEvent& event) { event.Skip(); }
+    virtual void OnCloseFolderUI(wxUpdateUIEvent& event) { event.Skip(); }
+    virtual void OnButtonCloseFolder(wxCommandEvent& event) { event.Skip(); }
     virtual void OnButtonClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnOpenFolder(wxCommandEvent& event) { event.Skip(); }
     virtual void OnExpandAll(wxCommandEvent& event) { event.Skip(); }
@@ -141,11 +143,11 @@ public:
     clToolBar* GetToolbar() { return m_toolbar; }
     clDataViewListCtrl* GetDataView() { return m_dataView; }
     wxPanel* GetPanelControls() { return m_panelControls; }
-    wxTextCtrl* GetTextCtrlLog() { return m_textCtrlLog; }
     clButton* GetButtonOne() { return m_buttonOne; }
     clButton* GetButtonTwo() { return m_buttonTwo; }
     clButton* GetButtonDisabled() { return m_buttonDisabled; }
     wxPanel* GetPanelButtons() { return m_panelButtons; }
+    wxTextCtrl* GetTextCtrlLog() { return m_textCtrlLog; }
     wxPanel* GetMainPanel() { return m_mainPanel; }
     wxMenuBar* GetMyMenuBar() { return m_myMenuBar; }
     MainFrameBaseClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("My Frame"),

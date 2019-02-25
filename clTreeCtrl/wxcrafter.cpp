@@ -77,11 +77,6 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
                                  wxDATAVIEW_COL_RESIZABLE);
     m_dataView->AppendTextColumn(_("File size"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT,
                                  wxDATAVIEW_COL_RESIZABLE);
-    m_textCtrlLog = new wxTextCtrl(m_mainPanel, wxID_ANY, wxT(""), wxDefaultPosition,
-                                   wxDLG_UNIT(m_mainPanel, wxSize(-1, 100)), wxTE_RICH | wxTE_MULTILINE);
-
-    boxSizer11->Add(m_textCtrlLog, 0, wxEXPAND, WXC_FROM_DIP(1));
-
     wxBoxSizer* boxSizer133 = new wxBoxSizer(wxHORIZONTAL);
 
     boxSizer11->Add(boxSizer133, 0, wxEXPAND | wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(5));
@@ -94,8 +89,9 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     wxBoxSizer* boxSizer137 = new wxBoxSizer(wxHORIZONTAL);
     m_panelButtons->SetSizer(boxSizer137);
 
-    m_buttonOne = new clButton(m_panelButtons, wxID_ANY, _("Button One"), wxDefaultPosition,
+    m_buttonOne = new clButton(m_panelButtons, wxID_ANY, _("Close Folder..."), wxDefaultPosition,
                                wxDLG_UNIT(m_panelButtons, wxSize(-1, -1)), 0);
+    m_buttonOne->SetToolTip(_("Close Folder..."));
 
     boxSizer137->Add(m_buttonOne, 0, wxALL, WXC_FROM_DIP(5));
 
@@ -109,6 +105,11 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     m_buttonDisabled->Enable(false);
 
     boxSizer137->Add(m_buttonDisabled, 0, wxALL, WXC_FROM_DIP(5));
+
+    m_textCtrlLog = new wxTextCtrl(m_mainPanel, wxID_ANY, wxT(""), wxDefaultPosition,
+                                   wxDLG_UNIT(m_mainPanel, wxSize(-1, 100)), wxTE_RICH | wxTE_MULTILINE);
+
+    boxSizer11->Add(m_textCtrlLog, 0, wxEXPAND, WXC_FROM_DIP(1));
 
     m_myMenuBar = new wxMenuBar(0);
     this->SetMenuBar(m_myMenuBar);
@@ -233,6 +234,9 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
 #endif
     // Connect events
     this->Connect(wxID_COLOURS, wxEVT_UPDATE_UI, wxUpdateUIEventHandler(MainFrameBaseClass::OnColoursUI), NULL, this);
+    m_buttonOne->Connect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(MainFrameBaseClass::OnCloseFolderUI), NULL, this);
+    m_buttonOne->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBaseClass::OnButtonCloseFolder),
+                         NULL, this);
     m_buttonTwo->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBaseClass::OnButtonClicked), NULL,
                          this);
     this->Connect(m_menuItem13->GetId(), wxEVT_COMMAND_MENU_SELECTED,
@@ -289,6 +293,9 @@ MainFrameBaseClass::~MainFrameBaseClass()
 {
     this->Disconnect(wxID_COLOURS, wxEVT_UPDATE_UI, wxUpdateUIEventHandler(MainFrameBaseClass::OnColoursUI), NULL,
                      this);
+    m_buttonOne->Disconnect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(MainFrameBaseClass::OnCloseFolderUI), NULL, this);
+    m_buttonOne->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED,
+                            wxCommandEventHandler(MainFrameBaseClass::OnButtonCloseFolder), NULL, this);
     m_buttonTwo->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBaseClass::OnButtonClicked),
                             NULL, this);
     this->Disconnect(m_menuItem13->GetId(), wxEVT_COMMAND_MENU_SELECTED,

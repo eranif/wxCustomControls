@@ -39,6 +39,7 @@ void clButtonBase::BindEvents()
     Bind(wxEVT_SET_FOCUS, &clButtonBase::OnFocus, this);
     Bind(wxEVT_KILL_FOCUS, &clButtonBase::OnFocus, this);
     Bind(wxEVT_KEY_DOWN, &clButtonBase::OnKeyDown, this);
+    Bind(wxEVT_IDLE, &clButtonBase::OnIdle, this);
 }
 
 void clButtonBase::UnBindEvents()
@@ -53,6 +54,7 @@ void clButtonBase::UnBindEvents()
     Unbind(wxEVT_SET_FOCUS, &clButtonBase::OnFocus, this);
     Unbind(wxEVT_KILL_FOCUS, &clButtonBase::OnFocus, this);
     Unbind(wxEVT_KEY_DOWN, &clButtonBase::OnKeyDown, this);
+    Unbind(wxEVT_IDLE, &clButtonBase::OnIdle, this);
 }
 
 void clButtonBase::OnPaint(wxPaintEvent& event)
@@ -61,6 +63,7 @@ void clButtonBase::OnPaint(wxPaintEvent& event)
     wxGCDC dc(abdc);
     PrepareDC(dc);
     Render(dc);
+    m_drawingState = GetDrawingState();
     if(HasFocus()) {
         wxRect clientRect = GetClientRect();
         wxRect focusRect = clientRect.Deflate(3);
@@ -120,7 +123,7 @@ void clButtonBase::Render(wxDC& dc)
     wxColour bgColour = m_colours.GetBgColour();
     wxColour borderColour = m_colours.GetBorderColour();
     if(isDark) { borderColour = borderColour.ChangeLightness(80); }
-    
+
     switch(m_state) {
     case eButtonState::kNormal:
     case eButtonState::kHover:
@@ -205,3 +208,15 @@ void clButtonBase::PostClickEvent()
     eventClick.SetEventObject(this);
     GetEventHandler()->AddPendingEvent(eventClick);
 }
+
+void clButtonBase::OnIdle(wxIdleEvent& event)
+{
+    event.Skip();
+    eDrawingState ds = GetDrawingState();
+    if(ds != m_drawingState) {
+        // We need to refresh the window
+        Refresh();
+    }
+}
+
+clButtonBase::eDrawingState clButtonBase::GetDrawingState() const { return IsEnabled() ? kEnabled : kDisabled; }

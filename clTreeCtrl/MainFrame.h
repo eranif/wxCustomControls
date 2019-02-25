@@ -49,6 +49,8 @@ private:
     void DoAddRoot();
 
 protected:
+    virtual void OnButtonCloseFolder(wxCommandEvent& event);
+    virtual void OnCloseFolderUI(wxUpdateUIEvent& event);
     virtual void OnButtonClicked(wxCommandEvent& event);
     virtual void OnSetTreeColWidth(wxCommandEvent& event);
     virtual void OnColoursUI(wxUpdateUIEvent& event);

@@ -73,7 +73,7 @@ MainFrame::MainFrame(wxWindow* parent)
     m_treeCtrl->SetShowHeader(true);
     m_treeCtrl->SetColumnWidth(0, wxCOL_WIDTH_AUTOSIZE);
     DoAddRoot();
-    
+
     wxLog::SetActiveTarget(new wxLogTextCtrl(m_textCtrlLog));
     // Provide a sorting function to the tree
     clSortFunc_t SortFunc = [&](clRowEntry* a, clRowEntry* b) {
@@ -391,17 +391,17 @@ void MainFrame::OnToggleTheme(wxCommandEvent& event)
 {
     ++m_selectedColours;
     if(m_selectedColours >= m_coloursArr.size()) { m_selectedColours = 0; }
-    
+
     clColours& colours = m_coloursArr[m_selectedColours];
     m_treeCtrl->SetColours(colours);
     m_dataView->SetColours(colours);
-    
+
     m_panelButtons->SetBackgroundColour(colours.GetBgColour());
     m_panelButtons->Refresh();
     m_buttonOne->SetColours(colours);
     m_buttonTwo->SetColours(colours);
     m_buttonDisabled->SetColours(colours);
-    
+
     m_treeCtrl->Refresh();
     m_dataView->Refresh();
 }
@@ -593,7 +593,11 @@ void MainFrame::OnSetTreeColWidth(wxCommandEvent& event)
     int width = ::wxGetNumberFromUser(_("Set the column width"), _("New width"), _("New width"), 300, -2, 1000, this);
     m_treeCtrl->SetColumnWidth(0, width);
 }
-void MainFrame::OnButtonClicked(wxCommandEvent& event)
+void MainFrame::OnButtonClicked(wxCommandEvent& event) { LogMessage("Button clicked!"); }
+
+void MainFrame::OnCloseFolderUI(wxUpdateUIEvent& event)
 {
-    LogMessage("Button clicked!");
+    event.Enable(m_treeCtrl->ItemHasChildren(m_treeCtrl->GetRootItem()));
 }
+
+void MainFrame::OnButtonCloseFolder(wxCommandEvent& event) { OnDeleteAllItems(event); }

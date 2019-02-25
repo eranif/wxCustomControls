@@ -14,6 +14,11 @@ class WXDLLIMPEXP_SDK clButtonBase : public wxControl
     clColours m_colours;
     wxString m_text;
     eButtonState m_state = eButtonState::kNormal;
+    enum eDrawingState {
+        kEnabled,
+        kDisabled,
+    };
+    eDrawingState m_drawingState = kEnabled;
 
 protected:
     void BindEvents();
@@ -21,6 +26,7 @@ protected:
     void Initialise();
     wxSize GetBestSize() const;
     void PostClickEvent();
+    clButtonBase::eDrawingState GetDrawingState() const;
 
 protected:
     // Event handlers
@@ -32,6 +38,7 @@ protected:
     void OnLeave(wxMouseEvent& event);
     void OnFocus(wxFocusEvent& event);
     void OnKeyDown(wxKeyEvent& event);
+    void OnIdle(wxIdleEvent& event);
 
     // Overridable
     virtual void Render(wxDC& dc);
