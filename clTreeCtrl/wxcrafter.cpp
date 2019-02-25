@@ -79,7 +79,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
                                  wxDATAVIEW_COL_RESIZABLE);
     wxBoxSizer* boxSizer133 = new wxBoxSizer(wxHORIZONTAL);
 
-    boxSizer11->Add(boxSizer133, 0, wxEXPAND | wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(5));
+    boxSizer11->Add(boxSizer133, 0, wxEXPAND, WXC_FROM_DIP(5));
 
     m_panelButtons =
         new wxPanel(m_mainPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainPanel, wxSize(-1, -1)), wxTAB_TRAVERSAL);

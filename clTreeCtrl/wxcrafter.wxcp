@@ -886,7 +886,7 @@
            "gbSpan": "1,1",
            "gbPosition": "0,0",
            "m_styles": [],
-           "m_sizerFlags": ["wxEXPAND", "wxALIGN_CENTER_HORIZONTAL"],
+           "m_sizerFlags": ["wxEXPAND"],
            "m_properties": [{
              "type": "string",
              "m_label": "Minimum Size:",
