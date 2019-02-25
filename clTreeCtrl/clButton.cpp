@@ -13,3 +13,7 @@ clButton::clButton(wxWindow* parent, wxWindowID id, const wxString& label, const
     : clButtonBase(parent, id, label, pos, size, style, validator, name)
 {
 }
+
+clButton::~clButton()
+{
+}
