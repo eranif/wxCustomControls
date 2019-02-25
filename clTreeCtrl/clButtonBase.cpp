@@ -4,6 +4,7 @@
 #include <wx/buffer.h>
 #include <wx/renderer.h>
 #include <wx/settings.h>
+#include <wx/anybutton.h>
 
 #ifdef __WXMSW__
 #define BUTTON_RADIUS 0.0
@@ -172,7 +173,9 @@ void clButtonBase::Render(wxDC& dc)
         dc.SetTextForeground(isDisabled ? m_colours.GetGrayText() : m_colours.GetItemTextColour());
         wxRect textRect = dc.GetTextExtent(GetText());
         textRect = textRect.CenterIn(clientRect);
+        dc.SetClippingRegion(textRect);
         dc.DrawText(GetText(), textRect.GetTopLeft());
+        dc.DestroyClippingRegion();
     }
 }
 
@@ -196,11 +199,16 @@ void clButtonBase::OnLeave(wxMouseEvent& event)
 
 wxSize clButtonBase::GetBestSize() const
 {
+    wxString sampleText;
+    if(m_buttonStyle & wxBU_EXACTFIT) {
+        sampleText = m_text.IsEmpty() ? "TTTppp" : m_text;
+    } else {
+        sampleText = "TTTpppTTTpp";
+    }
     wxBitmap bmp(1, 1);
     wxMemoryDC memDC(bmp);
     wxGCDC dc(memDC);
     dc.SetFont(DrawingUtils::GetDefaultGuiFont());
-    wxString sampleText = m_text.IsEmpty() ? "TTTppp" : m_text;
     wxRect rectSize = dc.GetTextExtent(sampleText);
     rectSize.Inflate(10);
     return rectSize.GetSize();
