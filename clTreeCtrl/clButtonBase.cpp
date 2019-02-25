@@ -171,24 +171,24 @@ void clButtonBase::Render(wxDC& dc)
     }
 
     // The "shade" rect is drawn when not disabled
-#ifdef __WXMSW__
-    if(!isDisabled && !isDark) {
-        wxRect shadeRect = rect;
-        if(isDark) {
-            shadeRect.SetHeight(shadeRect.GetHeight() / 2);
-            shadeRect.SetY(shadeRect.GetY() + 1);
-        } else {
-            shadeRect.SetTopLeft(wxPoint(shadeRect.x, (shadeRect.y + shadeRect.GetHeight() / 2)));
-            shadeRect.SetHeight((shadeRect.GetHeight() / 2) - 1);
-        }
-
-        wxColour bgColourBottomRect = isDark ? bgColour.ChangeLightness(103) : bgColour.ChangeLightness(97);
-        dc.SetBrush(bgColourBottomRect);
-        dc.SetPen(bgColourBottomRect);
-        shadeRect.Deflate(1);
-        dc.DrawRoundedRectangle(shadeRect, 0);
-    }
-#endif
+//#ifdef __WXMSW__
+//    if(!isDisabled && !isDark) {
+//        wxRect shadeRect = rect;
+//        if(isDark) {
+//            shadeRect.SetHeight(shadeRect.GetHeight() / 2);
+//            shadeRect.SetY(shadeRect.GetY() + 1);
+//        } else {
+//            shadeRect.SetTopLeft(wxPoint(shadeRect.x, (shadeRect.y + shadeRect.GetHeight() / 2)));
+//            shadeRect.SetHeight((shadeRect.GetHeight() / 2) - 1);
+//        }
+//
+//        wxColour bgColourBottomRect = isDark ? bgColour.ChangeLightness(103) : bgColour.ChangeLightness(97);
+//        dc.SetBrush(bgColourBottomRect);
+//        dc.SetPen(bgColourBottomRect);
+//        shadeRect.Deflate(1);
+//        dc.DrawRoundedRectangle(shadeRect, 0);
+//    }
+//#endif
 
     // Draw the text
     if(!GetText().IsEmpty()) {
