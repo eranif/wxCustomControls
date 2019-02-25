@@ -1066,7 +1066,7 @@
                   }, {
                    "type": "string",
                    "m_label": "Label:",
-                   "m_value": "Close Folder..."
+                   "m_value": "&Close Folder..."
                   }, {
                    "type": "bool",
                    "m_label": "Default Button",
@@ -1168,7 +1168,7 @@
                   }, {
                    "type": "string",
                    "m_label": "Label:",
-                   "m_value": "Button Two"
+                   "m_value": "Button T&wo"
                   }, {
                    "type": "bool",
                    "m_label": "Default Button",

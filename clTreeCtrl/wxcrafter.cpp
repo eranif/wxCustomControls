@@ -89,13 +89,13 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     wxBoxSizer* boxSizer137 = new wxBoxSizer(wxHORIZONTAL);
     m_panelButtons->SetSizer(boxSizer137);
 
-    m_buttonOne = new clButton(m_panelButtons, wxID_ANY, _("Close Folder..."), wxDefaultPosition,
+    m_buttonOne = new clButton(m_panelButtons, wxID_ANY, _("&Close Folder..."), wxDefaultPosition,
                                wxDLG_UNIT(m_panelButtons, wxSize(-1, -1)), 0);
     m_buttonOne->SetToolTip(_("Close Folder..."));
 
     boxSizer137->Add(m_buttonOne, 0, wxALL, WXC_FROM_DIP(5));
 
-    m_buttonTwo = new clButton(m_panelButtons, wxID_ANY, _("Button Two"), wxDefaultPosition,
+    m_buttonTwo = new clButton(m_panelButtons, wxID_ANY, _("Button T&wo"), wxDefaultPosition,
                                wxDLG_UNIT(m_panelButtons, wxSize(-1, -1)), 0);
 
     boxSizer137->Add(m_buttonTwo, 0, wxALL, WXC_FROM_DIP(5));
