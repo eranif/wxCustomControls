@@ -151,22 +151,25 @@ void clButtonBase::Render(wxDC& dc)
     dc.SetPen(borderColour);
     dc.SetBrush(bgColour);
     dc.DrawRoundedRectangle(rect, BUTTON_RADIUS);
+    
+    // The "shade" rect is drawn when not disabled
+    if(!isDisabled) {
+        wxRect shadeRect = rect;
+        if(isDark) {
+            shadeRect.SetHeight(shadeRect.GetHeight() / 2);
+            shadeRect.SetY(shadeRect.GetY() + 1);
+        } else {
+            shadeRect.SetTopLeft(wxPoint(shadeRect.x, (shadeRect.y + shadeRect.GetHeight() / 2)));
+            shadeRect.SetHeight((shadeRect.GetHeight() / 2) - 1);
+        }
 
-    wxRect shadeRect = rect;
-    if(isDark) {
-        shadeRect.SetHeight(shadeRect.GetHeight() / 2);
-        shadeRect.SetY(shadeRect.GetY() + 1);
-    } else {
-        shadeRect.SetTopLeft(wxPoint(shadeRect.x, (shadeRect.y + shadeRect.GetHeight() / 2)));
-        shadeRect.SetHeight((shadeRect.GetHeight() / 2) - 1);
+        wxColour bgColourBottomRect = isDark ? bgColour.ChangeLightness(103) : bgColour.ChangeLightness(97);
+        dc.SetBrush(bgColourBottomRect);
+        dc.SetPen(bgColourBottomRect);
+        shadeRect.Deflate(1);
+        dc.DrawRoundedRectangle(shadeRect, 0);
     }
-
-    wxColour bgColourBottomRect = isDark ? bgColour.ChangeLightness(103) : bgColour.ChangeLightness(97);
-    dc.SetBrush(bgColourBottomRect);
-    dc.SetPen(bgColourBottomRect);
-    shadeRect.Deflate(1);
-    dc.DrawRoundedRectangle(shadeRect, 0);
-
+    
     // Draw the text
     if(!GetText().IsEmpty()) {
         dc.SetFont(DrawingUtils::GetDefaultGuiFont());
@@ -210,7 +213,12 @@ wxSize clButtonBase::GetBestSize() const
     wxGCDC dc(memDC);
     dc.SetFont(DrawingUtils::GetDefaultGuiFont());
     wxRect rectSize = dc.GetTextExtent(sampleText);
-    rectSize.Inflate(10);
+    wxRect textSize = dc.GetTextExtent(m_text);
+
+    // If the text does not fit into the default button size, increase it
+    if(textSize.GetWidth() > rectSize.GetWidth()) { wxSwap(textSize, rectSize); }
+
+    rectSize.Inflate(8);
     return rectSize.GetSize();
 }
 
