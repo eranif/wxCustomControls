@@ -172,7 +172,7 @@ void clButtonBase::Render(wxDC& dc)
 
     // The "shade" rect is drawn when not disabled
 #ifdef __WXMSW__
-    if(!isDisabled) {
+    if(!isDisabled && !isDark) {
         wxRect shadeRect = rect;
         if(isDark) {
             shadeRect.SetHeight(shadeRect.GetHeight() / 2);
