@@ -3,6 +3,7 @@
 #include <wx/dcgraph.h>
 #include <wx/buffer.h>
 #include <wx/renderer.h>
+#include <wx/settings.h>
 
 clButtonBase::clButtonBase() {}
 
@@ -40,6 +41,7 @@ void clButtonBase::BindEvents()
     Bind(wxEVT_KILL_FOCUS, &clButtonBase::OnFocus, this);
     Bind(wxEVT_KEY_DOWN, &clButtonBase::OnKeyDown, this);
     Bind(wxEVT_IDLE, &clButtonBase::OnIdle, this);
+    Bind(wxEVT_SIZE, &clButtonBase::OnSize, this);
 }
 
 void clButtonBase::UnBindEvents()
@@ -55,6 +57,7 @@ void clButtonBase::UnBindEvents()
     Unbind(wxEVT_KILL_FOCUS, &clButtonBase::OnFocus, this);
     Unbind(wxEVT_KEY_DOWN, &clButtonBase::OnKeyDown, this);
     Unbind(wxEVT_IDLE, &clButtonBase::OnIdle, this);
+    Unbind(wxEVT_SIZE, &clButtonBase::OnSize, this);
 }
 
 void clButtonBase::OnPaint(wxPaintEvent& event)
@@ -234,4 +237,12 @@ void clButtonBase::SetText(const wxString& text)
     tmp.Replace("&", "");
     tmp.Replace("@@", "&");
     m_text = tmp;
+}
+
+void clButtonBase::SetDefault() {}
+
+void clButtonBase::OnSize(wxSizeEvent& event)
+{
+    event.Skip();
+    Refresh();
 }

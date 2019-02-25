@@ -40,7 +40,8 @@ protected:
     void OnFocus(wxFocusEvent& event);
     void OnKeyDown(wxKeyEvent& event);
     void OnIdle(wxIdleEvent& event);
-
+    void OnSize(wxSizeEvent& event);
+    
     // Overridable
     virtual void Render(wxDC& dc);
 
@@ -57,6 +58,7 @@ public:
     const clColours& GetColours() const { return m_colours; }
     void SetText(const wxString& text);
     const wxString& GetText() const { return m_text; }
+    void SetDefault();
 };
 
 #endif // CLBUTTONBASE_H
