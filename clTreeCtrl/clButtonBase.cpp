@@ -134,25 +134,44 @@ void clButtonBase::Render(wxDC& dc)
     switch(m_state) {
     case eButtonState::kNormal:
     case eButtonState::kHover:
-        bgColour = bgColour.ChangeLightness(isDark ? 60 : 95);
+        bgColour = bgColour.ChangeLightness(isDark ? 80 : 95);
         break;
     case eButtonState::kPressed:
-        bgColour = bgColour.ChangeLightness(isDark ? 30 : 80);
+        bgColour = bgColour.ChangeLightness(isDark ? 70 : 80);
         break;
     }
 
-    if(isDark) { borderColour = bgColour.ChangeLightness(60); }
+    if(isDark) { borderColour = bgColour.ChangeLightness(50); }
     if(isDisabled) {
-        bgColour = bgColour.ChangeLightness(120);
-        borderColour = borderColour.ChangeLightness(120);
+        bgColour = bgColour.ChangeLightness(110);
+        borderColour = borderColour.ChangeLightness(110);
     }
 
-    // Draw the button border
-    dc.SetPen(borderColour);
-    dc.SetBrush(bgColour);
-    dc.DrawRoundedRectangle(rect, BUTTON_RADIUS);
-    
+    // Draw the background
+    if(!isDisabled) {
+        if(m_state == eButtonState::kNormal || m_state == eButtonState::kHover) {
+            // fill the button bg colour with gradient
+            dc.GradientFillLinear(rect, bgColour, m_colours.GetBgColour(), wxNORTH);
+            // draw the border
+            dc.SetPen(borderColour);
+            dc.SetBrush(*wxTRANSPARENT_BRUSH);
+            dc.DrawRoundedRectangle(rect, BUTTON_RADIUS);
+        } else if(m_state == eButtonState::kPressed) {
+            // pressed button is drawns with flat bg colour and border
+            wxColour pressedBgColour = bgColour.ChangeLightness(90);
+            dc.SetPen(borderColour);
+            dc.SetBrush(pressedBgColour);
+            dc.DrawRoundedRectangle(rect, BUTTON_RADIUS);
+        }
+    } else {
+        // Draw the button border
+        dc.SetPen(borderColour);
+        dc.SetBrush(bgColour);
+        dc.DrawRoundedRectangle(rect, BUTTON_RADIUS);
+    }
+
     // The "shade" rect is drawn when not disabled
+#ifdef __WXMSW__
     if(!isDisabled) {
         wxRect shadeRect = rect;
         if(isDark) {
@@ -169,7 +188,8 @@ void clButtonBase::Render(wxDC& dc)
         shadeRect.Deflate(1);
         dc.DrawRoundedRectangle(shadeRect, 0);
     }
-    
+#endif
+
     // Draw the text
     if(!GetText().IsEmpty()) {
         dc.SetFont(DrawingUtils::GetDefaultGuiFont());
