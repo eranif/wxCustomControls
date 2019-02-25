@@ -49,6 +49,7 @@ private:
     void DoAddRoot();
 
 protected:
+    virtual void OnButtonClicked(wxCommandEvent& event);
     virtual void OnSetTreeColWidth(wxCommandEvent& event);
     virtual void OnColoursUI(wxUpdateUIEvent& event);
     virtual void OnOpen(wxCommandEvent& event);

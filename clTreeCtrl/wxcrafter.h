@@ -4,31 +4,33 @@
 // Do not modify this file by hand!
 //////////////////////////////////////////////////////////////////////
 
-#ifndef _CLTREECTRL_CLTREECTRL_WXCRAFTER_BASE_CLASSES_H
-#define _CLTREECTRL_CLTREECTRL_WXCRAFTER_BASE_CLASSES_H
+#ifndef _WXCUSTOMCONTROLS_CLTREECTRL_WXCRAFTER_BASE_CLASSES_H
+#define _WXCUSTOMCONTROLS_CLTREECTRL_WXCRAFTER_BASE_CLASSES_H
 
-#include "clDataViewListCtrl.h"
-#include "clToolBar.h"
-#include <map>
-#include <wx/artprov.h>
-#include <wx/bitmap.h>
-#include <wx/dataview.h>
-#include <wx/frame.h>
-#include <wx/icon.h>
-#include <wx/iconbndl.h>
-#include <wx/imaglist.h>
-#include <wx/menu.h>
-#include <wx/panel.h>
 #include <wx/settings.h>
-#include <wx/sizer.h>
-#include <wx/textctrl.h>
-#include <wx/toolbar.h>
-#include <wx/xrc/xh_bmp.h>
 #include <wx/xrc/xmlres.h>
+#include <wx/xrc/xh_bmp.h>
+#include <wx/frame.h>
+#include <wx/iconbndl.h>
+#include <wx/artprov.h>
+#include <wx/sizer.h>
+#include <wx/panel.h>
+#include <wx/toolbar.h>
+#include "clToolBar.h"
+#include <wx/dataview.h>
+#include "clDataViewListCtrl.h"
+#include <wx/textctrl.h>
+#include <wx/button.h>
+#include "clButton.h"
+#include <wx/menu.h>
+#include <wx/imaglist.h>
+#include <wx/bitmap.h>
+#include <map>
+#include <wx/icon.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
-#include <wx/persist/bookctrl.h>
 #include <wx/persist/toplevel.h>
+#include <wx/persist/bookctrl.h>
 #include <wx/persist/treebook.h>
 #endif
 
@@ -46,22 +48,22 @@ class MainFrameBaseClass : public wxFrame
 public:
     enum {
         ID_NATIVE_HEADER = 10001,
-        wxID_BOOKMARK = 10002,
-        wxID_COLOURS = 10003,
-        ID_OPEN_FOLDER = 10004,
-        ID_EXPAND_ALL = 10005,
-        ID_SELECT_CHILDREN = 10006,
-        ID_NEXT_SIBLING = 10007,
-        wxID_SET_TREE_COL_WIDTH = 10008,
-        ID_SHOW_SB_ON_FOCUS = 10009,
-        ID_PREV_SIBLING = 10010,
-        ID_HIDE_ROOT = 10011,
-        ID_SINGLE_SELECTION = 10012,
-        ID_DV_OPEN_FOLDER = 10013,
-        ID_FILL_WITH_5000_ENTRIES = 10014,
-        ID_DV_DELETE_ALL_ITEMS = 10015,
-        ID_ZEBRA = 10016,
-        ID_TOGGLE_THEMES = 10017,
+        ID_SHOW_SB_ON_FOCUS = 10002,
+        ID_SINGLE_SELECTION = 10003,
+        ID_HIDE_ROOT = 10004,
+        ID_TOGGLE_THEMES = 10005,
+        ID_ZEBRA = 10006,
+        ID_DV_DELETE_ALL_ITEMS = 10007,
+        ID_FILL_WITH_5000_ENTRIES = 10008,
+        ID_DV_OPEN_FOLDER = 10009,
+        wxID_SET_TREE_COL_WIDTH = 10010,
+        ID_PREV_SIBLING = 10011,
+        ID_NEXT_SIBLING = 10012,
+        ID_SELECT_CHILDREN = 10013,
+        ID_EXPAND_ALL = 10014,
+        ID_OPEN_FOLDER = 10015,
+        wxID_COLOURS = 10016,
+        wxID_BOOKMARK = 10017,
     };
 
 protected:
@@ -70,6 +72,10 @@ protected:
     wxPanel* m_panelControls;
     clDataViewListCtrl* m_dataView;
     wxTextCtrl* m_textCtrlLog;
+    wxPanel* m_panelButtons;
+    clButton* m_buttonOne;
+    clButton* m_buttonTwo;
+    clButton* m_buttonDisabled;
     wxMenuBar* m_myMenuBar;
     wxMenu* menu_clTreeCtrl;
     wxMenuItem* m_menuItem13;
@@ -105,6 +111,7 @@ protected:
 
 protected:
     virtual void OnColoursUI(wxUpdateUIEvent& event) { event.Skip(); }
+    virtual void OnButtonClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnOpenFolder(wxCommandEvent& event) { event.Skip(); }
     virtual void OnExpandAll(wxCommandEvent& event) { event.Skip(); }
     virtual void OnCollapseAll(wxCommandEvent& event) { event.Skip(); }
@@ -135,6 +142,10 @@ public:
     clDataViewListCtrl* GetDataView() { return m_dataView; }
     wxPanel* GetPanelControls() { return m_panelControls; }
     wxTextCtrl* GetTextCtrlLog() { return m_textCtrlLog; }
+    clButton* GetButtonOne() { return m_buttonOne; }
+    clButton* GetButtonTwo() { return m_buttonTwo; }
+    clButton* GetButtonDisabled() { return m_buttonDisabled; }
+    wxPanel* GetPanelButtons() { return m_panelButtons; }
     wxPanel* GetMainPanel() { return m_mainPanel; }
     wxMenuBar* GetMyMenuBar() { return m_myMenuBar; }
     MainFrameBaseClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("My Frame"),
