@@ -92,7 +92,9 @@ void clChoice::DoShowMenu()
     std::unordered_map<int, int> idToIndex;
     for(size_t i = 0; i < m_choices.size(); ++i) {
         int menuId = wxXmlResource::GetXRCID(m_choices[i]);
-        menu.Append(menuId, m_choices[i]);
+        const wxString& label = m_choices[i];
+        wxMenuItem* item = menu.Append(menuId, label, label, wxITEM_CHECK);
+        item->Check((int)i == m_selection);
         idToIndex.insert({ menuId, i });
         menu.Bind(wxEVT_MENU,
                   [&](wxCommandEvent& e) {

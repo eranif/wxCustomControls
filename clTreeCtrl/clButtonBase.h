@@ -7,9 +7,11 @@
 #include "clColours.h"
 #include "drawingutils.h"
 #include <wx/control.h>
+#include <wx/bitmap.h>
 
 class WXDLLIMPEXP_SDK clButtonBase : public wxControl
 {
+protected:
     size_t m_buttonStyle = 0;
     clColours m_colours;
     wxString m_text;
@@ -21,6 +23,7 @@ class WXDLLIMPEXP_SDK clButtonBase : public wxControl
     };
     size_t m_lastPaintFlags = 0;
     bool m_hasDropDownMenu = false;
+    wxBitmap m_bitmap;
 
 protected:
     void BindEvents();
@@ -69,6 +72,8 @@ public:
     void SetDefault();
     void SetHasDropDownMenu(bool hasDropDownMenu);
     bool HasDropDownMenu() const { return m_hasDropDownMenu; }
+    void SetBitmap(const wxBitmap& bmp);
+    const wxBitmap& GetBitmap() const;
 };
 
 #endif // CLBUTTONBASE_H

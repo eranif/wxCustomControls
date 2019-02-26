@@ -96,7 +96,9 @@ MainFrame::MainFrame(wxWindow* parent)
     m_bitmaps.push_back(images.Bitmap("file"));
     m_treeCtrl->SetBitmaps(&m_bitmaps);
     m_dataView->SetBitmaps(&m_bitmaps);
-
+    
+    m_choice->SetBitmap(images.Bitmap("folder_open"));
+    
     m_treeCtrl->Bind(wxEVT_TREE_ITEM_EXPANDING, &MainFrame::OnItemExpanding, this);
     m_treeCtrl->Bind(wxEVT_TREE_DELETE_ITEM, &MainFrame::OnItemDeleted, this);
     m_treeCtrl->Bind(wxEVT_TREE_BEGIN_DRAG, [&](wxTreeEvent& evt) { LogMessage(wxString() << "Drag started"); });
