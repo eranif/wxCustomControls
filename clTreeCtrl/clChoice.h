@@ -70,6 +70,26 @@ public:
      * @brief Selects the item with the specified string in the control
      */
     void SetStringSelection(const wxString& str);
+    
+    /**
+     * @brief append string
+     */
+    int Append(const wxString& str);
+    
+    /**
+     * @brief append items
+     */
+    void Append(const wxArrayString& items);
+    
+    /**
+     * @brief clear the current control strings
+     */
+    void Clear();
+    
+    /**
+     * @brief replace the current items in the control
+     */
+    void Set(const wxArrayString& items);
 };
 
 #endif // CLCHOICE_H

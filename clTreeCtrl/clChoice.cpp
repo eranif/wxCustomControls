@@ -100,7 +100,7 @@ void clChoice::DoShowMenu()
                   },
                   menuId);
     }
-    
+
     PopupMenu(&menu, menuPos);
     m_popupShown = false;
     SetNormal();
@@ -108,7 +108,7 @@ void clChoice::DoShowMenu()
     // Update the button label
     if(selectedIndex != wxNOT_FOUND) {
         SetSelection(selectedIndex);
-        
+
         // Fire event
         wxCommandEvent evt(wxEVT_CHOICE);
         evt.SetEventObject(this);
@@ -123,4 +123,27 @@ void clChoice::Render(wxDC& dc)
 {
     if(m_popupShown) { SetPressed(); }
     clButtonBase::Render(dc);
+}
+
+int clChoice::Append(const wxString& str)
+{
+    m_choices.push_back(str);
+    return (m_choices.size() - 1);
+}
+
+void clChoice::Append(const wxArrayString& items) { m_choices.insert(m_choices.end(), items.begin(), items.end()); }
+
+void clChoice::Clear()
+{
+    m_choices.clear();
+    SetText("");
+    Refresh();
+}
+
+void clChoice::Set(const wxArrayString& items)
+{
+    m_choices.clear();
+    Append(items);
+    SetText("");
+    Refresh();
 }
