@@ -20,6 +20,7 @@ class WXDLLIMPEXP_SDK clButtonBase : public wxControl
         kDrawingFlagChecked = (1 << 1),
     };
     size_t m_lastPaintFlags = 0;
+    bool m_hasDropDownMenu = true;
 
 protected:
     void BindEvents();
@@ -41,9 +42,13 @@ protected:
     void OnKeyDown(wxKeyEvent& event);
     void OnIdle(wxIdleEvent& event);
     void OnSize(wxSizeEvent& event);
-    
+
     // Overridable
     virtual void Render(wxDC& dc);
+
+    bool IsPressed() const { return m_state == eButtonState::kPressed; }
+    bool IsHover() const { return m_state == eButtonState::kHover; }
+    bool IsNormal() const { return m_state == eButtonState::kNormal; }
 
 public:
     clButtonBase();
@@ -59,6 +64,8 @@ public:
     void SetText(const wxString& text);
     const wxString& GetText() const { return m_text; }
     void SetDefault();
+    void SetHasDropDownMenu(bool hasDropDownMenu);
+    bool HasDropDownMenu() const { return m_hasDropDownMenu; }
 };
 
 #endif // CLBUTTONBASE_H

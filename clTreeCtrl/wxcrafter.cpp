@@ -77,7 +77,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
                                  wxDATAVIEW_COL_RESIZABLE);
     m_dataView->AppendTextColumn(_("File size"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT,
                                  wxDATAVIEW_COL_RESIZABLE);
-    wxBoxSizer* boxSizer133 = new wxBoxSizer(wxHORIZONTAL);
+    wxBoxSizer* boxSizer133 = new wxBoxSizer(wxVERTICAL);
 
     boxSizer11->Add(boxSizer133, 0, wxEXPAND, WXC_FROM_DIP(5));
 
@@ -89,22 +89,28 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     wxBoxSizer* boxSizer137 = new wxBoxSizer(wxHORIZONTAL);
     m_panelButtons->SetSizer(boxSizer137);
 
-    m_buttonOne = new clButton(m_panelButtons, wxID_ANY, _("&Close Folder..."), wxDefaultPosition,
+    wxFlexGridSizer* flexGridSizer141 = new wxFlexGridSizer(0, 3, 0, 0);
+    flexGridSizer141->SetFlexibleDirection(wxBOTH);
+    flexGridSizer141->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+    boxSizer137->Add(flexGridSizer141, 0, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+
+    m_buttonOne = new clButton(m_panelButtons, wxID_ANY, _("Close the Folder"), wxDefaultPosition,
+                               wxDLG_UNIT(m_panelButtons, wxSize(150, -1)), 0);
+    m_buttonOne->SetToolTip(_("Close the Folder"));
+
+    flexGridSizer141->Add(m_buttonOne, 0, wxALL, WXC_FROM_DIP(5));
+
+    m_buttonTwo = new clButton(m_panelButtons, wxID_ANY, _("Button Two Clicker"), wxDefaultPosition,
                                wxDLG_UNIT(m_panelButtons, wxSize(-1, -1)), 0);
-    m_buttonOne->SetToolTip(_("Close Folder..."));
 
-    boxSizer137->Add(m_buttonOne, 0, wxALL, WXC_FROM_DIP(5));
-
-    m_buttonTwo = new clButton(m_panelButtons, wxID_ANY, _("Button T&wo"), wxDefaultPosition,
-                               wxDLG_UNIT(m_panelButtons, wxSize(-1, -1)), 0);
-
-    boxSizer137->Add(m_buttonTwo, 0, wxALL, WXC_FROM_DIP(5));
+    flexGridSizer141->Add(m_buttonTwo, 0, wxALL, WXC_FROM_DIP(5));
 
     m_buttonDisabled = new clButton(m_panelButtons, wxID_ANY, _("Disabled"), wxDefaultPosition,
                                     wxDLG_UNIT(m_panelButtons, wxSize(-1, -1)), 0);
     m_buttonDisabled->Enable(false);
 
-    boxSizer137->Add(m_buttonDisabled, 0, wxALL, WXC_FROM_DIP(5));
+    flexGridSizer141->Add(m_buttonDisabled, 0, wxALL, WXC_FROM_DIP(5));
 
     m_textCtrlLog = new wxTextCtrl(m_mainPanel, wxID_ANY, wxT(""), wxDefaultPosition,
                                    wxDLG_UNIT(m_mainPanel, wxSize(-1, 100)), wxTE_RICH | wxTE_MULTILINE);
