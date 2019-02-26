@@ -8,6 +8,7 @@
 #include "drawingutils.h"
 #include <wx/control.h>
 #include <wx/bitmap.h>
+#include <wx/menu.h>
 
 class WXDLLIMPEXP_SDK clButtonBase : public wxControl
 {
@@ -74,6 +75,12 @@ public:
     bool HasDropDownMenu() const { return m_hasDropDownMenu; }
     void SetBitmap(const wxBitmap& bmp);
     const wxBitmap& GetBitmap() const;
+    
+    /**
+     * @brief display a menu for the user aligned to the button
+     * @param menu
+     */
+    void ShowMenu(wxMenu& menu);
 };
 
 #endif // CLBUTTONBASE_H

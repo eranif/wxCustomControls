@@ -406,3 +406,17 @@ void clButtonBase::SetBitmap(const wxBitmap& bmp)
 }
 
 const wxBitmap& clButtonBase::GetBitmap() const { return m_bitmap; }
+
+void clButtonBase::ShowMenu(wxMenu& menu)
+{
+    SetPressed();
+    Refresh();
+    
+    wxPoint menuPos = GetClientRect().GetBottomLeft();
+#ifdef __WXOSX__
+    menuPos.y += 5;
+#endif
+    PopupMenu(&menu, menuPos);
+    SetNormal();
+    Refresh();
+}

@@ -3,6 +3,8 @@
 #include <wx/xrc/xmlres.h>
 #include <unordered_map>
 
+wxDEFINE_EVENT(wxEVT_CHOICE_MENU_SHOWING, wxNotifyEvent);
+
 clChoice::clChoice() {}
 
 clChoice::~clChoice() { Unbind(wxEVT_BUTTON, &clChoice::OnClick, this); }
@@ -79,14 +81,12 @@ void clChoice::OnClick(wxCommandEvent& event)
 
 void clChoice::DoShowMenu()
 {
-    m_popupShown = true;
-    SetPressed();
-    Refresh();
-
-    wxPoint menuPos = GetClientRect().GetBottomLeft();
-#ifdef __WXOSX__
-    menuPos.y += 5;
-#endif
+    // Check if the user allows us to disable the action
+    wxNotifyEvent eventShowing(wxEVT_CHOICE_MENU_SHOWING);
+    eventShowing.SetEventObject(this);
+    GetEventHandler()->ProcessEvent(eventShowing);
+    if(!eventShowing.IsAllowed()) { return; }
+    
     wxMenu menu;
     int selectedIndex = wxNOT_FOUND;
     std::unordered_map<int, int> idToIndex;
@@ -103,21 +103,17 @@ void clChoice::DoShowMenu()
                   menuId);
     }
 
-    PopupMenu(&menu, menuPos);
-    m_popupShown = false;
-    SetNormal();
-
+    // Show the menu
+    ShowMenu(menu);
+    
     // Update the button label
     if(selectedIndex != wxNOT_FOUND) {
         SetSelection(selectedIndex);
-
         // Fire event
         wxCommandEvent evt(wxEVT_CHOICE);
         evt.SetEventObject(this);
         evt.SetInt(GetSelection());
         GetEventHandler()->AddPendingEvent(evt);
-    } else {
-        Refresh();
     }
 }
 
