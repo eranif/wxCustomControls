@@ -89,7 +89,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     wxBoxSizer* boxSizer137 = new wxBoxSizer(wxHORIZONTAL);
     m_panelButtons->SetSizer(boxSizer137);
 
-    wxFlexGridSizer* flexGridSizer141 = new wxFlexGridSizer(0, 3, 0, 0);
+    wxFlexGridSizer* flexGridSizer141 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer141->SetFlexibleDirection(wxBOTH);
     flexGridSizer141->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
 
@@ -104,13 +104,24 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     m_buttonTwo = new clButton(m_panelButtons, wxID_ANY, _("Button Two Clicker"), wxDefaultPosition,
                                wxDLG_UNIT(m_panelButtons, wxSize(-1, -1)), 0);
 
-    flexGridSizer141->Add(m_buttonTwo, 0, wxALL, WXC_FROM_DIP(5));
+    flexGridSizer141->Add(m_buttonTwo, 0, wxALL | wxEXPAND, WXC_FROM_DIP(5));
 
     m_buttonDisabled = new clButton(m_panelButtons, wxID_ANY, _("Disabled"), wxDefaultPosition,
                                     wxDLG_UNIT(m_panelButtons, wxSize(-1, -1)), 0);
     m_buttonDisabled->Enable(false);
 
-    flexGridSizer141->Add(m_buttonDisabled, 0, wxALL, WXC_FROM_DIP(5));
+    flexGridSizer141->Add(m_buttonDisabled, 0, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+
+    wxArrayString m_choiceArr;
+    m_choiceArr.Add(wxT("Item Number One"));
+    m_choiceArr.Add(wxT("Item Number Two"));
+    m_choiceArr.Add(wxT("Item Number Three"));
+    m_choiceArr.Add(wxT("Item Number Four"));
+    m_choice = new clChoice(m_panelButtons, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelButtons, wxSize(-1, -1)),
+                            m_choiceArr, 0);
+    m_choice->SetSelection(0);
+
+    flexGridSizer141->Add(m_choice, 0, wxALL | wxEXPAND, WXC_FROM_DIP(5));
 
     m_textCtrlLog = new wxTextCtrl(m_mainPanel, wxID_ANY, wxT(""), wxDefaultPosition,
                                    wxDLG_UNIT(m_mainPanel, wxSize(-1, 100)), wxTE_RICH | wxTE_MULTILINE);
@@ -245,6 +256,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
                          NULL, this);
     m_buttonTwo->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBaseClass::OnButtonClicked), NULL,
                          this);
+    m_choice->Connect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(MainFrameBaseClass::OnChoice), NULL, this);
     this->Connect(m_menuItem13->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                   wxCommandEventHandler(MainFrameBaseClass::OnOpenFolder), NULL, this);
     this->Connect(m_menuItemExpandAll->GetId(), wxEVT_COMMAND_MENU_SELECTED,
@@ -304,6 +316,8 @@ MainFrameBaseClass::~MainFrameBaseClass()
                             wxCommandEventHandler(MainFrameBaseClass::OnButtonCloseFolder), NULL, this);
     m_buttonTwo->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBaseClass::OnButtonClicked),
                             NULL, this);
+    m_choice->Disconnect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(MainFrameBaseClass::OnChoice), NULL,
+                         this);
     this->Disconnect(m_menuItem13->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                      wxCommandEventHandler(MainFrameBaseClass::OnOpenFolder), NULL, this);
     this->Disconnect(m_menuItemExpandAll->GetId(), wxEVT_COMMAND_MENU_SELECTED,

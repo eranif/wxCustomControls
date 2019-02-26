@@ -21,6 +21,9 @@
 #include "clDataViewListCtrl.h"
 #include <wx/button.h>
 #include "clButton.h"
+#include <wx/choice.h>
+#include <wx/arrstr.h>
+#include "clChoice.h"
 #include <wx/textctrl.h>
 #include <wx/menu.h>
 #include <wx/imaglist.h>
@@ -47,22 +50,22 @@ class MainFrameBaseClass : public wxFrame
 {
 public:
     enum {
-        ID_SINGLE_SELECTION = 10001,
-        ID_HIDE_ROOT = 10002,
-        ID_ZEBRA = 10003,
-        ID_DV_DELETE_ALL_ITEMS = 10004,
-        ID_FILL_WITH_5000_ENTRIES = 10005,
-        ID_NATIVE_HEADER = 10006,
-        wxID_SET_TREE_COL_WIDTH = 10007,
-        ID_DV_OPEN_FOLDER = 10008,
-        ID_PREV_SIBLING = 10009,
-        ID_NEXT_SIBLING = 10010,
-        ID_SELECT_CHILDREN = 10011,
-        ID_SHOW_SB_ON_FOCUS = 10012,
-        ID_EXPAND_ALL = 10013,
-        ID_OPEN_FOLDER = 10014,
-        wxID_COLOURS = 10015,
-        ID_TOGGLE_THEMES = 10016,
+        ID_NATIVE_HEADER = 10001,
+        ID_SHOW_SB_ON_FOCUS = 10002,
+        ID_SINGLE_SELECTION = 10003,
+        ID_HIDE_ROOT = 10004,
+        ID_TOGGLE_THEMES = 10005,
+        ID_ZEBRA = 10006,
+        ID_DV_DELETE_ALL_ITEMS = 10007,
+        ID_FILL_WITH_5000_ENTRIES = 10008,
+        ID_DV_OPEN_FOLDER = 10009,
+        wxID_SET_TREE_COL_WIDTH = 10010,
+        ID_PREV_SIBLING = 10011,
+        ID_NEXT_SIBLING = 10012,
+        ID_SELECT_CHILDREN = 10013,
+        ID_EXPAND_ALL = 10014,
+        ID_OPEN_FOLDER = 10015,
+        wxID_COLOURS = 10016,
         wxID_BOOKMARK = 10017,
     };
 
@@ -75,6 +78,7 @@ protected:
     clButton* m_buttonOne;
     clButton* m_buttonTwo;
     clButton* m_buttonDisabled;
+    clChoice* m_choice;
     wxTextCtrl* m_textCtrlLog;
     wxMenuBar* m_myMenuBar;
     wxMenu* menu_clTreeCtrl;
@@ -114,6 +118,7 @@ protected:
     virtual void OnCloseFolderUI(wxUpdateUIEvent& event) { event.Skip(); }
     virtual void OnButtonCloseFolder(wxCommandEvent& event) { event.Skip(); }
     virtual void OnButtonClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnChoice(wxCommandEvent& event) { event.Skip(); }
     virtual void OnOpenFolder(wxCommandEvent& event) { event.Skip(); }
     virtual void OnExpandAll(wxCommandEvent& event) { event.Skip(); }
     virtual void OnCollapseAll(wxCommandEvent& event) { event.Skip(); }
@@ -146,6 +151,7 @@ public:
     clButton* GetButtonOne() { return m_buttonOne; }
     clButton* GetButtonTwo() { return m_buttonTwo; }
     clButton* GetButtonDisabled() { return m_buttonDisabled; }
+    clChoice* GetChoice() { return m_choice; }
     wxPanel* GetPanelButtons() { return m_panelButtons; }
     wxTextCtrl* GetTextCtrlLog() { return m_textCtrlLog; }
     wxPanel* GetMainPanel() { return m_mainPanel; }

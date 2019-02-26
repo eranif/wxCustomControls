@@ -192,49 +192,40 @@ void clButtonBase::Render(wxDC& dc)
     }
 
     // Draw the text
-    wxRect textBoundingRect = rect;
+    int textWidth = rect.GetWidth() - (2 * TEXT_SPACER);
+    if(HasDropDownMenu()) { textWidth -= rect.GetHeight(); }
+
+    wxRect textBoundingRect(TEXT_SPACER, 0, textWidth, rect.GetHeight());
     wxRect arrowRect;
-    const int arrowSize = GetSize().GetHeight();
     if(HasDropDownMenu()) {
-        arrowRect.SetX(rect.GetRight() - arrowSize);
-        arrowRect.SetY(rect.GetY());
-        arrowRect.SetWidth(arrowSize);
-        arrowRect.SetHeight(arrowSize);
-        arrowRect = arrowRect.CenterIn(rect, wxVERTICAL);
-        textBoundingRect.SetWidth(textBoundingRect.GetWidth() - arrowRect.GetWidth());
+        arrowRect.SetX(textBoundingRect.GetRight() + TEXT_SPACER);
+        arrowRect.SetY(0);
+        arrowRect.SetWidth(rect.GetHeight());
+        arrowRect.SetHeight(rect.GetHeight());
     }
+
     if(!GetText().IsEmpty()) {
         dc.SetFont(DrawingUtils::GetDefaultGuiFont());
+        textBoundingRect = textBoundingRect.CenterIn(rect, wxVERTICAL);
         dc.SetTextForeground(isDisabled ? m_colours.GetGrayText() : m_colours.GetItemTextColour());
-        wxRect textRect = dc.GetTextExtent(GetText());
-        textRect.x += TEXT_SPACER;
-        textRect = textRect.CenterIn(textBoundingRect);
-
-        // Adjust the text rect so it wont overflow the button
-        if(textRect.GetLeft() < TEXT_SPACER) { textRect.SetX(TEXT_SPACER); }
-        if(textRect.GetRight() > textBoundingRect.GetRight()) { textRect.SetRight(textBoundingRect.GetRight()); }
-
-        // Set a clipping region
-        wxString fixedText;
-        DrawingUtils::TruncateText(GetText(), textRect.GetWidth(), dc, fixedText);
         dc.SetClippingRegion(textBoundingRect);
-
         // Truncate the text to fit the drawing area
-        dc.DrawText(fixedText, textRect.GetTopLeft());
+        wxString fixedText;
+        DrawingUtils::TruncateText(GetText(), textBoundingRect.GetWidth(), dc, fixedText);
+        dc.DrawLabel(fixedText, textBoundingRect, wxALIGN_CENTRE);
         dc.DestroyClippingRegion();
     }
 
     if(HasDropDownMenu()) {
         // Draw an arrow
-        wxRect drawArrowRect = arrowRect;
-        arrowRect.SetHeight(10);
-        arrowRect.SetWidth(16);
-        arrowRect = arrowRect.CenterIn(drawArrowRect);
+        int arrowHeight = arrowRect.GetHeight() / 4;
+        int arrowWidth = arrowRect.GetWidth() / 2;
+        wxRect r(0, 0, arrowWidth, arrowHeight);
+        r = r.CenterIn(arrowRect);
+        wxPoint downCenterPoint = wxPoint(r.GetBottomLeft().x + r.GetWidth() / 2, r.GetBottom());
         dc.SetPen(wxPen(isDisabled ? m_colours.GetGrayText() : m_colours.GetDarkBorderColour(), 3));
-        wxPoint downCenterPoint =
-            wxPoint(arrowRect.GetBottomLeft().x + arrowRect.GetWidth() / 2, arrowRect.GetBottom());
-        dc.DrawLine(arrowRect.GetTopLeft(), downCenterPoint);
-        dc.DrawLine(arrowRect.GetTopRight(), downCenterPoint);
+        dc.DrawLine(r.GetTopLeft(), downCenterPoint);
+        dc.DrawLine(r.GetTopRight(), downCenterPoint);
     }
 }
 
@@ -258,29 +249,35 @@ void clButtonBase::OnLeave(wxMouseEvent& event)
 
 wxSize clButtonBase::GetBestSize() const
 {
-    wxString sampleText;
-    if(m_buttonStyle & wxBU_EXACTFIT) {
-        sampleText = m_text.IsEmpty() ? "TTTppp" : m_text;
-    } else {
-        sampleText = "TTTpppTTTpp";
-    }
-
     wxBitmap bmp(1, 1);
     wxMemoryDC memDC(bmp);
     wxGCDC dc(memDC);
     dc.SetFont(DrawingUtils::GetDefaultGuiFont());
-    wxRect rectSize = dc.GetTextExtent(sampleText);
-    wxRect textSize = dc.GetTextExtent(m_text);
+
+    int buttonHeight = 0;
+    int buttonWidth = 0;
+    {
+        wxRect r = dc.GetTextExtent("Tp");
+        r.Inflate(8);
+        buttonHeight = r.GetHeight();
+    }
+
+    wxString sampleText;
+    if(m_buttonStyle & wxBU_EXACTFIT) {
+        sampleText = m_text;
+    } else {
+        sampleText = "TTTpppTTTpp";
+    }
+
+    wxRect sampleTextRect = dc.GetTextExtent(sampleText);
+    wxRect textRect = dc.GetTextExtent(m_text);
 
     // If the text does not fit into the default button size, increase it
-    if(textSize.GetWidth() > rectSize.GetWidth()) { rectSize = textSize; }
-    rectSize.Inflate(8);
-
-    // the arrow size is the same as the height
-    if(HasDropDownMenu()) { rectSize.SetWidth(textSize.GetWidth() + rectSize.GetHeight()); }
-    if(rectSize.GetWidth() < GetSize().GetWidth()) { rectSize.SetWidth(GetSize().GetWidth()); }
-    rectSize.width += TEXT_SPACER;
-    return rectSize.GetSize();
+    buttonWidth += TEXT_SPACER;
+    buttonWidth += wxMax(textRect.GetWidth(), sampleTextRect.GetWidth());
+    buttonWidth += TEXT_SPACER;
+    if(HasDropDownMenu()) { buttonWidth += buttonHeight; }
+    return wxSize(buttonWidth, buttonHeight);
 }
 
 void clButtonBase::SetColours(const clColours& colours)
@@ -339,6 +336,7 @@ void clButtonBase::SetText(const wxString& text)
     tmp.Replace("&", "");
     tmp.Replace("@@", "&");
     m_text = tmp;
+    Refresh();
 }
 
 void clButtonBase::SetDefault() {}

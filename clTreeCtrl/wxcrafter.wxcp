@@ -1,7 +1,7 @@
 {
  "metadata": {
   "m_generatedFilesDir": ".",
-  "m_objCounter": 141,
+  "m_objCounter": 143,
   "m_includeFiles": [],
   "m_bitmapFunction": "wxC9ED9InitBitmapResources",
   "m_bitmapsFile": "wxcrafter_bitmaps.cpp",
@@ -1022,7 +1022,7 @@
                   }, {
                    "type": "string",
                    "m_label": "# Columns:",
-                   "m_value": "3"
+                   "m_value": "2"
                   }, {
                    "type": "string",
                    "m_label": "# Rows:",
@@ -1154,7 +1154,7 @@
                    "gbSpan": "1,1",
                    "gbPosition": "0,0",
                    "m_styles": [],
-                   "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+                   "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
                    "m_properties": [{
                      "type": "winid",
                      "m_label": "ID:",
@@ -1249,7 +1249,7 @@
                    "gbSpan": "1,1",
                    "gbPosition": "0,0",
                    "m_styles": [],
-                   "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+                   "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
                    "m_properties": [{
                      "type": "winid",
                      "m_label": "ID:",
@@ -1329,6 +1329,88 @@
                      "m_value": "2,2"
                     }],
                    "m_events": [],
+                   "m_children": []
+                  }, {
+                   "m_type": 4411,
+                   "proportion": 0,
+                   "border": 5,
+                   "gbSpan": "1,1",
+                   "gbPosition": "0,0",
+                   "m_styles": [],
+                   "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
+                   "m_properties": [{
+                     "type": "winid",
+                     "m_label": "ID:",
+                     "m_winid": "wxID_ANY"
+                    }, {
+                     "type": "string",
+                     "m_label": "Size:",
+                     "m_value": "-1,-1"
+                    }, {
+                     "type": "string",
+                     "m_label": "Minimum Size:",
+                     "m_value": "-1,-1"
+                    }, {
+                     "type": "string",
+                     "m_label": "Name:",
+                     "m_value": "m_choice"
+                    }, {
+                     "type": "multi-string",
+                     "m_label": "Tooltip:",
+                     "m_value": ""
+                    }, {
+                     "type": "colour",
+                     "m_label": "Bg Colour:",
+                     "colour": "<Default>"
+                    }, {
+                     "type": "colour",
+                     "m_label": "Fg Colour:",
+                     "colour": "<Default>"
+                    }, {
+                     "type": "font",
+                     "m_label": "Font:",
+                     "m_value": ""
+                    }, {
+                     "type": "bool",
+                     "m_label": "Hidden",
+                     "m_value": false
+                    }, {
+                     "type": "bool",
+                     "m_label": "Disabled",
+                     "m_value": false
+                    }, {
+                     "type": "bool",
+                     "m_label": "Focused",
+                     "m_value": false
+                    }, {
+                     "type": "string",
+                     "m_label": "Class Name:",
+                     "m_value": "clChoice"
+                    }, {
+                     "type": "string",
+                     "m_label": "Include File:",
+                     "m_value": "clChoice.h"
+                    }, {
+                     "type": "string",
+                     "m_label": "Style:",
+                     "m_value": ""
+                    }, {
+                     "type": "multi-string",
+                     "m_label": "Choices:",
+                     "m_value": "Item Number One;Item Number Two;Item Number Three;Item Number Four"
+                    }, {
+                     "type": "string",
+                     "m_label": "Selection:",
+                     "m_value": "0"
+                    }],
+                   "m_events": [{
+                     "m_eventName": "wxEVT_COMMAND_CHOICE_SELECTED",
+                     "m_eventClass": "wxCommandEvent",
+                     "m_eventHandler": "wxCommandEventHandler",
+                     "m_functionNameAndSignature": "OnChoice(wxCommandEvent& event)",
+                     "m_description": "Process a wxEVT_COMMAND_CHOICE_SELECTED event, when an item on the list is selected.",
+                     "m_noBody": false
+                    }],
                    "m_children": []
                   }]
                 }]

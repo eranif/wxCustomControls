@@ -401,7 +401,7 @@ void MainFrame::OnToggleTheme(wxCommandEvent& event)
     m_buttonOne->SetColours(colours);
     m_buttonTwo->SetColours(colours);
     m_buttonDisabled->SetColours(colours);
-
+    m_choice->SetColours(colours);
     m_treeCtrl->Refresh();
     m_dataView->Refresh();
 }
@@ -601,3 +601,7 @@ void MainFrame::OnCloseFolderUI(wxUpdateUIEvent& event)
 }
 
 void MainFrame::OnButtonCloseFolder(wxCommandEvent& event) { OnDeleteAllItems(event); }
+void MainFrame::OnChoice(wxCommandEvent& event)
+{
+    LogMessage(wxString() << "Choice event. " << m_choice->GetStringSelection());
+}
