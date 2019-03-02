@@ -381,6 +381,8 @@ void clButtonBase::SetText(const wxString& text)
     tmp.Replace("&", "");
     tmp.Replace("@@", "&");
     m_text = tmp;
+    SetSizeHints(GetBestSize());
+    if(GetParent() && GetParent()->GetSizer()) { GetParent()->Layout(); }
     Refresh();
 }
 
@@ -402,6 +404,7 @@ void clButtonBase::SetBitmap(const wxBitmap& bmp)
 {
     m_bitmap = bmp;
     SetSizeHints(GetBestSize());
+    if(GetParent() && GetParent()->GetSizer()) { GetParent()->Layout(); }
     Refresh();
 }
 
