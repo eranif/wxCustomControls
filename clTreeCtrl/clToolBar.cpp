@@ -36,6 +36,13 @@ clToolBar::clToolBar(wxWindow* parent, wxWindowID winid, const wxPoint& pos, con
     Bind(wxEVT_ENTER_WINDOW, &clToolBar::OnEnterWindow, this);
     Bind(wxEVT_LEAVE_WINDOW, &clToolBar::OnLeaveWindow, this);
     Bind(wxEVT_SIZE, &clToolBar::OnSize, this);
+
+    // to make sure that the toolbar does not get the focus, we restore the focus back to the previous window
+    Bind(wxEVT_SET_FOCUS, [](wxFocusEvent& event) {
+        event.Skip();
+        wxWindow* oldFocus = event.GetWindow();
+        if(oldFocus) { oldFocus->CallAfter(&wxWindow::SetFocus); }
+    });
 }
 
 clToolBar::~clToolBar()
