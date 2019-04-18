@@ -282,6 +282,7 @@ void clRowEntry::ClearRects()
 
 void clRowEntry::Render(wxWindow* win, wxDC& dc, const clColours& c, int row_index, clSearchText* searcher)
 {
+    wxUnusedVar(searcher);
     wxRect rowRect = GetItemRect();
     bool zebraColouring = (m_tree->HasStyle(wxTR_ROW_LINES) || m_tree->HasStyle(wxDV_ROW_LINES));
     bool even_row = ((row_index % 2) == 0);
@@ -492,6 +493,8 @@ void clRowEntry::RenderText(wxWindow* win, wxDC& dc, const clColours& colours, c
 void clRowEntry::RenderTextSimple(wxWindow* win, wxDC& dc, const clColours& colours, const wxString& text, int x, int y,
                                   size_t col)
 {
+    wxUnusedVar(win);
+    wxUnusedVar(col);
 #ifdef __WXMSW__
     if(m_tree->IsNativeTheme()) {
         dc.SetTextForeground(colours.GetItemTextColour());
@@ -775,7 +778,7 @@ void clRowEntry::RenderCheckBox(wxWindow* win, wxDC& dc, const clColours& colour
 #if 1
     wxUnusedVar(win);
     wxUnusedVar(colours);
-    wxRendererNative::Get().DrawCheckBox(win, dc, rect, checked ? wxCONTROL_CHECKED : 0);
+    wxRendererNative::Get().DrawCheckBox(win, dc, rect, checked ? wxCONTROL_CHECKED : wxCONTROL_NONE);
 #else
     dc.SetPen(wxPen(colours.GetBorderColour(), 2));
     dc.SetBrush(checked ? colours.GetBorderColour() : *wxTRANSPARENT_BRUSH);

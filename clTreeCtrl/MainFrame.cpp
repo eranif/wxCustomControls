@@ -104,13 +104,18 @@ MainFrame::MainFrame(wxWindow* parent)
     m_bitmaps.push_back(images.Bitmap("file"));
     m_treeCtrl->SetBitmaps(&m_bitmaps);
     m_dataView->SetBitmaps(&m_bitmaps);
-    
+
     m_choice->SetBitmap(images.Bitmap("folder_open"));
-    
+
     m_treeCtrl->Bind(wxEVT_TREE_ITEM_EXPANDING, &MainFrame::OnItemExpanding, this);
     m_treeCtrl->Bind(wxEVT_TREE_DELETE_ITEM, &MainFrame::OnItemDeleted, this);
-    m_treeCtrl->Bind(wxEVT_TREE_BEGIN_DRAG, [&](wxTreeEvent& evt) { LogMessage(wxString() << "Drag started"); });
+    m_treeCtrl->Bind(wxEVT_TREE_BEGIN_DRAG, [&](wxTreeEvent& evt) {
+        wxUnusedVar(evt);
+        LogMessage(wxString() << "Drag started");
+    });
+
     m_treeCtrl->Bind(wxEVT_TREE_END_DRAG, [&](wxTreeEvent& evt) {
+        wxUnusedVar(evt);
         LogMessage(wxString() << "Drag ended. Drop is on item: " << m_treeCtrl->GetItemText(evt.GetItem()));
     });
 
@@ -158,6 +163,7 @@ MainFrame::MainFrame(wxWindow* parent)
         menu.Append(wxID_OPEN);
         menu.Bind(wxEVT_MENU,
                   [&](wxCommandEvent& e) {
+                      wxUnusedVar(e);
                       wxArrayTreeItemIds items;
                       if(m_treeCtrl->GetSelections(items)) {
                           for(size_t i = 0; i < items.size(); ++i) {
@@ -170,6 +176,7 @@ MainFrame::MainFrame(wxWindow* parent)
         menu.Append(wxID_NEW);
         menu.Bind(wxEVT_MENU,
                   [&](wxCommandEvent& e) {
+                      wxUnusedVar(e);
                       wxArrayTreeItemIds items;
                       m_treeCtrl->GetSelections(items);
                       MyItemData* cd = dynamic_cast<MyItemData*>(m_treeCtrl->GetItemData(items[0]));
@@ -302,6 +309,7 @@ void MainFrame::LogMessage(const wxString& message) { wxLogMessage(message); }
 
 void MainFrame::OnOpenFolder(wxCommandEvent& event)
 {
+    wxUnusedVar(event);
     wxString path = wxDirSelector();
     if(path.IsEmpty()) { return; }
 
@@ -357,21 +365,32 @@ void MainFrame::OnItemExpanding(wxTreeEvent& event)
     }
 }
 
-void MainFrame::OnExpandAll(wxCommandEvent& event) { m_treeCtrl->ExpandAll(); }
-void MainFrame::OnCollapseAll(wxCommandEvent& event) { m_treeCtrl->CollapseAll(); }
+void MainFrame::OnExpandAll(wxCommandEvent& event)
+{
+    wxUnusedVar(event);
+    m_treeCtrl->ExpandAll();
+}
+void MainFrame::OnCollapseAll(wxCommandEvent& event)
+{
+    wxUnusedVar(event);
+    m_treeCtrl->CollapseAll();
+}
 void MainFrame::OnFirstVisible(wxCommandEvent& event)
 {
+    wxUnusedVar(event);
     wxTreeItemId item = m_treeCtrl->GetFirstVisibleItem();
     m_treeCtrl->SelectItem(item);
 }
 
 void MainFrame::OnNextVisible(wxCommandEvent& event)
 {
+    wxUnusedVar(event);
     wxTreeItemId item = m_treeCtrl->GetNextVisible(m_treeCtrl->GetFocusedItem());
     m_treeCtrl->SelectItem(item);
 }
 void MainFrame::OnEnsureItemVisible(wxCommandEvent& event)
 {
+    wxUnusedVar(event);
     // long index = wxGetNumberFromUser("Item index:", "Item index:", "clTreeCtrl");
     // wxTreeItemId item = m_treeCtrl->RowToItem(index);
     // if(item.IsOk()) { wxMessageBox("Item is: " + m_treeCtrl->GetItemText(item)); }
@@ -385,20 +404,27 @@ void MainFrame::OnItemDeleted(wxTreeEvent& event)
     LogMessage("Item: " + text + " was deleted");
 }
 
-void MainFrame::OnSelectChildren(wxCommandEvent& event) { m_treeCtrl->SelectChildren(m_treeCtrl->GetFocusedItem()); }
+void MainFrame::OnSelectChildren(wxCommandEvent& event)
+{
+    wxUnusedVar(event);
+    m_treeCtrl->SelectChildren(m_treeCtrl->GetFocusedItem());
+}
 void MainFrame::OnNextSibling(wxCommandEvent& event)
 {
+    wxUnusedVar(event);
     m_treeCtrl->SelectItem(m_treeCtrl->GetNextSibling(m_treeCtrl->GetFocusedItem()));
     m_treeCtrl->EnsureVisible(m_treeCtrl->GetFocusedItem());
 }
 
 void MainFrame::OnPrevSibling(wxCommandEvent& event)
 {
+    wxUnusedVar(event);
     m_treeCtrl->SelectItem(m_treeCtrl->GetPrevSibling(m_treeCtrl->GetFocusedItem()));
     m_treeCtrl->EnsureVisible(m_treeCtrl->GetFocusedItem());
 }
 void MainFrame::OnToggleTheme(wxCommandEvent& event)
 {
+    wxUnusedVar(event);
     ++m_selectedColours;
     if(m_selectedColours >= m_coloursArr.size()) { m_selectedColours = 0; }
 
@@ -438,6 +464,7 @@ void MainFrame::OnHideHeaders(wxCommandEvent& event)
 }
 void MainFrame::OnDeleteAllItems(wxCommandEvent& event)
 {
+    wxUnusedVar(event);
     m_treeCtrl->DeleteAllItems();
     DoAddRoot();
 }
@@ -451,6 +478,7 @@ void MainFrame::DoAddRoot()
 
 void MainFrame::OnDVOpenFolder(wxCommandEvent& event)
 {
+    wxUnusedVar(event);
     wxString path = ::wxDirSelector();
     if(path.IsEmpty()) { return; }
     for(size_t i = 0; i < m_dataView->GetItemCount(); ++i) {
@@ -503,6 +531,7 @@ void MainFrame::OnNativeHeader(wxCommandEvent& event)
 
 void MainFrame::OnFillWith500Entries(wxCommandEvent& event)
 {
+    wxUnusedVar(event);
     wxBusyCursor bc;
     m_dataView->DeleteAllItems();
 
@@ -530,7 +559,11 @@ void MainFrame::OnFillWith500Entries(wxCommandEvent& event)
     LogMessage(wxString() << "Added " << itemCount << " entries in: " << timepassed << "ms");
 }
 
-void MainFrame::OnDVDeleteAllItems(wxCommandEvent& event) { m_dataView->DeleteAllItems(); }
+void MainFrame::OnDVDeleteAllItems(wxCommandEvent& event)
+{
+    wxUnusedVar(event);
+    m_dataView->DeleteAllItems();
+}
 
 void MainFrame::OnMenuitemsupportsearchMenuSelected(wxCommandEvent& event)
 {
@@ -540,6 +573,7 @@ void MainFrame::OnMenuitemsupportsearchMenuSelected(wxCommandEvent& event)
 
 void MainFrame::OnTreeFind(wxCommandEvent& event)
 {
+    wxUnusedVar(event);
     wxString findwhat = wxGetTextFromUser("Text to search", "Find");
     if(findwhat.IsEmpty()) { return; }
 
@@ -571,6 +605,7 @@ void MainFrame::OnIncrementalSearch(wxTreeEvent& event)
 
 void MainFrame::OnResetSearch(wxTreeEvent& event)
 {
+    wxUnusedVar(event);
     m_treeCtrl->ClearAllHighlights();
     m_matchedItem = wxTreeItemId();
 }
@@ -592,12 +627,19 @@ void MainFrame::OnDVIncrementalSearch(wxDataViewEvent& event)
 
 void MainFrame::OnDVResetSearch(wxDataViewEvent& event)
 {
+    wxUnusedVar(event);
     m_dataView->ClearAllHighlights();
     m_dvMatchedItem = wxDataViewItem();
 }
-void MainFrame::OnOpen(wxCommandEvent& event) { wxMessageBox("Open button clicked!"); }
+void MainFrame::OnOpen(wxCommandEvent& event)
+{
+    wxUnusedVar(event);
+    wxMessageBox("Open button clicked!");
+}
+
 void MainFrame::OnOpenMenu(wxCommandEvent& event)
 {
+    wxUnusedVar(event);
     wxMenu m;
     m.Append(XRCID("item_1"), _("Open file 1"));
     m.Append(XRCID("item_1"), _("Open file 2"));
@@ -606,10 +648,15 @@ void MainFrame::OnOpenMenu(wxCommandEvent& event)
 void MainFrame::OnColoursUI(wxUpdateUIEvent& event) { event.Enable(false); }
 void MainFrame::OnSetTreeColWidth(wxCommandEvent& event)
 {
+    wxUnusedVar(event);
     int width = ::wxGetNumberFromUser(_("Set the column width"), _("New width"), _("New width"), 300, -2, 1000, this);
     m_treeCtrl->SetColumnWidth(0, width);
 }
-void MainFrame::OnButtonClicked(wxCommandEvent& event) { LogMessage("Button clicked!"); }
+void MainFrame::OnButtonClicked(wxCommandEvent& event)
+{
+    wxUnusedVar(event);
+    LogMessage("Button clicked!");
+}
 
 void MainFrame::OnCloseFolderUI(wxUpdateUIEvent& event)
 {
@@ -619,5 +666,6 @@ void MainFrame::OnCloseFolderUI(wxUpdateUIEvent& event)
 void MainFrame::OnButtonCloseFolder(wxCommandEvent& event) { OnDeleteAllItems(event); }
 void MainFrame::OnChoice(wxCommandEvent& event)
 {
+    wxUnusedVar(event);
     LogMessage(wxString() << "Choice event. " << m_choice->GetStringSelection());
 }
