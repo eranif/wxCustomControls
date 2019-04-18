@@ -350,8 +350,8 @@ wxFont clScrolledPanel::GetDefaultFont()
 {
     wxFont f = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
 #ifdef __WXGTK__
-    static bool once = false;
     static double ratio = 1.0;
+    static bool once = false;
     if(!once) {
         GdkScreen* screen = gdk_screen_get_default();
         if(screen) {
