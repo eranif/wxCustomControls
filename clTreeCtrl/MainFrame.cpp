@@ -450,7 +450,8 @@ void MainFrame::OnDVOpenFolder(wxCommandEvent& event)
         wxDELETE(d);
     }
     m_dataView->DeleteAllItems();
-
+    
+    m_dataView->SetSortFunction(nullptr);
     // load the folders
     wxDir dir(path);
     if(dir.IsOpened()) {
@@ -479,6 +480,11 @@ void MainFrame::OnDVOpenFolder(wxCommandEvent& event)
             cont = dir.GetNext(&filename);
         }
     }
+    
+    // sort the view
+    auto SortFunc = [&](clRowEntry* a, clRowEntry* b) { return a->GetLabel(0).CmpNoCase(b->GetLabel(0)) < 0; };
+    m_dataView->SetSortFunction(SortFunc);
+    
 }
 
 void MainFrame::OnNativeHeader(wxCommandEvent& event)
@@ -508,11 +514,11 @@ void MainFrame::OnFillWith500Entries(wxCommandEvent& event)
         cols.push_back("0KB");
         m_dataView->AppendItem(cols);
     }
+    auto SortFunc = [&](clRowEntry* a, clRowEntry* b) { return a->GetLabel(0).CmpNoCase(b->GetLabel(0)) < 0; };
+    m_dataView->SetSortFunction(SortFunc);
+    long timepassed = sw.Time();
 
     // Now that we got all the items populated, set a sorting function
-    auto SortFunc = [&](clRowEntry* a, clRowEntry* b) { return a->GetLabel(0).CmpNoCase(b->GetLabel(0)) < 0; };
-    long timepassed = sw.Time();
-    m_dataView->SetSortFunction(SortFunc);
     LogMessage(wxString() << "Added " << itemCount << " entries in: " << timepassed << "ms");
 }
 
