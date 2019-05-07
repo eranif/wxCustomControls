@@ -27,6 +27,14 @@ public:
     ~MyDvData() {}
 };
 
+static wxVariant MakeChoice(const wxArrayString& choices, int sel, int bmp_index)
+{
+    clDataViewChoice ict(choices, sel, bmp_index);
+    wxVariant v;
+    v << ict;
+    return v;
+}
+
 static wxVariant MakeIconText(const wxString& text, int bmp_index)
 {
     clDataViewTextBitmap ict(text, bmp_index);
