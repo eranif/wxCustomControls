@@ -27,9 +27,9 @@ public:
     ~MyDvData() {}
 };
 
-static wxVariant MakeChoice(const wxArrayString& choices, int sel, int bmp_index)
+static wxVariant MakeChoice(const wxString& label, int bmp_index)
 {
-    clDataViewChoice ict(choices, sel, bmp_index);
+    clDataViewChoice ict(label, bmp_index);
     wxVariant v;
     v << ict;
     return v;
@@ -507,8 +507,7 @@ void MainFrame::OnDVOpenFolder(wxCommandEvent& event)
                 // A file
                 wxString t;
                 t << std::ceil((double)fn.GetSize().ToDouble() / 1024.0) << "KB";
-
-                cols.push_back(MakeCheckBox(false, fn.GetFullName(), 2));
+                cols.push_back(MakeChoice(fn.GetFullName(), 2));
                 cols.push_back(true);
                 cols.push_back(t);
             }

@@ -179,12 +179,17 @@ public:
     bool IsExpanded() const { return HasFlag(kNF_Expanded) || HasFlag(kNF_Hidden); }
     bool SetExpanded(bool b);
     bool IsRoot() const { return GetParent() == nullptr; }
-
+    
     // Cell accessors
     void SetBitmapIndex(int bitmapIndex, size_t col = 0);
     void SetBitmapSelectedIndex(int bitmapIndex, size_t col = 0);
     void SetLabel(const wxString& label, size_t col = 0);
-
+    /**
+     * @brief make this specific cell as "choice" (dropdown will drawn to the right)
+     */
+    void SetChoice(bool b, size_t col = 0);
+    bool IsChoice(size_t col) const;
+    
     // Set this cell as "checkable" cell with possible label
     void SetChecked(bool checked, int bitmapIndex, const wxString& label, size_t col = 0);
     bool IsChecked(size_t col = 0) const;

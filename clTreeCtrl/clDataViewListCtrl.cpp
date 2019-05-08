@@ -334,6 +334,12 @@ void clDataViewListCtrl::DoSetCellValue(clRowEntry* row, size_t col, const wxVar
         //  update the row with the icon + text
         row->SetLabel(iconText.GetText(), col);
         row->SetBitmapIndex(iconText.GetBitmapIndex(), col);
+    } else if(variantType == "clDataViewChoice") {
+        clDataViewChoice choice;
+        choice << value;
+        row->SetChoice(true, col);
+        row->SetBitmapIndex(choice.GetBitmapIndex());
+        row->SetLabel(choice.GetLabel());
     } else if(variantType == "double") {
         row->SetLabel(wxString() << value.GetDouble(), col);
     } else if(variantType == "datetime") {
