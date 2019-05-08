@@ -157,6 +157,7 @@ public:
     const wxRect& GetItemRect() const { return m_rowRect; }
     const wxRect& GetButtonRect() const { return m_buttonRect; }
     const wxRect& GetCheckboxRect(size_t col = 0) const;
+    const wxRect& GetChoiceRect(size_t col = 0) const;
 
     void AddChild(clRowEntry* child);
 

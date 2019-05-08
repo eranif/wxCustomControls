@@ -781,6 +781,16 @@ const wxRect& clRowEntry::GetCheckboxRect(size_t col) const
     return cell.GetCheckboxRect();
 }
 
+const wxRect& clRowEntry::GetChoiceRect(size_t col) const
+{
+    const clCellValue& cell = GetColumn(col);
+    if(!cell.IsOk()) {
+        static wxRect emptyRect;
+        return emptyRect;
+    }
+    return cell.GetDropDownRect();
+}
+
 void clRowEntry::RenderCheckBox(wxWindow* win, wxDC& dc, const clColours& colours, const wxRect& rect, bool checked)
 {
 #if 1
