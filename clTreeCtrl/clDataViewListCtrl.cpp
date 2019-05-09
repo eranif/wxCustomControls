@@ -4,6 +4,8 @@
 #include <wx/dataview.h>
 #include <wx/dcbuffer.h>
 #include <wx/dcgraph.h>
+#include <wx/menu.h>
+#include <wx/xrc/xmlres.h>
 
 #define DV_ITEM(tree_item) wxDataViewItem(tree_item.GetID())
 #define TREE_ITEM(dv_item) wxTreeItemId(dv_item.GetID())
@@ -365,7 +367,7 @@ void clDataViewListCtrl::SetSortFunction(const clSortFunc_t& CompareFunc)
         // we are done
         return;
     }
-    
+
     // This list ctrl is composed of a hidden root + its children
     // Step 1:
     clRowEntry::Vec_t& children = root->GetChildren();
@@ -389,10 +391,10 @@ void clDataViewListCtrl::SetSortFunction(const clSortFunc_t& CompareFunc)
         child->SetPrev(prev);
         prev = child;
     }
-    
+
     // and store the new sorting method
     m_model.SetSortFunction(CompareFunc);
-    
+
     Refresh();
 }
 
@@ -451,4 +453,37 @@ void clDataViewListCtrl::SetItemChecked(const wxDataViewItem& item, bool checked
 bool clDataViewListCtrl::IsItemChecked(const wxDataViewItem& item, size_t col) const
 {
     return clTreeCtrl::IsChecked(TREE_ITEM(item), col);
+}
+
+void clDataViewListCtrl::ShowMenuForItem(const wxDataViewItem& item, wxMenu& menu, size_t col)
+{
+    clRowEntry* row = m_model.ToPtr(TREE_ITEM(item));
+    if(!row) { return; }
+
+    wxRect r = row->GetCellRect(col);
+    PopupMenu(&menu, r.GetBottomLeft());
+}
+
+void clDataViewListCtrl::ShowStringSelectionMenu(const wxDataViewItem& item, const wxArrayString& choices, size_t col)
+{
+    clRowEntry* row = m_model.ToPtr(TREE_ITEM(item));
+    if(!row) { return; }
+    const wxString& currentSelection = row->GetLabel(col);
+    wxMenu menu;
+    wxString selectedString;
+    std::unordered_map<int, wxString> M;
+    for(const wxString& str : choices) {
+        int id = wxXmlResource::GetXRCID(str);
+        wxMenuItem* item = menu.Append(id, str, str, wxITEM_CHECK);
+        item->Check(currentSelection == str);
+        M.insert({ id, str });
+    }
+    menu.Bind(wxEVT_MENU,
+              [&](wxCommandEvent& event) {
+                  if(M.count(event.GetId())) { selectedString = M[event.GetId()]; }
+              },
+              wxID_ANY);
+    wxRect r = row->GetCellRect(col);
+    PopupMenu(&menu, r.GetBottomLeft());
+    if(!selectedString.IsEmpty()) { SetItemText(item, selectedString, col); }
 }

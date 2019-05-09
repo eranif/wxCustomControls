@@ -214,6 +214,18 @@ MainFrame::MainFrame(wxWindow* parent)
     // Data view events
     //===-----------------------------------------------------------------------------
     //===-----------------------------------------------------------------------------
+    m_dataView->Bind(wxEVT_DATAVIEW_CHOICE, [&](wxDataViewEvent& e) {
+        e.Skip();
+        
+        MyDvData *d = reinterpret_cast<MyDvData*>(m_dataView->GetItemData(e.GetItem()));
+        wxFileName fn(d->m_path);
+        
+        wxArrayString choices;
+        choices.Add(fn.GetFullName());
+        choices.Add(fn.GetFullPath());
+        m_dataView->ShowStringSelectionMenu(e.GetItem(), choices, e.GetColumn());
+    });
+
     m_dataView->Bind(wxEVT_DATAVIEW_ITEM_ACTIVATED, [&](wxDataViewEvent& event) {
         event.Skip();
         wxDataViewItemArray items;
@@ -486,7 +498,7 @@ void MainFrame::OnDVOpenFolder(wxCommandEvent& event)
         wxDELETE(d);
     }
     m_dataView->DeleteAllItems();
-    
+
     m_dataView->SetSortFunction(nullptr);
     // load the folders
     wxDir dir(path);
@@ -515,11 +527,10 @@ void MainFrame::OnDVOpenFolder(wxCommandEvent& event)
             cont = dir.GetNext(&filename);
         }
     }
-    
+
     // sort the view
     auto SortFunc = [&](clRowEntry* a, clRowEntry* b) { return a->GetLabel(0).CmpNoCase(b->GetLabel(0)) < 0; };
     m_dataView->SetSortFunction(SortFunc);
-    
 }
 
 void MainFrame::OnNativeHeader(wxCommandEvent& event)

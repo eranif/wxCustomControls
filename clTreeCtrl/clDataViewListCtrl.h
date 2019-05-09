@@ -167,6 +167,16 @@ public:
      * @brief remove all columns from the control
      */
     void ClearColumns();
+
+    /**
+     * @brief display a menu for a given item & column ("cell")
+     */
+    void ShowMenuForItem(const wxDataViewItem& item, wxMenu& menu, size_t col = 0);
+
+    /**
+     * @brief display a string selection menu for a given cell. The selection string is set as the cell text
+     */
+    void ShowStringSelectionMenu(const wxDataViewItem& item, const wxArrayString& choices, size_t col = 0);
 };
 
 // Helper class passing bitmap index + text
@@ -290,7 +300,7 @@ public:
 
     void SetLabel(const wxString& label) { this->m_label = label; }
     const wxString& GetLabel() const { return m_label; }
-    
+
     bool IsSameAs(const clDataViewChoice& other) const
     {
         return m_label == other.m_label && m_bitmapIndex == other.m_bitmapIndex;
