@@ -22,6 +22,7 @@ IMPLEMENT_VARIANT_OBJECT_EXPORTED(clDataViewChoice, WXDLLIMPEXP_SDK);
 wxDEFINE_EVENT(wxEVT_DATAVIEW_SEARCH_TEXT, wxDataViewEvent);
 wxDEFINE_EVENT(wxEVT_DATAVIEW_CLEAR_SEARCH, wxDataViewEvent);
 wxDEFINE_EVENT(wxEVT_DATAVIEW_CHOICE_BUTTON, wxDataViewEvent);
+wxDEFINE_EVENT(wxEVT_DATAVIEW_CHOICE, wxDataViewEvent);
 
 std::unordered_map<int, int> clDataViewListCtrl::m_stylesMap;
 clDataViewListCtrl::clDataViewListCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size,
@@ -485,5 +486,18 @@ void clDataViewListCtrl::ShowStringSelectionMenu(const wxDataViewItem& item, con
               wxID_ANY);
     wxRect r = row->GetCellRect(col);
     PopupMenu(&menu, r.GetBottomLeft());
-    if(!selectedString.IsEmpty()) { SetItemText(item, selectedString, col); }
+    if(!selectedString.IsEmpty()) {
+        SetItemText(item, selectedString, col);
+        // fire selection made event
+#if wxCHECK_VERSION(3, 1, 0)
+        wxDataViewEvent e(wxEVT_DATAVIEW_CHOICE, &m_dummy, item);
+#else
+        wxDataViewEvent e(wxEVT_DATAVIEW_CHOICE);
+        e.SetItem(item);
+#endif
+        e.SetEventObject(this);
+        e.SetColumn(col);
+        e.SetString(selectedString);
+        GetEventHandler()->ProcessEvent(e);
+    }
 }
