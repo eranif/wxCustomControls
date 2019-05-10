@@ -437,10 +437,18 @@ void clRowEntry::Render(wxWindow* win, wxDC& dc, const clColours& c, int row_ind
                                 rowRect.GetHeight());
             dropDownRect = dropDownRect.CenterIn(rowRect, wxVERTICAL);
             DrawingUtils::DrawDropDownArrow(win, dc, dropDownRect, wxNullColour);
-            textXOffset += dropDownRect.GetWidth();
-            textXOffset += X_SPACER;
             // Keep the rect to test clicks
             cell.SetDropDownRect(dropDownRect);
+            textXOffset += dropDownRect.GetWidth();
+            textXOffset += X_SPACER;
+            
+            // Draw a separator line between the drop down arrow and the rest of the cell content
+            dropDownRect.Deflate(1);
+            dropDownRect = dropDownRect.CenterIn(rowRect, wxVERTICAL);
+            dc.SetPen(wxPen(colours.GetHeaderVBorderColour(), 1, PEN_STYLE));
+            dc.SetBrush(*wxTRANSPARENT_BRUSH);
+            dc.DrawRectangle(dropDownRect);
+            
         } else {
             cell.SetDropDownRect(wxRect());
         }
@@ -838,7 +846,7 @@ void clRowEntry::SetChoice(bool b, size_t col)
 {
     clCellValue& cell = GetColumn(col);
     if(!cell.IsOk()) { return; }
-    cell.SetType(clCellValue::kTypeChoice);
+    cell.SetType(b ? clCellValue::kTypeChoice : clCellValue::kTypeString);
 }
 
 bool clRowEntry::IsChoice(size_t col) const
