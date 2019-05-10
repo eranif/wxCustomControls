@@ -346,8 +346,8 @@ void clDataViewListCtrl::DoSetCellValue(clRowEntry* row, size_t col, const wxVar
         clDataViewChoice choice;
         choice << value;
         row->SetChoice(true, col);
-        row->SetBitmapIndex(choice.GetBitmapIndex());
-        row->SetLabel(choice.GetLabel());
+        row->SetBitmapIndex(choice.GetBitmapIndex(), col);
+        row->SetLabel(choice.GetLabel(), col);
     } else if(variantType == "double") {
         row->SetLabel(wxString() << value.GetDouble(), col);
     } else if(variantType == "datetime") {
