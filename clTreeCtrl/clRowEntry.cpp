@@ -443,11 +443,10 @@ void clRowEntry::Render(wxWindow* win, wxDC& dc, const clColours& c, int row_ind
             textXOffset += X_SPACER;
             
             // Draw a separator line between the drop down arrow and the rest of the cell content
-            dropDownRect.Deflate(1);
+            dropDownRect.Deflate(3);
             dropDownRect = dropDownRect.CenterIn(rowRect, wxVERTICAL);
             dc.SetPen(wxPen(colours.GetHeaderVBorderColour(), 1, PEN_STYLE));
-            dc.SetBrush(*wxTRANSPARENT_BRUSH);
-            dc.DrawRectangle(dropDownRect);
+            dc.DrawLine(dropDownRect.GetTopLeft(), dropDownRect.GetBottomLeft());
             
         } else {
             cell.SetDropDownRect(wxRect());
