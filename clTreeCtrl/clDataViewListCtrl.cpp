@@ -21,7 +21,7 @@ IMPLEMENT_VARIANT_OBJECT_EXPORTED(clDataViewChoice, WXDLLIMPEXP_SDK);
 
 wxDEFINE_EVENT(wxEVT_DATAVIEW_SEARCH_TEXT, wxDataViewEvent);
 wxDEFINE_EVENT(wxEVT_DATAVIEW_CLEAR_SEARCH, wxDataViewEvent);
-wxDEFINE_EVENT(wxEVT_DATAVIEW_CHOICE, wxDataViewEvent);
+wxDEFINE_EVENT(wxEVT_DATAVIEW_CHOICE_BUTTON, wxDataViewEvent);
 
 std::unordered_map<int, int> clDataViewListCtrl::m_stylesMap;
 clDataViewListCtrl::clDataViewListCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size,
@@ -154,7 +154,7 @@ void clDataViewListCtrl::OnConvertEvent(wxTreeEvent& event)
     } else if(event.GetEventType() == wxEVT_TREE_ITEM_VALUE_CHANGED) {
         type = wxEVT_DATAVIEW_ITEM_VALUE_CHANGED;
     } else if(event.GetEventType() == wxEVT_TREE_CHOICE) {
-        type = wxEVT_DATAVIEW_CHOICE;
+        type = wxEVT_DATAVIEW_CHOICE_BUTTON;
     }
     if(type != wxEVT_ANY) { SendDataViewEvent(type, event, eventText); }
 }

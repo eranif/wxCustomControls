@@ -214,7 +214,7 @@ MainFrame::MainFrame(wxWindow* parent)
     // Data view events
     //===-----------------------------------------------------------------------------
     //===-----------------------------------------------------------------------------
-    m_dataView->Bind(wxEVT_DATAVIEW_CHOICE, [&](wxDataViewEvent& e) {
+    m_dataView->Bind(wxEVT_DATAVIEW_CHOICE_BUTTON, [&](wxDataViewEvent& e) {
         e.Skip();
         
         MyDvData *d = reinterpret_cast<MyDvData*>(m_dataView->GetItemData(e.GetItem()));
