@@ -66,6 +66,7 @@ clToolBar::~clToolBar()
 
 void clToolBar::OnPaint(wxPaintEvent& event)
 {
+    wxUnusedVar(event);
     wxAutoBufferedPaintDC dc(this);
     PrepareDC(dc);
     wxGCDC gcdc(dc);
@@ -100,8 +101,10 @@ void clToolBar::OnPaint(wxPaintEvent& event)
         m_chevronRect = chevronRect;
     }
 }
+
 void clToolBar::RenderGroup(int& xx, const clToolBar::ToolVect_t& G, wxDC& gcdc, bool isLastGroup)
 {
+    wxUnusedVar(isLastGroup);
     wxRect clientRect = GetClientRect();
 
     // Calculate the group size
@@ -110,22 +113,22 @@ void clToolBar::RenderGroup(int& xx, const clToolBar::ToolVect_t& G, wxDC& gcdc,
         wxSize buttonSize = button->CalculateSize(gcdc);
         groupWidth += buttonSize.GetWidth();
     });
-    
-//    bool drawBackground = !((G.size() == 1) && G[0]->IsStretchableSpace()) || !isLastGroup;
-//    if(drawBackground) {
-//        wxRect bgRect = wxRect(wxPoint(xx, 0), wxSize(groupWidth, clientRect.GetHeight()));
-//#ifdef __WXOSX__
-//        bgRect.SetHeight(bgRect.GetHeight() - 5);
-//        bgRect = bgRect.CenterIn(clientRect, wxVERTICAL);
-//#endif
-//        {
-//            wxColour lineColour = DrawingUtils::GetMenuBarBgColour(IsMiniToolBar());
-//            lineColour = lineColour.ChangeLightness(90);
-//            gcdc.SetPen(lineColour);
-//            gcdc.SetBrush(*wxTRANSPARENT_BRUSH);
-//            gcdc.DrawRectangle(bgRect);
-//        }
-//    }
+
+    //    bool drawBackground = !((G.size() == 1) && G[0]->IsStretchableSpace()) || !isLastGroup;
+    //    if(drawBackground) {
+    //        wxRect bgRect = wxRect(wxPoint(xx, 0), wxSize(groupWidth, clientRect.GetHeight()));
+    //#ifdef __WXOSX__
+    //        bgRect.SetHeight(bgRect.GetHeight() - 5);
+    //        bgRect = bgRect.CenterIn(clientRect, wxVERTICAL);
+    //#endif
+    //        {
+    //            wxColour lineColour = DrawingUtils::GetMenuBarBgColour(IsMiniToolBar());
+    //            lineColour = lineColour.ChangeLightness(90);
+    //            gcdc.SetPen(lineColour);
+    //            gcdc.SetBrush(*wxTRANSPARENT_BRUSH);
+    //            gcdc.DrawRectangle(bgRect);
+    //        }
+    //    }
 
     // Now draw the buttons
     std::for_each(G.begin(), G.end(), [&](clToolBarButtonBase* button) {
@@ -269,14 +272,19 @@ void clToolBar::OnMotion(wxMouseEvent& event)
             button->SetHover(false);
         }
     }
-    if (!tooltipValid) { UnsetToolTip(); }
+    if(!tooltipValid) { UnsetToolTip(); }
     if(refreshNeeded) { Refresh(); }
 }
 
-void clToolBar::OnEnterWindow(wxMouseEvent& event) { OnMotion(event); }
+void clToolBar::OnEnterWindow(wxMouseEvent& event)
+{
+    wxUnusedVar(event);
+    OnMotion(event);
+}
 
 void clToolBar::OnLeaveWindow(wxMouseEvent& event)
 {
+    wxUnusedVar(event);
     if(!m_popupShown) {
         for(size_t i = 0; i < m_buttons.size(); ++i) {
             m_buttons[i]->ClearRenderFlags();
@@ -455,6 +463,7 @@ void clToolBar::DoShowOverflowMenu()
         menu.Append(XRCID("customise_toolbar"), _("Customise..."));
         menu.Bind(wxEVT_MENU,
                   [&](wxCommandEvent& event) {
+                      wxUnusedVar(event);
                       wxCommandEvent evtCustomise(wxEVT_TOOLBAR_CUSTOMISE);
                       evtCustomise.SetEventObject(this);
                       GetEventHandler()->AddPendingEvent(evtCustomise);
@@ -574,6 +583,6 @@ void clToolBar::PrepareForDrawings(wxDC& dc, std::vector<ToolVect_t>& G, const w
     }
 }
 
-int clToolBar::GetXSpacer() const { return HasFlag(kMiniToolBar) ? 5 : 10; }
+int clToolBar::GetXSpacer() const { return HasFlag(kMiniToolBar) ? 2 : 5; }
 
-int clToolBar::GetYSpacer() const { return HasFlag(kMiniToolBar) ? 5 : 10; }
+int clToolBar::GetYSpacer() const { return HasFlag(kMiniToolBar) ? 2 : 5; }

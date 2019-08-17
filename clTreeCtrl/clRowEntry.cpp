@@ -12,6 +12,10 @@
 #include <wx/window.h>
 #include <drawingutils.h>
 
+#if !wxCHECK_VERSION(3, 1, 0)
+#define wxCONTROL_NONE 0
+#endif
+
 #ifdef __WXMSW__
 #define PEN_STYLE wxPENSTYLE_SHORT_DASH
 #else
@@ -843,9 +847,10 @@ int clRowEntry::GetCheckBoxWidth(wxWindow* win)
 
 void clRowEntry::SetChoice(bool b, size_t col)
 {
+    wxUnusedVar(b);
     clCellValue& cell = GetColumn(col);
     if(!cell.IsOk()) { return; }
-    cell.SetType(b ? clCellValue::kTypeChoice : clCellValue::kTypeString);
+    cell.SetType(clCellValue::kTypeChoice);
 }
 
 bool clRowEntry::IsChoice(size_t col) const
