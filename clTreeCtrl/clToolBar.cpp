@@ -583,6 +583,7 @@ void clToolBar::PrepareForDrawings(wxDC& dc, std::vector<ToolVect_t>& G, const w
     }
 }
 
-int clToolBar::GetXSpacer() const { return HasFlag(kMiniToolBar) ? 2 : 5; }
+int clToolBar::GetXSpacer() const { return HasFlag(kMiniToolBar) ? 3 : 6; }
 
-int clToolBar::GetYSpacer() const { return HasFlag(kMiniToolBar) ? 2 : 5; }
+int clToolBar::GetYSpacer() const { return HasFlag(kMiniToolBar) ? 4 : 8; }
+
