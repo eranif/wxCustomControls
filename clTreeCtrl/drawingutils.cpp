@@ -300,6 +300,7 @@ wxColour DrawingUtils::GetMenuTextColour() { return wxSystemSettings::GetColour(
 
 wxColour DrawingUtils::GetMenuBarBgColour(bool miniToolbar)
 {
+    wxUnusedVar(miniToolbar);
 #ifdef __WXMSW__
     // return miniToolbar ? wxSystemSettings::GetColour(wxSYS_COLOUR_MENUBAR) : wxColour("rgb(245,246,247)");
     return wxColour("rgb(245,246,247)");
@@ -314,6 +315,7 @@ wxColour DrawingUtils::GetMenuBarBgColour(bool miniToolbar)
 
 void DrawingUtils::FillMenuBarBgColour(wxDC& dc, const wxRect& rect, bool miniToolbar)
 {
+    wxUnusedVar(miniToolbar);
 #ifdef __WXMSW__
 
     wxColour topColour(*wxWHITE);
@@ -596,6 +598,7 @@ wxColour DrawingUtils::GetButtonTextColour() { return wxSystemSettings::GetColou
 void DrawingUtils::DrawButtonX(wxDC& dc, wxWindow* win, const wxRect& rect, const wxColour& penColour,
                                const wxColour& bgColouur, eButtonState state)
 {
+    wxUnusedVar(penColour);
 #if defined(__WXMSW__) || defined(__WXOSX__)
     size_t flags = 0;
     switch(state) {
@@ -652,6 +655,7 @@ void DrawingUtils::DrawButtonX(wxDC& dc, wxWindow* win, const wxRect& rect, cons
 
 void DrawingUtils::DrawDropDownArrow(wxWindow* win, wxDC& dc, const wxRect& rect, const wxColour& colour)
 {
+    wxUnusedVar(win);
     // Draw an arrow
     wxRect buttonRect(rect);
     int sz = wxMin(rect.GetHeight(), rect.GetWidth());
@@ -696,6 +700,7 @@ wxColour DrawingUtils::GetCaptionTextColour()
 void DrawingUtils::DrawNativeChoice(wxWindow* win, wxDC& dc, const wxRect& rect, const wxString& label,
                                     const wxBitmap& bmp, int align)
 {
+    wxUnusedVar(align);
     wxRect choiceRect = rect;
 #if defined(__WXMSW__) || defined(__WXGTK__)
 #ifdef __WXMSW__

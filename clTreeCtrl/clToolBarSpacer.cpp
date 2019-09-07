@@ -9,6 +9,7 @@ clToolBarSpacer::~clToolBarSpacer() {}
 
 wxSize clToolBarSpacer::CalculateSize(wxDC& dc) const
 {
+    wxUnusedVar(dc);
     return wxSize(m_toolbar->GetXSpacer() * 10 + 1, -1);
 }
 

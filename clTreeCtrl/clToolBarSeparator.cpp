@@ -9,6 +9,7 @@ clToolBarSeparator::~clToolBarSeparator() {}
 
 wxSize clToolBarSeparator::CalculateSize(wxDC& dc) const
 {
+    wxUnusedVar(dc);
     return wxSize(m_toolbar->GetXSpacer() + 1 + m_toolbar->GetXSpacer(), -1);
 }
 
