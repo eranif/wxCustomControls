@@ -5,6 +5,15 @@
       <![CDATA[00080001N0005Debug0000000000000001N0011Debug_Linux0000000000000001N0016Debug_Linux_GTK30000000000000001N0009OSX_Debug0000000000000001N0011OSX_Release0000000000000001N0007Release0000000000000001N0013Release_Linux0000000000000001N0018Release_Linux_GTK3000000000000]]>
     </Plugin>
   </Plugins>
+  <Reconciliation>
+    <Regexes/>
+    <Excludepaths/>
+    <Ignorefiles/>
+    <Extensions>
+      <![CDATA[*.cpp;*.c;*.h;*.hpp;*.xrc;*.wxcp;*.fbp]]>
+    </Extensions>
+    <Topleveldir>/src/wxCustomControls/clTreeCtrl</Topleveldir>
+  </Reconciliation>
   <VirtualDirectory Name="Controls">
     <VirtualDirectory Name="Common">
       <File Name="clChoice.cpp"/>

@@ -67,6 +67,7 @@ bool clTreeCtrl::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, con
     return true;
 }
 
+
 void clTreeCtrl::DoInitialize()
 {
     wxSize textSize = GetTextSize("Tp");
