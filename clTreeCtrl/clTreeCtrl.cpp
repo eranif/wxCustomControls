@@ -67,12 +67,23 @@ bool clTreeCtrl::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, con
     return true;
 }
 
-void clTreeCtrl::DoInitialize()
+void clTreeCtrl::UpdateLineHeight()
 {
-    wxSize textSize = GetTextSize("Tp");
+    wxMemoryDC tmpDC;
+    wxBitmap bmp(1, 1);
+    tmpDC.SelectObject(bmp);
+    wxGCDC gcdc(tmpDC);
+
+    gcdc.SetFont(GetDefaultFont());
+    wxSize textSize = gcdc.GetTextExtent("Tp");
+
     SetLineHeight(clRowEntry::Y_SPACER + textSize.GetHeight() + clRowEntry::Y_SPACER);
     SetIndent(GetLineHeight());
+}
 
+void clTreeCtrl::DoInitialize()
+{
+    UpdateLineHeight();
     Bind(wxEVT_IDLE, &clTreeCtrl::OnIdle, this);
     Bind(wxEVT_PAINT, &clTreeCtrl::OnPaint, this);
     Bind(wxEVT_ERASE_BACKGROUND, [&](wxEraseEvent& event) { wxUnusedVar(event); });
@@ -1229,3 +1240,16 @@ void clTreeCtrl::LineDown() { ScrollRows(1, wxDOWN); }
 void clTreeCtrl::PageDown() { ScrollRows(GetNumLineCanFitOnScreen(), wxDOWN); }
 
 void clTreeCtrl::PageUp() { ScrollRows(GetNumLineCanFitOnScreen(), wxUP); }
+
+void clTreeCtrl::SetDefaultFont(const wxFont& font)
+{
+    m_defaultFont = font;
+    UpdateLineHeight();
+    Refresh();
+}
+
+wxFont clTreeCtrl::GetDefaultFont() const
+{
+    if(m_defaultFont.IsOk()) { return m_defaultFont; }
+    return clScrolledPanel::GetDefaultFont();
+}

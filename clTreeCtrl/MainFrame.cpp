@@ -104,7 +104,9 @@ MainFrame::MainFrame(wxWindow* parent)
     m_bitmaps.push_back(images.Bitmap("file"));
     m_treeCtrl->SetBitmaps(&m_bitmaps);
     m_dataView->SetBitmaps(&m_bitmaps);
-
+    //m_dataView->SetDefaultFont(wxFont(wxFontInfo(10).Family(wxFONTFAMILY_TELETYPE).FaceName("Fira Code")));
+    //m_treeCtrl->SetDefaultFont(wxFont(wxFontInfo(10).Family(wxFONTFAMILY_TELETYPE).FaceName("Fira Code")));
+    
     m_choice->SetBitmap(images.Bitmap("folder_open"));
 
     m_treeCtrl->Bind(wxEVT_TREE_ITEM_EXPANDING, &MainFrame::OnItemExpanding, this);
@@ -681,7 +683,23 @@ void MainFrame::OnChoice(wxCommandEvent& event)
     wxUnusedVar(event);
     LogMessage(wxString() << "Choice event. " << m_choice->GetStringSelection());
 }
-void MainFrame::OnLineDown(wxCommandEvent& event) { m_dataView->LineDown(); }
-void MainFrame::OnLineUp(wxCommandEvent& event) { m_dataView->LineUp(); }
-void MainFrame::OnPgDown(wxCommandEvent& event) { m_dataView->PageDown(); }
-void MainFrame::OnPgUp(wxCommandEvent& event) { m_dataView->PageUp(); }
+void MainFrame::OnLineDown(wxCommandEvent& event)
+{
+    wxUnusedVar(event);
+    m_dataView->LineDown();
+}
+void MainFrame::OnLineUp(wxCommandEvent& event)
+{
+    wxUnusedVar(event);
+    m_dataView->LineUp();
+}
+void MainFrame::OnPgDown(wxCommandEvent& event)
+{
+    wxUnusedVar(event);
+    m_dataView->PageDown();
+}
+void MainFrame::OnPgUp(wxCommandEvent& event)
+{
+    wxUnusedVar(event);
+    m_dataView->PageUp();
+}

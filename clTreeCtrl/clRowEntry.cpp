@@ -332,8 +332,8 @@ void clRowEntry::Render(wxWindow* win, wxDC& dc, const clColours& c, int row_ind
     for(size_t i = 0; i < m_cells.size(); ++i) {
         bool last_cell = (i == (m_cells.size() - 1));
         colours = c; // reset the colours
-        wxFont f = clScrolledPanel::GetDefaultFont();
         clCellValue& cell = GetColumn(i);
+        wxFont f = cell.GetFont().IsOk() ? cell.GetFont() : m_tree->GetDefaultFont();
         if(cell.GetFont().IsOk()) { f = cell.GetFont(); }
         if(cell.GetTextColour().IsOk()) { colours.SetItemTextColour(cell.GetTextColour()); }
         if(cell.GetBgColour().IsOk()) { colours.SetItemBgColour(cell.GetBgColour()); }
@@ -602,7 +602,7 @@ int clRowEntry::CalcItemWidth(wxDC& dc, int rowHeight, size_t col)
     if(col >= m_cells.size()) { return 0; }
 
     clCellValue& cell = GetColumn(col);
-    wxFont f = clScrolledPanel::GetDefaultFont();
+    wxFont f = GetFont().IsOk() ? GetFont() : m_tree->GetDefaultFont();
     if(cell.GetFont().IsOk()) { f = cell.GetFont(); }
     dc.SetFont(f);
 

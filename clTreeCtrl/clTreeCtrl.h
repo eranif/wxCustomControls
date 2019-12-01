@@ -27,6 +27,7 @@ protected:
     bool m_needToClearDefaultHeader = true;
     long m_treeStyle = 0;
     int m_scrollLines = 0;
+    wxFont m_defaultFont = wxNullFont;
 
 private:
     wxPoint DoFixPoint(const wxPoint& pt);
@@ -54,7 +55,8 @@ private:
 protected:
     void UpdateScrollBar();
     void DoAddHeader(const wxString& label, const wxBitmap& bmp, int width = wxCOL_WIDTH_AUTOSIZE);
-
+    void UpdateLineHeight();
+    
 public:
     virtual int GetFirstItemPosition() const;
     virtual int GetRange() const;
@@ -64,6 +66,9 @@ public:
     virtual ~clTreeCtrl();
     bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
                 const wxSize& size = wxDefaultSize, long style = 0);
+
+    void SetDefaultFont(const wxFont& font);
+    wxFont GetDefaultFont() const;
 
     //===--------------------
     // Search support
