@@ -200,6 +200,20 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
         new wxMenuItem(menu_clDataViewListCtrl, ID_DV_DELETE_ALL_ITEMS, _("Delete All Items"), wxT(""), wxITEM_NORMAL);
     menu_clDataViewListCtrl->Append(m_menuItem89);
 
+    menu_clDataViewListCtrl->AppendSeparator();
+
+    m_menuItem147 = new wxMenuItem(menu_clDataViewListCtrl, wxID_UP, _("Line Up"), wxT(""), wxITEM_NORMAL);
+    menu_clDataViewListCtrl->Append(m_menuItem147);
+
+    m_menuItem149 = new wxMenuItem(menu_clDataViewListCtrl, wxID_DOWN, _("Line Down"), wxT(""), wxITEM_NORMAL);
+    menu_clDataViewListCtrl->Append(m_menuItem149);
+
+    m_menuItem151 = new wxMenuItem(menu_clDataViewListCtrl, ID_PG_UP, _("Page Up"), wxT(""), wxITEM_NORMAL);
+    menu_clDataViewListCtrl->Append(m_menuItem151);
+
+    m_menuItem153 = new wxMenuItem(menu_clDataViewListCtrl, ID_PG_DOWN, _("Page Down"), wxT(""), wxITEM_NORMAL);
+    menu_clDataViewListCtrl->Append(m_menuItem153);
+
     menu_Style = new wxMenu();
     m_myMenuBar->Append(menu_Style, _("Style"));
 
@@ -289,6 +303,14 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
                   wxCommandEventHandler(MainFrameBaseClass::OnFillWith500Entries), NULL, this);
     this->Connect(m_menuItem89->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                   wxCommandEventHandler(MainFrameBaseClass::OnDVDeleteAllItems), NULL, this);
+    this->Connect(m_menuItem147->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                  wxCommandEventHandler(MainFrameBaseClass::OnLineUp), NULL, this);
+    this->Connect(m_menuItem149->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                  wxCommandEventHandler(MainFrameBaseClass::OnLineDown), NULL, this);
+    this->Connect(m_menuItem151->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                  wxCommandEventHandler(MainFrameBaseClass::OnPgUp), NULL, this);
+    this->Connect(m_menuItem153->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                  wxCommandEventHandler(MainFrameBaseClass::OnPgDown), NULL, this);
     this->Connect(m_menuItemZebra->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                   wxCommandEventHandler(MainFrameBaseClass::OnZebraColouring), NULL, this);
     this->Connect(m_menuItemThemes->GetId(), wxEVT_COMMAND_MENU_SELECTED,
@@ -350,6 +372,14 @@ MainFrameBaseClass::~MainFrameBaseClass()
                      wxCommandEventHandler(MainFrameBaseClass::OnFillWith500Entries), NULL, this);
     this->Disconnect(m_menuItem89->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                      wxCommandEventHandler(MainFrameBaseClass::OnDVDeleteAllItems), NULL, this);
+    this->Disconnect(m_menuItem147->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                     wxCommandEventHandler(MainFrameBaseClass::OnLineUp), NULL, this);
+    this->Disconnect(m_menuItem149->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                     wxCommandEventHandler(MainFrameBaseClass::OnLineDown), NULL, this);
+    this->Disconnect(m_menuItem151->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                     wxCommandEventHandler(MainFrameBaseClass::OnPgUp), NULL, this);
+    this->Disconnect(m_menuItem153->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                     wxCommandEventHandler(MainFrameBaseClass::OnPgDown), NULL, this);
     this->Disconnect(m_menuItemZebra->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                      wxCommandEventHandler(MainFrameBaseClass::OnZebraColouring), NULL, this);
     this->Disconnect(m_menuItemThemes->GetId(), wxEVT_COMMAND_MENU_SELECTED,

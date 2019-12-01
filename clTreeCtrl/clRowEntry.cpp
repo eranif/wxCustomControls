@@ -369,6 +369,7 @@ void clRowEntry::Render(wxWindow* win, wxDC& dc, const clColours& c, int row_ind
                         SetRects(GetItemRect(), wxRect());
                         continue;
                     }
+                    
                     buttonRect.Deflate((buttonRect.GetWidth() / 3), (buttonRect.GetHeight() / 3));
                     wxRect tribtn = buttonRect;
                     dc.SetPen(wxPen(buttonColour, GetSizeDIP(2, win)));

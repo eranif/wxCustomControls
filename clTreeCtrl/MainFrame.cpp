@@ -681,3 +681,7 @@ void MainFrame::OnChoice(wxCommandEvent& event)
     wxUnusedVar(event);
     LogMessage(wxString() << "Choice event. " << m_choice->GetStringSelection());
 }
+void MainFrame::OnLineDown(wxCommandEvent& event) { m_dataView->LineDown(); }
+void MainFrame::OnLineUp(wxCommandEvent& event) { m_dataView->LineUp(); }
+void MainFrame::OnPgDown(wxCommandEvent& event) { m_dataView->PageDown(); }
+void MainFrame::OnPgUp(wxCommandEvent& event) { m_dataView->PageUp(); }

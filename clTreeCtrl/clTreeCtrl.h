@@ -17,7 +17,7 @@
 // Sorting is applied for top level items (i.e. items whom their direct parent is the root item)
 #define wxTR_SORT_TOP_LEVEL 0x0100
 
-static const int wxTREE_HITTEST_ONDROPDOWNARROW  = 0x2000;
+static const int wxTREE_HITTEST_ONDROPDOWNARROW = 0x2000;
 
 class clScrollBar;
 class WXDLLIMPEXP_SDK clTreeCtrl : public clControlWithItems
@@ -27,7 +27,7 @@ protected:
     bool m_needToClearDefaultHeader = true;
     long m_treeStyle = 0;
     int m_scrollLines = 0;
-    
+
 private:
     wxPoint DoFixPoint(const wxPoint& pt);
     wxTreeItemId DoGetSiblingVisibleItem(const wxTreeItemId& item, bool next) const;
@@ -50,11 +50,11 @@ private:
 
     void DoInitialize();
     clRowEntry* DoFind(clRowEntry* from, const wxString& what, size_t col, size_t searchFlags, bool next);
-    
+
 protected:
     void UpdateScrollBar();
     void DoAddHeader(const wxString& label, const wxBitmap& bmp, int width = wxCOL_WIDTH_AUTOSIZE);
-    
+
 public:
     virtual int GetFirstItemPosition() const;
     virtual int GetRange() const;
@@ -96,13 +96,13 @@ public:
      * @brief clear all highlighted text from all the items
      */
     void ClearAllHighlights();
-    
+
     //===--------------------
     // table view support
     //===--------------------
-    
+
     void AddHeader(const wxString& label, const wxBitmap& bmp = wxNullBitmap, int width = wxCOL_WIDTH_AUTOSIZE);
-    
+
     // For internal use, dont use these two methods
     const clTreeCtrlModel& GetModel() const { return m_model; }
     clTreeCtrlModel& GetModel() { return m_model; }
@@ -117,7 +117,7 @@ public:
      * @brief associate bitmap vector with this tree. The bitmaps array must exists as long as this control exists
      */
     virtual void SetBitmaps(BitmapVec_t* bitmaps);
-    
+
     /**
      * @brief set image list. The control does not take ownership on the input image list
      * Instead, it creates a copy of the images. It is up to the user to free any resources allocated
@@ -143,17 +143,17 @@ public:
      * @brief does the tree has 'style' enabled?
      */
     bool HasStyle(int style) const { return m_treeStyle & style; }
-    
+
     /**
      * @brief add style to the current tree style
      */
     void AddTreeStyle(int style) { m_treeStyle |= style; }
-    
+
     /**
      * @brief set style to the tree
      */
     void SetTreeStyle(int style) { m_treeStyle = style; }
-    
+
     /**
      * @brief Calculates which (if any) item is under the given point, returning the tree item id at this point plus
      *  extra information flags.
@@ -193,18 +193,18 @@ public:
      * @brief Expands the given item
      */
     void Expand(const wxTreeItemId& item);
-    
+
     /**
      * @brief check a given item (if it has checkbox)
      * This method fires 'wxEVT_TREE_ITEM_VALUE_CHANGED' event
      */
     void Check(const wxTreeItemId& item, bool check, size_t col = 0);
-    
+
     /**
      * @brief is the state of an item is checked?
      */
     bool IsChecked(const wxTreeItemId& item, size_t col = 0) const;
-    
+
     /**
      * @brief Collapses the given item
      */
@@ -384,6 +384,23 @@ public:
      * @brief is item selected?
      */
     bool IsSelected(const wxTreeItemId& item) const;
+
+    /**
+     * @brief move one line up
+     */
+    void LineUp();
+    /**
+     * @brief move one line down
+     */
+    void LineDown();
+    /**
+     * @brief move page down
+     */
+    void PageDown();
+    /**
+     * @brief move page up
+     */
+    void PageUp();
 
 protected:
     virtual bool DoKeyDown(const wxKeyEvent& event);

@@ -7,6 +7,7 @@
 #ifndef _WXCUSTOMCONTROLS_CLTREECTRL_WXCRAFTER_BASE_CLASSES_H
 #define _WXCUSTOMCONTROLS_CLTREECTRL_WXCRAFTER_BASE_CLASSES_H
 
+// clang-format off
 #include <wx/settings.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/xrc/xh_bmp.h>
@@ -46,27 +47,31 @@
 #define WXC_FROM_DIP(x) x
 #endif
 
+// clang-format on
+
 class MainFrameBaseClass : public wxFrame
 {
 public:
     enum {
-        ID_NATIVE_HEADER = 10001,
-        ID_SHOW_SB_ON_FOCUS = 10002,
-        ID_SINGLE_SELECTION = 10003,
-        ID_HIDE_ROOT = 10004,
-        ID_TOGGLE_THEMES = 10005,
-        ID_ZEBRA = 10006,
-        ID_DV_DELETE_ALL_ITEMS = 10007,
-        ID_FILL_WITH_5000_ENTRIES = 10008,
-        ID_DV_OPEN_FOLDER = 10009,
-        wxID_SET_TREE_COL_WIDTH = 10010,
-        ID_PREV_SIBLING = 10011,
-        ID_NEXT_SIBLING = 10012,
-        ID_SELECT_CHILDREN = 10013,
-        ID_EXPAND_ALL = 10014,
-        ID_OPEN_FOLDER = 10015,
-        wxID_COLOURS = 10016,
-        wxID_BOOKMARK = 10017,
+        ID_SHOW_SB_ON_FOCUS = 10001,
+        ID_SINGLE_SELECTION = 10002,
+        ID_HIDE_ROOT = 10003,
+        ID_TOGGLE_THEMES = 10004,
+        ID_ZEBRA = 10005,
+        ID_PG_DOWN = 10006,
+        ID_NATIVE_HEADER = 10007,
+        ID_PG_UP = 10008,
+        ID_DV_DELETE_ALL_ITEMS = 10009,
+        ID_FILL_WITH_5000_ENTRIES = 10010,
+        ID_DV_OPEN_FOLDER = 10011,
+        wxID_SET_TREE_COL_WIDTH = 10012,
+        ID_PREV_SIBLING = 10013,
+        ID_NEXT_SIBLING = 10014,
+        ID_SELECT_CHILDREN = 10015,
+        ID_EXPAND_ALL = 10016,
+        ID_OPEN_FOLDER = 10017,
+        wxID_COLOURS = 10018,
+        wxID_BOOKMARK = 10019,
     };
 
 protected:
@@ -102,6 +107,11 @@ protected:
     wxMenuItem* m_menuItem83;
     wxMenuItem* m_menuItem87;
     wxMenuItem* m_menuItem89;
+    wxMenuItem* m_menuItem145;
+    wxMenuItem* m_menuItem147;
+    wxMenuItem* m_menuItem149;
+    wxMenuItem* m_menuItem151;
+    wxMenuItem* m_menuItem153;
     wxMenu* menu_Style;
     wxMenuItem* m_menuItemZebra;
     wxMenuItem* m_menuItemThemes;
@@ -135,6 +145,10 @@ protected:
     virtual void OnDVOpenFolder(wxCommandEvent& event) { event.Skip(); }
     virtual void OnFillWith500Entries(wxCommandEvent& event) { event.Skip(); }
     virtual void OnDVDeleteAllItems(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnLineUp(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnLineDown(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnPgUp(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnPgDown(wxCommandEvent& event) { event.Skip(); }
     virtual void OnZebraColouring(wxCommandEvent& event) { event.Skip(); }
     virtual void OnToggleTheme(wxCommandEvent& event) { event.Skip(); }
     virtual void OnHideRoot(wxCommandEvent& event) { event.Skip(); }

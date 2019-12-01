@@ -67,7 +67,6 @@ bool clTreeCtrl::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, con
     return true;
 }
 
-
 void clTreeCtrl::DoInitialize()
 {
     wxSize textSize = GetTextSize("Tp");
@@ -150,12 +149,11 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
         while(
             (canScrollDown &&
              (items.size() < maxItems)) || // While can move the scroll thumb a bit further down, increase the list size
-            (!canScrollDown &&
-             (items.size() < (maxItems - 1)))) { // the scroll thumb cant be moved further down, so it
-                                                 // makes no sense on hiding the last item (we wont be
-                                                 // able to reach it), so make sure we extend the list
-                                                 // up to max-items -1, this means that the last item is
-                                                 // always fully visible
+            (!canScrollDown && (items.size() < (maxItems - 1)))) { // the scroll thumb cant be moved further down, so it
+                                                                   // makes no sense on hiding the last item (we wont be
+                                                                   // able to reach it), so make sure we extend the list
+                                                                   // up to max-items -1, this means that the last item
+                                                                   // is always fully visible
             firstItem = m_model.GetRowBefore(firstItem, true);
             if(!firstItem) { break; }
             items.insert(items.begin(), firstItem);
@@ -1223,3 +1221,11 @@ void clTreeCtrl::SetImageList(wxImageList* images)
     DoBitmapAdded();
     Refresh();
 }
+
+void clTreeCtrl::LineUp() { ScrollRows(1, wxUP); }
+
+void clTreeCtrl::LineDown() { ScrollRows(1, wxDOWN); }
+
+void clTreeCtrl::PageDown() { ScrollRows(GetNumLineCanFitOnScreen(), wxDOWN); }
+
+void clTreeCtrl::PageUp() { ScrollRows(GetNumLineCanFitOnScreen(), wxUP); }

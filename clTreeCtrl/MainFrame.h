@@ -49,6 +49,10 @@ private:
     void DoAddRoot();
 
 protected:
+    virtual void OnLineDown(wxCommandEvent& event);
+    virtual void OnLineUp(wxCommandEvent& event);
+    virtual void OnPgDown(wxCommandEvent& event);
+    virtual void OnPgUp(wxCommandEvent& event);
     virtual void OnChoice(wxCommandEvent& event);
     virtual void OnButtonCloseFolder(wxCommandEvent& event);
     virtual void OnCloseFolderUI(wxUpdateUIEvent& event);
