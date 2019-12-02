@@ -741,7 +741,6 @@ bool clTreeCtrl::DoKeyDown(const wxKeyEvent& event)
 
     clRowEntry* row = m_model.ToPtr(selectedItem);
     if(event.GetKeyCode() == WXK_LEFT) {
-        row = m_model.ToPtr(selectedItem);
         if(row->IsExpanded()) {
             Collapse(selectedItem);
             return true;
