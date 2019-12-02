@@ -53,25 +53,26 @@ class MainFrameBaseClass : public wxFrame
 {
 public:
     enum {
-        ID_SHOW_SB_ON_FOCUS = 10001,
-        ID_SINGLE_SELECTION = 10002,
-        ID_HIDE_ROOT = 10003,
-        ID_TOGGLE_THEMES = 10004,
-        ID_ZEBRA = 10005,
-        ID_PG_DOWN = 10006,
-        ID_NATIVE_HEADER = 10007,
-        ID_PG_UP = 10008,
-        ID_DV_DELETE_ALL_ITEMS = 10009,
-        ID_FILL_WITH_5000_ENTRIES = 10010,
-        ID_DV_OPEN_FOLDER = 10011,
-        wxID_SET_TREE_COL_WIDTH = 10012,
-        ID_PREV_SIBLING = 10013,
-        ID_NEXT_SIBLING = 10014,
-        ID_SELECT_CHILDREN = 10015,
-        ID_EXPAND_ALL = 10016,
-        ID_OPEN_FOLDER = 10017,
-        wxID_COLOURS = 10018,
-        wxID_BOOKMARK = 10019,
+        ID_NEVER_SHOW_SCROLLBARS = 10001,
+        ID_SHOW_SB_ON_FOCUS = 10002,
+        ID_SINGLE_SELECTION = 10003,
+        ID_HIDE_ROOT = 10004,
+        ID_TOGGLE_THEMES = 10005,
+        ID_ZEBRA = 10006,
+        ID_PG_DOWN = 10007,
+        ID_NATIVE_HEADER = 10008,
+        ID_PG_UP = 10009,
+        ID_DV_DELETE_ALL_ITEMS = 10010,
+        ID_FILL_WITH_5000_ENTRIES = 10011,
+        ID_DV_OPEN_FOLDER = 10012,
+        wxID_SET_TREE_COL_WIDTH = 10013,
+        ID_PREV_SIBLING = 10014,
+        ID_NEXT_SIBLING = 10015,
+        ID_SELECT_CHILDREN = 10016,
+        ID_EXPAND_ALL = 10017,
+        ID_OPEN_FOLDER = 10018,
+        wxID_COLOURS = 10019,
+        wxID_BOOKMARK = 10020,
     };
 
 protected:
@@ -122,6 +123,7 @@ protected:
     wxMenuItem* m_menuItemHideHeaders;
     wxMenuItem* m_menuItemNativeHeader;
     wxMenuItem* m_menuItemSupportSearch;
+    wxMenuItem* m_menuItem155;
 
 protected:
     virtual void OnColoursUI(wxUpdateUIEvent& event) { event.Skip(); }
@@ -157,6 +159,7 @@ protected:
     virtual void OnHideHeaders(wxCommandEvent& event) { event.Skip(); }
     virtual void OnNativeHeader(wxCommandEvent& event) { event.Skip(); }
     virtual void OnMenuitemsupportsearchMenuSelected(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnHideScrollbars(wxCommandEvent& event) { event.Skip(); }
 
 public:
     clToolBar* GetToolbar() { return m_toolbar; }

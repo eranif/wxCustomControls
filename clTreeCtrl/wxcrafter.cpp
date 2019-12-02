@@ -248,6 +248,9 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     m_menuItemSupportSearch = new wxMenuItem(menu_Style, wxID_ANY, _("Enable Search"), wxT(""), wxITEM_CHECK);
     menu_Style->Append(m_menuItemSupportSearch);
 
+    m_menuItem155 = new wxMenuItem(menu_Style, ID_NEVER_SHOW_SCROLLBARS, _("Hide Scroll Bars"), wxT(""), wxITEM_CHECK);
+    menu_Style->Append(m_menuItem155);
+
     SetName(wxT("MainFrameBaseClass"));
     SetSize(wxDLG_UNIT(this, wxSize(-1, -1)));
     if(GetSizer()) { GetSizer()->Fit(this); }
@@ -327,6 +330,8 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
                   wxCommandEventHandler(MainFrameBaseClass::OnNativeHeader), NULL, this);
     this->Connect(m_menuItemSupportSearch->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                   wxCommandEventHandler(MainFrameBaseClass::OnMenuitemsupportsearchMenuSelected), NULL, this);
+    this->Connect(m_menuItem155->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                  wxCommandEventHandler(MainFrameBaseClass::OnHideScrollbars), NULL, this);
 }
 
 MainFrameBaseClass::~MainFrameBaseClass()
@@ -396,6 +401,8 @@ MainFrameBaseClass::~MainFrameBaseClass()
                      wxCommandEventHandler(MainFrameBaseClass::OnNativeHeader), NULL, this);
     this->Disconnect(m_menuItemSupportSearch->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                      wxCommandEventHandler(MainFrameBaseClass::OnMenuitemsupportsearchMenuSelected), NULL, this);
+    this->Disconnect(m_menuItem155->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                     wxCommandEventHandler(MainFrameBaseClass::OnHideScrollbars), NULL, this);
 }
 
 MyImages::MyImages()

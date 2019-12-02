@@ -49,6 +49,7 @@ private:
     void DoAddRoot();
 
 protected:
+    virtual void OnHideScrollbars(wxCommandEvent& event);
     virtual void OnLineDown(wxCommandEvent& event);
     virtual void OnLineUp(wxCommandEvent& event);
     virtual void OnPgDown(wxCommandEvent& event);

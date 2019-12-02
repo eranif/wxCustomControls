@@ -703,3 +703,12 @@ void MainFrame::OnPgUp(wxCommandEvent& event)
     wxUnusedVar(event);
     m_dataView->PageUp();
 }
+void MainFrame::OnHideScrollbars(wxCommandEvent& event)
+{
+    m_dataView->SetNeverShowScrollBar(wxHORIZONTAL, event.IsChecked());
+    m_dataView->SetNeverShowScrollBar(wxVERTICAL, event.IsChecked());
+    
+    m_treeCtrl->SetNeverShowScrollBar(wxHORIZONTAL, event.IsChecked());
+    m_treeCtrl->SetNeverShowScrollBar(wxVERTICAL, event.IsChecked());
+    
+}
