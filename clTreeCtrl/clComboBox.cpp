@@ -196,3 +196,7 @@ void clComboBox::Delete(size_t index)
     }
     m_choices.RemoveAt(index);
 }
+
+int clComboBox::FindString(const wxString& s, bool bCase) const { return m_choices.Index(s, bCase); }
+
+wxString clComboBox::GetValue() const { return m_textCtrl->GetValue(); }

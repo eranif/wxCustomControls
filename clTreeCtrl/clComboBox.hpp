@@ -122,6 +122,16 @@ public:
      * @brief Returns the number of items in the control
      */
     size_t GetCount() const { return m_choices.size(); }
+    /**
+     * @brief Finds an item whose label matches the given string.
+     */
+    int FindString(const wxString& s, bool bCase = false) const;
+    /**
+     * @brief Gets the contents of the control.
+     */
+    wxString GetValue() const;
+    clButton* GetButton() const { return m_button; }
+    wxTextCtrl* GetTextCtrl() const { return m_textCtrl; }
 };
 
 #endif // CLCOMBOBOX_HPP
