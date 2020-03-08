@@ -1479,7 +1479,7 @@
 																				}, {
 																					"type":	"multi-string",
 																					"m_label":	"ComboBox Choices:",
-																					"m_value":	"Choice 1\\nChoice 2"
+																					"m_value":	"Choice 1\\nChoice 2\\nChoice 3\\nChoice 4\\nChoice 5\\nChoice 6\\nChoice 7"
 																				}, {
 																					"type":	"string",
 																					"m_label":	"Text Hint",

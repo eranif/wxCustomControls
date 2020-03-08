@@ -127,6 +127,11 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     wxArrayString m_comboBoxArr;
     m_comboBoxArr.Add(wxT("Choice 1"));
     m_comboBoxArr.Add(wxT("Choice 2"));
+    m_comboBoxArr.Add(wxT("Choice 3"));
+    m_comboBoxArr.Add(wxT("Choice 4"));
+    m_comboBoxArr.Add(wxT("Choice 5"));
+    m_comboBoxArr.Add(wxT("Choice 6"));
+    m_comboBoxArr.Add(wxT("Choice 7"));
     m_comboBox = new clComboBox(m_panelButtons, wxID_ANY, wxT(""), wxDefaultPosition,
                                 wxDLG_UNIT(m_panelButtons, wxSize(-1, -1)), m_comboBoxArr, 0);
 #if wxVERSION_NUMBER >= 3000
@@ -266,7 +271,9 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
 
     SetName(wxT("MainFrameBaseClass"));
     SetSize(wxDLG_UNIT(this, wxSize(-1, -1)));
-    if(GetSizer()) { GetSizer()->Fit(this); }
+    if(GetSizer()) {
+        GetSizer()->Fit(this);
+    }
     if(GetParent()) {
         CentreOnParent(wxBOTH);
     } else {

@@ -1,10 +1,12 @@
 #include "MainFrame.h"
+#include "clColours.h"
 #include "clTreeCtrl.h"
 #include <cmath>
 #include <wx/aboutdlg.h>
 #include <wx/checkbox.h>
 #include <wx/dir.h>
 #include <wx/dirdlg.h>
+#include <wx/ffile.h>
 #include <wx/minifram.h>
 #include <wx/msgdlg.h>
 #include <wx/numdlg.h>
@@ -13,8 +15,6 @@
 #include <wx/stopwatch.h>
 #include <wx/textdlg.h>
 #include <wx/utils.h>
-#include <wx/ffile.h>
-#include "clColours.h"
 
 class MyDvData
 {
@@ -60,6 +60,32 @@ MainFrame::MainFrame(wxWindow* parent)
                        wxTR_ROW_LINES | wxTR_ENABLE_SEARCH);
     m_panelControls->GetSizer()->Insert(0, m_treeCtrl, 1, wxEXPAND | wxALL, 2);
 
+    m_comboBox->Bind(wxEVT_COMBOBOX, [this](wxCommandEvent& event) {
+        wxString combo_text;
+        combo_text << "wxEVT_COMBOBOX captured. New Selection is " << event.GetSelection() << "\n";
+        m_textCtrlLog->AppendText(combo_text);
+    });
+
+    m_comboBox->Bind(wxEVT_TEXT, [this](wxCommandEvent& event) {
+        wxUnusedVar(event);
+        wxString combo_text;
+        combo_text << "wxEVT_TEXT captured (combobox)\n";
+        m_textCtrlLog->AppendText(combo_text);
+    });
+
+    m_comboBox->Bind(wxEVT_TEXT_ENTER, [this](wxCommandEvent& event) {
+        wxUnusedVar(event);
+        wxString combo_text;
+        combo_text << "wxEVT_TEXT_ENTER captured (combobox)\n";
+        m_textCtrlLog->AppendText(combo_text);
+    });
+    m_comboBox->SetSelection(3);
+    std::vector<wxString> V = { "new string 1", "new string 2" };
+    m_comboBox->Append(V);
+    m_comboBox->CallAfter(&clComboBox::SetFocus);
+    int sel = m_comboBox->GetSelection();
+    wxUnusedVar(sel);
+    
     clColours colours;
     colours.InitDefaults();
     m_coloursArr[0] = colours;
@@ -104,9 +130,9 @@ MainFrame::MainFrame(wxWindow* parent)
     m_bitmaps.push_back(images.Bitmap("file"));
     m_treeCtrl->SetBitmaps(&m_bitmaps);
     m_dataView->SetBitmaps(&m_bitmaps);
-    //m_dataView->SetDefaultFont(wxFont(wxFontInfo(10).Family(wxFONTFAMILY_TELETYPE).FaceName("Fira Code")));
-    //m_treeCtrl->SetDefaultFont(wxFont(wxFontInfo(10).Family(wxFONTFAMILY_TELETYPE).FaceName("Fira Code")));
-    
+    // m_dataView->SetDefaultFont(wxFont(wxFontInfo(10).Family(wxFONTFAMILY_TELETYPE).FaceName("Fira Code")));
+    // m_treeCtrl->SetDefaultFont(wxFont(wxFontInfo(10).Family(wxFONTFAMILY_TELETYPE).FaceName("Fira Code")));
+
     m_choice->SetBitmap(images.Bitmap("folder_open"));
 
     m_treeCtrl->Bind(wxEVT_TREE_ITEM_EXPANDING, &MainFrame::OnItemExpanding, this);
@@ -163,51 +189,55 @@ MainFrame::MainFrame(wxWindow* parent)
                               << ", Column: " << evt.GetInt());
         wxMenu menu;
         menu.Append(wxID_OPEN);
-        menu.Bind(
-            wxEVT_MENU,
-            [&](wxCommandEvent& e) {
-                wxUnusedVar(e);
-                wxArrayTreeItemIds items;
-                if(m_treeCtrl->GetSelections(items)) {
-                    for(size_t i = 0; i < items.size(); ++i) {
-                        MyItemData* cd = dynamic_cast<MyItemData*>(m_treeCtrl->GetItemData(items[i]));
-                        if(cd) { ::wxLaunchDefaultApplication(cd->GetPath()); }
-                    }
-                }
-            },
-            wxID_OPEN);
+        menu.Bind(wxEVT_MENU,
+                  [&](wxCommandEvent& e) {
+                      wxUnusedVar(e);
+                      wxArrayTreeItemIds items;
+                      if(m_treeCtrl->GetSelections(items)) {
+                          for(size_t i = 0; i < items.size(); ++i) {
+                              MyItemData* cd = dynamic_cast<MyItemData*>(m_treeCtrl->GetItemData(items[i]));
+                              if(cd) {
+                                  ::wxLaunchDefaultApplication(cd->GetPath());
+                              }
+                          }
+                      }
+                  },
+                  wxID_OPEN);
         menu.Append(wxID_NEW);
-        menu.Bind(
-            wxEVT_MENU,
-            [&](wxCommandEvent& e) {
-                wxUnusedVar(e);
-                wxArrayTreeItemIds items;
-                m_treeCtrl->GetSelections(items);
-                MyItemData* cd = dynamic_cast<MyItemData*>(m_treeCtrl->GetItemData(items[0]));
-                wxString name = ::wxGetTextFromUser("File name:");
-                if(name.IsEmpty()) { return; }
-                wxFileName filename(cd->GetPath(), name);
+        menu.Bind(wxEVT_MENU,
+                  [&](wxCommandEvent& e) {
+                      wxUnusedVar(e);
+                      wxArrayTreeItemIds items;
+                      m_treeCtrl->GetSelections(items);
+                      MyItemData* cd = dynamic_cast<MyItemData*>(m_treeCtrl->GetItemData(items[0]));
+                      wxString name = ::wxGetTextFromUser("File name:");
+                      if(name.IsEmpty()) {
+                          return;
+                      }
+                      wxFileName filename(cd->GetPath(), name);
 
-                // Create the new file
-                wxFFile fp;
-                fp.Open(filename.GetFullPath(), "a+");
-                fp.Close();
+                      // Create the new file
+                      wxFFile fp;
+                      fp.Open(filename.GetFullPath(), "a+");
+                      fp.Close();
 
-                // Add the file to the tree
-                wxTreeItemId fileItem = m_treeCtrl->AppendItem(items[0], filename.GetFullName(), 2, 2,
-                                                               new MyItemData(filename.GetFullPath(), false));
-                m_treeCtrl->SetItemText(fileItem, "File", 1);
-                wxString t;
-                t << std::ceil((double)filename.GetSize().ToDouble() / 1024.0) << "KB";
-                m_treeCtrl->SetItemText(fileItem, t, 2);
-                m_treeCtrl->EnsureVisible(fileItem);
-            },
-            wxID_NEW);
+                      // Add the file to the tree
+                      wxTreeItemId fileItem = m_treeCtrl->AppendItem(items[0], filename.GetFullName(), 2, 2,
+                                                                     new MyItemData(filename.GetFullPath(), false));
+                      m_treeCtrl->SetItemText(fileItem, "File", 1);
+                      wxString t;
+                      t << std::ceil((double)filename.GetSize().ToDouble() / 1024.0) << "KB";
+                      m_treeCtrl->SetItemText(fileItem, t, 2);
+                      m_treeCtrl->EnsureVisible(fileItem);
+                  },
+                  wxID_NEW);
         bool enableNew = false;
         wxArrayTreeItemIds items;
         if(m_treeCtrl->GetSelections(items) == 1) {
             MyItemData* cd = dynamic_cast<MyItemData*>(m_treeCtrl->GetItemData(items[0]));
-            if(cd) { enableNew = cd->IsFolder(); }
+            if(cd) {
+                enableNew = cd->IsFolder();
+            }
         }
         menu.Enable(wxID_NEW, enableNew);
         m_treeCtrl->PopupMenu(&menu);
@@ -327,7 +357,9 @@ void MainFrame::OnOpenFolder(wxCommandEvent& event)
 {
     wxUnusedVar(event);
     wxString path = wxDirSelector();
-    if(path.IsEmpty()) { return; }
+    if(path.IsEmpty()) {
+        return;
+    }
 
     m_path = path;
     wxTreeItemId item = m_treeCtrl->AppendItem(m_treeCtrl->GetRootItem(), path, 0, 1, new MyItemData(m_path, true));
@@ -442,7 +474,9 @@ void MainFrame::OnToggleTheme(wxCommandEvent& event)
 {
     wxUnusedVar(event);
     ++m_selectedColours;
-    if(m_selectedColours >= m_coloursArr.size()) { m_selectedColours = 0; }
+    if(m_selectedColours >= m_coloursArr.size()) {
+        m_selectedColours = 0;
+    }
 
     clColours& colours = m_coloursArr[m_selectedColours];
     m_treeCtrl->SetColours(colours);
@@ -496,7 +530,9 @@ void MainFrame::OnDVOpenFolder(wxCommandEvent& event)
 {
     wxUnusedVar(event);
     wxString path = ::wxDirSelector();
-    if(path.IsEmpty()) { return; }
+    if(path.IsEmpty()) {
+        return;
+    }
     for(size_t i = 0; i < m_dataView->GetItemCount(); ++i) {
         MyDvData* d = reinterpret_cast<MyDvData*>(m_dataView->GetItemData(m_dataView->RowToItem(i)));
         wxDELETE(d);
@@ -589,7 +625,9 @@ void MainFrame::OnTreeFind(wxCommandEvent& event)
 {
     wxUnusedVar(event);
     wxString findwhat = wxGetTextFromUser("Text to search", "Find");
-    if(findwhat.IsEmpty()) { return; }
+    if(findwhat.IsEmpty()) {
+        return;
+    }
 
     m_treeCtrl->ClearAllHighlights();
     wxTreeItemId where =
@@ -707,8 +745,7 @@ void MainFrame::OnHideScrollbars(wxCommandEvent& event)
 {
     m_dataView->SetNeverShowScrollBar(wxHORIZONTAL, event.IsChecked());
     m_dataView->SetNeverShowScrollBar(wxVERTICAL, event.IsChecked());
-    
+
     m_treeCtrl->SetNeverShowScrollBar(wxHORIZONTAL, event.IsChecked());
     m_treeCtrl->SetNeverShowScrollBar(wxVERTICAL, event.IsChecked());
-    
 }
