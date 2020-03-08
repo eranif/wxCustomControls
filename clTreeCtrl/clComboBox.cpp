@@ -9,7 +9,7 @@ clComboBox::clComboBox(wxWindow* parent, wxWindowID id, const wxString& value, c
 {
     wxUnusedVar(validator);
     wxUnusedVar(name);
-    Create(parent, id, value, pos, size, n, choices, style, validator, name);
+    DoCreate(value);
 }
 
 clComboBox::clComboBox(wxWindow* parent, wxWindowID id, const wxString& value, const wxPoint& pos, const wxSize& size,
@@ -18,7 +18,7 @@ clComboBox::clComboBox(wxWindow* parent, wxWindowID id, const wxString& value, c
 {
     wxUnusedVar(validator);
     wxUnusedVar(name);
-    Create(parent, id, value, pos, size, choices, style, validator, name);
+    DoCreate(value);
 }
 
 clComboBox::clComboBox() {}
