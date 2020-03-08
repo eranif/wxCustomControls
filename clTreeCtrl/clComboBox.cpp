@@ -200,3 +200,14 @@ void clComboBox::Delete(size_t index)
 int clComboBox::FindString(const wxString& s, bool bCase) const { return m_choices.Index(s, bCase); }
 
 wxString clComboBox::GetValue() const { return m_textCtrl->GetValue(); }
+
+wxArrayString clComboBox::GetStrings() const
+{
+    wxArrayString strings;
+    strings.reserve(m_choices.size() + 1);
+    if(GetSelection() == wxNOT_FOUND) {
+        strings.Add(GetValue());
+    }
+    strings.insert(strings.end(), m_choices.begin(), m_choices.end());
+    return strings;
+}

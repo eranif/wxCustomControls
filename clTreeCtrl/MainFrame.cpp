@@ -71,6 +71,13 @@ MainFrame::MainFrame(wxWindow* parent)
         wxString combo_text;
         combo_text << "wxEVT_TEXT captured (combobox)\n";
         m_textCtrlLog->AppendText(combo_text);
+
+        wxString str;
+        wxArrayString selections = m_comboBox->GetStrings();
+        for(const auto& s : selections) {
+            str << s << " ";
+        }
+        m_textCtrlLog->AppendText("Strings: " + str + "\n");
     });
 
     m_comboBox->Bind(wxEVT_TEXT_ENTER, [this](wxCommandEvent& event) {
@@ -85,7 +92,7 @@ MainFrame::MainFrame(wxWindow* parent)
     m_comboBox->CallAfter(&clComboBox::SetFocus);
     int sel = m_comboBox->GetSelection();
     wxUnusedVar(sel);
-    
+
     clColours colours;
     colours.InitDefaults();
     m_coloursArr[0] = colours;

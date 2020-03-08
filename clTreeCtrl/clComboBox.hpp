@@ -130,6 +130,10 @@ public:
      * @brief Gets the contents of the control.
      */
     wxString GetValue() const;
+    /**
+     * @brief return the combo box strings
+     */
+    wxArrayString GetStrings() const;
     clButton* GetButton() const { return m_button; }
     wxTextCtrl* GetTextCtrl() const { return m_textCtrl; }
 };
