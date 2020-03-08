@@ -25,6 +25,8 @@
 #include <wx/choice.h>
 #include <wx/arrstr.h>
 #include "clChoice.h"
+#include <wx/combobox.h>
+#include "clComboBox.hpp"
 #include <wx/textctrl.h>
 #include <wx/menu.h>
 #include <wx/imaglist.h>
@@ -85,6 +87,7 @@ protected:
     clButton* m_buttonTwo;
     clButton* m_buttonDisabled;
     clChoice* m_choice;
+    clComboBox* m_comboBox;
     wxTextCtrl* m_textCtrlLog;
     wxMenuBar* m_myMenuBar;
     wxMenu* menu_clTreeCtrl;
@@ -169,6 +172,7 @@ public:
     clButton* GetButtonTwo() { return m_buttonTwo; }
     clButton* GetButtonDisabled() { return m_buttonDisabled; }
     clChoice* GetChoice() { return m_choice; }
+    clComboBox* GetComboBox() { return m_comboBox; }
     wxPanel* GetPanelButtons() { return m_panelButtons; }
     wxTextCtrl* GetTextCtrlLog() { return m_textCtrlLog; }
     wxPanel* GetMainPanel() { return m_mainPanel; }

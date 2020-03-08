@@ -92,19 +92,20 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     wxFlexGridSizer* flexGridSizer141 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer141->SetFlexibleDirection(wxBOTH);
     flexGridSizer141->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+    flexGridSizer141->AddGrowableCol(1);
 
-    boxSizer137->Add(flexGridSizer141, 0, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+    boxSizer137->Add(flexGridSizer141, 1, wxALL | wxEXPAND, WXC_FROM_DIP(5));
 
     m_buttonOne = new clButton(m_panelButtons, wxID_ANY, _("Close the Folder"), wxDefaultPosition,
                                wxDLG_UNIT(m_panelButtons, wxSize(150, -1)), 0);
     m_buttonOne->SetToolTip(_("Close the Folder"));
 
-    flexGridSizer141->Add(m_buttonOne, 0, wxALL, WXC_FROM_DIP(5));
+    flexGridSizer141->Add(m_buttonOne, 0, wxALL | wxEXPAND, WXC_FROM_DIP(5));
 
     m_buttonTwo = new clButton(m_panelButtons, wxID_ANY, _("Button Two Clicker"), wxDefaultPosition,
                                wxDLG_UNIT(m_panelButtons, wxSize(-1, -1)), 0);
 
-    flexGridSizer141->Add(m_buttonTwo, 0, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+    flexGridSizer141->Add(m_buttonTwo, 1, wxALL | wxEXPAND, WXC_FROM_DIP(5));
 
     m_buttonDisabled = new clButton(m_panelButtons, wxID_ANY, _("Disabled"), wxDefaultPosition,
                                     wxDLG_UNIT(m_panelButtons, wxSize(-1, -1)), 0);
@@ -117,11 +118,23 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     m_choiceArr.Add(wxT("Item Number Two"));
     m_choiceArr.Add(wxT("Item Number Three"));
     m_choiceArr.Add(wxT("Item Number Four"));
-    m_choice = new clChoice(m_panelButtons, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelButtons, wxSize(-1, -1)),
+    m_choice = new clChoice(m_panelButtons, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelButtons, wxSize(200, -1)),
                             m_choiceArr, 0);
     m_choice->SetSelection(0);
 
-    flexGridSizer141->Add(m_choice, 0, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+    flexGridSizer141->Add(m_choice, 1, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+
+    wxArrayString m_comboBoxArr;
+    m_comboBoxArr.Add(wxT("Choice 1"));
+    m_comboBoxArr.Add(wxT("Choice 2"));
+    m_comboBox = new clComboBox(m_panelButtons, wxID_ANY, wxT(""), wxDefaultPosition,
+                                wxDLG_UNIT(m_panelButtons, wxSize(-1, -1)), m_comboBoxArr, 0);
+#if wxVERSION_NUMBER >= 3000
+    m_comboBox->SetHint(wxT(""));
+#endif
+    m_comboBox->SetSelection(0);
+
+    flexGridSizer141->Add(m_comboBox, 0, wxALL | wxEXPAND, WXC_FROM_DIP(5));
 
     m_textCtrlLog = new wxTextCtrl(m_mainPanel, wxID_ANY, wxT(""), wxDefaultPosition,
                                    wxDLG_UNIT(m_mainPanel, wxSize(-1, 100)), wxTE_RICH | wxTE_MULTILINE);
