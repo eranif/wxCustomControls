@@ -86,13 +86,12 @@ MainFrame::MainFrame(wxWindow* parent)
         combo_text << "wxEVT_TEXT_ENTER captured (combobox)\n";
         m_textCtrlLog->AppendText(combo_text);
     });
-    m_comboBox->SetSelection(3);
     std::vector<wxString> V = { "new string 1", "new string 2" };
     m_comboBox->Append(V);
+    m_comboBox->SetHint("Hint...");
+    m_comboBox->SetSelection(INVALID_SIZE_T);
     m_comboBox->CallAfter(&clComboBox::SetFocus);
-    int sel = m_comboBox->GetSelection();
-    wxUnusedVar(sel);
-
+    
     clColours colours;
     colours.InitDefaults();
     m_coloursArr[0] = colours;
