@@ -5,7 +5,7 @@
 clComboBox::clComboBox(wxWindow* parent, wxWindowID id, const wxString& value, const wxPoint& pos, const wxSize& size,
                        size_t n, const wxString choices[], long style, const wxValidator& validator,
                        const wxString& name)
-    : wxControl(parent, id, pos, size, style)
+    : wxControl(parent, id, pos, size, wxNO_BORDER)
 {
     wxUnusedVar(validator);
     wxUnusedVar(name);
@@ -19,7 +19,7 @@ clComboBox::clComboBox(wxWindow* parent, wxWindowID id, const wxString& value, c
 
 clComboBox::clComboBox(wxWindow* parent, wxWindowID id, const wxString& value, const wxPoint& pos, const wxSize& size,
                        const wxArrayString& choices, long style, const wxValidator& validator, const wxString& name)
-    : wxControl(parent, id, pos, size, style)
+    : wxControl(parent, id, pos, size, wxNO_BORDER)
 {
     wxUnusedVar(validator);
     wxUnusedVar(name);
@@ -39,11 +39,12 @@ bool clComboBox::Create(wxWindow* parent, wxWindowID id, const wxString& value, 
 {
     wxUnusedVar(validator);
     wxUnusedVar(name);
-    bool res = wxControl::Create(parent, id, pos, size, style);
+    bool res = wxControl::Create(parent, id, pos, size, wxNO_BORDER);
     m_choices.reserve(n);
     for(size_t i = 0; i < n; ++i) {
         m_choices.push_back(choices[i]);
     }
+    m_cbStyle = style & ~wxWINDOW_STYLE_MASK;
     DoCreate(value);
     return res;
 }
@@ -53,7 +54,8 @@ bool clComboBox::Create(wxWindow* parent, wxWindowID id, const wxString& value, 
 {
     wxUnusedVar(validator);
     wxUnusedVar(name);
-    bool res = wxControl::Create(parent, id, pos, size, style);
+    bool res = wxControl::Create(parent, id, pos, size, wxNO_BORDER);
+    m_cbStyle = style & ~wxWINDOW_STYLE_MASK;
     m_choices = choices;
     DoCreate(value);
     return res;
@@ -70,6 +72,8 @@ void clComboBox::DoCreate(const wxString& value)
     m_button->Bind(wxEVT_BUTTON, &clComboBox::OnButtonClicked, this);
     m_textCtrl->Bind(wxEVT_TEXT, &clComboBox::OnText, this);
     m_textCtrl->Bind(wxEVT_CHAR_HOOK, &clComboBox::OnCharHook, this);
+    Bind(wxEVT_SET_FOCUS, &clComboBox::OnFocus, this);
+
     if(m_cbStyle & wxCB_READONLY) {
         m_textCtrl->SetEditable(false);
     }
@@ -245,4 +249,10 @@ void clComboBox::OnCharHook(wxKeyEvent& event)
     } else {
         event.Skip();
     }
+}
+
+void clComboBox::OnFocus(wxFocusEvent& event)
+{
+    event.Skip();
+    m_textCtrl->CallAfter(&wxTextCtrl::SetFocus);
 }
