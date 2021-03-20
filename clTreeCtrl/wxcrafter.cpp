@@ -86,7 +86,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
 
     boxSizer133->Add(m_panelButtons, 1, wxEXPAND, WXC_FROM_DIP(5));
 
-    wxBoxSizer* boxSizer137 = new wxBoxSizer(wxHORIZONTAL);
+    wxBoxSizer* boxSizer137 = new wxBoxSizer(wxVERTICAL);
     m_panelButtons->SetSizer(boxSizer137);
 
     wxFlexGridSizer* flexGridSizer141 = new wxFlexGridSizer(0, 2, 0, 0);
@@ -140,6 +140,11 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     m_comboBox->SetSelection(0);
 
     flexGridSizer141->Add(m_comboBox, 0, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+
+    m_buttonAction = new clButton(m_panelButtons, wxID_ANY, _("My Button"), wxDefaultPosition,
+                                  wxDLG_UNIT(m_panelButtons, wxSize(-1, -1)), 0);
+
+    boxSizer137->Add(m_buttonAction, 1, wxALL | wxEXPAND, WXC_FROM_DIP(5));
 
     m_textCtrlLog = new wxTextCtrl(m_mainPanel, wxID_ANY, wxT(""), wxDefaultPosition,
                                    wxDLG_UNIT(m_mainPanel, wxSize(-1, 100)), wxTE_RICH | wxTE_MULTILINE);

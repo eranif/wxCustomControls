@@ -66,6 +66,9 @@ MainFrame::MainFrame(wxWindow* parent)
         m_textCtrlLog->AppendText(combo_text);
     });
 
+    m_buttonAction->SetText("Open workspace!");
+    m_buttonAction->SetSubText("click me...");
+
     m_comboBox->Bind(wxEVT_TEXT, [this](wxCommandEvent& event) {
         wxUnusedVar(event);
         wxString combo_text;
@@ -91,7 +94,7 @@ MainFrame::MainFrame(wxWindow* parent)
     m_comboBox->SetHint("Hint...");
     m_comboBox->SetSelection(INVALID_SIZE_T);
     m_comboBox->CallAfter(&clComboBox::SetFocus);
-    
+
     clColours colours;
     colours.InitDefaults();
     m_coloursArr[0] = colours;
@@ -195,48 +198,50 @@ MainFrame::MainFrame(wxWindow* parent)
                               << ", Column: " << evt.GetInt());
         wxMenu menu;
         menu.Append(wxID_OPEN);
-        menu.Bind(wxEVT_MENU,
-                  [&](wxCommandEvent& e) {
-                      wxUnusedVar(e);
-                      wxArrayTreeItemIds items;
-                      if(m_treeCtrl->GetSelections(items)) {
-                          for(size_t i = 0; i < items.size(); ++i) {
-                              MyItemData* cd = dynamic_cast<MyItemData*>(m_treeCtrl->GetItemData(items[i]));
-                              if(cd) {
-                                  ::wxLaunchDefaultApplication(cd->GetPath());
-                              }
-                          }
-                      }
-                  },
-                  wxID_OPEN);
+        menu.Bind(
+            wxEVT_MENU,
+            [&](wxCommandEvent& e) {
+                wxUnusedVar(e);
+                wxArrayTreeItemIds items;
+                if(m_treeCtrl->GetSelections(items)) {
+                    for(size_t i = 0; i < items.size(); ++i) {
+                        MyItemData* cd = dynamic_cast<MyItemData*>(m_treeCtrl->GetItemData(items[i]));
+                        if(cd) {
+                            ::wxLaunchDefaultApplication(cd->GetPath());
+                        }
+                    }
+                }
+            },
+            wxID_OPEN);
         menu.Append(wxID_NEW);
-        menu.Bind(wxEVT_MENU,
-                  [&](wxCommandEvent& e) {
-                      wxUnusedVar(e);
-                      wxArrayTreeItemIds items;
-                      m_treeCtrl->GetSelections(items);
-                      MyItemData* cd = dynamic_cast<MyItemData*>(m_treeCtrl->GetItemData(items[0]));
-                      wxString name = ::wxGetTextFromUser("File name:");
-                      if(name.IsEmpty()) {
-                          return;
-                      }
-                      wxFileName filename(cd->GetPath(), name);
+        menu.Bind(
+            wxEVT_MENU,
+            [&](wxCommandEvent& e) {
+                wxUnusedVar(e);
+                wxArrayTreeItemIds items;
+                m_treeCtrl->GetSelections(items);
+                MyItemData* cd = dynamic_cast<MyItemData*>(m_treeCtrl->GetItemData(items[0]));
+                wxString name = ::wxGetTextFromUser("File name:");
+                if(name.IsEmpty()) {
+                    return;
+                }
+                wxFileName filename(cd->GetPath(), name);
 
-                      // Create the new file
-                      wxFFile fp;
-                      fp.Open(filename.GetFullPath(), "a+");
-                      fp.Close();
+                // Create the new file
+                wxFFile fp;
+                fp.Open(filename.GetFullPath(), "a+");
+                fp.Close();
 
-                      // Add the file to the tree
-                      wxTreeItemId fileItem = m_treeCtrl->AppendItem(items[0], filename.GetFullName(), 2, 2,
-                                                                     new MyItemData(filename.GetFullPath(), false));
-                      m_treeCtrl->SetItemText(fileItem, "File", 1);
-                      wxString t;
-                      t << std::ceil((double)filename.GetSize().ToDouble() / 1024.0) << "KB";
-                      m_treeCtrl->SetItemText(fileItem, t, 2);
-                      m_treeCtrl->EnsureVisible(fileItem);
-                  },
-                  wxID_NEW);
+                // Add the file to the tree
+                wxTreeItemId fileItem = m_treeCtrl->AppendItem(items[0], filename.GetFullName(), 2, 2,
+                                                               new MyItemData(filename.GetFullPath(), false));
+                m_treeCtrl->SetItemText(fileItem, "File", 1);
+                wxString t;
+                t << std::ceil((double)filename.GetSize().ToDouble() / 1024.0) << "KB";
+                m_treeCtrl->SetItemText(fileItem, t, 2);
+                m_treeCtrl->EnsureVisible(fileItem);
+            },
+            wxID_NEW);
         bool enableNew = false;
         wxArrayTreeItemIds items;
         if(m_treeCtrl->GetSelections(items) == 1) {

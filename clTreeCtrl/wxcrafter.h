@@ -88,6 +88,7 @@ protected:
     clButton* m_buttonDisabled;
     clChoice* m_choice;
     clComboBox* m_comboBox;
+    clButton* m_buttonAction;
     wxTextCtrl* m_textCtrlLog;
     wxMenuBar* m_myMenuBar;
     wxMenu* menu_clTreeCtrl;
@@ -173,6 +174,7 @@ public:
     clButton* GetButtonDisabled() { return m_buttonDisabled; }
     clChoice* GetChoice() { return m_choice; }
     clComboBox* GetComboBox() { return m_comboBox; }
+    clButton* GetButtonAction() { return m_buttonAction; }
     wxPanel* GetPanelButtons() { return m_panelButtons; }
     wxTextCtrl* GetTextCtrlLog() { return m_textCtrlLog; }
     wxPanel* GetMainPanel() { return m_mainPanel; }

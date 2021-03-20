@@ -133,6 +133,17 @@ void clButtonBase::Initialise()
     SetSizeHints(GetBestSize());
 }
 
+static void DrawLabel(wxDC& dc, const wxRect& rr, const wxString& text, const wxColour& textColour)
+{
+    dc.SetTextForeground(textColour);
+    dc.SetClippingRegion(rr);
+    // Truncate the text to fit the drawing area
+    wxString fixedText;
+    DrawingUtils::TruncateText(text, rr.GetWidth(), dc, fixedText);
+    dc.DrawText(fixedText, rr.x, rr.y);
+    dc.DestroyClippingRegion();
+}
+
 void clButtonBase::Render(wxDC& dc)
 {
     wxRect clientRect = GetClientRect();
@@ -224,11 +235,29 @@ void clButtonBase::Render(wxDC& dc)
         arrow_rect.SetHeight(rect.GetHeight());
     }
 
-    if(!GetText().IsEmpty()) {
+    wxString buttonText = GetText();
+    wxString subtext = GetSubText();
+    int sub_text_x_spacer = 0;
+    if(!buttonText.IsEmpty()) {
+        wxFont font = DrawingUtils::GetDefaultGuiFont();
+        if(!subtext.empty()) {
+            font.SetFractionalPointSize((double)1.5 * font.GetPointSize());
+        }
+        dc.SetFont(font);
+
+        if(!subtext.empty()) {
+            wxString prefix = L"\u276f  ";
+            sub_text_x_spacer = dc.GetTextExtent(prefix).x;
+            buttonText.Prepend(prefix);
+        }
+
         text_rect.SetX(GetBitmap().IsOk() ? bitmap_rect.GetRight() : TEXT_SPACER);
         text_rect.SetY(0);
         text_rect.SetRight(HasDropDownMenu() ? arrow_rect.GetLeft() : (rect.GetRight() - TEXT_SPACER));
-        text_rect.SetHeight(rect.GetHeight());
+
+        wxSize text_size = dc.GetTextExtent(buttonText);
+        text_rect.SetHeight(text_size.GetHeight());
+        text_rect.SetWidth(text_size.GetWidth());
     }
 
     // Draw the bitmap first
@@ -248,17 +277,26 @@ void clButtonBase::Render(wxDC& dc)
         dropDownColour = dropDownColour.ChangeLightness(isDark ? 70 : 110);
     }
 
-    if(!GetText().IsEmpty()) {
+    if(!buttonText.IsEmpty()) {
+        bool has_sub_text = !subtext.empty();
         wxRect textBoundingRect = text_rect;
-        dc.SetFont(DrawingUtils::GetDefaultGuiFont());
-        textBoundingRect = textBoundingRect.CenterIn(rect, wxVERTICAL);
-        dc.SetTextForeground(textColour);
-        dc.SetClippingRegion(textBoundingRect);
-        // Truncate the text to fit the drawing area
-        wxString fixedText;
-        DrawingUtils::TruncateText(GetText(), textBoundingRect.GetWidth(), dc, fixedText);
-        dc.DrawLabel(fixedText, textBoundingRect, wxALIGN_CENTRE);
-        dc.DestroyClippingRegion();
+        textBoundingRect = textBoundingRect.CenterIn(rect, wxVERTICAL | wxHORIZONTAL);
+        wxRect sub_text_rect = textBoundingRect;
+
+        if(has_sub_text) {
+            sub_text_rect.x += sub_text_x_spacer; // align the text with the actual text and not the with the arrow
+            sub_text_rect.y += sub_text_rect.height;
+            sub_text_rect.y += this->FromDIP(5); // spacer between texts
+            textBoundingRect.y -= (sub_text_rect.height / 2);
+            sub_text_rect.y -= (sub_text_rect.height / 2);
+        }
+
+        DrawLabel(dc, textBoundingRect, buttonText, textColour);
+        if(has_sub_text) {
+            wxFont font = DrawingUtils::GetDefaultGuiFont();
+            dc.SetFont(DrawingUtils::GetDefaultGuiFont());
+            DrawLabel(dc, sub_text_rect, subtext, textColour);
+        }
     }
 
     if(HasDropDownMenu()) {

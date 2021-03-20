@@ -1,14 +1,14 @@
 #ifndef CLBUTTONBASE_H
 #define CLBUTTONBASE_H
 
+#include "clColours.h"
 #include "codelite_exports.h"
+#include "drawingutils.h"
+#include <wx/bitmap.h>
+#include <wx/control.h>
+#include <wx/menu.h>
 #include <wx/panel.h>
 #include <wx/validate.h>
-#include "clColours.h"
-#include "drawingutils.h"
-#include <wx/control.h>
-#include <wx/bitmap.h>
-#include <wx/menu.h>
 
 class WXDLLIMPEXP_SDK clButtonBase : public wxControl
 {
@@ -16,6 +16,7 @@ protected:
     size_t m_buttonStyle = 0;
     clColours m_colours;
     wxString m_text;
+    wxString m_subText;
     eButtonState m_state = eButtonState::kNormal;
 
     enum eDrawingFlags {
@@ -70,12 +71,14 @@ public:
     const clColours& GetColours() const { return m_colours; }
     void SetText(const wxString& text);
     const wxString& GetText() const { return m_text; }
+    void SetSubText(const wxString& subText) { this->m_subText = subText; }
+    const wxString& GetSubText() const { return m_subText; }
     void SetDefault();
     void SetHasDropDownMenu(bool hasDropDownMenu);
     bool HasDropDownMenu() const { return m_hasDropDownMenu; }
     void SetBitmap(const wxBitmap& bmp);
     const wxBitmap& GetBitmap() const;
-    
+
     /**
      * @brief display a menu for the user aligned to the button
      * @param menu
