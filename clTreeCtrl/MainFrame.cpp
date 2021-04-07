@@ -1,5 +1,6 @@
 #include "MainFrame.h"
 #include "clColours.h"
+#include "clMenuBar.hpp"
 #include "clTreeCtrl.h"
 #include <cmath>
 #include <wx/aboutdlg.h>
@@ -54,6 +55,26 @@ static wxVariant MakeCheckBox(bool checked, const wxString& text, int bmp_index)
 MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
 {
+    wxMenu* file_menu = new wxMenu;
+    file_menu->Append(wxID_OPEN);
+    file_menu->Append(wxID_CLOSE);
+    file_menu->AppendSeparator();
+    file_menu->Append(wxID_EXIT);
+
+    wxMenu* edit_menu = new wxMenu;
+    edit_menu->Append(wxID_UNDO);
+    edit_menu->Append(wxID_REDO);
+    file_menu->AppendSeparator();
+    edit_menu->Append(wxID_DELETE);
+    edit_menu->Append(wxID_CUT);
+    edit_menu->Append(wxID_COPY);
+    edit_menu->Append(wxID_PASTE);
+
+    wxMenu* menus[] = { file_menu, edit_menu };
+    wxString titles[] = { "&File", "&Edit" };
+    clMenuBar* mb = new clMenuBar(this, sizeof(menus) / sizeof(wxMenu*), menus, titles);
+    GetSizer()->Insert(0, mb, 0, wxEXPAND);
+
     // Create some themes so we can toggle through them
     m_treeCtrl = new clTreeCtrl();
     m_treeCtrl->Create(m_panelControls, wxID_ANY, wxDefaultPosition, wxDefaultSize,

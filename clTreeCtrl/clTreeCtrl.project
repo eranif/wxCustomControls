@@ -16,6 +16,8 @@
   </Reconciliation>
   <VirtualDirectory Name="Controls">
     <VirtualDirectory Name="Common">
+      <File Name="clMenuBar.cpp"/>
+      <File Name="clMenuBar.hpp"/>
       <File Name="clComboBox.cpp"/>
       <File Name="clComboBox.hpp"/>
       <File Name="clChoice.cpp"/>
