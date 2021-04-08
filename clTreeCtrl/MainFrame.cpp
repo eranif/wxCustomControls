@@ -56,20 +56,17 @@ MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
 {
     wxMenu* file_menu = new wxMenu;
-    file_menu->Append(wxID_OPEN);
-    file_menu->Append(wxID_CLOSE);
-    file_menu->AppendSeparator();
-    file_menu->Append(wxID_EXIT);
+    file_menu->Append(XRCID("say_bye"), "Bye!");
 
     wxMenu* edit_menu = new wxMenu;
-    edit_menu->Append(wxID_UNDO);
-    edit_menu->Append(wxID_REDO);
-    file_menu->AppendSeparator();
-    edit_menu->Append(wxID_DELETE);
-    edit_menu->Append(wxID_CUT);
-    edit_menu->Append(wxID_COPY);
-    edit_menu->Append(wxID_PASTE);
-
+    edit_menu->Append(XRCID("say_hi"), "Say Hi!\tCtrl-K");
+    edit_menu->Bind(
+        wxEVT_MENU,
+        [](wxCommandEvent& e) {
+            wxUnusedVar(e);
+            wxMessageBox("Hi!");
+        },
+        XRCID("say_hi"));
     wxMenu* menus[] = { file_menu, edit_menu };
     wxString titles[] = { "&File", "&Edit" };
     clMenuBar* mb = new clMenuBar(this, sizeof(menus) / sizeof(wxMenu*), menus, titles);
@@ -362,6 +359,7 @@ MainFrame::MainFrame(wxWindow* parent)
     tb->AddTool(wxID_CLEAR, _("Clear"), images.Bitmap("file"), "", wxITEM_NORMAL);
     tb->Realize();
     GetSizer()->Add(tb, 0, wxEXPAND);
+    mb->UpdateAccelerators();
 }
 
 MainFrame::~MainFrame() {}

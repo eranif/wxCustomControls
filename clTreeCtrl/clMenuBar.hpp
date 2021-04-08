@@ -10,7 +10,7 @@
 #include <wx/menu.h>
 #include <wx/panel.h>
 
-class clMenuBar : public wxPanel
+class WXDLLIMPEXP_SDK clMenuBar : public wxPanel
 {
 protected:
     struct menu_info {
@@ -171,6 +171,11 @@ public:
      * @brief Sets the label of a top-level menu
      */
     virtual void SetMenuLabel(size_t pos, const wxString& label);
+
+    /**
+     * @brief update the accelerator table for the parent based on the installed menus
+     */
+    void UpdateAccelerators();
 
     // Customisation point: allow user to set colours
     void SetColours(const clColours& colours);

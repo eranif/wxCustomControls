@@ -1,8 +1,11 @@
 #include "clMenuBar.hpp"
+#include <deque>
 #include <drawingutils.h>
 #include <wx/dc.h>
 #include <wx/dcbuffer.h>
 #include <wx/dcgraph.h>
+#include <wx/frame.h>
+#include <wx/sizer.h>
 
 clMenuBar::clMenuBar() {}
 
@@ -27,6 +30,7 @@ clMenuBar::clMenuBar(wxWindow* parent, size_t n, wxMenu* menus[], const wxString
 
     SetBackgroundStyle(wxBG_STYLE_PAINT);
     DoSetBestSize();
+    UpdateAccelerators();
 }
 
 clMenuBar::~clMenuBar()
@@ -71,6 +75,7 @@ bool clMenuBar::Append(wxMenu* menu, const wxString& title)
 
     menu_info mi = { title, menu, true };
     m_menus.emplace_back(mi);
+    UpdateAccelerators();
     Refresh();
     return true;
 }
@@ -215,6 +220,7 @@ wxMenu* clMenuBar::Remove(size_t pos)
     }
     auto mi = m_menus[pos];
     m_menus.erase(m_menus.begin() + pos);
+    UpdateAccelerators();
     Refresh();
     return mi.menu;
 }
@@ -422,11 +428,50 @@ void clMenuBar::OnLeftUp(wxMouseEvent& e)
         auto& mi = m_menus[where];
         if(mi.menu) {
             m_menu_is_up = true;
-            PopupMenu(mi.menu, mi.m_rect.GetBottomLeft());
+            wxPoint pt = mi.m_rect.GetBottomLeft();
+            pt.x += 1;
+            PopupMenu(mi.menu, pt);
             m_menu_is_up = false;
 
             UpdateFlags(::wxGetMousePosition());
             Refresh();
         }
     }
+}
+
+void clMenuBar::UpdateAccelerators()
+{
+    std::vector<wxAcceleratorEntry*> accels;
+    accels.reserve(1000); // make enough room
+    std::deque<wxMenu*> Q;
+    for(const auto& mi : m_menus) {
+        Q.push_back(mi.menu);
+        while(!Q.empty()) {
+            auto menu = Q.back();
+            Q.pop_back();
+            const auto& items = menu->GetMenuItems();
+            for(auto menuItem : items) {
+                if(menuItem->IsSubMenu()) {
+                    Q.push_back(menuItem->GetSubMenu());
+                } else {
+                    auto accel = menuItem->GetAccel();
+                    if(accel && accel->IsOk()) {
+                        accels.push_back(accel);
+
+                    } else {
+                        wxDELETE(accel);
+                    }
+                }
+            }
+        }
+    }
+
+    wxAcceleratorEntry entries[accels.size()];
+    for(size_t i = 0; i < accels.size(); ++i) {
+        entries[i] = *accels[i];
+        wxDELETE(accels[i]);
+    }
+
+    wxAcceleratorTable table(accels.size(), entries);
+    SetAcceleratorTable(table);
 }
