@@ -10,7 +10,7 @@
 clMenuBar::clMenuBar() {}
 
 clMenuBar::clMenuBar(wxWindow* parent, size_t n, wxMenu* menus[], const wxString titles[], long style)
-    : wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE)
+    : wxWindow(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE)
 {
     m_colours.InitDefaults();
     wxUnusedVar(style);
@@ -442,7 +442,7 @@ void clMenuBar::OnLeftUp(wxMouseEvent& e)
 void clMenuBar::UpdateAccelerators()
 {
     std::vector<wxAcceleratorEntry*> accels;
-    accels.reserve(1000); // make enough room
+    accels.reserve(100); // make enough room
     std::deque<wxMenu*> Q;
     for(const auto& mi : m_menus) {
         Q.push_back(mi.menu);
@@ -456,6 +456,7 @@ void clMenuBar::UpdateAccelerators()
                 } else {
                     auto accel = menuItem->GetAccel();
                     if(accel && accel->IsOk()) {
+                        accel->Set(accel->GetFlags(), accel->GetKeyCode(), menuItem->GetId());
                         accels.push_back(accel);
 
                     } else {
@@ -473,5 +474,5 @@ void clMenuBar::UpdateAccelerators()
     }
 
     wxAcceleratorTable table(accels.size(), entries);
-    SetAcceleratorTable(table);
+    GetParent()->SetAcceleratorTable(table);
 }

@@ -56,14 +56,14 @@ MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
 {
     wxMenu* file_menu = new wxMenu;
-    file_menu->Append(XRCID("say_bye"), "Bye!");
+    file_menu->Append(XRCID("say_bye"), "Bye!\tCtrl-Q");
 
     wxMenu* edit_menu = new wxMenu;
     edit_menu->Append(XRCID("say_hi"), "Say Hi!\tCtrl-K");
-    edit_menu->Bind(
+    Bind(
         wxEVT_MENU,
         [](wxCommandEvent& e) {
-            wxUnusedVar(e);
+            e.Skip();
             wxMessageBox("Hi!");
         },
         XRCID("say_hi"));
@@ -359,7 +359,6 @@ MainFrame::MainFrame(wxWindow* parent)
     tb->AddTool(wxID_CLEAR, _("Clear"), images.Bitmap("file"), "", wxITEM_NORMAL);
     tb->Realize();
     GetSizer()->Add(tb, 0, wxEXPAND);
-    mb->UpdateAccelerators();
 }
 
 MainFrame::~MainFrame() {}

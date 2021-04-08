@@ -10,7 +10,7 @@
 #include <wx/menu.h>
 #include <wx/panel.h>
 
-class WXDLLIMPEXP_SDK clMenuBar : public wxPanel
+class WXDLLIMPEXP_SDK clMenuBar : public wxWindow
 {
 protected:
     struct menu_info {
