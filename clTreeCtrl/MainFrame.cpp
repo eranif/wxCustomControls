@@ -55,21 +55,8 @@ static wxVariant MakeCheckBox(bool checked, const wxString& text, int bmp_index)
 MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
 {
-    wxMenu* file_menu = new wxMenu;
-    file_menu->Append(XRCID("say_bye"), "Bye!\tCtrl-Q");
-
-    wxMenu* edit_menu = new wxMenu;
-    edit_menu->Append(XRCID("say_hi"), "Say Hi!\tCtrl-K");
-    Bind(
-        wxEVT_MENU,
-        [](wxCommandEvent& e) {
-            e.Skip();
-            wxMessageBox("Hi!");
-        },
-        XRCID("say_hi"));
-    wxMenu* menus[] = { file_menu, edit_menu };
-    wxString titles[] = { "&File", "&Edit" };
-    clMenuBar* mb = new clMenuBar(this, sizeof(menus) / sizeof(wxMenu*), menus, titles);
+    clMenuBar* mb = new clMenuBar(this, 0, nullptr, nullptr);
+    mb->FromMenuBar(GetMenuBar());
     GetSizer()->Insert(0, mb, 0, wxEXPAND);
 
     // Create some themes so we can toggle through them

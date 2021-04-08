@@ -16,8 +16,7 @@ clMenuBar::clMenuBar(wxWindow* parent, size_t n, wxMenu* menus[], const wxString
     wxUnusedVar(style);
     m_menus.reserve(n);
     for(size_t i = 0; i < n; ++i) {
-        menu_info mi{ titles[i], menus[i], true };
-        m_menus.emplace_back(mi);
+        DoAppend(menus[i], titles[i]);
     }
 
     Bind(wxEVT_PAINT, &clMenuBar::OnPaint, this);
@@ -65,7 +64,7 @@ clMenuBar::menu_info* clMenuBar::DoFindMenu(wxMenu* menu) const
     return nullptr;
 }
 
-bool clMenuBar::Append(wxMenu* menu, const wxString& title)
+bool clMenuBar::DoAppend(wxMenu* menu, const wxString& title)
 {
     for(auto d : m_menus) {
         if(d.menu == menu) {
@@ -75,6 +74,15 @@ bool clMenuBar::Append(wxMenu* menu, const wxString& title)
 
     menu_info mi = { title, menu, true };
     m_menus.emplace_back(mi);
+    return true;
+}
+
+bool clMenuBar::Append(wxMenu* menu, const wxString& title)
+{
+    if(!DoAppend(menu, title)) {
+        return false;
+    }
+
     UpdateAccelerators();
     Refresh();
     return true;
@@ -475,4 +483,20 @@ void clMenuBar::UpdateAccelerators()
 
     wxAcceleratorTable table(accels.size(), entries);
     GetParent()->SetAcceleratorTable(table);
+}
+
+void clMenuBar::FromMenuBar(wxMenuBar* mb)
+{
+    while(mb->GetMenuCount()) {
+        wxString label = mb->GetMenuLabel(0);
+        wxMenu* menu = mb->Remove(0);
+        DoAppend(menu, label);
+    }
+
+    wxFrame* frame = mb->GetFrame();
+    frame->SetMenuBar(nullptr);
+    mb->Detach();
+
+    UpdateAccelerators();
+    Refresh();
 }

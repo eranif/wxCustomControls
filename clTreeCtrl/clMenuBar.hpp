@@ -10,6 +10,7 @@
 #include <wx/menu.h>
 #include <wx/panel.h>
 
+class wxMenuBar;
 class WXDLLIMPEXP_SDK clMenuBar : public wxWindow
 {
 protected:
@@ -70,6 +71,7 @@ protected:
     void OnMotion(wxMouseEvent& e);
     void OnEnterWindow(wxMouseEvent& e);
     void OnLeaveWindow(wxMouseEvent& e);
+    bool DoAppend(wxMenu* menu, const wxString& title);
 
 public:
     clMenuBar();
@@ -180,6 +182,12 @@ public:
     // Customisation point: allow user to set colours
     void SetColours(const clColours& colours);
     const clColours& GetColours() const { return m_colours; }
+
+    /**
+     * @brief built menu bar from wxMenuBar. Note that this class takes ownership over the menus
+     * and "strip" the wxMenuBar from all the menus attached to it
+     */
+    void FromMenuBar(wxMenuBar* mb);
 };
 
 #endif // CLMENUBAR_HPP
