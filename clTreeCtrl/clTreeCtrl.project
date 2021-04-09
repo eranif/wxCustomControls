@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Project Name="clTreeCtrl" Version="11000" InternalType="GUI">
+<CodeLite_Project Name="wxCustomControls" Version="11000" InternalType="GUI">
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00080001N0005Debug0000000000000001N0011Debug_Linux0000000000000001N0016Debug_Linux_GTK30000000000000001N0009OSX_Debug0000000000000001N0011OSX_Release0000000000000001N0007Release0000000000000001N0013Release_Linux0000000000000001N0018Release_Linux_GTK3000000000000]]>
