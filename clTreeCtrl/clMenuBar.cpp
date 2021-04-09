@@ -1,13 +1,21 @@
 #include "clMenuBar.hpp"
+#if !wxUSE_NATIVE_MENUBAR
+#if CL_BUILD
+#include "file_logger.h"
+#endif
 #include <deque>
 #include <drawingutils.h>
 #include <wx/dc.h>
 #include <wx/dcbuffer.h>
 #include <wx/dcgraph.h>
 #include <wx/frame.h>
+#include <wx/msgdlg.h>
 #include <wx/sizer.h>
+#include <wx/xrc/xmlres.h>
 
-clMenuBar::clMenuBar() {}
+clMenuBar::clMenuBar()
+{
+}
 
 clMenuBar::clMenuBar(wxWindow* parent, size_t n, wxMenu* menus[], const wxString titles[], long style)
     : wxWindow(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE)
@@ -26,7 +34,7 @@ clMenuBar::clMenuBar(wxWindow* parent, size_t n, wxMenu* menus[], const wxString
     Bind(wxEVT_MOTION, &clMenuBar::OnMotion, this);
     Bind(wxEVT_ENTER_WINDOW, &clMenuBar::OnEnterWindow, this);
     Bind(wxEVT_LEAVE_WINDOW, &clMenuBar::OnLeaveWindow, this);
-
+    //Bind(wxEVT_IDLE, &clMenuBar::OnIdle, this);
     SetBackgroundStyle(wxBG_STYLE_PAINT);
     DoSetBestSize();
     UpdateAccelerators();
@@ -41,13 +49,15 @@ clMenuBar::~clMenuBar()
     Unbind(wxEVT_MOTION, &clMenuBar::OnMotion, this);
     Unbind(wxEVT_ENTER_WINDOW, &clMenuBar::OnEnterWindow, this);
     Unbind(wxEVT_LEAVE_WINDOW, &clMenuBar::OnLeaveWindow, this);
+    //Unbind(wxEVT_IDLE, &clMenuBar::OnIdle, this);
 }
 
 wxMenuItem* clMenuBar::DoFindMenuItem(int id, wxMenu** parent) const
 {
     wxMenuItem* mi = nullptr;
     for(auto d : m_menus) {
-        if((mi = d.menu->FindItem(id, parent))) {
+        if((mi = d.menu->FindItem(id, nullptr))) {
+            *parent = d.menu;
             return mi;
         }
     }
@@ -122,7 +132,10 @@ void clMenuBar::EnableTop(size_t pos, bool enable)
     Refresh();
 }
 
-wxMenuItem* clMenuBar::FindItem(int id, wxMenu** menu) const { return DoFindMenuItem(id, menu); }
+wxMenuItem* clMenuBar::FindItem(int id, wxMenu** menu) const
+{
+    return DoFindMenuItem(id, menu);
+}
 
 int clMenuBar::FindMenu(const wxString& title) const
 {
@@ -168,7 +181,10 @@ wxMenu* clMenuBar::GetMenu(size_t menuIndex) const
     return m_menus[menuIndex].menu;
 }
 
-size_t clMenuBar::GetMenuCount() const { return m_menus.size(); }
+size_t clMenuBar::GetMenuCount() const
+{
+    return m_menus.size();
+}
 
 wxString clMenuBar::GetMenuLabel(size_t pos) const
 {
@@ -263,7 +279,10 @@ void clMenuBar::SetLabel(int id, const wxString& label)
     mi->SetItemLabel(label);
 }
 
-void clMenuBar::SetLabelTop(size_t pos, const wxString& label) { SetMenuLabel(pos, label); }
+void clMenuBar::SetLabelTop(size_t pos, const wxString& label)
+{
+    SetMenuLabel(pos, label);
+}
 
 void clMenuBar::SetMenuLabel(size_t pos, const wxString& label)
 {
@@ -293,7 +312,10 @@ void clMenuBar::OnPaint(wxPaintEvent& e)
     }
 }
 
-void clMenuBar::OnEraseBg(wxEraseEvent& e) { wxUnusedVar(e); }
+void clMenuBar::OnEraseBg(wxEraseEvent& e)
+{
+    wxUnusedVar(e);
+}
 
 void clMenuBar::SetColours(const clColours& colours)
 {
@@ -326,12 +348,12 @@ void clMenuBar::DrawButton(wxDC& dc, size_t index, size_t flags)
         dc.SetTextForeground(m_colours.GetGrayText());
     } else if(mi.drawing_flags & k_pressed) {
         dc.SetBrush(m_colours.GetSelItemBgColour());
-        dc.SetPen(m_colours.GetSelItemTextColour());
+        dc.SetPen(m_colours.GetSelItemBgColour());
         dc.DrawRectangle(mi.m_rect);
         dc.SetTextForeground(m_colours.GetSelItemTextColour());
     } else if(mi.drawing_flags & k_hover) {
         dc.SetBrush(m_colours.GetSelItemBgColour());
-        dc.SetPen(m_colours.GetSelItemTextColour());
+        dc.SetPen(m_colours.GetSelItemBgColour());
         dc.DrawRectangle(mi.m_rect);
         dc.SetTextForeground(m_colours.GetSelItemTextColour());
     }
@@ -437,10 +459,9 @@ void clMenuBar::OnLeftUp(wxMouseEvent& e)
         if(mi.menu) {
             m_menu_is_up = true;
             wxPoint pt = mi.m_rect.GetBottomLeft();
-            pt.x += 1;
+            pt.y += 1;
             PopupMenu(mi.menu, pt);
             m_menu_is_up = false;
-
             UpdateFlags(::wxGetMousePosition());
             Refresh();
         }
@@ -458,15 +479,14 @@ void clMenuBar::UpdateAccelerators()
             auto menu = Q.back();
             Q.pop_back();
             const auto& items = menu->GetMenuItems();
-            for(auto menuItem : items) {
-                if(menuItem->IsSubMenu()) {
-                    Q.push_back(menuItem->GetSubMenu());
+            for(auto menu_item : items) {
+                if(menu_item->IsSubMenu()) {
+                    Q.push_back(menu_item->GetSubMenu());
                 } else {
-                    auto accel = menuItem->GetAccel();
+                    wxAcceleratorEntry* accel = wxAcceleratorEntry::Create(menu_item->GetItemLabel());
                     if(accel && accel->IsOk()) {
-                        accel->Set(accel->GetFlags(), accel->GetKeyCode(), menuItem->GetId());
+                        accel->Set(accel->GetFlags(), accel->GetKeyCode(), menu_item->GetId());
                         accels.push_back(accel);
-
                     } else {
                         wxDELETE(accel);
                     }
@@ -493,10 +513,17 @@ void clMenuBar::FromMenuBar(wxMenuBar* mb)
         DoAppend(menu, label);
     }
 
-    wxFrame* frame = mb->GetFrame();
-    frame->SetMenuBar(nullptr);
-    mb->Detach();
-
+    if(mb->IsAttached()) {
+        wxFrame* frame = mb->GetFrame();
+        frame->SetMenuBar(nullptr);
+        mb->Detach();
+    }
     UpdateAccelerators();
     Refresh();
 }
+
+void clMenuBar::OnIdle(wxIdleEvent& e)
+{
+    wxUnusedVar(e);
+}
+#endif

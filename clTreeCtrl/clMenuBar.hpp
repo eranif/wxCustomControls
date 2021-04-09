@@ -1,6 +1,24 @@
 #ifndef CLMENUBAR_HPP
 #define CLMENUBAR_HPP
 
+#include "wxCustomControls.hpp"
+#if wxUSE_NATIVE_MENUBAR
+#include <wx/menu.h>
+class clMenuBar : public wxMenuBar
+{
+public:
+    clMenuBar(wxWindow* WXUNUSED(parent), size_t n, wxMenu* menus[], const wxString titles[], long style = 0)
+        : wxMenuBar(n, menus, titles, style)
+    {
+    }
+    virtual ~clMenuBar()
+    {
+    }
+    void FromMenuBar(wxMenuBar* WXUNUSED(mb))
+    {
+    }
+};
+#else
 #include <clColours.h>
 #include <codelite_exports.h>
 #include <unordered_map>
@@ -71,6 +89,7 @@ protected:
     void OnMotion(wxMouseEvent& e);
     void OnEnterWindow(wxMouseEvent& e);
     void OnLeaveWindow(wxMouseEvent& e);
+    void OnIdle(wxIdleEvent& e);
     bool DoAppend(wxMenu* menu, const wxString& title);
 
 public:
@@ -181,7 +200,10 @@ public:
 
     // Customisation point: allow user to set colours
     void SetColours(const clColours& colours);
-    const clColours& GetColours() const { return m_colours; }
+    const clColours& GetColours() const
+    {
+        return m_colours;
+    }
 
     /**
      * @brief built menu bar from wxMenuBar. Note that this class takes ownership over the menus
@@ -189,5 +211,5 @@ public:
      */
     void FromMenuBar(wxMenuBar* mb);
 };
-
+#endif
 #endif // CLMENUBAR_HPP

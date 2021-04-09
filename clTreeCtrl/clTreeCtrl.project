@@ -16,6 +16,7 @@
   </Reconciliation>
   <VirtualDirectory Name="Controls">
     <VirtualDirectory Name="Common">
+      <File Name="wxCustomControls.hpp"/>
       <File Name="clMenuBar.cpp"/>
       <File Name="clMenuBar.hpp"/>
       <File Name="clComboBox.cpp"/>
