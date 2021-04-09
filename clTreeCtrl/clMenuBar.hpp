@@ -89,7 +89,6 @@ protected:
     void OnMotion(wxMouseEvent& e);
     void OnEnterWindow(wxMouseEvent& e);
     void OnLeaveWindow(wxMouseEvent& e);
-    void OnIdle(wxIdleEvent& e);
     bool DoAppend(wxMenu* menu, const wxString& title);
 
 public:

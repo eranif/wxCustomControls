@@ -34,7 +34,6 @@ clMenuBar::clMenuBar(wxWindow* parent, size_t n, wxMenu* menus[], const wxString
     Bind(wxEVT_MOTION, &clMenuBar::OnMotion, this);
     Bind(wxEVT_ENTER_WINDOW, &clMenuBar::OnEnterWindow, this);
     Bind(wxEVT_LEAVE_WINDOW, &clMenuBar::OnLeaveWindow, this);
-    //Bind(wxEVT_IDLE, &clMenuBar::OnIdle, this);
     SetBackgroundStyle(wxBG_STYLE_PAINT);
     DoSetBestSize();
     UpdateAccelerators();
@@ -49,7 +48,6 @@ clMenuBar::~clMenuBar()
     Unbind(wxEVT_MOTION, &clMenuBar::OnMotion, this);
     Unbind(wxEVT_ENTER_WINDOW, &clMenuBar::OnEnterWindow, this);
     Unbind(wxEVT_LEAVE_WINDOW, &clMenuBar::OnLeaveWindow, this);
-    //Unbind(wxEVT_IDLE, &clMenuBar::OnIdle, this);
 }
 
 wxMenuItem* clMenuBar::DoFindMenuItem(int id, wxMenu** parent) const
@@ -522,8 +520,4 @@ void clMenuBar::FromMenuBar(wxMenuBar* mb)
     Refresh();
 }
 
-void clMenuBar::OnIdle(wxIdleEvent& e)
-{
-    wxUnusedVar(e);
-}
 #endif
