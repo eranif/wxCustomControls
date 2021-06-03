@@ -13,4 +13,5 @@
   <object class="wxBitmap" name="folder_open">C:\src\wxCustomControls\bitmaps\24-folder-open-regular.png</object>
   <object class="wxBitmap" name="folder_open@2x">C:\src\wxCustomControls\bitmaps\24-folder-open-regular@2x.png</object>
   <object class="wxBitmap" name="folder_open@2x">C:\src\wxCustomControls\bitmaps\24-folder-open-regular@2x.png</object>
+  <object class="wxBitmap" name="logo">C:\src\wxCustomControls\bitmaps\16-codelite-logo@2x.png</object>
 </resource>

@@ -8,6 +8,8 @@
 
 class clCaptionBar;
 class clTreeCtrl;
+class clMenuBar;
+
 class MyItemData : public wxTreeItemData
 {
     wxString m_path;
@@ -45,6 +47,7 @@ class MainFrame : public MainFrameBaseClass
     std::vector<wxBitmap> m_bitmaps;
     clTreeCtrl* m_treeCtrl = nullptr;
     clCaptionBar* m_captionBar = nullptr;
+    clMenuBar* m_menuBar = nullptr;
 
 private:
     void LogMessage(const wxString& message);

@@ -66,15 +66,15 @@ MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
 {
     MyImages images;
-    clMenuBar* mb = new clMenuBar(this, 0, nullptr, nullptr);
-    mb->FromMenuBar(GetMenuBar());
-    GetSizer()->Insert(0, mb, 0, wxEXPAND);
+    m_menuBar = new clMenuBar(this, 0, nullptr, nullptr);
+    m_menuBar->FromMenuBar(GetMenuBar());
+    GetSizer()->Insert(0, m_menuBar, 0, wxEXPAND);
 
     m_captionBar = new clCaptionBar(this, this);
     GetSizer()->Insert(0, m_captionBar, 0, wxEXPAND);
     m_captionBar->SetCaption("My Custom Caption");
-    m_captionBar->SetBitmap(images.Bitmap("file"));
-    
+    m_captionBar->SetBitmap(images.Bitmap("logo"));
+
     // Create some themes so we can toggle through them
     m_treeCtrl = new clTreeCtrl();
     m_treeCtrl->Create(m_panelControls, wxID_ANY, wxDefaultPosition, wxDefaultSize,
@@ -520,6 +520,7 @@ void MainFrame::OnToggleTheme(wxCommandEvent& event)
     m_buttonDisabled->SetColours(colours);
     m_choice->SetColours(colours);
     m_captionBar->SetColours(colours);
+    m_menuBar->SetColours(colours);
     m_treeCtrl->Refresh();
     m_dataView->Refresh();
 }

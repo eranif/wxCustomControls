@@ -34,6 +34,7 @@ protected:
     void OnEnterWindow(wxMouseEvent& e);
     void OnLeaveWindow(wxMouseEvent& e);
     void OnSize(wxSizeEvent& e);
+    void OnMouseDoubleClick(wxMouseEvent& e);
 
 public:
     clCaptionBar();
@@ -42,7 +43,7 @@ public:
 
     void SetBitmap(const wxBitmap& bitmap);
     void SetCaption(const wxString& caption);
-    
+
     const wxBitmap& GetBitmap() const { return m_bitmap; }
     const wxString& GetCaption() const { return m_caption; }
     // Customisation point: allow user to set colours

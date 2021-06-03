@@ -2,6 +2,17 @@
 #include "drawingutils.h"
 #include <wx/dcbuffer.h>
 #include <wx/dcgraph.h>
+#include <wx/wupdlock.h>
+
+namespace
+{
+constexpr int SPACER = 2;
+}
+
+#define check_ptr_return(ptr) \
+    if(!ptr) {                \
+        return;               \
+    }
 
 clCaptionBar::clCaptionBar() {}
 
@@ -19,6 +30,7 @@ clCaptionBar::clCaptionBar(wxWindow* parent, wxTopLevelWindow* topLevelFrame)
     Bind(wxEVT_ENTER_WINDOW, &clCaptionBar::OnEnterWindow, this);
     Bind(wxEVT_LEAVE_WINDOW, &clCaptionBar::OnLeaveWindow, this);
     Bind(wxEVT_SIZE, &clCaptionBar::OnSize, this);
+    Bind(wxEVT_LEFT_DCLICK, &clCaptionBar::OnMouseDoubleClick, this);
     SetBackgroundStyle(wxBG_STYLE_PAINT);
     DoSetBestSize();
     topLevelFrame->SetWindowStyle(wxRESIZE_BORDER);
@@ -35,6 +47,7 @@ clCaptionBar::~clCaptionBar()
     Unbind(wxEVT_ENTER_WINDOW, &clCaptionBar::OnEnterWindow, this);
     Unbind(wxEVT_LEAVE_WINDOW, &clCaptionBar::OnLeaveWindow, this);
     Unbind(wxEVT_SIZE, &clCaptionBar::OnSize, this);
+    Unbind(wxEVT_LEFT_DCLICK, &clCaptionBar::OnMouseDoubleClick, this);
 }
 
 int clCaptionBar::HitTest(const wxPoint& pt) const
@@ -59,7 +72,7 @@ void clCaptionBar::OnPaint(wxPaintEvent& e)
     dc.SetTextForeground(m_colours.GetItemTextColour());
     dc.SetFont(DrawingUtils::GetDefaultGuiFont());
 
-    int xx = FromDIP(5);
+    int xx = FromDIP(SPACER);
 
     // draw the bitmap
     if(GetBitmap().IsOk()) {
@@ -68,7 +81,7 @@ void clCaptionBar::OnPaint(wxPaintEvent& e)
         wxRect bound_rect(xx, 0, width, height);
         bound_rect = bound_rect.CenterIn(rect, wxVERTICAL);
         dc.DrawBitmap(GetBitmap(), bound_rect.GetTopLeft());
-        xx += bound_rect.GetWidth() + FromDIP(5);
+        xx += bound_rect.GetWidth() + FromDIP(SPACER);
     }
 
     // draw the text
@@ -89,9 +102,8 @@ void clCaptionBar::OnEraseBg(wxEraseEvent& e) { wxUnusedVar(e); }
 void clCaptionBar::OnLeftDown(wxMouseEvent& e)
 {
     wxUnusedVar(e);
-    if(!m_topLevelWindow) {
-        return;
-    }
+    check_ptr_return(m_topLevelWindow);
+
     CaptureMouse();
     wxPoint pos = m_topLevelWindow->ClientToScreen(e.GetPosition());
     wxPoint origin = m_topLevelWindow->GetPosition();
@@ -111,9 +123,7 @@ void clCaptionBar::OnLeftUp(wxMouseEvent& e)
 void clCaptionBar::OnMotion(wxMouseEvent& e)
 {
     wxUnusedVar(e);
-    if(!m_topLevelWindow) {
-        return;
-    }
+    check_ptr_return(m_topLevelWindow);
 
     if(e.Dragging() && e.LeftIsDown()) {
         wxPoint pt = e.GetPosition();
@@ -139,13 +149,20 @@ void clCaptionBar::DoSetBestSize()
     wxGCDC dc(memDC);
     dc.SetFont(DrawingUtils::GetDefaultGuiFont());
 
+    wxRect r(0, 0, 10, 16);
     int buttonHeight = 0;
     {
-        wxRect r = dc.GetTextExtent("Tp");
-        r.Inflate(FromDIP(8));
-        buttonHeight = r.GetHeight();
+        wxSize textSize = dc.GetTextExtent("Tp");
+        buttonHeight = wxMax(buttonHeight, textSize.GetHeight());
     }
-    SetSizeHints(wxSize(-1, buttonHeight));
+
+    if(GetBitmap().IsOk()) {
+        int bmpHeight = GetBitmap().GetScaledHeight();
+        buttonHeight = wxMax(buttonHeight, bmpHeight);
+    }
+    r.SetHeight(buttonHeight);
+    r.Inflate(FromDIP(SPACER));
+    SetSizeHints(wxSize(-1, r.GetHeight()));
 }
 
 void clCaptionBar::OnSize(wxSizeEvent& e)
@@ -157,6 +174,7 @@ void clCaptionBar::OnSize(wxSizeEvent& e)
 void clCaptionBar::SetBitmap(const wxBitmap& bitmap)
 {
     m_bitmap = bitmap;
+    DoSetBestSize();
     Refresh();
 }
 
@@ -164,4 +182,16 @@ void clCaptionBar::SetCaption(const wxString& caption)
 {
     m_caption = caption;
     Refresh();
+}
+
+void clCaptionBar::OnMouseDoubleClick(wxMouseEvent& e)
+{
+    wxUnusedVar(e);
+    wxWindowUpdateLocker locker(m_topLevelWindow);
+    check_ptr_return(m_topLevelWindow);
+    if(m_topLevelWindow->IsMaximized()) {
+        m_topLevelWindow->Restore();
+    } else {
+        m_topLevelWindow->Maximize();
+    }
 }
