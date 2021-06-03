@@ -4,8 +4,8 @@
 // Do not modify this file by hand!
 //////////////////////////////////////////////////////////////////////
 
-#ifndef _WXCUSTOMCONTROLS_CLTREECTRL_WXCRAFTER_BASE_CLASSES_H
-#define _WXCUSTOMCONTROLS_CLTREECTRL_WXCRAFTER_BASE_CLASSES_H
+#ifndef _WXCUSTOMCONTROLS_SRC_WXCRAFTER_BASE_CLASSES_H
+#define _WXCUSTOMCONTROLS_SRC_WXCRAFTER_BASE_CLASSES_H
 
 // clang-format off
 #include <wx/settings.h>
@@ -55,25 +55,25 @@ class MainFrameBaseClass : public wxFrame
 {
 public:
     enum {
-        ID_NEVER_SHOW_SCROLLBARS = 10001,
-        ID_SHOW_SB_ON_FOCUS = 10002,
-        ID_SINGLE_SELECTION = 10003,
-        ID_HIDE_ROOT = 10004,
-        ID_TOGGLE_THEMES = 10005,
-        ID_ZEBRA = 10006,
-        ID_PG_DOWN = 10007,
-        ID_NATIVE_HEADER = 10008,
-        ID_PG_UP = 10009,
-        ID_DV_DELETE_ALL_ITEMS = 10010,
-        ID_FILL_WITH_5000_ENTRIES = 10011,
-        ID_DV_OPEN_FOLDER = 10012,
-        wxID_SET_TREE_COL_WIDTH = 10013,
-        ID_PREV_SIBLING = 10014,
-        ID_NEXT_SIBLING = 10015,
-        ID_SELECT_CHILDREN = 10016,
-        ID_EXPAND_ALL = 10017,
-        ID_OPEN_FOLDER = 10018,
-        wxID_COLOURS = 10019,
+        ID_SHOW_SB_ON_FOCUS = 10001,
+        ID_SINGLE_SELECTION = 10002,
+        ID_HIDE_ROOT = 10003,
+        ID_TOGGLE_THEMES = 10004,
+        ID_ZEBRA = 10005,
+        ID_PG_UP = 10006,
+        ID_FILL_WITH_5000_ENTRIES = 10007,
+        ID_DV_OPEN_FOLDER = 10008,
+        wxID_SET_TREE_COL_WIDTH = 10009,
+        ID_PREV_SIBLING = 10010,
+        ID_NEXT_SIBLING = 10011,
+        ID_NEVER_SHOW_SCROLLBARS = 10012,
+        ID_SELECT_CHILDREN = 10013,
+        ID_EXPAND_ALL = 10014,
+        ID_OPEN_FOLDER = 10015,
+        ID_NATIVE_HEADER = 10016,
+        wxID_COLOURS = 10017,
+        ID_PG_DOWN = 10018,
+        ID_DV_DELETE_ALL_ITEMS = 10019,
         wxID_BOOKMARK = 10020,
     };
 
@@ -181,8 +181,7 @@ public:
     wxMenuBar* GetMyMenuBar() { return m_myMenuBar; }
     MainFrameBaseClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("My Frame"),
                        const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1, -1),
-                       long style = wxCAPTION | wxRESIZE_BORDER | wxMAXIMIZE_BOX | wxMINIMIZE_BOX | wxSYSTEM_MENU |
-                                    wxCLOSE_BOX);
+                       long style = wxRESIZE_BORDER);
     virtual ~MainFrameBaseClass();
 };
 

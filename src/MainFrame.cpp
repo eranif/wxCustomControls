@@ -1,10 +1,14 @@
 #include "MainFrame.h"
+#include "clCaptionBar.hpp"
 #include "clColours.h"
 #include "clMenuBar.hpp"
 #include "clTreeCtrl.h"
 #include <cmath>
+#include <uxtheme.h>
 #include <wx/aboutdlg.h>
 #include <wx/checkbox.h>
+#include <wx/dc.h>
+#include <wx/dcclient.h>
 #include <wx/dir.h>
 #include <wx/dirdlg.h>
 #include <wx/ffile.h>
@@ -16,6 +20,12 @@
 #include <wx/stopwatch.h>
 #include <wx/textdlg.h>
 #include <wx/utils.h>
+
+#ifdef __WXMSW__
+#include "wx/msw/dc.h"
+#include "wx/msw/private.h"
+#include "wx/msw/uxtheme.h"
+#endif
 
 class MyDvData
 {
@@ -55,10 +65,16 @@ static wxVariant MakeCheckBox(bool checked, const wxString& text, int bmp_index)
 MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
 {
+    MyImages images;
     clMenuBar* mb = new clMenuBar(this, 0, nullptr, nullptr);
     mb->FromMenuBar(GetMenuBar());
     GetSizer()->Insert(0, mb, 0, wxEXPAND);
 
+    m_captionBar = new clCaptionBar(this, this);
+    GetSizer()->Insert(0, m_captionBar, 0, wxEXPAND);
+    m_captionBar->SetCaption("My Custom Caption");
+    m_captionBar->SetBitmap(images.Bitmap("file"));
+    
     // Create some themes so we can toggle through them
     m_treeCtrl = new clTreeCtrl();
     m_treeCtrl->Create(m_panelControls, wxID_ANY, wxDefaultPosition, wxDefaultSize,
@@ -138,7 +154,6 @@ MainFrame::MainFrame(wxWindow* parent)
     };
     m_treeCtrl->SetSortFunction(SortFunc);
 
-    MyImages images;
     m_bitmaps.push_back(images.Bitmap("folder"));
     m_bitmaps.push_back(images.Bitmap("folder_open"));
     m_bitmaps.push_back(images.Bitmap("file"));
@@ -504,6 +519,7 @@ void MainFrame::OnToggleTheme(wxCommandEvent& event)
     m_buttonTwo->SetColours(colours);
     m_buttonDisabled->SetColours(colours);
     m_choice->SetColours(colours);
+    m_captionBar->SetColours(colours);
     m_treeCtrl->Refresh();
     m_dataView->Refresh();
 }

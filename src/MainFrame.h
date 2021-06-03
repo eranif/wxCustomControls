@@ -6,6 +6,7 @@
 #include <vector>
 #include <wx/bitmap.h>
 
+class clCaptionBar;
 class clTreeCtrl;
 class MyItemData : public wxTreeItemData
 {
@@ -43,6 +44,7 @@ class MainFrame : public MainFrameBaseClass
     wxDataViewItem m_dvMatchedItem;
     std::vector<wxBitmap> m_bitmaps;
     clTreeCtrl* m_treeCtrl = nullptr;
+    clCaptionBar* m_captionBar = nullptr;
 
 private:
     void LogMessage(const wxString& message);
