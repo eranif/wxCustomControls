@@ -2,7 +2,7 @@
 <CodeLite_Workspace Name="wxCustomControls" Database="" Version="10.0.0">
   <Project Name="wxCustomControls" Path="src/wxCustomControls.project" Active="Yes"/>
   <BuildMatrix>
-    <WorkspaceConfiguration Name="Debug" Selected="yes">
+    <WorkspaceConfiguration Name="Debug" Selected="no">
       <Environment/>
       <Project Name="wxCustomControls" ConfigName="Debug"/>
     </WorkspaceConfiguration>
@@ -10,13 +10,9 @@
       <Environment/>
       <Project Name="wxCustomControls" ConfigName="Release"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Debug_Linux" Selected="no">
+    <WorkspaceConfiguration Name="Debug_Linux" Selected="yes">
       <Environment/>
       <Project Name="wxCustomControls" ConfigName="Debug_Linux"/>
-    </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Release_Linux" Selected="no">
-      <Environment/>
-      <Project Name="wxCustomControls" ConfigName="Release_Linux"/>
     </WorkspaceConfiguration>
     <WorkspaceConfiguration Name="OSX_Release" Selected="no">
       <Environment/>
@@ -25,14 +21,6 @@
     <WorkspaceConfiguration Name="OSX_Debug" Selected="no">
       <Environment/>
       <Project Name="wxCustomControls" ConfigName="OSX_Debug"/>
-    </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Debug_Linux_GTK3" Selected="no">
-      <Environment/>
-      <Project Name="wxCustomControls" ConfigName="Debug_Linux_GTK3"/>
-    </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Release_Linux_GTK3" Selected="yes">
-      <Environment/>
-      <Project Name="wxCustomControls" ConfigName="Release_Linux_GTK3"/>
     </WorkspaceConfiguration>
   </BuildMatrix>
 </CodeLite_Workspace>

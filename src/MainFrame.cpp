@@ -4,7 +4,6 @@
 #include "clMenuBar.hpp"
 #include "clTreeCtrl.h"
 #include <cmath>
-#include <uxtheme.h>
 #include <wx/aboutdlg.h>
 #include <wx/checkbox.h>
 #include <wx/dc.h>
