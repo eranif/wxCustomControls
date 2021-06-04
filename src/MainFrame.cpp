@@ -72,6 +72,9 @@ MainFrame::MainFrame(wxWindow* parent)
 
     m_captionBar = new clCaptionBar(this, this);
     GetSizer()->Insert(0, m_captionBar, 0, wxEXPAND);
+    m_captionBar->SetOptions(wxCAPTION_BOLD_FONT | wxCAPTION_CLOSE_BUTTON | wxCAPTION_MAXIMIZE_BUTTON |
+                             wxCAPTION_MINIMIZE_BUTTON);
+
     m_captionBar->SetCaption("My Custom Caption");
     m_captionBar->SetBitmap(images.Bitmap("logo"));
 

@@ -13,9 +13,7 @@
 #include <wx/sizer.h>
 #include <wx/xrc/xmlres.h>
 
-clMenuBar::clMenuBar()
-{
-}
+clMenuBar::clMenuBar() {}
 
 clMenuBar::clMenuBar(wxWindow* parent, size_t n, wxMenu* menus[], const wxString titles[], long style)
     : wxWindow(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE)
@@ -130,10 +128,7 @@ void clMenuBar::EnableTop(size_t pos, bool enable)
     Refresh();
 }
 
-wxMenuItem* clMenuBar::FindItem(int id, wxMenu** menu) const
-{
-    return DoFindMenuItem(id, menu);
-}
+wxMenuItem* clMenuBar::FindItem(int id, wxMenu** menu) const { return DoFindMenuItem(id, menu); }
 
 int clMenuBar::FindMenu(const wxString& title) const
 {
@@ -179,10 +174,7 @@ wxMenu* clMenuBar::GetMenu(size_t menuIndex) const
     return m_menus[menuIndex].menu;
 }
 
-size_t clMenuBar::GetMenuCount() const
-{
-    return m_menus.size();
-}
+size_t clMenuBar::GetMenuCount() const { return m_menus.size(); }
 
 wxString clMenuBar::GetMenuLabel(size_t pos) const
 {
@@ -277,10 +269,7 @@ void clMenuBar::SetLabel(int id, const wxString& label)
     mi->SetItemLabel(label);
 }
 
-void clMenuBar::SetLabelTop(size_t pos, const wxString& label)
-{
-    SetMenuLabel(pos, label);
-}
+void clMenuBar::SetLabelTop(size_t pos, const wxString& label) { SetMenuLabel(pos, label); }
 
 void clMenuBar::SetMenuLabel(size_t pos, const wxString& label)
 {
@@ -299,9 +288,11 @@ void clMenuBar::OnPaint(wxPaintEvent& e)
     PrepareDC(dc);
 
     wxRect rect = GetClientRect();
+    rect.Inflate(1);
     dc.SetBrush(m_colours.GetBgColour());
     dc.SetPen(m_colours.GetBgColour());
     dc.DrawRectangle(rect);
+    rect.Deflate(1);
 
     UpdateRects(dc);
     for(size_t i = 0; i < m_menus.size(); ++i) {
@@ -310,10 +301,7 @@ void clMenuBar::OnPaint(wxPaintEvent& e)
     }
 }
 
-void clMenuBar::OnEraseBg(wxEraseEvent& e)
-{
-    wxUnusedVar(e);
-}
+void clMenuBar::OnEraseBg(wxEraseEvent& e) { wxUnusedVar(e); }
 
 void clMenuBar::SetColours(const clColours& colours)
 {
