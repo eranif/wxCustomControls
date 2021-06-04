@@ -1,7 +1,7 @@
 {
 	"metadata":	{
 		"m_generatedFilesDir":	".",
-		"m_objCounter":	161,
+		"m_objCounter":	173,
 		"m_includeFiles":	[],
 		"m_bitmapFunction":	"wxC9ED9InitBitmapResources",
 		"m_bitmapsFile":	"wxcrafter_bitmaps.cpp",
@@ -691,7 +691,7 @@
 															"gbSpan":	"1,1",
 															"gbPosition":	"0,0",
 															"m_styles":	["wxDV_ROW_LINES", "wxDV_SINGLE"],
-															"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
+															"m_sizerFlags":	["wxEXPAND"],
 															"m_properties":	[{
 																	"type":	"winid",
 																	"m_label":	"ID:",
@@ -3494,6 +3494,273 @@
 											"m_eventClass":	"wxCommandEvent",
 											"m_eventHandler":	"wxCommandEventHandler",
 											"m_functionNameAndSignature":	"OnHideScrollbars(wxCommandEvent& event)",
+											"m_description":	"Menu item has been clicked",
+											"m_noBody":	false
+										}],
+									"m_children":	[]
+								}]
+						}, {
+							"m_type":	4458,
+							"proportion":	0,
+							"border":	5,
+							"gbSpan":	"1,1",
+							"gbPosition":	"0,0",
+							"m_styles":	[],
+							"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+							"m_properties":	[{
+									"type":	"string",
+									"m_label":	"Name:",
+									"m_value":	"m_menu163"
+								}, {
+									"type":	"string",
+									"m_label":	"Label:",
+									"m_value":	"Caption Bar"
+								}],
+							"m_events":	[],
+							"m_children":	[{
+									"m_type":	4459,
+									"proportion":	0,
+									"border":	5,
+									"gbSpan":	"1,1",
+									"gbPosition":	"0,0",
+									"m_styles":	[],
+									"m_sizerFlags":	[],
+									"m_properties":	[{
+											"type":	"winid",
+											"m_label":	"ID:",
+											"m_winid":	"wxID_ANY"
+										}, {
+											"type":	"string",
+											"m_label":	"Name:",
+											"m_value":	"m_menuItem165"
+										}, {
+											"type":	"string",
+											"m_label":	"Label:",
+											"m_value":	"Show Menu Bar Button"
+										}, {
+											"type":	"string",
+											"m_label":	"Shortcut:",
+											"m_value":	""
+										}, {
+											"type":	"string",
+											"m_label":	"Help String:",
+											"m_value":	""
+										}, {
+											"type":	"bitmapPicker",
+											"m_label":	"Bitmap File:",
+											"m_path":	""
+										}, {
+											"type":	"choice",
+											"m_label":	"Kind:",
+											"m_selection":	1,
+											"m_options":	["normal", "checkable", "radio", "separator"]
+										}, {
+											"type":	"bool",
+											"m_label":	"Checked",
+											"m_value":	true
+										}],
+									"m_events":	[{
+											"m_eventName":	"wxEVT_COMMAND_MENU_SELECTED",
+											"m_eventClass":	"wxCommandEvent",
+											"m_eventHandler":	"wxCommandEventHandler",
+											"m_functionNameAndSignature":	"OnCaptionBarToggleMenuButton(wxCommandEvent& event)",
+											"m_description":	"Menu item has been clicked",
+											"m_noBody":	false
+										}],
+									"m_children":	[]
+								}, {
+									"m_type":	4459,
+									"proportion":	0,
+									"border":	5,
+									"gbSpan":	"1,1",
+									"gbPosition":	"0,0",
+									"m_styles":	[],
+									"m_sizerFlags":	[],
+									"m_properties":	[{
+											"type":	"winid",
+											"m_label":	"ID:",
+											"m_winid":	"wxID_ANY"
+										}, {
+											"type":	"string",
+											"m_label":	"Name:",
+											"m_value":	"m_menuItem173"
+										}, {
+											"type":	"string",
+											"m_label":	"Label:",
+											"m_value":	"Item45"
+										}, {
+											"type":	"string",
+											"m_label":	"Shortcut:",
+											"m_value":	""
+										}, {
+											"type":	"string",
+											"m_label":	"Help String:",
+											"m_value":	""
+										}, {
+											"type":	"bitmapPicker",
+											"m_label":	"Bitmap File:",
+											"m_path":	""
+										}, {
+											"type":	"choice",
+											"m_label":	"Kind:",
+											"m_selection":	3,
+											"m_options":	["normal", "checkable", "radio", "separator"]
+										}, {
+											"type":	"bool",
+											"m_label":	"Checked",
+											"m_value":	false
+										}],
+									"m_events":	[],
+									"m_children":	[]
+								}, {
+									"m_type":	4459,
+									"proportion":	0,
+									"border":	5,
+									"gbSpan":	"1,1",
+									"gbPosition":	"0,0",
+									"m_styles":	[],
+									"m_sizerFlags":	[],
+									"m_properties":	[{
+											"type":	"winid",
+											"m_label":	"ID:",
+											"m_winid":	"wxID_ANY"
+										}, {
+											"type":	"string",
+											"m_label":	"Name:",
+											"m_value":	"m_menuItem167"
+										}, {
+											"type":	"string",
+											"m_label":	"Label:",
+											"m_value":	"Show Close Button"
+										}, {
+											"type":	"string",
+											"m_label":	"Shortcut:",
+											"m_value":	""
+										}, {
+											"type":	"string",
+											"m_label":	"Help String:",
+											"m_value":	""
+										}, {
+											"type":	"bitmapPicker",
+											"m_label":	"Bitmap File:",
+											"m_path":	""
+										}, {
+											"type":	"choice",
+											"m_label":	"Kind:",
+											"m_selection":	1,
+											"m_options":	["normal", "checkable", "radio", "separator"]
+										}, {
+											"type":	"bool",
+											"m_label":	"Checked",
+											"m_value":	true
+										}],
+									"m_events":	[{
+											"m_eventName":	"wxEVT_COMMAND_MENU_SELECTED",
+											"m_eventClass":	"wxCommandEvent",
+											"m_eventHandler":	"wxCommandEventHandler",
+											"m_functionNameAndSignature":	"OnCaptionBarToggleCloseButton(wxCommandEvent& event)",
+											"m_description":	"Menu item has been clicked",
+											"m_noBody":	false
+										}],
+									"m_children":	[]
+								}, {
+									"m_type":	4459,
+									"proportion":	0,
+									"border":	5,
+									"gbSpan":	"1,1",
+									"gbPosition":	"0,0",
+									"m_styles":	[],
+									"m_sizerFlags":	[],
+									"m_properties":	[{
+											"type":	"winid",
+											"m_label":	"ID:",
+											"m_winid":	"wxID_ANY"
+										}, {
+											"type":	"string",
+											"m_label":	"Name:",
+											"m_value":	"m_menuItem169"
+										}, {
+											"type":	"string",
+											"m_label":	"Label:",
+											"m_value":	"Show Maximize Button"
+										}, {
+											"type":	"string",
+											"m_label":	"Shortcut:",
+											"m_value":	""
+										}, {
+											"type":	"string",
+											"m_label":	"Help String:",
+											"m_value":	""
+										}, {
+											"type":	"bitmapPicker",
+											"m_label":	"Bitmap File:",
+											"m_path":	""
+										}, {
+											"type":	"choice",
+											"m_label":	"Kind:",
+											"m_selection":	1,
+											"m_options":	["normal", "checkable", "radio", "separator"]
+										}, {
+											"type":	"bool",
+											"m_label":	"Checked",
+											"m_value":	true
+										}],
+									"m_events":	[{
+											"m_eventName":	"wxEVT_COMMAND_MENU_SELECTED",
+											"m_eventClass":	"wxCommandEvent",
+											"m_eventHandler":	"wxCommandEventHandler",
+											"m_functionNameAndSignature":	"OnShowMaximizeButton(wxCommandEvent& event)",
+											"m_description":	"Menu item has been clicked",
+											"m_noBody":	false
+										}],
+									"m_children":	[]
+								}, {
+									"m_type":	4459,
+									"proportion":	0,
+									"border":	5,
+									"gbSpan":	"1,1",
+									"gbPosition":	"0,0",
+									"m_styles":	[],
+									"m_sizerFlags":	[],
+									"m_properties":	[{
+											"type":	"winid",
+											"m_label":	"ID:",
+											"m_winid":	"wxID_ANY"
+										}, {
+											"type":	"string",
+											"m_label":	"Name:",
+											"m_value":	"m_menuItem171"
+										}, {
+											"type":	"string",
+											"m_label":	"Label:",
+											"m_value":	"Show Minimize Button"
+										}, {
+											"type":	"string",
+											"m_label":	"Shortcut:",
+											"m_value":	""
+										}, {
+											"type":	"string",
+											"m_label":	"Help String:",
+											"m_value":	""
+										}, {
+											"type":	"bitmapPicker",
+											"m_label":	"Bitmap File:",
+											"m_path":	""
+										}, {
+											"type":	"choice",
+											"m_label":	"Kind:",
+											"m_selection":	1,
+											"m_options":	["normal", "checkable", "radio", "separator"]
+										}, {
+											"type":	"bool",
+											"m_label":	"Checked",
+											"m_value":	true
+										}],
+									"m_events":	[{
+											"m_eventName":	"wxEVT_COMMAND_MENU_SELECTED",
+											"m_eventClass":	"wxCommandEvent",
+											"m_eventHandler":	"wxCommandEventHandler",
+											"m_functionNameAndSignature":	"OnShowMinimizeButton(wxCommandEvent& event)",
 											"m_description":	"Menu item has been clicked",
 											"m_noBody":	false
 										}],

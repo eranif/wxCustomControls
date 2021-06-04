@@ -72,16 +72,18 @@ MainFrame::MainFrame(wxWindow* parent)
     m_captionBar = new clCaptionBar(this, this);
     GetSizer()->Insert(0, m_captionBar, 0, wxEXPAND);
     m_captionBar->SetOptions(wxCAPTION_BOLD_FONT | wxCAPTION_CLOSE_BUTTON | wxCAPTION_MAXIMIZE_BUTTON |
-                             wxCAPTION_MINIMIZE_BUTTON);
+                             wxCAPTION_MINIMIZE_BUTTON | wxCAPTION_MENU_BUTTON);
 
     m_captionBar->SetCaption("My Custom Caption");
     m_captionBar->SetBitmap(images.Bitmap("logo"));
+    m_captionBar->SetMenuBar(m_menuBar);
+    m_menuBar->Hide();
 
     // Create some themes so we can toggle through them
     m_treeCtrl = new clTreeCtrl();
     m_treeCtrl->Create(m_panelControls, wxID_ANY, wxDefaultPosition, wxDefaultSize,
                        wxTR_ROW_LINES | wxTR_ENABLE_SEARCH);
-    m_panelControls->GetSizer()->Insert(0, m_treeCtrl, 1, wxEXPAND | wxALL, 2);
+    m_panelControls->GetSizer()->Insert(0, m_treeCtrl, 1, wxEXPAND | wxALL, 0);
 
     m_comboBox->Bind(wxEVT_COMBOBOX, [this](wxCommandEvent& event) {
         wxString combo_text;
@@ -355,14 +357,14 @@ MainFrame::MainFrame(wxWindow* parent)
     m_toolbar->SetMiniToolBar(false);
     m_toolbar->Realize();
 
-    clToolBar* tb = new clToolBar(this);
-    tb->SetMiniToolBar(true);
-    tb->AddControl(new wxStaticText(tb, wxID_ANY, "", wxDefaultPosition, wxSize(250, -1)));
-    tb->AddStretchableSpace();
-    tb->AddTool(wxID_OPEN, _("Open"), images.Bitmap("folder"), "", wxITEM_NORMAL);
-    tb->AddTool(wxID_CLEAR, _("Clear"), images.Bitmap("file"), "", wxITEM_NORMAL);
-    tb->Realize();
-    GetSizer()->Add(tb, 0, wxEXPAND);
+    m_bottomToolBar = new clToolBar(this);
+    m_bottomToolBar->SetMiniToolBar(true);
+    m_bottomToolBar->AddControl(new wxStaticText(m_bottomToolBar, wxID_ANY, "", wxDefaultPosition, wxSize(250, -1)));
+    m_bottomToolBar->AddStretchableSpace();
+    m_bottomToolBar->AddTool(wxID_OPEN, _("Open"), images.Bitmap("folder"), "", wxITEM_NORMAL);
+    m_bottomToolBar->AddTool(wxID_CLEAR, _("Clear"), images.Bitmap("file"), "", wxITEM_NORMAL);
+    m_bottomToolBar->Realize();
+    GetSizer()->Add(m_bottomToolBar, 0, wxEXPAND);
 }
 
 MainFrame::~MainFrame() {}
@@ -783,4 +785,29 @@ void MainFrame::OnHideScrollbars(wxCommandEvent& event)
 
     m_treeCtrl->SetNeverShowScrollBar(wxHORIZONTAL, event.IsChecked());
     m_treeCtrl->SetNeverShowScrollBar(wxVERTICAL, event.IsChecked());
+}
+
+void MainFrame::OnCaptionBarToggleMenuButton(wxCommandEvent& event)
+{
+    if(event.IsChecked()) {
+        m_captionBar->SetMenuBar(m_menuBar);
+        m_menuBar->Hide();
+    } else {
+        m_captionBar->SetMenuBar(nullptr);
+        m_menuBar->Show();
+    }
+    PostSizeEvent();
+}
+
+void MainFrame::OnCaptionBarToggleCloseButton(wxCommandEvent& event)
+{
+    m_captionBar->SetOption(wxCAPTION_CLOSE_BUTTON, event.IsChecked());
+}
+void MainFrame::OnShowMaximizeButton(wxCommandEvent& event)
+{
+    m_captionBar->SetOption(wxCAPTION_MAXIMIZE_BUTTON, event.IsChecked());
+}
+void MainFrame::OnShowMinimizeButton(wxCommandEvent& event)
+{
+    m_captionBar->SetOption(wxCAPTION_MINIMIZE_BUTTON, event.IsChecked());
 }

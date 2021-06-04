@@ -69,7 +69,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     m_dataView = new clDataViewListCtrl(m_panelControls, wxID_ANY, wxDefaultPosition,
                                         wxDLG_UNIT(m_panelControls, wxSize(-1, 300)), wxDV_ROW_LINES | wxDV_SINGLE);
 
-    boxSizer71->Add(m_dataView, 1, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+    boxSizer71->Add(m_dataView, 1, wxEXPAND, WXC_FROM_DIP(1));
 
     m_dataView->AppendIconTextColumn(_("Path"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT,
                                      wxDATAVIEW_COL_RESIZABLE);
@@ -274,6 +274,27 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     m_menuItem155 = new wxMenuItem(menu_Style, ID_NEVER_SHOW_SCROLLBARS, _("Hide Scroll Bars"), wxT(""), wxITEM_CHECK);
     menu_Style->Append(m_menuItem155);
 
+    m_menu163 = new wxMenu();
+    m_myMenuBar->Append(m_menu163, _("Caption Bar"));
+
+    m_menuItem165 = new wxMenuItem(m_menu163, wxID_ANY, _("Show Menu Bar Button"), wxT(""), wxITEM_CHECK);
+    m_menu163->Append(m_menuItem165);
+    m_menuItem165->Check();
+
+    m_menu163->AppendSeparator();
+
+    m_menuItem167 = new wxMenuItem(m_menu163, wxID_ANY, _("Show Close Button"), wxT(""), wxITEM_CHECK);
+    m_menu163->Append(m_menuItem167);
+    m_menuItem167->Check();
+
+    m_menuItem169 = new wxMenuItem(m_menu163, wxID_ANY, _("Show Maximize Button"), wxT(""), wxITEM_CHECK);
+    m_menu163->Append(m_menuItem169);
+    m_menuItem169->Check();
+
+    m_menuItem171 = new wxMenuItem(m_menu163, wxID_ANY, _("Show Minimize Button"), wxT(""), wxITEM_CHECK);
+    m_menu163->Append(m_menuItem171);
+    m_menuItem171->Check();
+
     SetName(wxT("MainFrameBaseClass"));
     SetSize(wxDLG_UNIT(this, wxSize(-1, -1)));
     if(GetSizer()) {
@@ -357,6 +378,14 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
                   wxCommandEventHandler(MainFrameBaseClass::OnMenuitemsupportsearchMenuSelected), NULL, this);
     this->Connect(m_menuItem155->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                   wxCommandEventHandler(MainFrameBaseClass::OnHideScrollbars), NULL, this);
+    this->Connect(m_menuItem165->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                  wxCommandEventHandler(MainFrameBaseClass::OnCaptionBarToggleMenuButton), NULL, this);
+    this->Connect(m_menuItem167->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                  wxCommandEventHandler(MainFrameBaseClass::OnCaptionBarToggleCloseButton), NULL, this);
+    this->Connect(m_menuItem169->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                  wxCommandEventHandler(MainFrameBaseClass::OnShowMaximizeButton), NULL, this);
+    this->Connect(m_menuItem171->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                  wxCommandEventHandler(MainFrameBaseClass::OnShowMinimizeButton), NULL, this);
 }
 
 MainFrameBaseClass::~MainFrameBaseClass()
@@ -428,6 +457,14 @@ MainFrameBaseClass::~MainFrameBaseClass()
                      wxCommandEventHandler(MainFrameBaseClass::OnMenuitemsupportsearchMenuSelected), NULL, this);
     this->Disconnect(m_menuItem155->GetId(), wxEVT_COMMAND_MENU_SELECTED,
                      wxCommandEventHandler(MainFrameBaseClass::OnHideScrollbars), NULL, this);
+    this->Disconnect(m_menuItem165->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                     wxCommandEventHandler(MainFrameBaseClass::OnCaptionBarToggleMenuButton), NULL, this);
+    this->Disconnect(m_menuItem167->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                     wxCommandEventHandler(MainFrameBaseClass::OnCaptionBarToggleCloseButton), NULL, this);
+    this->Disconnect(m_menuItem169->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                     wxCommandEventHandler(MainFrameBaseClass::OnShowMaximizeButton), NULL, this);
+    this->Disconnect(m_menuItem171->GetId(), wxEVT_COMMAND_MENU_SELECTED,
+                     wxCommandEventHandler(MainFrameBaseClass::OnShowMinimizeButton), NULL, this);
 }
 
 MyImages::MyImages()

@@ -48,12 +48,17 @@ class MainFrame : public MainFrameBaseClass
     clTreeCtrl* m_treeCtrl = nullptr;
     clCaptionBar* m_captionBar = nullptr;
     clMenuBar* m_menuBar = nullptr;
+    clToolBar* m_bottomToolBar = nullptr;
 
 private:
     void LogMessage(const wxString& message);
     void DoAddRoot();
 
 protected:
+    virtual void OnShowMaximizeButton(wxCommandEvent& event);
+    virtual void OnShowMinimizeButton(wxCommandEvent& event);
+    virtual void OnCaptionBarToggleCloseButton(wxCommandEvent& event);
+    virtual void OnCaptionBarToggleMenuButton(wxCommandEvent& event);
     virtual void OnHideScrollbars(wxCommandEvent& event);
     virtual void OnLineDown(wxCommandEvent& event);
     virtual void OnLineUp(wxCommandEvent& event);

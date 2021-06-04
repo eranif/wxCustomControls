@@ -1,4 +1,5 @@
 #include "clCaptionBar.hpp"
+#include "clMenuBar.hpp"
 #include "drawingutils.h"
 #include <wx/dcbuffer.h>
 #include <wx/dcgraph.h>
@@ -7,7 +8,7 @@
 
 namespace
 {
-constexpr int SPACER = 2;
+constexpr int SPACER = 1;
 }
 
 #define check_ptr_return(ptr) \
@@ -96,9 +97,10 @@ void clCaptionBar::OnPaint(wxPaintEvent& e)
     wxRect rect = GetClientRect();
 
     // define the area required for the buttons
-    int right = rect.GetRight();
+    int right = rect.GetWidth() + rect.GetX();
     int total_buttons_width = 0;
     int button_width = rect.GetHeight();
+
     if(HasOption(wxCAPTION_CLOSE_BUTTON)) {
         m_buttonClose.SetRect({ right - button_width, 0, button_width, button_width });
         total_buttons_width += button_width;
@@ -134,6 +136,16 @@ void clCaptionBar::OnPaint(wxPaintEvent& e)
     dc.SetClippingRegion(0, 0, rect.GetWidth() - total_buttons_width, rect.GetHeight());
 
     int xx = FromDIP(SPACER);
+
+    // Check if we need to draw a menu button
+    if(HasOption(wxCAPTION_MENU_BUTTON) && m_mainMenu) {
+        m_buttonMenu.SetRect({ xx, 0, button_width, button_width });
+        if(m_menu_is_up) {
+            m_buttonMenu.SetState(wxCAPTION_BUTTON_PRESSED);
+        }
+        m_buttonMenu.Render(dc, wxCAPTION_HT_MENUBUTTON);
+        xx += m_buttonMenu.GetRect().GetWidth() + FromDIP(SPACER);
+    }
     // draw the bitmap
     if(GetBitmap().IsOk()) {
         int width = GetBitmap().GetScaledWidth();
@@ -215,6 +227,7 @@ void clCaptionBar::OnMotion(wxMouseEvent& e)
         refresh_needed = refresh_needed || m_buttonClose.DoHover(e.GetPosition());
         refresh_needed = refresh_needed || m_buttonMaximize.DoHover(e.GetPosition());
         refresh_needed = refresh_needed || m_buttonMinimize.DoHover(e.GetPosition());
+        refresh_needed = refresh_needed || m_buttonMenu.DoHover(e.GetPosition());
 
         if(refresh_needed) {
             Refresh();
@@ -230,7 +243,15 @@ void clCaptionBar::OnMotion(wxMouseEvent& e)
 
 void clCaptionBar::OnEnterWindow(wxMouseEvent& e) { wxUnusedVar(e); }
 
-void clCaptionBar::OnLeaveWindow(wxMouseEvent& e) { wxUnusedVar(e); }
+void clCaptionBar::OnLeaveWindow(wxMouseEvent& e)
+{
+    wxUnusedVar(e);
+    m_buttonClose.ResetState();
+    m_buttonMaximize.ResetState();
+    m_buttonMenu.ResetState();
+    m_buttonMinimize.ResetState();
+    Refresh();
+}
 
 void clCaptionBar::SetColours(const clColours& colours)
 {
@@ -277,6 +298,7 @@ void clCaptionBar::SetBitmap(const wxBitmap& bitmap)
 void clCaptionBar::SetCaption(const wxString& caption)
 {
     m_caption = caption;
+    m_topLevelWindow->SetLabel(caption);
     Refresh();
 }
 
@@ -335,6 +357,30 @@ bool clCaptionBar::ProcessCallback(const CallbackMap_t& map, wxCaptionHitTest wh
     }
 }
 
+void clCaptionBar::SetMenuBar(clMenuBar* menuBar)
+{
+    if(menuBar) {
+        m_mainMenu = menuBar->CreateSingleMenu();
+    } else {
+        m_mainMenu = nullptr;
+    }
+
+    SetOption(wxCAPTION_MENU_BUTTON, m_mainMenu ? true : false);
+    DoSetBestSize();
+    Refresh();
+}
+
+void clCaptionBar::ShowMenuBar()
+{
+    if(!m_mainMenu || !m_mainMenu->GetMenu()) {
+        return;
+    }
+    m_menu_is_up = true;
+    PopupMenu(m_mainMenu->GetMenu(), GetClientRect().GetBottomLeft());
+    m_menu_is_up = false;
+    Refresh();
+}
+
 // Button methods
 void clCaptionButton::LeftDown(wxCaptionHitTest where)
 {
@@ -361,6 +407,7 @@ void clCaptionButton::LeftUp(wxCaptionHitTest where)
         frame->Iconize();
         break;
     case wxCAPTION_HT_MENUBUTTON:
+        m_captionBar->ShowMenuBar();
         break;
     case wxCAPTION_HT_ICON:
         break;
@@ -416,6 +463,21 @@ void clCaptionButton::Render(wxDC& dc, wxCaptionHitTest ht)
     case wxCAPTION_HT_MAXMIZEBUTTON: {
         PREPARE_BUTTON_DRAW();
         dc.DrawRectangle(m_innerRect);
+    } break;
+    case wxCAPTION_HT_MENUBUTTON: {
+        PREPARE_BUTTON_DRAW();
+        // draw 3 lines
+        wxPoint pt1, pt2;
+        pt1 = m_innerRect.GetTopLeft();
+        pt2 = m_innerRect.GetTopRight();
+
+        pt1.y += m_innerRect.GetHeight() / 2;
+        pt2.y += m_innerRect.GetHeight() / 2;
+
+        dc.DrawLine(m_innerRect.GetTopLeft(), m_innerRect.GetTopRight());
+        dc.DrawLine(pt1, pt2);
+        dc.DrawLine(m_innerRect.GetBottomLeft(), m_innerRect.GetBottomRight());
+
     } break;
     case wxCAPTION_HT_MINIMIZEBUTTON: {
         PREPARE_BUTTON_DRAW();

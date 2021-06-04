@@ -128,6 +128,12 @@ protected:
     wxMenuItem* m_menuItemNativeHeader;
     wxMenuItem* m_menuItemSupportSearch;
     wxMenuItem* m_menuItem155;
+    wxMenu* m_menu163;
+    wxMenuItem* m_menuItem165;
+    wxMenuItem* m_menuItem173;
+    wxMenuItem* m_menuItem167;
+    wxMenuItem* m_menuItem169;
+    wxMenuItem* m_menuItem171;
 
 protected:
     virtual void OnColoursUI(wxUpdateUIEvent& event) { event.Skip(); }
@@ -164,6 +170,10 @@ protected:
     virtual void OnNativeHeader(wxCommandEvent& event) { event.Skip(); }
     virtual void OnMenuitemsupportsearchMenuSelected(wxCommandEvent& event) { event.Skip(); }
     virtual void OnHideScrollbars(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnCaptionBarToggleMenuButton(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnCaptionBarToggleCloseButton(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnShowMaximizeButton(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnShowMinimizeButton(wxCommandEvent& event) { event.Skip(); }
 
 public:
     clToolBar* GetToolbar() { return m_toolbar; }

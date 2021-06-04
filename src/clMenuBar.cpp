@@ -46,6 +46,14 @@ clMenuBar::~clMenuBar()
     Unbind(wxEVT_MOTION, &clMenuBar::OnMotion, this);
     Unbind(wxEVT_ENTER_WINDOW, &clMenuBar::OnEnterWindow, this);
     Unbind(wxEVT_LEAVE_WINDOW, &clMenuBar::OnLeaveWindow, this);
+
+    // free the menus
+    for(auto& mi : m_menus) {
+        if(mi.menu) {
+            wxDELETE(mi.menu);
+        }
+    }
+    m_menus.clear();
 }
 
 wxMenuItem* clMenuBar::DoFindMenuItem(int id, wxMenu** parent) const
@@ -491,6 +499,17 @@ void clMenuBar::UpdateAccelerators()
     GetParent()->SetAcceleratorTable(table);
 }
 
+clMenuWrapper::ptr_t clMenuBar::CreateSingleMenu() const
+{
+    clMenuWrapper::ptr_t p = std::make_shared<clMenuWrapper>();
+    wxMenu* menu = new wxMenu;
+    for(const auto& mi : m_menus) {
+        menu->Append(wxID_ANY, mi.text, mi.menu);
+    }
+    p->AssignMenu(menu);
+    return p;
+}
+
 void clMenuBar::FromMenuBar(wxMenuBar* mb)
 {
     while(mb->GetMenuCount()) {
@@ -506,6 +525,33 @@ void clMenuBar::FromMenuBar(wxMenuBar* mb)
     }
     UpdateAccelerators();
     Refresh();
+}
+
+clMenuWrapper::~clMenuWrapper() { Delete(); }
+
+void clMenuWrapper::Delete()
+{
+    if(m_mainMenu && m_mainMenu->GetMenuItemCount()) {
+        std::vector<wxWindowID> menus_id;
+        menus_id.reserve(m_mainMenu->GetMenuItemCount());
+
+        for(const auto& mi : m_mainMenu->GetMenuItems()) {
+            menus_id.push_back(mi->GetId());
+        }
+
+        // remove all the menu entries
+        while(!menus_id.empty()) {
+            m_mainMenu->Remove(menus_id[0]);
+            menus_id.erase(menus_id.begin());
+        }
+    }
+    wxDELETE(m_mainMenu);
+}
+
+void clMenuWrapper::AssignMenu(wxMenu* menu)
+{
+    Delete();
+    m_mainMenu = menu;
 }
 
 #endif

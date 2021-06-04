@@ -1,6 +1,7 @@
 #ifndef CLCAPTIONBAR_HPP
 #define CLCAPTIONBAR_HPP
 
+#include "clMenuBar.hpp"
 #include "wxCustomControls.hpp"
 #include <clColours.h>
 #include <codelite_exports.h>
@@ -12,11 +13,13 @@
 #include <wx/panel.h>
 #include <wx/toplevel.h>
 
+class clMenuBar;
 enum wxCaptionStyle {
     wxCAPTION_BOLD_FONT = (1 << 0),
     wxCAPTION_CLOSE_BUTTON = (1 << 1),
     wxCAPTION_MINIMIZE_BUTTON = (1 << 2),
     wxCAPTION_MAXIMIZE_BUTTON = (1 << 3),
+    wxCAPTION_MENU_BUTTON = (1 << 4),
 };
 
 enum wxCaptionHitTest {
@@ -87,6 +90,7 @@ public:
         return old_state != m_state;
     }
 
+    void SetState(wxCaptionButtonState state) { m_state = state; }
     void LeftDown(wxCaptionHitTest where);
     void LeftUp(wxCaptionHitTest where);
     void Render(wxDC& dc, wxCaptionHitTest ht);
@@ -115,6 +119,8 @@ protected:
 
     CallbackMap_t m_leftDownCallbacks;
     CallbackMap_t m_leftUpCallbacks;
+    clMenuWrapper::ptr_t m_mainMenu;
+    bool m_menu_is_up = false;
 
 protected:
     wxCaptionHitTest HitTest(const wxPoint& pt) const;
@@ -132,6 +138,7 @@ protected:
     void OnLeaveWindow(wxMouseEvent& e);
     void OnSize(wxSizeEvent& e);
     void OnMouseDoubleClick(wxMouseEvent& e);
+    void ShowMenuBar();
 
 public:
     clCaptionBar(wxWindow* parent, wxTopLevelWindow* topLevelFrame);
@@ -151,5 +158,11 @@ public:
      */
     void SetOptions(size_t options);
     bool HasOption(wxCaptionStyle option) const { return m_flags & option; }
+
+    /**
+     * @brief associate menu bar with this caption
+     * this also implicitly enables/disables the wxCAPTION_MENU_BUTTON style
+     */
+    void SetMenuBar(clMenuBar* menuBar);
 };
 #endif // CLCAPTIONBAR_HPP
