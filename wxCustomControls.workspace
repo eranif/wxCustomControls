@@ -6,11 +6,11 @@
       <Environment/>
       <Project Name="wxCustomControls" ConfigName="Debug"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Release" Selected="no">
+    <WorkspaceConfiguration Name="Release" Selected="yes">
       <Environment/>
       <Project Name="wxCustomControls" ConfigName="Release"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Debug_Linux" Selected="yes">
+    <WorkspaceConfiguration Name="Debug_Linux" Selected="no">
       <Environment/>
       <Project Name="wxCustomControls" ConfigName="Debug_Linux"/>
     </WorkspaceConfiguration>
