@@ -75,10 +75,13 @@ MainFrame::MainFrame(wxWindow* parent)
     GetSizer()->Insert(0, m_captionBar, 0, wxEXPAND);
     m_captionBar->SetOptions(wxCAPTION_STYLE_DEFAULT);
 
-    m_captionBar->Bind(wxEVT_CAPTION_ACTION_BUTTON, [](wxCommandEvent& e) {
+    m_captionBar->Bind(wxEVT_CAPTION_ACTION_BUTTON, [this](wxCommandEvent& e) {
         wxUnusedVar(e);
-        wxMessageBox("Action button clicked!\nGoing to popup a colour selector dialog!");
-        wxGetColourFromUser();
+        wxMessageBox("Action button clicked!\nGoing to show menu!");
+        wxMenu menu;
+        menu.Append(wxID_OPEN);
+        menu.Append(wxID_PRINT);
+        m_captionBar->ShowMenuForActionButton(&menu);
     });
 
     m_captionBar->SetCaption("My Custom Caption");
