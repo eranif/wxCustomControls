@@ -15,11 +15,11 @@
 
 class clMenuBar;
 enum wxCaptionStyle {
-    wxCAPTION_BOLD_FONT = (1 << 0),
-    wxCAPTION_CLOSE_BUTTON = (1 << 1),
-    wxCAPTION_MINIMIZE_BUTTON = (1 << 2),
-    wxCAPTION_MAXIMIZE_BUTTON = (1 << 3),
-    wxCAPTION_MENU_BUTTON = (1 << 4),
+    wxCAPTION_STYLE_BOLD_FONT = (1 << 0),
+    wxCAPTION_STYLE_CLOSE_BUTTON = (1 << 1),
+    wxCAPTION_STYLE_MINIMIZE_BUTTON = (1 << 2),
+    wxCAPTION_STYLE_MAXIMIZE_BUTTON = (1 << 3),
+    wxCAPTION_STYLE_MENU_BUTTON = (1 << 4),
 };
 
 enum wxCaptionHitTest {
@@ -32,9 +32,9 @@ enum wxCaptionHitTest {
 };
 
 enum wxCaptionButtonState {
-    wxCAPTION_BUTTON_NORMAL,
-    wxCAPTION_BUTTON_PRESSED,
-    wxCAPTION_BUTTON_HOVER,
+    wxCAPTION_BUTTON_STATE_NORMAL,
+    wxCAPTION_BUTTON_STATE_PRESSED,
+    wxCAPTION_BUTTON_STATE_HOVER,
 };
 
 class clCaptionBar;
@@ -42,16 +42,16 @@ class WXDLLIMPEXP_SDK clCaptionButton
 {
     wxRect m_rect;
     wxRect m_innerRect;
-    size_t m_state = wxCAPTION_BUTTON_NORMAL;
+    size_t m_state = wxCAPTION_BUTTON_STATE_NORMAL;
     clCaptionBar* m_captionBar = nullptr;
 
 public:
     clCaptionButton(clCaptionBar* captionBar) { m_captionBar = captionBar; }
     ~clCaptionButton() {}
 
-    bool IsPressed() const { return m_state & wxCAPTION_BUTTON_PRESSED; }
-    bool IsHover() const { return m_state & wxCAPTION_BUTTON_HOVER; }
-    bool IsNormal() const { return m_state & wxCAPTION_BUTTON_NORMAL; }
+    bool IsPressed() const { return m_state & wxCAPTION_BUTTON_STATE_PRESSED; }
+    bool IsHover() const { return m_state & wxCAPTION_BUTTON_STATE_HOVER; }
+    bool IsNormal() const { return m_state & wxCAPTION_BUTTON_STATE_NORMAL; }
     bool Contains(const wxPoint& pt) const { return m_rect.Contains(pt); }
     void SetRect(const wxRect& rect)
     {
@@ -72,7 +72,7 @@ public:
     bool ResetState()
     {
         auto old_state = m_state;
-        m_state = wxCAPTION_BUTTON_NORMAL;
+        m_state = wxCAPTION_BUTTON_STATE_NORMAL;
         return old_state != m_state;
     }
 
@@ -83,9 +83,9 @@ public:
     {
         auto old_state = m_state;
         if(m_rect.Contains(pt)) {
-            m_state = wxCAPTION_BUTTON_HOVER;
+            m_state = wxCAPTION_BUTTON_STATE_HOVER;
         } else {
-            m_state = wxCAPTION_BUTTON_NORMAL;
+            m_state = wxCAPTION_BUTTON_STATE_NORMAL;
         }
         return old_state != m_state;
     }
@@ -161,7 +161,7 @@ public:
 
     /**
      * @brief associate menu bar with this caption
-     * this also implicitly enables/disables the wxCAPTION_MENU_BUTTON style
+     * this also implicitly enables/disables the wxCAPTION_STYLE_MENU_BUTTON style
      */
     void SetMenuBar(clMenuBar* menuBar);
 };

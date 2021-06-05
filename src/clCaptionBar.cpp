@@ -101,19 +101,19 @@ void clCaptionBar::OnPaint(wxPaintEvent& e)
     int total_buttons_width = 0;
     int button_width = rect.GetHeight();
 
-    if(HasOption(wxCAPTION_CLOSE_BUTTON)) {
+    if(HasOption(wxCAPTION_STYLE_CLOSE_BUTTON)) {
         m_buttonClose.SetRect({ right - button_width, 0, button_width, button_width });
         total_buttons_width += button_width;
         right = m_buttonClose.GetRect().GetLeft();
     }
 
-    if(HasOption(wxCAPTION_MAXIMIZE_BUTTON)) {
+    if(HasOption(wxCAPTION_STYLE_MAXIMIZE_BUTTON)) {
         m_buttonMaximize.SetRect({ right - button_width, 0, button_width, button_width });
         total_buttons_width += button_width;
         right = m_buttonMaximize.GetRect().GetLeft();
     }
 
-    if(HasOption(wxCAPTION_MINIMIZE_BUTTON)) {
+    if(HasOption(wxCAPTION_STYLE_MINIMIZE_BUTTON)) {
         m_buttonMinimize.SetRect({ right - button_width, 0, button_width, button_width });
         total_buttons_width += button_width;
         right = m_buttonMinimize.GetRect().GetLeft();
@@ -127,7 +127,7 @@ void clCaptionBar::OnPaint(wxPaintEvent& e)
 
     dc.SetTextForeground(m_colours.GetItemTextColour());
     auto font = DrawingUtils::GetDefaultGuiFont();
-    if(HasOption(wxCAPTION_BOLD_FONT)) {
+    if(HasOption(wxCAPTION_STYLE_BOLD_FONT)) {
         font.SetWeight(wxFONTWEIGHT_BOLD);
     }
     dc.SetFont(font);
@@ -138,10 +138,10 @@ void clCaptionBar::OnPaint(wxPaintEvent& e)
     int xx = FromDIP(SPACER);
 
     // Check if we need to draw a menu button
-    if(HasOption(wxCAPTION_MENU_BUTTON) && m_mainMenu) {
+    if(HasOption(wxCAPTION_STYLE_MENU_BUTTON) && m_mainMenu) {
         m_buttonMenu.SetRect({ xx, 0, button_width, button_width });
         if(m_menu_is_up) {
-            m_buttonMenu.SetState(wxCAPTION_BUTTON_PRESSED);
+            m_buttonMenu.SetState(wxCAPTION_BUTTON_STATE_PRESSED);
         }
         m_buttonMenu.Render(dc, wxCAPTION_HT_MENUBUTTON);
         xx += m_buttonMenu.GetRect().GetWidth() + FromDIP(SPACER);
@@ -172,15 +172,15 @@ void clCaptionBar::OnPaint(wxPaintEvent& e)
 
     // draw buttons (if any)
     dc.SetPen(m_colours.GetItemTextColour());
-    if(HasOption(wxCAPTION_CLOSE_BUTTON)) {
+    if(HasOption(wxCAPTION_STYLE_CLOSE_BUTTON)) {
         m_buttonClose.Render(dc, wxCAPTION_HT_CLOSEBUTTON);
     }
 
-    if(HasOption(wxCAPTION_MAXIMIZE_BUTTON)) {
+    if(HasOption(wxCAPTION_STYLE_MAXIMIZE_BUTTON)) {
         m_buttonMaximize.Render(dc, wxCAPTION_HT_MAXMIZEBUTTON);
     }
 
-    if(HasOption(wxCAPTION_MINIMIZE_BUTTON)) {
+    if(HasOption(wxCAPTION_STYLE_MINIMIZE_BUTTON)) {
         m_buttonMinimize.Render(dc, wxCAPTION_HT_MINIMIZEBUTTON);
     }
 }
@@ -365,7 +365,7 @@ void clCaptionBar::SetMenuBar(clMenuBar* menuBar)
         m_mainMenu = nullptr;
     }
 
-    SetOption(wxCAPTION_MENU_BUTTON, m_mainMenu ? true : false);
+    SetOption(wxCAPTION_STYLE_MENU_BUTTON, m_mainMenu ? true : false);
     DoSetBestSize();
     Refresh();
 }
@@ -385,7 +385,7 @@ void clCaptionBar::ShowMenuBar()
 void clCaptionButton::LeftDown(wxCaptionHitTest where)
 {
     wxUnusedVar(where);
-    m_state = wxCAPTION_BUTTON_PRESSED;
+    m_state = wxCAPTION_BUTTON_STATE_PRESSED;
     m_captionBar->Refresh();
 }
 
@@ -424,7 +424,7 @@ void clCaptionButton::Render(wxDC& dc, wxCaptionHitTest ht)
     wxColour pen_colour = m_captionBar->m_colours.GetItemTextColour();
 
     bool draw_background = true;
-    if(m_state == wxCAPTION_BUTTON_HOVER) {
+    if(m_state == wxCAPTION_BUTTON_STATE_HOVER) {
         if(ht == wxCAPTION_HT_CLOSEBUTTON) {
             bg_colour = *wxRED;
             pen_colour = *wxWHITE;
@@ -432,7 +432,7 @@ void clCaptionButton::Render(wxDC& dc, wxCaptionHitTest ht)
             bool is_dark = DrawingUtils::IsDark(bg_colour);
             bg_colour = bg_colour.ChangeLightness(is_dark ? 120 : 80);
         }
-    } else if(m_state == wxCAPTION_BUTTON_PRESSED) {
+    } else if(m_state == wxCAPTION_BUTTON_STATE_PRESSED) {
         if(ht == wxCAPTION_HT_CLOSEBUTTON) {
             bg_colour = wxColour(*wxRED).ChangeLightness(60);
             pen_colour = wxColour(*wxWHITE).ChangeLightness(60);

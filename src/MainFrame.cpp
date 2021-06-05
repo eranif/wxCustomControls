@@ -71,8 +71,8 @@ MainFrame::MainFrame(wxWindow* parent)
 
     m_captionBar = new clCaptionBar(this, this);
     GetSizer()->Insert(0, m_captionBar, 0, wxEXPAND);
-    m_captionBar->SetOptions(wxCAPTION_BOLD_FONT | wxCAPTION_CLOSE_BUTTON | wxCAPTION_MAXIMIZE_BUTTON |
-                             wxCAPTION_MINIMIZE_BUTTON | wxCAPTION_MENU_BUTTON);
+    m_captionBar->SetOptions(wxCAPTION_STYLE_BOLD_FONT | wxCAPTION_STYLE_CLOSE_BUTTON | wxCAPTION_STYLE_MAXIMIZE_BUTTON |
+                             wxCAPTION_STYLE_MINIMIZE_BUTTON | wxCAPTION_STYLE_MENU_BUTTON);
 
     m_captionBar->SetCaption("My Custom Caption");
     m_captionBar->SetBitmap(images.Bitmap("logo"));
@@ -801,13 +801,13 @@ void MainFrame::OnCaptionBarToggleMenuButton(wxCommandEvent& event)
 
 void MainFrame::OnCaptionBarToggleCloseButton(wxCommandEvent& event)
 {
-    m_captionBar->SetOption(wxCAPTION_CLOSE_BUTTON, event.IsChecked());
+    m_captionBar->SetOption(wxCAPTION_STYLE_CLOSE_BUTTON, event.IsChecked());
 }
 void MainFrame::OnShowMaximizeButton(wxCommandEvent& event)
 {
-    m_captionBar->SetOption(wxCAPTION_MAXIMIZE_BUTTON, event.IsChecked());
+    m_captionBar->SetOption(wxCAPTION_STYLE_MAXIMIZE_BUTTON, event.IsChecked());
 }
 void MainFrame::OnShowMinimizeButton(wxCommandEvent& event)
 {
-    m_captionBar->SetOption(wxCAPTION_MINIMIZE_BUTTON, event.IsChecked());
+    m_captionBar->SetOption(wxCAPTION_STYLE_MINIMIZE_BUTTON, event.IsChecked());
 }
