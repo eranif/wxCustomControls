@@ -50,6 +50,8 @@ clCaptionBar::clCaptionBar(wxWindow* parent, wxTopLevelWindow* topLevelFrame)
     Bind(wxEVT_LEAVE_WINDOW, &clCaptionBar::OnLeaveWindow, this);
     Bind(wxEVT_SIZE, &clCaptionBar::OnSize, this);
     Bind(wxEVT_LEFT_DCLICK, &clCaptionBar::OnMouseDoubleClick, this);
+    Bind(wxEVT_CONTEXT_MENU, &clCaptionBar::OnContextMenu, this);
+
     SetBackgroundStyle(wxBG_STYLE_PAINT);
     DoSetBestSize();
     topLevelFrame->SetWindowStyle(wxRESIZE_BORDER);
@@ -67,6 +69,7 @@ clCaptionBar::~clCaptionBar()
     Unbind(wxEVT_LEAVE_WINDOW, &clCaptionBar::OnLeaveWindow, this);
     Unbind(wxEVT_SIZE, &clCaptionBar::OnSize, this);
     Unbind(wxEVT_LEFT_DCLICK, &clCaptionBar::OnMouseDoubleClick, this);
+    Unbind(wxEVT_CONTEXT_MENU, &clCaptionBar::OnContextMenu, this);
 }
 
 wxCaptionHitTest clCaptionBar::HitTest(const wxPoint& pt) const
@@ -380,6 +383,8 @@ void clCaptionBar::ShowMenuBar()
     m_menu_is_up = false;
     Refresh();
 }
+
+void clCaptionBar::OnContextMenu(wxContextMenuEvent& event) { event.Skip(); }
 
 // Button methods
 void clCaptionButton::LeftDown(wxCaptionHitTest where)

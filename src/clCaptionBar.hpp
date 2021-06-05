@@ -139,6 +139,7 @@ protected:
     void OnSize(wxSizeEvent& e);
     void OnMouseDoubleClick(wxMouseEvent& e);
     void ShowMenuBar();
+    void OnContextMenu(wxContextMenuEvent& event);
 
 public:
     clCaptionBar(wxWindow* parent, wxTopLevelWindow* topLevelFrame);
