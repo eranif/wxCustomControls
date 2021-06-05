@@ -1,7 +1,6 @@
 #ifndef CLCAPTIONBAR_HPP
 #define CLCAPTIONBAR_HPP
 
-#include "clMenuBar.hpp"
 #include "wxCustomControls.hpp"
 #include <clColours.h>
 #include <codelite_exports.h>
@@ -13,13 +12,14 @@
 #include <wx/panel.h>
 #include <wx/toplevel.h>
 
-class clMenuBar;
 enum wxCaptionStyle {
     wxCAPTION_STYLE_BOLD_FONT = (1 << 0),
     wxCAPTION_STYLE_CLOSE_BUTTON = (1 << 1),
     wxCAPTION_STYLE_MINIMIZE_BUTTON = (1 << 2),
     wxCAPTION_STYLE_MAXIMIZE_BUTTON = (1 << 3),
-    wxCAPTION_STYLE_MENU_BUTTON = (1 << 4),
+    wxCAPTION_STYLE_ACTION_BUTTON = (1 << 4),
+    wxCAPTION_STYLE_DEFAULT =
+        wxCAPTION_STYLE_CLOSE_BUTTON | wxCAPTION_STYLE_MINIMIZE_BUTTON | wxCAPTION_STYLE_MAXIMIZE_BUTTON,
 };
 
 enum wxCaptionHitTest {
@@ -28,7 +28,7 @@ enum wxCaptionHitTest {
     wxCAPTION_HT_CLOSEBUTTON,
     wxCAPTION_HT_MINIMIZEBUTTON,
     wxCAPTION_HT_MAXMIZEBUTTON,
-    wxCAPTION_HT_MENUBUTTON,
+    wxCAPTION_HT_ACTIONBUTTON,
 };
 
 enum wxCaptionButtonState {
@@ -108,10 +108,11 @@ protected:
     wxTopLevelWindow* m_topLevelWindow = nullptr;
     wxString m_caption;
     wxBitmap m_bitmap;
+    wxBitmap m_actionButtonBitmap;
     wxRect m_bitmapRect;
 
     // buttons
-    clCaptionButton m_buttonMenu;
+    clCaptionButton m_buttonAction;
     clCaptionButton m_buttonClose;
     clCaptionButton m_buttonMinimize;
     clCaptionButton m_buttonMaximize;
@@ -119,7 +120,6 @@ protected:
 
     CallbackMap_t m_leftDownCallbacks;
     CallbackMap_t m_leftUpCallbacks;
-    clMenuWrapper::ptr_t m_mainMenu;
     bool m_menu_is_up = false;
 
 protected:
@@ -138,8 +138,6 @@ protected:
     void OnLeaveWindow(wxMouseEvent& e);
     void OnSize(wxSizeEvent& e);
     void OnMouseDoubleClick(wxMouseEvent& e);
-    void ShowMenuBar();
-    void OnContextMenu(wxContextMenuEvent& event);
 
 public:
     clCaptionBar(wxWindow* parent, wxTopLevelWindow* topLevelFrame);
@@ -161,9 +159,19 @@ public:
     bool HasOption(wxCaptionStyle option) const { return m_flags & option; }
 
     /**
-     * @brief associate menu bar with this caption
-     * this also implicitly enables/disables the wxCAPTION_STYLE_MENU_BUTTON style
+     * @brief show menu for action button
      */
-    void SetMenuBar(clMenuBar* menuBar);
+    void ShowMenuForActionButton(wxMenu* menu);
+
+    /**
+     * @brief enable action button
+     */
+    void ShowActionButton(const wxBitmap& bitmap);
+
+    /**
+     * @brief hide the action button
+     */
+    void HideActionButton();
 };
+wxDECLARE_EXPORTED_EVENT(WXDLLIMPEXP_SDK, wxEVT_CAPTION_ACTION_BUTTON, wxCommandEvent);
 #endif // CLCAPTIONBAR_HPP

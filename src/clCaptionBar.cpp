@@ -8,7 +8,7 @@
 
 namespace
 {
-constexpr int SPACER = 1;
+constexpr int SPACER = 5;
 }
 
 #define check_ptr_return(ptr) \
@@ -16,10 +16,12 @@ constexpr int SPACER = 1;
         return;               \
     }
 
+wxDEFINE_EVENT(wxEVT_CAPTION_ACTION_BUTTON, wxCommandEvent);
+
 clCaptionBar::clCaptionBar(wxWindow* parent, wxTopLevelWindow* topLevelFrame)
     : wxWindow(parent, wxID_ANY)
     , m_topLevelWindow(topLevelFrame)
-    , m_buttonMenu(this)
+    , m_buttonAction(this)
     , m_buttonClose(this)
     , m_buttonMinimize(this)
     , m_buttonMaximize(this)
@@ -28,14 +30,14 @@ clCaptionBar::clCaptionBar(wxWindow* parent, wxTopLevelWindow* topLevelFrame)
     m_colours.InitDefaults();
     // initialise the callbacks
     m_leftDownCallbacks = {
-        { wxCAPTION_HT_MENUBUTTON, { &m_buttonMenu, &clCaptionButton::LeftDown } },
+        { wxCAPTION_HT_ACTIONBUTTON, { &m_buttonAction, &clCaptionButton::LeftDown } },
         { wxCAPTION_HT_CLOSEBUTTON, { &m_buttonClose, &clCaptionButton::LeftDown } },
         { wxCAPTION_HT_MINIMIZEBUTTON, { &m_buttonMinimize, &clCaptionButton::LeftDown } },
         { wxCAPTION_HT_MAXMIZEBUTTON, { &m_buttonMaximize, &clCaptionButton::LeftDown } },
     };
 
     m_leftUpCallbacks = {
-        { wxCAPTION_HT_MENUBUTTON, { &m_buttonMenu, &clCaptionButton::LeftUp } },
+        { wxCAPTION_HT_ACTIONBUTTON, { &m_buttonAction, &clCaptionButton::LeftUp } },
         { wxCAPTION_HT_CLOSEBUTTON, { &m_buttonClose, &clCaptionButton::LeftUp } },
         { wxCAPTION_HT_MINIMIZEBUTTON, { &m_buttonMinimize, &clCaptionButton::LeftUp } },
         { wxCAPTION_HT_MAXMIZEBUTTON, { &m_buttonMaximize, &clCaptionButton::LeftUp } },
@@ -50,7 +52,6 @@ clCaptionBar::clCaptionBar(wxWindow* parent, wxTopLevelWindow* topLevelFrame)
     Bind(wxEVT_LEAVE_WINDOW, &clCaptionBar::OnLeaveWindow, this);
     Bind(wxEVT_SIZE, &clCaptionBar::OnSize, this);
     Bind(wxEVT_LEFT_DCLICK, &clCaptionBar::OnMouseDoubleClick, this);
-    Bind(wxEVT_CONTEXT_MENU, &clCaptionBar::OnContextMenu, this);
 
     SetBackgroundStyle(wxBG_STYLE_PAINT);
     DoSetBestSize();
@@ -69,7 +70,6 @@ clCaptionBar::~clCaptionBar()
     Unbind(wxEVT_LEAVE_WINDOW, &clCaptionBar::OnLeaveWindow, this);
     Unbind(wxEVT_SIZE, &clCaptionBar::OnSize, this);
     Unbind(wxEVT_LEFT_DCLICK, &clCaptionBar::OnMouseDoubleClick, this);
-    Unbind(wxEVT_CONTEXT_MENU, &clCaptionBar::OnContextMenu, this);
 }
 
 wxCaptionHitTest clCaptionBar::HitTest(const wxPoint& pt) const
@@ -82,8 +82,8 @@ wxCaptionHitTest clCaptionBar::HitTest(const wxPoint& pt) const
         return wxCAPTION_HT_MAXMIZEBUTTON;
     } else if(m_buttonMinimize.Contains(pt)) {
         return wxCAPTION_HT_MINIMIZEBUTTON;
-    } else if(m_buttonMenu.Contains(pt)) {
-        return wxCAPTION_HT_MENUBUTTON;
+    } else if(m_buttonAction.Contains(pt)) {
+        return wxCAPTION_HT_ACTIONBUTTON;
     }
     return wxCAPTION_HT_NOWHERE;
 }
@@ -141,13 +141,13 @@ void clCaptionBar::OnPaint(wxPaintEvent& e)
     int xx = FromDIP(SPACER);
 
     // Check if we need to draw a menu button
-    if(HasOption(wxCAPTION_STYLE_MENU_BUTTON) && m_mainMenu) {
-        m_buttonMenu.SetRect({ xx, 0, button_width, button_width });
+    if(HasOption(wxCAPTION_STYLE_ACTION_BUTTON) && m_actionButtonBitmap.IsOk()) {
+        m_buttonAction.SetRect({ xx, 0, button_width, button_width });
         if(m_menu_is_up) {
-            m_buttonMenu.SetState(wxCAPTION_BUTTON_STATE_PRESSED);
+            m_buttonAction.SetState(wxCAPTION_BUTTON_STATE_PRESSED);
         }
-        m_buttonMenu.Render(dc, wxCAPTION_HT_MENUBUTTON);
-        xx += m_buttonMenu.GetRect().GetWidth() + FromDIP(SPACER);
+        m_buttonAction.Render(dc, wxCAPTION_HT_ACTIONBUTTON);
+        xx += m_buttonAction.GetRect().GetWidth() + FromDIP(SPACER);
     }
     // draw the bitmap
     if(GetBitmap().IsOk()) {
@@ -230,7 +230,7 @@ void clCaptionBar::OnMotion(wxMouseEvent& e)
         refresh_needed = refresh_needed || m_buttonClose.DoHover(e.GetPosition());
         refresh_needed = refresh_needed || m_buttonMaximize.DoHover(e.GetPosition());
         refresh_needed = refresh_needed || m_buttonMinimize.DoHover(e.GetPosition());
-        refresh_needed = refresh_needed || m_buttonMenu.DoHover(e.GetPosition());
+        refresh_needed = refresh_needed || m_buttonAction.DoHover(e.GetPosition());
 
         if(refresh_needed) {
             Refresh();
@@ -251,7 +251,7 @@ void clCaptionBar::OnLeaveWindow(wxMouseEvent& e)
     wxUnusedVar(e);
     m_buttonClose.ResetState();
     m_buttonMaximize.ResetState();
-    m_buttonMenu.ResetState();
+    m_buttonAction.ResetState();
     m_buttonMinimize.ResetState();
     Refresh();
 }
@@ -278,6 +278,10 @@ void clCaptionBar::DoSetBestSize()
 
     if(GetBitmap().IsOk()) {
         int bmpHeight = GetBitmap().GetScaledHeight();
+        buttonHeight = wxMax(buttonHeight, bmpHeight);
+    }
+    if(m_actionButtonBitmap.IsOk()) {
+        int bmpHeight = m_actionButtonBitmap.GetScaledHeight();
         buttonHeight = wxMax(buttonHeight, bmpHeight);
     }
     r.SetHeight(buttonHeight);
@@ -308,12 +312,14 @@ void clCaptionBar::SetCaption(const wxString& caption)
 void clCaptionBar::OnMouseDoubleClick(wxMouseEvent& e)
 {
     wxUnusedVar(e);
-    wxWindowUpdateLocker locker(m_topLevelWindow);
-    check_ptr_return(m_topLevelWindow);
-    if(m_topLevelWindow->IsMaximized()) {
-        m_topLevelWindow->Restore();
-    } else {
-        m_topLevelWindow->Maximize();
+    if(HitTest(e.GetPosition()) == wxCAPTION_HT_NOWHERE) {
+        wxWindowUpdateLocker locker(m_topLevelWindow);
+        check_ptr_return(m_topLevelWindow);
+        if(m_topLevelWindow->IsMaximized()) {
+            m_topLevelWindow->Restore();
+        } else {
+            m_topLevelWindow->Maximize();
+        }
     }
 }
 
@@ -340,7 +346,7 @@ void clCaptionBar::ClearRects()
     m_bitmapRect = {};
     m_buttonClose.Clear();
     m_buttonMaximize.Clear();
-    m_buttonMenu.Clear();
+    m_buttonAction.Clear();
     m_buttonMinimize.Clear();
 }
 
@@ -360,31 +366,41 @@ bool clCaptionBar::ProcessCallback(const CallbackMap_t& map, wxCaptionHitTest wh
     }
 }
 
-void clCaptionBar::SetMenuBar(clMenuBar* menuBar)
+void clCaptionBar::ShowMenuForActionButton(wxMenu* menu)
 {
-    if(menuBar) {
-        m_mainMenu = menuBar->CreateSingleMenu();
-    } else {
-        m_mainMenu = nullptr;
+    if(!menu) {
+        return;
     }
 
-    SetOption(wxCAPTION_STYLE_MENU_BUTTON, m_mainMenu ? true : false);
+    m_menu_is_up = true;
+    m_buttonAction.SetState(wxCAPTION_BUTTON_STATE_PRESSED);
+    Refresh();
+
+    PopupMenu(menu, m_buttonAction.GetRect().GetBottomLeft());
+    m_menu_is_up = false;
+    m_buttonAction.SetState(wxCAPTION_BUTTON_STATE_NORMAL);
+    Refresh();
+}
+
+void clCaptionBar::ShowActionButton(const wxBitmap& bitmap)
+{
+    if(!bitmap.IsOk()) {
+        HideActionButton();
+    } else {
+        m_actionButtonBitmap = bitmap;
+        m_flags |= wxCAPTION_STYLE_ACTION_BUTTON;
+        DoSetBestSize();
+        Refresh();
+    }
+}
+
+void clCaptionBar::HideActionButton()
+{
+    m_actionButtonBitmap = wxNullBitmap;
+    m_flags &= ~wxCAPTION_STYLE_ACTION_BUTTON;
     DoSetBestSize();
     Refresh();
 }
-
-void clCaptionBar::ShowMenuBar()
-{
-    if(!m_mainMenu || !m_mainMenu->GetMenu()) {
-        return;
-    }
-    m_menu_is_up = true;
-    PopupMenu(m_mainMenu->GetMenu(), GetClientRect().GetBottomLeft());
-    m_menu_is_up = false;
-    Refresh();
-}
-
-void clCaptionBar::OnContextMenu(wxContextMenuEvent& event) { event.Skip(); }
 
 // Button methods
 void clCaptionButton::LeftDown(wxCaptionHitTest where)
@@ -411,15 +427,18 @@ void clCaptionButton::LeftUp(wxCaptionHitTest where)
     case wxCAPTION_HT_MINIMIZEBUTTON:
         frame->Iconize();
         break;
-    case wxCAPTION_HT_MENUBUTTON:
-        m_captionBar->ShowMenuBar();
-        break;
+    case wxCAPTION_HT_ACTIONBUTTON: {
+        wxCommandEvent event_action(wxEVT_CAPTION_ACTION_BUTTON);
+        event_action.SetEventObject(m_captionBar);
+        m_captionBar->GetEventHandler()->ProcessEvent(event_action);
+    } break;
     case wxCAPTION_HT_ICON:
         break;
     case wxCAPTION_HT_NOWHERE:
         break;
     }
     ResetState();
+    m_captionBar->Refresh();
 }
 
 void clCaptionButton::Render(wxDC& dc, wxCaptionHitTest ht)
@@ -435,15 +454,15 @@ void clCaptionButton::Render(wxDC& dc, wxCaptionHitTest ht)
             pen_colour = *wxWHITE;
         } else {
             bool is_dark = DrawingUtils::IsDark(bg_colour);
-            bg_colour = bg_colour.ChangeLightness(is_dark ? 120 : 80);
+            bg_colour = bg_colour.ChangeLightness(is_dark ? 110 : 90);
         }
     } else if(m_state == wxCAPTION_BUTTON_STATE_PRESSED) {
         if(ht == wxCAPTION_HT_CLOSEBUTTON) {
-            bg_colour = wxColour(*wxRED).ChangeLightness(60);
-            pen_colour = wxColour(*wxWHITE).ChangeLightness(60);
+            bg_colour = wxColour(*wxRED).ChangeLightness(80);
+            pen_colour = wxColour(*wxWHITE).ChangeLightness(80);
         } else {
             bool is_dark = DrawingUtils::IsDark(bg_colour);
-            bg_colour = bg_colour.ChangeLightness(is_dark ? 140 : 60);
+            bg_colour = bg_colour.ChangeLightness(is_dark ? 120 : 80);
         }
     } else {
         draw_background = false;
@@ -469,19 +488,12 @@ void clCaptionButton::Render(wxDC& dc, wxCaptionHitTest ht)
         PREPARE_BUTTON_DRAW();
         dc.DrawRectangle(m_innerRect);
     } break;
-    case wxCAPTION_HT_MENUBUTTON: {
+    case wxCAPTION_HT_ACTIONBUTTON: {
         PREPARE_BUTTON_DRAW();
         // draw 3 lines
-        wxPoint pt1, pt2;
-        pt1 = m_innerRect.GetTopLeft();
-        pt2 = m_innerRect.GetTopRight();
-
-        pt1.y += m_innerRect.GetHeight() / 2;
-        pt2.y += m_innerRect.GetHeight() / 2;
-
-        dc.DrawLine(m_innerRect.GetTopLeft(), m_innerRect.GetTopRight());
-        dc.DrawLine(pt1, pt2);
-        dc.DrawLine(m_innerRect.GetBottomLeft(), m_innerRect.GetBottomRight());
+        wxRect bitmap_rect = wxRect({ 0, 0 }, m_captionBar->m_actionButtonBitmap.GetScaledSize());
+        bitmap_rect = bitmap_rect.CenterIn(m_rect);
+        dc.DrawBitmap(m_captionBar->m_actionButtonBitmap, bitmap_rect.GetTopLeft());
 
     } break;
     case wxCAPTION_HT_MINIMIZEBUTTON: {

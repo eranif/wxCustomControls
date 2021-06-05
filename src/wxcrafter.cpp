@@ -277,9 +277,8 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     m_menu163 = new wxMenu();
     m_myMenuBar->Append(m_menu163, _("Caption Bar"));
 
-    m_menuItem165 = new wxMenuItem(m_menu163, wxID_ANY, _("Show Menu Bar Button"), wxT(""), wxITEM_CHECK);
+    m_menuItem165 = new wxMenuItem(m_menu163, wxID_ANY, _("Show action button"), wxT(""), wxITEM_CHECK);
     m_menu163->Append(m_menuItem165);
-    m_menuItem165->Check();
 
     m_menu163->AppendSeparator();
 
@@ -552,6 +551,19 @@ MyImages::MyImages()
                 this->Add(icn);
             }
             m_bitmaps.insert(std::make_pair(wxT("logo"), bmp));
+        }
+    }
+
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("colours"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())) {
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("colours"), bmp));
         }
     }
 }

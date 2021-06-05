@@ -26,6 +26,8 @@
 #include "wx/msw/uxtheme.h"
 #endif
 
+#include <wx/colordlg.h>
+
 class MyDvData
 {
 public:
@@ -71,13 +73,16 @@ MainFrame::MainFrame(wxWindow* parent)
 
     m_captionBar = new clCaptionBar(this, this);
     GetSizer()->Insert(0, m_captionBar, 0, wxEXPAND);
-    m_captionBar->SetOptions(wxCAPTION_STYLE_BOLD_FONT | wxCAPTION_STYLE_CLOSE_BUTTON | wxCAPTION_STYLE_MAXIMIZE_BUTTON |
-                             wxCAPTION_STYLE_MINIMIZE_BUTTON | wxCAPTION_STYLE_MENU_BUTTON);
+    m_captionBar->SetOptions(wxCAPTION_STYLE_DEFAULT);
+
+    m_captionBar->Bind(wxEVT_CAPTION_ACTION_BUTTON, [](wxCommandEvent& e) {
+        wxUnusedVar(e);
+        wxMessageBox("Action button clicked!\nGoing to popup a colour selector dialog!");
+        wxGetColourFromUser();
+    });
 
     m_captionBar->SetCaption("My Custom Caption");
     m_captionBar->SetBitmap(images.Bitmap("logo"));
-    m_captionBar->SetMenuBar(m_menuBar);
-    m_menuBar->Hide();
 
     // Create some themes so we can toggle through them
     m_treeCtrl = new clTreeCtrl();
@@ -790,11 +795,10 @@ void MainFrame::OnHideScrollbars(wxCommandEvent& event)
 void MainFrame::OnCaptionBarToggleMenuButton(wxCommandEvent& event)
 {
     if(event.IsChecked()) {
-        m_captionBar->SetMenuBar(m_menuBar);
-        m_menuBar->Hide();
+        MyImages images;
+        m_captionBar->ShowActionButton(images.Bitmap("colours"));
     } else {
-        m_captionBar->SetMenuBar(nullptr);
-        m_menuBar->Show();
+        m_captionBar->HideActionButton();
     }
     PostSizeEvent();
 }

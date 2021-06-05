@@ -1,7 +1,7 @@
 {
 	"metadata":	{
 		"m_generatedFilesDir":	".",
-		"m_objCounter":	173,
+		"m_objCounter":	175,
 		"m_includeFiles":	[],
 		"m_bitmapFunction":	"wxC9ED9InitBitmapResources",
 		"m_bitmapsFile":	"wxcrafter_bitmaps.cpp",
@@ -3536,7 +3536,7 @@
 										}, {
 											"type":	"string",
 											"m_label":	"Label:",
-											"m_value":	"Show Menu Bar Button"
+											"m_value":	"Show action button"
 										}, {
 											"type":	"string",
 											"m_label":	"Shortcut:",
@@ -3557,7 +3557,7 @@
 										}, {
 											"type":	"bool",
 											"m_label":	"Checked",
-											"m_value":	true
+											"m_value":	false
 										}],
 									"m_events":	[{
 											"m_eventName":	"wxEVT_COMMAND_MENU_SELECTED",
@@ -3875,6 +3875,25 @@
 							"type":	"filePicker",
 							"m_label":	"Bitmap File:",
 							"m_path":	"../bitmaps/16-codelite-logo@2x.png"
+						}],
+					"m_events":	[],
+					"m_children":	[]
+				}, {
+					"m_type":	4482,
+					"proportion":	0,
+					"border":	5,
+					"gbSpan":	"1,1",
+					"gbPosition":	"0,0",
+					"m_styles":	[],
+					"m_sizerFlags":	[],
+					"m_properties":	[{
+							"type":	"string",
+							"m_label":	"Name:",
+							"m_value":	"colours"
+						}, {
+							"type":	"filePicker",
+							"m_label":	"Bitmap File:",
+							"m_path":	"../bitmaps/16-colour-pallette@2x.png"
 						}],
 					"m_events":	[],
 					"m_children":	[]

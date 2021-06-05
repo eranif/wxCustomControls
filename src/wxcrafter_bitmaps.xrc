@@ -6,6 +6,7 @@
   <object class="wxBitmap" name="16-file-regular@2x">..\bitmaps\16-file-regular@2x.png</object>
   <object class="wxBitmap" name="16-folder-open-regular@2x">..\bitmaps\16-folder-open-regular@2x.png</object>
   <object class="wxBitmap" name="16-mime-txt@2x">..\bitmaps\16-mime-txt@2x.png</object>
+  <object class="wxBitmap" name="colours">C:\src\wxCustomControls\bitmaps\16-colour-pallette@2x.png</object>
   <object class="wxBitmap" name="file">C:\src\wxCustomControls\bitmaps\16-mime-txt@2x.png</object>
   <object class="wxBitmap" name="folder">C:\src\wxCustomControls\bitmaps\24-folder-regular.png</object>
   <object class="wxBitmap" name="folder@2x">C:\src\wxCustomControls\bitmaps\24-folder-regular@2x.png</object>
