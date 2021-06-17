@@ -78,11 +78,18 @@ public:
     };
 
 protected:
+    wxBoxSizer* boxSizer1;
     wxPanel* m_mainPanel;
+    wxBoxSizer* boxSizer11;
     clToolBar* m_toolbar;
+    clDataViewListCtrl* m_dvListCtrlCustom;
     wxPanel* m_panelControls;
+    wxBoxSizer* boxSizer71;
     clDataViewListCtrl* m_dataView;
+    wxBoxSizer* boxSizer133;
     wxPanel* m_panelButtons;
+    wxBoxSizer* boxSizer137;
+    wxFlexGridSizer* flexGridSizer141;
     clButton* m_buttonOne;
     clButton* m_buttonTwo;
     clButton* m_buttonDisabled;
@@ -177,6 +184,7 @@ protected:
 
 public:
     clToolBar* GetToolbar() { return m_toolbar; }
+    clDataViewListCtrl* GetDvListCtrlCustom() { return m_dvListCtrlCustom; }
     clDataViewListCtrl* GetDataView() { return m_dataView; }
     wxPanel* GetPanelControls() { return m_panelControls; }
     clButton* GetButtonOne() { return m_buttonOne; }

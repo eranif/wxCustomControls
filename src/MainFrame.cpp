@@ -1,4 +1,5 @@
 #include "MainFrame.h"
+#include "clAsciiEscapCodeHandler.hpp"
 #include "clCaptionBar.hpp"
 #include "clColours.h"
 #include "clMenuBar.hpp"
@@ -7,6 +8,7 @@
 #include <wx/aboutdlg.h>
 #include <wx/checkbox.h>
 #include <wx/dc.h>
+#include <wx/dcbuffer.h>
 #include <wx/dcclient.h>
 #include <wx/dir.h>
 #include <wx/dirdlg.h>
@@ -28,6 +30,8 @@
 
 #include <wx/colordlg.h>
 
+namespace
+{
 class MyDvData
 {
 public:
@@ -39,7 +43,7 @@ public:
     ~MyDvData() {}
 };
 
-static wxVariant MakeChoice(const wxString& label, int bmp_index)
+wxVariant MakeChoice(const wxString& label, int bmp_index)
 {
     clDataViewChoice ict(label, bmp_index);
     wxVariant v;
@@ -47,7 +51,7 @@ static wxVariant MakeChoice(const wxString& label, int bmp_index)
     return v;
 }
 
-static wxVariant MakeIconText(const wxString& text, int bmp_index)
+wxVariant MakeIconText(const wxString& text, int bmp_index)
 {
     clDataViewTextBitmap ict(text, bmp_index);
     wxVariant v;
@@ -55,13 +59,44 @@ static wxVariant MakeIconText(const wxString& text, int bmp_index)
     return v;
 }
 
-static wxVariant MakeCheckBox(bool checked, const wxString& text, int bmp_index)
+wxVariant MakeCheckBox(bool checked, const wxString& text, int bmp_index)
 {
     clDataViewCheckbox ict(checked, bmp_index, text);
     wxVariant v;
     v << ict;
     return v;
 }
+
+class MyAsciiRenderer : public clControlWithItemsRowRenderer
+{
+    clAsciiEscapeCodeHandler handler;
+
+public:
+    void Render(wxWindow* window, wxDC& dc, const clColours& colours, int row_index, clRowEntry* entry) override
+    {
+        wxUnusedVar(window);
+        wxUnusedVar(row_index);
+
+        // draw the ascii line
+        handler.Reset();
+        handler.Parse(entry->GetLabel(0));
+
+        if(entry->IsSelected()) {
+            dc.SetPen(colours.GetSelItemBgColour());
+            dc.SetBrush(colours.GetSelItemBgColour());
+            dc.DrawRectangle(entry->GetItemRect());
+        }
+
+        clRenderDefaultStyle ds;
+        ds.bg_colour = colours.GetBgColour();
+        ds.fg_colour = colours.GetItemTextColour();
+        ds.font.SetFaceName("Consolas");
+        ds.font.SetFamily(wxFONTFAMILY_TELETYPE);
+        ds.font.SetPointSize(12);
+        handler.Render(dc, ds, 0, entry->GetItemRect());
+    }
+};
+} // namespace
 
 MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
@@ -373,6 +408,26 @@ MainFrame::MainFrame(wxWindow* parent)
     m_bottomToolBar->AddTool(wxID_CLEAR, _("Clear"), images.Bitmap("file"), "", wxITEM_NORMAL);
     m_bottomToolBar->Realize();
     GetSizer()->Add(m_bottomToolBar, 0, wxEXPAND);
+
+    m_dvListCtrlCustom->SetCustomRenderer(new MyAsciiRenderer);
+    m_dvListCtrlCustom->SetSortFunction(nullptr);
+
+    const wxChar ESC = 0x1B;
+    m_dvListCtrlCustom->Begin();
+    for(size_t i = 0; i < 10000; ++i) {
+        wxString buffer;
+        {
+            buffer.clear();
+            buffer << ESC << "[1;32;47m    Updating " << ESC << "[mcrates.io index";
+            m_dvListCtrlCustom->AppendItem(buffer);
+        }
+        {
+            buffer.clear();
+            buffer << ESC << "[33;47m    Reading " << ESC << "[mcrates.io index..done";
+            m_dvListCtrlCustom->AppendItem(buffer);
+        }
+    }
+    m_dvListCtrlCustom->Commit();
 }
 
 MainFrame::~MainFrame() {}
@@ -533,6 +588,7 @@ void MainFrame::OnToggleTheme(wxCommandEvent& event)
     m_choice->SetColours(colours);
     m_captionBar->SetColours(colours);
     m_menuBar->SetColours(colours);
+    m_dvListCtrlCustom->SetColours(colours);
     m_treeCtrl->Refresh();
     m_dataView->Refresh();
 }
@@ -638,7 +694,10 @@ void MainFrame::OnFillWith500Entries(wxCommandEvent& event)
     wxString file_size = "100KB";
 
     // A nice trick to boost performance: remove the sorting method
-    m_dataView->SetSortFunction(nullptr);
+    auto SortFunc = [&](clRowEntry* a, clRowEntry* b) { return a->GetLabel(0).CmpNoCase(b->GetLabel(0)) < 0; };
+    m_dataView->SetSortFunction(SortFunc);
+    // delay any UI updates until the Commit() is called
+    m_dataView->Begin();
     for(size_t i = 0; i < itemCount; ++i) {
         wxVector<wxVariant> cols;
         cols.push_back(MakeIconText(wxString() << "File #" << i, 0));
@@ -646,8 +705,7 @@ void MainFrame::OnFillWith500Entries(wxCommandEvent& event)
         cols.push_back("0KB");
         m_dataView->AppendItem(cols);
     }
-    auto SortFunc = [&](clRowEntry* a, clRowEntry* b) { return a->GetLabel(0).CmpNoCase(b->GetLabel(0)) < 0; };
-    m_dataView->SetSortFunction(SortFunc);
+    m_dataView->Commit();
     long timepassed = sw.Time();
 
     // Now that we got all the items populated, set a sorting function

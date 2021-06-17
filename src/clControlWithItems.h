@@ -7,6 +7,7 @@
 #include "clScrolledPanel.h"
 #include <array>
 #include <wx/imaglist.h>
+#include <memory>
 
 #ifdef __WXOSX__
 #define SCROLL_TICK 2
@@ -41,6 +42,21 @@ public:
     bool IsEnabled() const { return m_enabled; }
 };
 
+/// base class for custom row renderers
+class WXDLLIMPEXP_SDK clControlWithItemsRowRenderer
+{
+public:
+    clControlWithItemsRowRenderer() {}
+    virtual ~clControlWithItemsRowRenderer() {}
+
+    /**
+     * @brief override this method to provide a custom row drawing.
+     * The text, bitmap and other info that needs to be drawn are stored
+     * in the `entry` field.
+     */
+    virtual void Render(wxWindow* window, wxDC& dc, const clColours& colours, int row_index, clRowEntry* entry) = 0;
+};
+
 class WXDLLIMPEXP_SDK clControlWithItems : public clScrolledPanel
 {
 public:
@@ -60,6 +76,7 @@ protected:
     clSearchControl* m_searchControl = nullptr;
     bool m_maxList = false;
     bool m_nativeTheme = false;
+    std::unique_ptr<clControlWithItemsRowRenderer> m_customRenderer;
 
 protected:
     void DoInitialize();
@@ -85,6 +102,12 @@ public:
                        const wxSize& size = wxDefaultSize, long style = 0);
     virtual ~clControlWithItems();
     clControlWithItems();
+
+    /**
+     * @brief set a custom renderer to draw the rows for this control
+     * `this` takes ownership for the renderer (i.e. it will free it)
+     */
+    void SetCustomRenderer(clControlWithItemsRowRenderer* renderer);
 
     void SetNativeTheme(bool nativeTheme);
     bool IsNativeTheme() const { return m_nativeTheme; }
@@ -155,13 +178,7 @@ public:
      */
     virtual void UpdateScrollBar();
 
-    void SetColours(const clColours& colours)
-    {
-        this->m_colours = colours;
-        GetVScrollBar()->SetColours(m_colours);
-        GetHScrollBar()->SetColours(m_colours);
-        Refresh();
-    }
+    void SetColours(const clColours& colours);
 
     const clColours& GetColours() const { return m_colours; }
     clColours& GetColours() { return m_colours; }

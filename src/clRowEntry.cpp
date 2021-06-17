@@ -4,40 +4,21 @@
 #include "clRowEntry.h"
 #include "clTreeCtrl.h"
 #include <algorithm>
+#include <drawingutils.h>
 #include <functional>
 #include <wx/dataview.h>
 #include <wx/dc.h>
 #include <wx/renderer.h>
 #include <wx/settings.h>
 #include <wx/window.h>
-#include <drawingutils.h>
 
 #if !wxCHECK_VERSION(3, 1, 0)
 #define wxCONTROL_NONE 0
 #endif
 
-#ifdef __WXMSW__
-#define PEN_STYLE wxPENSTYLE_SHORT_DASH
-#else
-#define PEN_STYLE wxPENSTYLE_DOT
-#endif
-
-#ifdef __WXMSW__
-int clRowEntry::X_SPACER = 4;
-int clRowEntry::Y_SPACER = 2;
-#else
-int clRowEntry::X_SPACER = 5;
-int clRowEntry::Y_SPACER = 3;
-#endif
-
-#ifdef __WXOSX__
-#define IS_OSX 1
-#else
-#define IS_OSX 0
-#endif
-
+namespace
+{
 struct clClipperHelper {
-
     bool m_used = false;
     wxRect m_oldRect;
     wxDC& m_dc;
@@ -52,7 +33,9 @@ struct clClipperHelper {
     void Clip(const wxRect& rect)
     {
         // Make sure we can call this method only once
-        if(m_used) { return; }
+        if(m_used) {
+            return;
+        }
         m_dc.GetClippingBox(m_oldRect);
         m_dc.SetClippingRegion(rect);
         m_used = true;
@@ -63,28 +46,67 @@ struct clClipperHelper {
         // Make sure we can call this method only once
         if(m_used) {
             m_dc.DestroyClippingRegion();
-            if(!m_oldRect.IsEmpty()) { m_dc.SetClippingRegion(m_oldRect); }
+            if(!m_oldRect.IsEmpty()) {
+                m_dc.SetClippingRegion(m_oldRect);
+            }
             m_used = false;
         }
     }
 };
+} // namespace
+
+#ifdef __WXMSW__
+int clRowEntry::X_SPACER = 4;
+int clRowEntry::Y_SPACER = 0;
+#elif defined(__WXOSX__)
+int clRowEntry::X_SPACER = 4;
+int clRowEntry::Y_SPACER = 2;
+#else
+int clRowEntry::X_SPACER = 5;
+int clRowEntry::Y_SPACER = 2;
+#endif
+
+// clang-format off
+#ifdef __WXMSW__
+#   define PEN_STYLE wxPENSTYLE_SHORT_DASH
+#   define IS_MSW 1
+#else
+#   define PEN_STYLE wxPENSTYLE_DOT
+#   define IS_MSW 0
+#endif
+
+#ifdef __WXOSX__
+#   define IS_OSX 1
+#else
+#   define IS_OSX 0
+#endif
+
+#ifdef __WXGTK__
+#   define IS_GTK 1
+#else
+#   define IS_GTK 0
+#endif
+// clang-format on
 
 void clRowEntry::DrawSimpleSelection(wxWindow* win, wxDC& dc, const wxRect& rect, const clColours& colours)
 {
+    wxColour c = win->HasFocus() ? colours.GetSelItemBgColour() : colours.GetSelItemBgColourNoFocus();
 #ifdef __WXMSW__
     if(m_tree->IsNativeTheme()) {
         int flags = wxCONTROL_SELECTED;
-        if(win->HasFocus()) { flags |= wxCONTROL_FOCUSED; }
+        if(win->HasFocus()) {
+            flags |= wxCONTROL_FOCUSED;
+        }
         wxRendererNative::Get().DrawItemSelectionRect(win, dc, rect, flags);
 
     } else {
-        dc.SetPen(win->HasFocus() ? colours.GetSelItemBgColour() : colours.GetSelItemBgColourNoFocus());
-        dc.SetBrush(win->HasFocus() ? colours.GetSelItemBgColour() : colours.GetSelItemBgColourNoFocus());
+        dc.SetPen(c);
+        dc.SetBrush(c);
         dc.DrawRectangle(rect);
     }
 #else
-    dc.SetPen(win->HasFocus() ? colours.GetSelItemBgColour() : colours.GetSelItemBgColourNoFocus());
-    dc.SetBrush(win->HasFocus() ? colours.GetSelItemBgColour() : colours.GetSelItemBgColourNoFocus());
+    dc.SetPen(c);
+    dc.SetBrush(c);
     dc.DrawRectangle(rect);
 #endif
 }
@@ -120,15 +142,21 @@ clRowEntry::~clRowEntry()
     wxDELETE(m_clientObject);
 
     // Notify the model that a selection is being deleted
-    if(m_model) { m_model->NodeDeleted(this); }
+    if(m_model) {
+        m_model->NodeDeleted(this);
+    }
 }
 
 void clRowEntry::ConnectNodes(clRowEntry* first, clRowEntry* second)
 {
-    if(first) { first->m_next = this; }
+    if(first) {
+        first->m_next = this;
+    }
     this->m_prev = first;
     this->m_next = second;
-    if(second) { second->m_prev = this; }
+    if(second) {
+        second->m_prev = this;
+    }
 }
 
 void clRowEntry::InsertChild(clRowEntry* child, clRowEntry* prev)
@@ -144,7 +172,9 @@ void clRowEntry::InsertChild(clRowEntry* child, clRowEntry* prev)
         // Insert the item in the parent children list
         clRowEntry::Vec_t::iterator iter = m_children.end();
         iter = std::find_if(m_children.begin(), m_children.end(), [&](clRowEntry* c) { return c == prev; });
-        if(iter != m_children.end()) { ++iter; }
+        if(iter != m_children.end()) {
+            ++iter;
+        }
         // if iter is end(), than the is actually appending the item
         m_children.insert(iter, child);
     }
@@ -172,8 +202,12 @@ void clRowEntry::AddChild(clRowEntry* child) { InsertChild(child, m_children.emp
 
 void clRowEntry::SetParent(clRowEntry* parent)
 {
-    if(m_parent == parent) { return; }
-    if(m_parent) { m_parent->DeleteChild(this); }
+    if(m_parent == parent) {
+        return;
+    }
+    if(m_parent) {
+        m_parent->DeleteChild(this);
+    }
     m_parent = parent;
 }
 
@@ -189,12 +223,18 @@ void clRowEntry::DeleteChild(clRowEntry* child)
     // Connect the list
     clRowEntry* prev = child->m_prev;
     clRowEntry* next = child->m_next;
-    if(prev) { prev->m_next = next; }
-    if(next) { next->m_prev = prev; }
+    if(prev) {
+        prev->m_next = next;
+    }
+    if(next) {
+        next->m_prev = prev;
+    }
     // Now disconnect this child from this node
     clRowEntry::Vec_t::iterator iter =
         std::find_if(m_children.begin(), m_children.end(), [&](clRowEntry* c) { return c == child; });
-    if(iter != m_children.end()) { m_children.erase(iter); }
+    if(iter != m_children.end()) {
+        m_children.erase(iter);
+    }
     wxDELETE(child);
 }
 
@@ -203,7 +243,9 @@ int clRowEntry::GetExpandedLines() const
     clRowEntry* node = const_cast<clRowEntry*>(this);
     int counter = 0;
     while(node) {
-        if(node->IsVisible()) { ++counter; }
+        if(node->IsVisible()) {
+            ++counter;
+        }
         node = node->m_next;
     }
     return counter;
@@ -211,26 +253,42 @@ int clRowEntry::GetExpandedLines() const
 
 void clRowEntry::GetNextItems(int count, clRowEntry::Vec_t& items, bool selfIncluded)
 {
-    if(count <= 0) { return; }
+    if(count <= 0) {
+        return;
+    }
     items.reserve(count);
-    if(!this->IsHidden() && selfIncluded) { items.push_back(this); }
+    if(!this->IsHidden() && selfIncluded) {
+        items.push_back(this);
+    }
     clRowEntry* next = GetNext();
     while(next) {
-        if(next->IsVisible() && !next->IsHidden()) { items.push_back(next); }
-        if((int)items.size() == count) { return; }
+        if(next->IsVisible() && !next->IsHidden()) {
+            items.push_back(next);
+        }
+        if((int)items.size() == count) {
+            return;
+        }
         next = next->GetNext();
     }
 }
 
 void clRowEntry::GetPrevItems(int count, clRowEntry::Vec_t& items, bool selfIncluded)
 {
-    if(count <= 0) { return; }
+    if(count <= 0) {
+        return;
+    }
     items.reserve(count);
-    if(!this->IsHidden() && selfIncluded) { items.insert(items.begin(), this); }
+    if(!this->IsHidden() && selfIncluded) {
+        items.insert(items.begin(), this);
+    }
     clRowEntry* prev = GetPrev();
     while(prev) {
-        if(prev->IsVisible() && !prev->IsHidden()) { items.insert(items.begin(), prev); }
-        if((int)items.size() == count) { return; }
+        if(prev->IsVisible() && !prev->IsHidden()) {
+            items.insert(items.begin(), prev);
+        }
+        if((int)items.size() == count) {
+            return;
+        }
         prev = prev->GetPrev();
     }
 }
@@ -239,7 +297,9 @@ clRowEntry* clRowEntry::GetVisibleItem(int index)
 {
     clRowEntry::Vec_t items;
     GetNextItems(index, items);
-    if((int)items.size() != index) { return nullptr; }
+    if((int)items.size() != index) {
+        return nullptr;
+    }
     return items.back();
 }
 
@@ -254,7 +314,9 @@ void clRowEntry::UnselectAll()
 
 bool clRowEntry::SetExpanded(bool b)
 {
-    if(!m_model) { return false; }
+    if(!m_model) {
+        return false;
+    }
     if(IsHidden() && !b) {
         // Hidden root can not be hidden
         return false;
@@ -267,11 +329,17 @@ bool clRowEntry::SetExpanded(bool b)
     }
 
     // Already expanded?
-    if(b && IsExpanded()) { return true; }
+    if(b && IsExpanded()) {
+        return true;
+    }
 
     // Already collapsed?
-    if(!b && !IsExpanded()) { return true; }
-    if(!m_model->NodeExpanding(this, b)) { return false; }
+    if(!b && !IsExpanded()) {
+        return true;
+    }
+    if(!m_model->NodeExpanding(this, b)) {
+        return false;
+    }
 
     SetFlag(kNF_Expanded, b);
     m_model->NodeExpanded(this, b);
@@ -286,7 +354,9 @@ void clRowEntry::ClearRects()
 
 static int GetSizeDIP(int size, wxWindow* win)
 {
-    if(!win) { return size; }
+    if(!win) {
+        return size;
+    }
 #if wxCHECK_VERSION(3, 1, 0)
     return win->FromDIP(size);
 #else
@@ -312,7 +382,9 @@ void clRowEntry::Render(wxWindow* win, wxDC& dc, const clColours& c, int row_ind
     }
 
     // Override default item bg colour with the user's one
-    if(GetBgColour().IsOk()) { colours.SetItemBgColour(GetBgColour()); }
+    if(GetBgColour().IsOk()) {
+        colours.SetItemBgColour(GetBgColour());
+    }
     wxRect selectionRect = rowRect;
     wxPoint deviceOrigin = dc.GetDeviceOrigin();
     selectionRect.SetX(-deviceOrigin.x);
@@ -334,9 +406,15 @@ void clRowEntry::Render(wxWindow* win, wxDC& dc, const clColours& c, int row_ind
         colours = c; // reset the colours
         clCellValue& cell = GetColumn(i);
         wxFont f = cell.GetFont().IsOk() ? cell.GetFont() : m_tree->GetDefaultFont();
-        if(cell.GetFont().IsOk()) { f = cell.GetFont(); }
-        if(cell.GetTextColour().IsOk()) { colours.SetItemTextColour(cell.GetTextColour()); }
-        if(cell.GetBgColour().IsOk()) { colours.SetItemBgColour(cell.GetBgColour()); }
+        if(cell.GetFont().IsOk()) {
+            f = cell.GetFont();
+        }
+        if(cell.GetTextColour().IsOk()) {
+            colours.SetItemTextColour(cell.GetTextColour());
+        }
+        if(cell.GetBgColour().IsOk()) {
+            colours.SetItemBgColour(cell.GetBgColour());
+        }
         dc.SetFont(f);
         wxColour buttonColour = IsSelected() ? colours.GetSelbuttonColour() : colours.GetButtonColour();
         wxRect cellRect = GetCellRect(i);
@@ -344,7 +422,9 @@ void clRowEntry::Render(wxWindow* win, wxDC& dc, const clColours& c, int row_ind
         // We use a helper class to clip the drawings this ensures that if we exit the scope
         // the clipping region is restored properly
         clClipperHelper clipper(dc);
-        if(hasHeader) { clipper.Clip(cellRect); }
+        if(hasHeader) {
+            clipper.Clip(cellRect);
+        }
 
         int textXOffset = cellRect.GetX();
         if((i == 0) && !IsListItem()) {
@@ -353,9 +433,11 @@ void clRowEntry::Render(wxWindow* win, wxDC& dc, const clColours& c, int row_ind
                 wxRect buttonRect = GetButtonRect();
                 buttonRect.Deflate(1);
                 textXOffset += buttonRect.GetWidth();
-                if(m_tree->IsNativeTheme() && !IS_OSX) {
+                if(IS_GTK || IS_MSW) {
                     int flags = wxCONTROL_CURRENT;
-                    if(IsExpanded()) { flags |= wxCONTROL_EXPANDED; }
+                    if(IsExpanded()) {
+                        flags |= wxCONTROL_EXPANDED;
+                    }
                     int button_width = wxSystemSettings::GetMetric(wxSYS_SMALLICON_X);
                     wxRect modButtonRect = buttonRect;
                     modButtonRect.SetWidth(button_width);
@@ -369,10 +451,10 @@ void clRowEntry::Render(wxWindow* win, wxDC& dc, const clColours& c, int row_ind
                         SetRects(GetItemRect(), wxRect());
                         continue;
                     }
-                    
+
                     buttonRect.Deflate((buttonRect.GetWidth() / 3), (buttonRect.GetHeight() / 3));
                     wxRect tribtn = buttonRect;
-                    dc.SetPen(wxPen(buttonColour, GetSizeDIP(2, win)));
+                    dc.SetPen(wxPen(buttonColour, GetSizeDIP(1, win)));
                     if(IsExpanded()) {
                         tribtn.SetHeight(tribtn.GetHeight() - tribtn.GetHeight() / 2);
                         tribtn = tribtn.CenterIn(buttonRect);
@@ -530,11 +612,20 @@ void clRowEntry::RenderTextSimple(wxWindow* win, wxDC& dc, const clColours& colo
         dc.SetTextForeground(colours.GetItemTextColour());
         dc.DrawText(text, x, y);
     } else {
-        dc.SetTextForeground(IsSelected() ? colours.GetSelItemTextColour() : colours.GetItemTextColour());
+        if(!IsSelected()) {
+            dc.SetTextForeground(colours.GetItemTextColour());
+        } else {
+            dc.SetTextForeground(win->HasFocus() ? colours.GetSelItemTextColour()
+                                                 : colours.GetSelItemTextColourNoFocus());
+        }
         dc.DrawText(text, x, y);
     }
 #else
-    dc.SetTextForeground(IsSelected() ? colours.GetSelItemTextColour() : colours.GetItemTextColour());
+    if(!IsSelected()) {
+        dc.SetTextForeground(colours.GetItemTextColour());
+    } else {
+        dc.SetTextForeground(win->HasFocus() ? colours.GetSelItemTextColour() : colours.GetSelItemTextColourNoFocus());
+    }
     dc.DrawText(text, x, y);
 #endif
 }
@@ -555,10 +646,14 @@ size_t clRowEntry::GetChildrenCount(bool recurse) const
 
 bool clRowEntry::IsVisible() const
 {
-    if(IsHidden()) { return false; }
+    if(IsHidden()) {
+        return false;
+    }
     clRowEntry* parent = GetParent();
     while(parent) {
-        if(!parent->IsExpanded()) { return false; }
+        if(!parent->IsExpanded()) {
+            return false;
+        }
         parent = parent->GetParent();
     }
     return true;
@@ -575,19 +670,25 @@ void clRowEntry::DeleteAllChildren()
 
 clRowEntry* clRowEntry::GetLastChild() const
 {
-    if(m_children.empty()) { return nullptr; }
+    if(m_children.empty()) {
+        return nullptr;
+    }
     return m_children.back();
 }
 
 clRowEntry* clRowEntry::GetFirstChild() const
 {
-    if(m_children.empty()) { return nullptr; }
+    if(m_children.empty()) {
+        return nullptr;
+    }
     return m_children[0];
 }
 
 void clRowEntry::SetHidden(bool b)
 {
-    if(b && !IsRoot()) { return; }
+    if(b && !IsRoot()) {
+        return;
+    }
     SetFlag(kNF_Hidden, b);
     if(b) {
         m_indentsCount = -1;
@@ -599,11 +700,15 @@ void clRowEntry::SetHidden(bool b)
 int clRowEntry::CalcItemWidth(wxDC& dc, int rowHeight, size_t col)
 {
     wxUnusedVar(col);
-    if(col >= m_cells.size()) { return 0; }
+    if(col >= m_cells.size()) {
+        return 0;
+    }
 
     clCellValue& cell = GetColumn(col);
     wxFont f = GetFont().IsOk() ? GetFont() : m_tree->GetDefaultFont();
-    if(cell.GetFont().IsOk()) { f = cell.GetFont(); }
+    if(cell.GetFont().IsOk()) {
+        f = cell.GetFont();
+    }
     dc.SetFont(f);
 
     int item_width = X_SPACER;
@@ -646,35 +751,45 @@ int clRowEntry::CalcItemWidth(wxDC& dc, int rowHeight, size_t col)
 void clRowEntry::SetBitmapIndex(int bitmapIndex, size_t col)
 {
     clCellValue& cell = GetColumn(col);
-    if(!cell.IsOk()) { return; }
+    if(!cell.IsOk()) {
+        return;
+    }
     cell.SetBitmapIndex(bitmapIndex);
 }
 
 int clRowEntry::GetBitmapIndex(size_t col) const
 {
     const clCellValue& cell = GetColumn(col);
-    if(!cell.IsOk()) { return wxNOT_FOUND; }
+    if(!cell.IsOk()) {
+        return wxNOT_FOUND;
+    }
     return cell.GetBitmapIndex();
 }
 
 void clRowEntry::SetBitmapSelectedIndex(int bitmapIndex, size_t col)
 {
     clCellValue& cell = GetColumn(col);
-    if(!cell.IsOk()) { return; }
+    if(!cell.IsOk()) {
+        return;
+    }
     cell.SetBitmapSelectedIndex(bitmapIndex);
 }
 
 int clRowEntry::GetBitmapSelectedIndex(size_t col) const
 {
     const clCellValue& cell = GetColumn(col);
-    if(!cell.IsOk()) { return wxNOT_FOUND; }
+    if(!cell.IsOk()) {
+        return wxNOT_FOUND;
+    }
     return cell.GetBitmapSelectedIndex();
 }
 
 void clRowEntry::SetLabel(const wxString& label, size_t col)
 {
     clCellValue& cell = GetColumn(col);
-    if(!cell.IsOk()) { return; }
+    if(!cell.IsOk()) {
+        return;
+    }
     cell.SetValue(label);
 }
 
@@ -691,7 +806,9 @@ const wxString& clRowEntry::GetLabel(size_t col) const
 void clRowEntry::SetChecked(bool checked, int bitmapIndex, const wxString& label, size_t col)
 {
     clCellValue& cell = GetColumn(col);
-    if(!cell.IsOk()) { return; }
+    if(!cell.IsOk()) {
+        return;
+    }
     cell.SetValue(checked);
     cell.SetValue(label);
     cell.SetBitmapIndex(bitmapIndex);
@@ -702,7 +819,9 @@ void clRowEntry::SetChecked(bool checked, int bitmapIndex, const wxString& label
 bool clRowEntry::IsChecked(size_t col) const
 {
     const clCellValue& cell = GetColumn(col);
-    if(!cell.IsOk()) { return false; }
+    if(!cell.IsOk()) {
+        return false;
+    }
     return cell.GetValueBool();
 }
 
@@ -727,21 +846,27 @@ clCellValue& clRowEntry::GetColumn(size_t col)
 void clRowEntry::SetBgColour(const wxColour& bgColour, size_t col)
 {
     clCellValue& cell = GetColumn(col);
-    if(!cell.IsOk()) { return; }
+    if(!cell.IsOk()) {
+        return;
+    }
     cell.SetBgColour(bgColour);
 }
 
 void clRowEntry::SetFont(const wxFont& font, size_t col)
 {
     clCellValue& cell = GetColumn(col);
-    if(!cell.IsOk()) { return; }
+    if(!cell.IsOk()) {
+        return;
+    }
     cell.SetFont(font);
 }
 
 void clRowEntry::SetTextColour(const wxColour& textColour, size_t col)
 {
     clCellValue& cell = GetColumn(col);
-    if(!cell.IsOk()) { return; }
+    if(!cell.IsOk()) {
+        return;
+    }
     cell.SetTextColour(textColour);
 }
 
@@ -860,13 +985,17 @@ void clRowEntry::SetChoice(bool b, size_t col)
 {
     wxUnusedVar(b);
     clCellValue& cell = GetColumn(col);
-    if(!cell.IsOk()) { return; }
+    if(!cell.IsOk()) {
+        return;
+    }
     cell.SetType(clCellValue::kTypeChoice);
 }
 
 bool clRowEntry::IsChoice(size_t col) const
 {
     const clCellValue& cell = GetColumn(col);
-    if(!cell.IsOk()) { return false; }
+    if(!cell.IsOk()) {
+        return false;
+    }
     return cell.IsChoice();
 }

@@ -1,4 +1,5 @@
 #include "MainFrame.h"
+#include "clAsciiEscapCodeHandler.hpp"
 #include <wx/app.h>
 #include <wx/event.h>
 #include <wx/image.h>
@@ -17,7 +18,9 @@ public:
         HINSTANCE user32Dll = LoadLibrary(L"User32.dll");
         if(user32Dll) {
             SetProcessDPIAwareFunc pFunc = (SetProcessDPIAwareFunc)GetProcAddress(user32Dll, "SetProcessDPIAware");
-            if(pFunc) { pFunc(); }
+            if(pFunc) {
+                pFunc();
+            }
             FreeLibrary(user32Dll);
         }
 #endif

@@ -22,14 +22,14 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
         bBitmapLoaded = true;
     }
 
-    wxBoxSizer* boxSizer1 = new wxBoxSizer(wxVERTICAL);
+    boxSizer1 = new wxBoxSizer(wxVERTICAL);
     this->SetSizer(boxSizer1);
 
     m_mainPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, -1)), wxTAB_TRAVERSAL);
 
     boxSizer1->Add(m_mainPanel, 1, wxEXPAND, WXC_FROM_DIP(5));
 
-    wxBoxSizer* boxSizer11 = new wxBoxSizer(wxVERTICAL);
+    boxSizer11 = new wxBoxSizer(wxVERTICAL);
     m_mainPanel->SetSizer(boxSizer11);
 
     m_toolbar =
@@ -58,12 +58,19 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
                        wxNullBitmap, wxITEM_CHECK, wxT(""), wxT(""), NULL);
     m_toolbar->Realize();
 
+    m_dvListCtrlCustom = new clDataViewListCtrl(m_mainPanel, wxID_ANY, wxDefaultPosition,
+                                                wxDLG_UNIT(m_mainPanel, wxSize(-1, 150)), wxDV_ROW_LINES | wxDV_SINGLE);
+
+    boxSizer11->Add(m_dvListCtrlCustom, 0, wxEXPAND, WXC_FROM_DIP(5));
+
+    m_dvListCtrlCustom->AppendTextColumn(_("Text"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT,
+                                         wxDATAVIEW_COL_RESIZABLE);
     m_panelControls =
         new wxPanel(m_mainPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainPanel, wxSize(-1, -1)), wxTAB_TRAVERSAL);
 
     boxSizer11->Add(m_panelControls, 1, wxEXPAND, WXC_FROM_DIP(5));
 
-    wxBoxSizer* boxSizer71 = new wxBoxSizer(wxHORIZONTAL);
+    boxSizer71 = new wxBoxSizer(wxHORIZONTAL);
     m_panelControls->SetSizer(boxSizer71);
 
     m_dataView = new clDataViewListCtrl(m_panelControls, wxID_ANY, wxDefaultPosition,
@@ -77,7 +84,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
                                  wxDATAVIEW_COL_RESIZABLE);
     m_dataView->AppendTextColumn(_("File size"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT,
                                  wxDATAVIEW_COL_RESIZABLE);
-    wxBoxSizer* boxSizer133 = new wxBoxSizer(wxVERTICAL);
+    boxSizer133 = new wxBoxSizer(wxVERTICAL);
 
     boxSizer11->Add(boxSizer133, 0, wxEXPAND, WXC_FROM_DIP(5));
 
@@ -86,10 +93,10 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
 
     boxSizer133->Add(m_panelButtons, 1, wxEXPAND, WXC_FROM_DIP(5));
 
-    wxBoxSizer* boxSizer137 = new wxBoxSizer(wxVERTICAL);
+    boxSizer137 = new wxBoxSizer(wxVERTICAL);
     m_panelButtons->SetSizer(boxSizer137);
 
-    wxFlexGridSizer* flexGridSizer141 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer141 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer141->SetFlexibleDirection(wxBOTH);
     flexGridSizer141->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer141->AddGrowableCol(1);

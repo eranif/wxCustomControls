@@ -1,4 +1,12 @@
 #include "clColours.h"
+
+#if CL_BUILD
+#include "clSystemSettings.h"
+#else
+#define clSystemSettings wxSystemSettings
+#define GetDefaultPanelColour() GetColour(wxSYS_COLOUR_3DFACE)
+#endif
+
 #include "drawingutils.h"
 #include <wx/gdicmn.h>
 #include <wx/settings.h>
@@ -22,12 +30,16 @@ void clColours::InitDefaults()
     selItemTextColour = wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOXHIGHLIGHTTEXT);
 }
 
-void clColours::InitDarkDefaults()
-{
-    InitFromColour(wxColour("#5F6A6A"));
-}
+void clColours::InitDarkDefaults() { InitFromColour(wxColour("#5F6A6A")); }
 
-bool clColours::IsLightTheme() const { return !DrawingUtils::IsDark(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE)); }
+bool clColours::IsLightTheme() const
+{
+    if(GetBgColour().IsOk()) {
+        return !DrawingUtils::IsDark(GetBgColour());
+    } else {
+        return !DrawingUtils::IsDark(clSystemSettings::GetDefaultPanelColour());
+    }
+}
 
 void clColours::InitFromColour(const wxColour& baseColour)
 {
@@ -39,18 +51,21 @@ void clColours::InitFromColour(const wxColour& baseColour)
     bool is_light = !is_dark;
     bgColour = baseColour;
     itemTextColour = is_light ? wxColour("#212121") : wxColour("#FDFEFE");
-
     if(is_light) {
         alternateColour = bgColour.ChangeLightness(FACTOR_ALTROW_LIGHT);
         hoverBgColour = bgColour.ChangeLightness(110);
         headerBgColour = bgColour.ChangeLightness(96);
         headerHBorderColour = headerBgColour.ChangeLightness(90);
         headerVBorderColour = headerBgColour.ChangeLightness(90);
+
         selItemTextColour = itemTextColour;
-        selItemBgColour = bgColour.ChangeLightness(80);
+        selItemBgColour = wxColour("#BDD8F2").ChangeLightness(130);
+
+        selItemTextColourNoFocus = selItemTextColour;
+        selItemBgColourNoFocus = selItemBgColour.ChangeLightness(130);
+
         selbuttonColour = selItemTextColour.ChangeLightness(120);
         buttonColour = itemTextColour.ChangeLightness(120);
-        selItemBgColourNoFocus = selItemBgColour.ChangeLightness(FACTOR_SEL_BG_COLOUR_NOFOCUS);
         grayText = itemTextColour.ChangeLightness(150);
     } else {
         alternateColour = bgColour.ChangeLightness(FACTOR_ALTROW_DARK);
@@ -59,11 +74,13 @@ void clColours::InitFromColour(const wxColour& baseColour)
         headerHBorderColour = headerBgColour.ChangeLightness(112);
         headerVBorderColour = headerBgColour.ChangeLightness(112);
         selItemTextColour = itemTextColour;
-        selItemBgColour = bgColour.ChangeLightness(130);
         selbuttonColour = selItemTextColour.ChangeLightness(80);
         buttonColour = itemTextColour.ChangeLightness(80);
-        selItemBgColourNoFocus = bgColour.ChangeLightness(115);
         grayText = itemTextColour.ChangeLightness(50);
+
+        selItemBgColour = bgColour.ChangeLightness(120);
+        selItemTextColourNoFocus = itemTextColour;
+        selItemBgColourNoFocus = bgColour.ChangeLightness(110);
     }
     itemBgColour = bgColour;
     matchedItemBgText = wxColour("#8BC34A");

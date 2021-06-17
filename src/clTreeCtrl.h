@@ -9,9 +9,9 @@
 #include <wx/arrstr.h>
 #include <wx/datetime.h>
 #include <wx/dc.h>
+#include <wx/headercol.h>
 #include <wx/panel.h>
 #include <wx/scrolwin.h>
-#include <wx/headercol.h>
 
 #define wxTR_ENABLE_SEARCH 0x4000
 // Sorting is applied for top level items (i.e. items whom their direct parent is the root item)
@@ -28,6 +28,8 @@ protected:
     long m_treeStyle = 0;
     int m_scrollLines = 0;
     wxFont m_defaultFont = wxNullFont;
+    bool m_bulkInsert = false;
+    clSortFunc_t m_oldSortFunc;
 
 private:
     wxPoint DoFixPoint(const wxPoint& pt);
@@ -56,7 +58,7 @@ protected:
     void UpdateScrollBar();
     void DoAddHeader(const wxString& label, const wxBitmap& bmp, int width = wxCOL_WIDTH_AUTOSIZE);
     void UpdateLineHeight();
-    
+
 public:
     virtual int GetFirstItemPosition() const;
     virtual int GetRange() const;
@@ -66,6 +68,17 @@ public:
     virtual ~clTreeCtrl();
     bool Create(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
                 const wxSize& size = wxDefaultSize, long style = 0);
+
+    /**
+     * @brief notify the control that we are doing bulk insert so avoid
+     * not needed UI updates
+     */
+    void Begin();
+
+    /**
+     * @brief update the UI to the control content, use with `Begin()`
+     */
+    void Commit();
 
     void SetDefaultFont(const wxFont& font);
     wxFont GetDefaultFont() const;

@@ -7,6 +7,8 @@
   </Plugins>
   <VirtualDirectory Name="Controls">
     <VirtualDirectory Name="Common">
+      <File Name="clAsciiEscapCodeHandler.cpp"/>
+      <File Name="clAsciiEscapCodeHandler.hpp"/>
       <File Name="clCaptionBar.cpp"/>
       <File Name="clCaptionBar.hpp"/>
       <File Name="wxCustomControls.hpp"/>
