@@ -2,49 +2,17 @@
 #define CLMENUBAR_HPP
 
 #include "wxCustomControls.hpp"
-#include <codelite_exports.h>
-#include <memory>
-#include <wx/menu.h>
-
-class WXDLLIMPEXP_SDK clMenuWrapper
-{
-    wxMenu* m_mainMenu = nullptr;
-
-private:
-    void Delete();
-
-public:
-    typedef std::shared_ptr<clMenuWrapper> ptr_t;
-    clMenuWrapper() {}
-    ~clMenuWrapper();
-
-    /**
-     * @brief set menu. the menu must be allocated on the heap
-     * the menu will be deleted when this class is destructed
-     * Before it is deleted, all its child menus are removed (i.e. they are not deleted)
-     */
-    void AssignMenu(wxMenu* menu);
-    wxMenu* GetMenu() const { return m_mainMenu; }
-};
-
 #if wxUSE_NATIVE_MENUBAR
-class clMenuBar : public wxMenuBar
-{
-public:
-    clMenuBar(wxWindow* WXUNUSED(parent), size_t n, wxMenu* menus[], const wxString titles[], long style = 0)
-        : wxMenuBar(n, menus, titles, style)
-    {
-    }
-    virtual ~clMenuBar() {}
-    void FromMenuBar(wxMenuBar* WXUNUSED(mb)) {}
-    clMenuWrapper::ptr_t CreateSingleMenu() const { return clMenuWrapper::ptr_t(nullptr); }
-};
+#include <wx/menu.h>
+typedef wxMenuBar clMenuBar;
 #else
 #include <clColours.h>
+#include <codelite_exports.h>
 #include <unordered_map>
 #include <vector>
 #include <wx/control.h>
 #include <wx/dc.h>
+#include <wx/menu.h>
 #include <wx/panel.h>
 
 class wxMenuBar;
@@ -225,13 +193,6 @@ public:
      * and "strip" the wxMenuBar from all the menus attached to it
      */
     void FromMenuBar(wxMenuBar* mb);
-
-    /**
-     * @brief build a single menu from the entire menu bar
-     * i.e. the return menu as list of children sub menus from the toolbar
-     * @note
-     */
-    clMenuWrapper::ptr_t CreateSingleMenu() const;
 };
 #endif
 #endif // CLMENUBAR_HPP

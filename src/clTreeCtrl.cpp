@@ -136,7 +136,11 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
     wxAutoBufferedPaintDC pdc(this);
     PrepareDC(pdc);
 
+#ifdef __WXGTK__
+    wxDC& dc = pdc;
+#else
     wxGCDC dc(pdc);
+#endif
 
     // Call the parent's Render method
     Render(dc);
@@ -229,6 +233,30 @@ void clTreeCtrl::OnPaint(wxPaintEvent& event)
     if(GetHeader() && GetHeader()->IsShown()) {
         GetHeader()->Update();
     }
+
+    // draw a one pixel line at the top of the items area
+    // this gives a nice border and UI separation
+    wxColour top_border_colour = GetColours().GetBorderColour();
+    wxColour right_border_colour;
+    if(GetColours().IsLightTheme()) {
+        right_border_colour = *wxWHITE;
+    } else {
+        right_border_colour = GetColours().GetBgColour().ChangeLightness(80);
+    }
+
+    dc.SetPen(top_border_colour);
+    dc.DrawLine(clientRect.GetTopLeft(), clientRect.GetTopRight());
+
+    // draw another one pixel line on the right side
+    dc.SetPen(right_border_colour);
+
+    wxPoint pt1 = clientRect.GetTopRight();
+    wxPoint pt2 = clientRect.GetBottomRight();
+#ifndef __WXOSX__
+    pt1.x -= 1;
+    pt2.x -= 1;
+#endif
+    dc.DrawLine(pt1, pt2);
 }
 
 wxTreeItemId clTreeCtrl::InsertItem(const wxTreeItemId& parent, const wxTreeItemId& previous, const wxString& text,
@@ -246,11 +274,9 @@ wxTreeItemId clTreeCtrl::AppendItem(const wxTreeItemId& parent, const wxString& 
                                     wxTreeItemData* data)
 {
     wxTreeItemId item = m_model.AppendItem(parent, text, image, selImage, data);
-    if(!m_bulkInsert) {
-        DoUpdateHeader(item);
-        if(IsExpanded(parent)) {
-            UpdateScrollBar();
-        }
+    DoUpdateHeader(item);
+    if(IsExpanded(parent)) {
+        UpdateScrollBar();
     }
     return item;
 }
@@ -1085,6 +1111,9 @@ void clTreeCtrl::ScrollToRow(int firstLine)
     UpdateScrollBar();
 #endif
     Refresh();
+#ifndef __WXGTK3__
+    wxYieldIfNeeded();
+#endif
 }
 
 void clTreeCtrl::ScrollRows(int steps, wxDirection direction)
@@ -1121,6 +1150,9 @@ void clTreeCtrl::ScrollRows(int steps, wxDirection direction)
     }
     EnsureItemVisible(m_model.ToPtr(nextSelection), fromTop);
     Refresh();
+#ifndef __WXGTK3__
+    wxYieldIfNeeded();
+#endif
     UpdateScrollBar();
 }
 

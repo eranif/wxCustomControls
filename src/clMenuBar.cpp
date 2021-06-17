@@ -300,7 +300,6 @@ void clMenuBar::OnPaint(wxPaintEvent& e)
     dc.SetBrush(m_colours.GetBgColour());
     dc.SetPen(m_colours.GetBgColour());
     dc.DrawRectangle(rect);
-    rect.Deflate(1);
 
     UpdateRects(dc);
     for(size_t i = 0; i < m_menus.size(); ++i) {
@@ -499,17 +498,6 @@ void clMenuBar::UpdateAccelerators()
     GetParent()->SetAcceleratorTable(table);
 }
 
-clMenuWrapper::ptr_t clMenuBar::CreateSingleMenu() const
-{
-    clMenuWrapper::ptr_t p = std::make_shared<clMenuWrapper>();
-    wxMenu* menu = new wxMenu;
-    for(const auto& mi : m_menus) {
-        menu->Append(wxID_ANY, mi.text, mi.menu);
-    }
-    p->AssignMenu(menu);
-    return p;
-}
-
 void clMenuBar::FromMenuBar(wxMenuBar* mb)
 {
     while(mb->GetMenuCount()) {
@@ -526,32 +514,4 @@ void clMenuBar::FromMenuBar(wxMenuBar* mb)
     UpdateAccelerators();
     Refresh();
 }
-
-clMenuWrapper::~clMenuWrapper() { Delete(); }
-
-void clMenuWrapper::Delete()
-{
-    if(m_mainMenu && m_mainMenu->GetMenuItemCount()) {
-        std::vector<wxWindowID> menus_id;
-        menus_id.reserve(m_mainMenu->GetMenuItemCount());
-
-        for(const auto& mi : m_mainMenu->GetMenuItems()) {
-            menus_id.push_back(mi->GetId());
-        }
-
-        // remove all the menu entries
-        while(!menus_id.empty()) {
-            m_mainMenu->Remove(menus_id[0]);
-            menus_id.erase(menus_id.begin());
-        }
-    }
-    wxDELETE(m_mainMenu);
-}
-
-void clMenuWrapper::AssignMenu(wxMenu* menu)
-{
-    Delete();
-    m_mainMenu = menu;
-}
-
 #endif
