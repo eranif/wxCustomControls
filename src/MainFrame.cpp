@@ -414,16 +414,12 @@ MainFrame::MainFrame(wxWindow* parent)
 
     const wxChar ESC = 0x1B;
     m_dvListCtrlCustom->Begin();
-    for(size_t i = 0; i < 10000; ++i) {
+    for(size_t i = 0; i < 1; ++i) {
         wxString buffer;
         {
             buffer.clear();
-            buffer << ESC << "[1;32;47m    Updating " << ESC << "[mcrates.io index";
-            m_dvListCtrlCustom->AppendItem(buffer);
-        }
-        {
-            buffer.clear();
-            buffer << ESC << "[33;47m    Reading " << ESC << "[mcrates.io index..done";
+            //buffer << ESC<< "[0m   " << ESC[0mESC[1mESC[38;5;14m| ESC[0m ESC[0mESC[1mESC[38;5;9m^ESC[0m ESC[0mESC[1mESC[38;5;9mexpected one of `!` or `::`ESC[0m
+            buffer << "[0m   [0m[1m[38;5;14m| [0m [0m[1m[38;5;9m^[0m [0m[1m[38;5;9mexpected one of `!` or `::`[0m";
             m_dvListCtrlCustom->AppendItem(buffer);
         }
     }
