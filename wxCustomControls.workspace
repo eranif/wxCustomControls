@@ -2,23 +2,23 @@
 <CodeLite_Workspace Name="wxCustomControls" Database="" Version="10.0.0">
   <Project Name="wxCustomControls" Path="src/wxCustomControls.project" Active="Yes"/>
   <BuildMatrix>
-    <WorkspaceConfiguration Name="Debug" Selected="yes">
+    <WorkspaceConfiguration Name="Debug">
       <Environment/>
       <Project Name="wxCustomControls" ConfigName="Debug"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Release" Selected="no">
+    <WorkspaceConfiguration Name="Release">
       <Environment/>
       <Project Name="wxCustomControls" ConfigName="Release"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Debug_Linux" Selected="no">
+    <WorkspaceConfiguration Name="Debug_Linux">
       <Environment/>
       <Project Name="wxCustomControls" ConfigName="Debug_Linux"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="OSX_Release" Selected="no">
+    <WorkspaceConfiguration Name="OSX_Release">
       <Environment/>
       <Project Name="wxCustomControls" ConfigName="OSX_Release"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="OSX_Debug" Selected="no">
+    <WorkspaceConfiguration Name="OSX_Debug">
       <Environment/>
       <Project Name="wxCustomControls" ConfigName="OSX_Debug"/>
     </WorkspaceConfiguration>

@@ -18,6 +18,7 @@
 #include <wx/panel.h>
 #include <wx/toolbar.h>
 #include "clToolBar.h"
+#include "clSideBarCtrl.hpp"
 #include <wx/dataview.h>
 #include "clDataViewListCtrl.h"
 #include <wx/button.h>
@@ -56,40 +57,34 @@ class MainFrameBaseClass : public wxFrame
 public:
     enum {
         ID_SHOW_SB_ON_FOCUS = 10001,
-        ID_SINGLE_SELECTION = 10002,
-        ID_HIDE_ROOT = 10003,
-        ID_TOGGLE_THEMES = 10004,
-        ID_ZEBRA = 10005,
+        ID_HIDE_ROOT = 10002,
+        ID_TOGGLE_THEMES = 10003,
+        ID_DV_DELETE_ALL_ITEMS = 10004,
+        ID_FILL_WITH_5000_ENTRIES = 10005,
         ID_PG_UP = 10006,
-        ID_FILL_WITH_5000_ENTRIES = 10007,
-        ID_DV_OPEN_FOLDER = 10008,
-        wxID_SET_TREE_COL_WIDTH = 10009,
-        ID_PREV_SIBLING = 10010,
-        ID_NEXT_SIBLING = 10011,
-        ID_NEVER_SHOW_SCROLLBARS = 10012,
+        ID_DV_OPEN_FOLDER = 10007,
+        ID_PREV_SIBLING = 10008,
+        ID_SINGLE_SELECTION = 10009,
+        ID_NEXT_SIBLING = 10010,
+        ID_ZEBRA = 10011,
+        wxID_SET_TREE_COL_WIDTH = 10012,
         ID_SELECT_CHILDREN = 10013,
-        ID_EXPAND_ALL = 10014,
-        ID_OPEN_FOLDER = 10015,
-        ID_NATIVE_HEADER = 10016,
+        ID_NATIVE_HEADER = 10014,
+        ID_EXPAND_ALL = 10015,
+        ID_OPEN_FOLDER = 10016,
         wxID_COLOURS = 10017,
-        ID_PG_DOWN = 10018,
-        ID_DV_DELETE_ALL_ITEMS = 10019,
+        ID_NEVER_SHOW_SCROLLBARS = 10018,
+        ID_PG_DOWN = 10019,
         wxID_BOOKMARK = 10020,
     };
 
 protected:
-    wxBoxSizer* boxSizer1;
     wxPanel* m_mainPanel;
-    wxBoxSizer* boxSizer11;
     clToolBar* m_toolbar;
-    clDataViewListCtrl* m_dvListCtrlCustom;
     wxPanel* m_panelControls;
-    wxBoxSizer* boxSizer71;
+    clSideBarCtrl* m_sidebar;
     clDataViewListCtrl* m_dataView;
-    wxBoxSizer* boxSizer133;
     wxPanel* m_panelButtons;
-    wxBoxSizer* boxSizer137;
-    wxFlexGridSizer* flexGridSizer141;
     clButton* m_buttonOne;
     clButton* m_buttonTwo;
     clButton* m_buttonDisabled;
@@ -184,7 +179,7 @@ protected:
 
 public:
     clToolBar* GetToolbar() { return m_toolbar; }
-    clDataViewListCtrl* GetDvListCtrlCustom() { return m_dvListCtrlCustom; }
+    clSideBarCtrl* GetSidebar() { return m_sidebar; }
     clDataViewListCtrl* GetDataView() { return m_dataView; }
     wxPanel* GetPanelControls() { return m_panelControls; }
     clButton* GetButtonOne() { return m_buttonOne; }

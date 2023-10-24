@@ -9,7 +9,19 @@
 // Declare the bitmap loading function
 extern void wxC9ED9InitBitmapResources();
 
-static bool bBitmapLoaded = false;
+namespace
+{
+// return the wxBORDER_SIMPLE that matches the current application theme
+wxBorder get_border_simple_theme_aware_bit()
+{
+#if wxVERSION_NUMBER >= 3300 && defined(__WXMSW__)
+    return wxSystemSettings::GetAppearance().IsDark() ? wxBORDER_SIMPLE : wxBORDER_STATIC;
+#else
+    return wxBORDER_DEFAULT;
+#endif
+} // DoGetBorderSimpleBit
+bool bBitmapLoaded = false;
+} // namespace
 
 MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos,
                                        const wxSize& size, long style)
@@ -22,14 +34,14 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
         bBitmapLoaded = true;
     }
 
-    boxSizer1 = new wxBoxSizer(wxVERTICAL);
+    wxBoxSizer* boxSizer1 = new wxBoxSizer(wxVERTICAL);
     this->SetSizer(boxSizer1);
 
     m_mainPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, -1)), wxTAB_TRAVERSAL);
 
     boxSizer1->Add(m_mainPanel, 1, wxEXPAND, WXC_FROM_DIP(5));
 
-    boxSizer11 = new wxBoxSizer(wxVERTICAL);
+    wxBoxSizer* boxSizer11 = new wxBoxSizer(wxVERTICAL);
     m_mainPanel->SetSizer(boxSizer11);
 
     m_toolbar =
@@ -58,20 +70,18 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
                        wxNullBitmap, wxITEM_CHECK, wxT(""), wxT(""), NULL);
     m_toolbar->Realize();
 
-    m_dvListCtrlCustom = new clDataViewListCtrl(m_mainPanel, wxID_ANY, wxDefaultPosition,
-                                                wxDLG_UNIT(m_mainPanel, wxSize(-1, 150)), wxDV_ROW_LINES | wxDV_SINGLE);
-
-    boxSizer11->Add(m_dvListCtrlCustom, 0, wxEXPAND, WXC_FROM_DIP(5));
-
-    m_dvListCtrlCustom->AppendTextColumn(_("Text"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT,
-                                         wxDATAVIEW_COL_RESIZABLE);
     m_panelControls =
         new wxPanel(m_mainPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainPanel, wxSize(-1, -1)), wxTAB_TRAVERSAL);
 
     boxSizer11->Add(m_panelControls, 1, wxEXPAND, WXC_FROM_DIP(5));
 
-    boxSizer71 = new wxBoxSizer(wxHORIZONTAL);
+    wxBoxSizer* boxSizer71 = new wxBoxSizer(wxHORIZONTAL);
     m_panelControls->SetSizer(boxSizer71);
+
+    m_sidebar = new clSideBarCtrl(m_panelControls, wxID_ANY, wxDefaultPosition,
+                                  wxDLG_UNIT(m_panelControls, wxSize(-1, -1)), wxTAB_TRAVERSAL);
+
+    boxSizer71->Add(m_sidebar, 0, 0, WXC_FROM_DIP(5));
 
     m_dataView = new clDataViewListCtrl(m_panelControls, wxID_ANY, wxDefaultPosition,
                                         wxDLG_UNIT(m_panelControls, wxSize(-1, 300)), wxDV_ROW_LINES | wxDV_SINGLE);
@@ -84,7 +94,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
                                  wxDATAVIEW_COL_RESIZABLE);
     m_dataView->AppendTextColumn(_("File size"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT,
                                  wxDATAVIEW_COL_RESIZABLE);
-    boxSizer133 = new wxBoxSizer(wxVERTICAL);
+    wxBoxSizer* boxSizer133 = new wxBoxSizer(wxVERTICAL);
 
     boxSizer11->Add(boxSizer133, 0, wxEXPAND, WXC_FROM_DIP(5));
 
@@ -93,10 +103,10 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
 
     boxSizer133->Add(m_panelButtons, 1, wxEXPAND, WXC_FROM_DIP(5));
 
-    boxSizer137 = new wxBoxSizer(wxVERTICAL);
+    wxBoxSizer* boxSizer137 = new wxBoxSizer(wxVERTICAL);
     m_panelButtons->SetSizer(boxSizer137);
 
-    flexGridSizer141 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer141 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer141->SetFlexibleDirection(wxBOTH);
     flexGridSizer141->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer141->AddGrowableCol(1);
@@ -121,10 +131,10 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     flexGridSizer141->Add(m_buttonDisabled, 0, wxALL | wxEXPAND, WXC_FROM_DIP(5));
 
     wxArrayString m_choiceArr;
-    m_choiceArr.Add(wxT("Item Number One"));
-    m_choiceArr.Add(wxT("Item Number Two"));
-    m_choiceArr.Add(wxT("Item Number Three"));
-    m_choiceArr.Add(wxT("Item Number Four"));
+    m_choiceArr.Add(_("Item Number One"));
+    m_choiceArr.Add(_("Item Number Two"));
+    m_choiceArr.Add(_("Item Number Three"));
+    m_choiceArr.Add(_("Item Number Four"));
     m_choice = new clChoice(m_panelButtons, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelButtons, wxSize(200, -1)),
                             m_choiceArr, 0);
     m_choice->SetSelection(0);
@@ -132,13 +142,13 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     flexGridSizer141->Add(m_choice, 1, wxALL | wxEXPAND, WXC_FROM_DIP(5));
 
     wxArrayString m_comboBoxArr;
-    m_comboBoxArr.Add(wxT("Choice 1"));
-    m_comboBoxArr.Add(wxT("Choice 2"));
-    m_comboBoxArr.Add(wxT("Choice 3"));
-    m_comboBoxArr.Add(wxT("Choice 4"));
-    m_comboBoxArr.Add(wxT("Choice 5"));
-    m_comboBoxArr.Add(wxT("Choice 6"));
-    m_comboBoxArr.Add(wxT("Choice 7"));
+    m_comboBoxArr.Add(_("Choice 1"));
+    m_comboBoxArr.Add(_("Choice 2"));
+    m_comboBoxArr.Add(_("Choice 3"));
+    m_comboBoxArr.Add(_("Choice 4"));
+    m_comboBoxArr.Add(_("Choice 5"));
+    m_comboBoxArr.Add(_("Choice 6"));
+    m_comboBoxArr.Add(_("Choice 7"));
     m_comboBox = new clComboBox(m_panelButtons, wxID_ANY, wxT(""), wxDefaultPosition,
                                 wxDLG_UNIT(m_panelButtons, wxSize(-1, -1)), m_comboBoxArr, 0);
 #if wxVERSION_NUMBER >= 3000
@@ -311,166 +321,113 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     } else {
         CentreOnScreen(wxBOTH);
     }
-#if wxVERSION_NUMBER >= 2900
     if(!wxPersistenceManager::Get().Find(this)) {
         wxPersistenceManager::Get().RegisterAndRestore(this);
     } else {
         wxPersistenceManager::Get().Restore(this);
     }
-#endif
     // Connect events
-    this->Connect(wxID_COLOURS, wxEVT_UPDATE_UI, wxUpdateUIEventHandler(MainFrameBaseClass::OnColoursUI), NULL, this);
-    m_buttonOne->Connect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(MainFrameBaseClass::OnCloseFolderUI), NULL, this);
-    m_buttonOne->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBaseClass::OnButtonCloseFolder),
-                         NULL, this);
-    m_buttonTwo->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBaseClass::OnButtonClicked), NULL,
-                         this);
-    m_choice->Connect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(MainFrameBaseClass::OnChoice), NULL, this);
-    this->Connect(m_menuItem13->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnOpenFolder), NULL, this);
-    this->Connect(m_menuItemExpandAll->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnExpandAll), NULL, this);
-    this->Connect(m_menuItemCollapseAll->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnCollapseAll), NULL, this);
-    this->Connect(m_menuItemFirstVisible->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnFirstVisible), NULL, this);
-    this->Connect(m_menuItemNextVisibleItem->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnNextVisible), NULL, this);
-    this->Connect(m_menuItemEnsureVisible->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnEnsureItemVisible), NULL, this);
-    this->Connect(m_menuItemSelectChildren->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnSelectChildren), NULL, this);
-    this->Connect(m_menuItemNextSibling->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnNextSibling), NULL, this);
-    this->Connect(m_menuItemPrevSibling->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnPrevSibling), NULL, this);
-    this->Connect(m_menuItemDeleteAllItems->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnDeleteAllItems), NULL, this);
-    this->Connect(m_menuItemFind->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnTreeFind), NULL, this);
-    this->Connect(m_menuItemSetWidth->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnSetTreeColWidth), NULL, this);
-    this->Connect(m_menuItemExit->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnExit), NULL, this);
-    this->Connect(m_menuItem83->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnDVOpenFolder), NULL, this);
-    this->Connect(m_menuItem87->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnFillWith500Entries), NULL, this);
-    this->Connect(m_menuItem89->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnDVDeleteAllItems), NULL, this);
-    this->Connect(m_menuItem147->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnLineUp), NULL, this);
-    this->Connect(m_menuItem149->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnLineDown), NULL, this);
-    this->Connect(m_menuItem151->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnPgUp), NULL, this);
-    this->Connect(m_menuItem153->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnPgDown), NULL, this);
-    this->Connect(m_menuItemZebra->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnZebraColouring), NULL, this);
-    this->Connect(m_menuItemThemes->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnToggleTheme), NULL, this);
-    this->Connect(m_menuItemHideRoot->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnHideRoot), NULL, this);
-    this->Connect(m_menuItemSingleSelection->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnSingleSelection), NULL, this);
-    this->Connect(m_menuItemShowSBOnFocus->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnShowSBOnFocus), NULL, this);
-    this->Connect(m_menuItemHideHeaders->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnHideHeaders), NULL, this);
-    this->Connect(m_menuItemNativeHeader->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnNativeHeader), NULL, this);
-    this->Connect(m_menuItemSupportSearch->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnMenuitemsupportsearchMenuSelected), NULL, this);
-    this->Connect(m_menuItem155->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnHideScrollbars), NULL, this);
-    this->Connect(m_menuItem165->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnCaptionBarToggleMenuButton), NULL, this);
-    this->Connect(m_menuItem167->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnCaptionBarToggleCloseButton), NULL, this);
-    this->Connect(m_menuItem169->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnShowMaximizeButton), NULL, this);
-    this->Connect(m_menuItem171->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                  wxCommandEventHandler(MainFrameBaseClass::OnShowMinimizeButton), NULL, this);
+    this->Bind(wxEVT_UPDATE_UI, &MainFrameBaseClass::OnColoursUI, this, wxID_COLOURS);
+    m_buttonOne->Bind(wxEVT_UPDATE_UI, &MainFrameBaseClass::OnCloseFolderUI, this);
+    m_buttonOne->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBaseClass::OnButtonCloseFolder, this);
+    m_buttonTwo->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBaseClass::OnButtonClicked, this);
+    m_choice->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &MainFrameBaseClass::OnChoice, this);
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnOpenFolder, this, m_menuItem13->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnExpandAll, this, m_menuItemExpandAll->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnCollapseAll, this, m_menuItemCollapseAll->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnFirstVisible, this, m_menuItemFirstVisible->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnNextVisible, this,
+               m_menuItemNextVisibleItem->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnEnsureItemVisible, this,
+               m_menuItemEnsureVisible->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnSelectChildren, this,
+               m_menuItemSelectChildren->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnNextSibling, this, m_menuItemNextSibling->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnPrevSibling, this, m_menuItemPrevSibling->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnDeleteAllItems, this,
+               m_menuItemDeleteAllItems->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnTreeFind, this, m_menuItemFind->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnSetTreeColWidth, this, m_menuItemSetWidth->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnExit, this, m_menuItemExit->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnDVOpenFolder, this, m_menuItem83->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnFillWith500Entries, this, m_menuItem87->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnDVDeleteAllItems, this, m_menuItem89->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnLineUp, this, m_menuItem147->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnLineDown, this, m_menuItem149->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnPgUp, this, m_menuItem151->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnPgDown, this, m_menuItem153->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnZebraColouring, this, m_menuItemZebra->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnToggleTheme, this, m_menuItemThemes->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnHideRoot, this, m_menuItemHideRoot->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnSingleSelection, this,
+               m_menuItemSingleSelection->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnShowSBOnFocus, this,
+               m_menuItemShowSBOnFocus->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnHideHeaders, this, m_menuItemHideHeaders->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnNativeHeader, this, m_menuItemNativeHeader->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnMenuitemsupportsearchMenuSelected, this,
+               m_menuItemSupportSearch->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnHideScrollbars, this, m_menuItem155->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnCaptionBarToggleMenuButton, this,
+               m_menuItem165->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnCaptionBarToggleCloseButton, this,
+               m_menuItem167->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnShowMaximizeButton, this, m_menuItem169->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnShowMinimizeButton, this, m_menuItem171->GetId());
 }
 
 MainFrameBaseClass::~MainFrameBaseClass()
 {
-    this->Disconnect(wxID_COLOURS, wxEVT_UPDATE_UI, wxUpdateUIEventHandler(MainFrameBaseClass::OnColoursUI), NULL,
-                     this);
-    m_buttonOne->Disconnect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(MainFrameBaseClass::OnCloseFolderUI), NULL, this);
-    m_buttonOne->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED,
-                            wxCommandEventHandler(MainFrameBaseClass::OnButtonCloseFolder), NULL, this);
-    m_buttonTwo->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBaseClass::OnButtonClicked),
-                            NULL, this);
-    m_choice->Disconnect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(MainFrameBaseClass::OnChoice), NULL,
-                         this);
-    this->Disconnect(m_menuItem13->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnOpenFolder), NULL, this);
-    this->Disconnect(m_menuItemExpandAll->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnExpandAll), NULL, this);
-    this->Disconnect(m_menuItemCollapseAll->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnCollapseAll), NULL, this);
-    this->Disconnect(m_menuItemFirstVisible->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnFirstVisible), NULL, this);
-    this->Disconnect(m_menuItemNextVisibleItem->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnNextVisible), NULL, this);
-    this->Disconnect(m_menuItemEnsureVisible->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnEnsureItemVisible), NULL, this);
-    this->Disconnect(m_menuItemSelectChildren->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnSelectChildren), NULL, this);
-    this->Disconnect(m_menuItemNextSibling->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnNextSibling), NULL, this);
-    this->Disconnect(m_menuItemPrevSibling->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnPrevSibling), NULL, this);
-    this->Disconnect(m_menuItemDeleteAllItems->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnDeleteAllItems), NULL, this);
-    this->Disconnect(m_menuItemFind->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnTreeFind), NULL, this);
-    this->Disconnect(m_menuItemSetWidth->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnSetTreeColWidth), NULL, this);
-    this->Disconnect(m_menuItemExit->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnExit), NULL, this);
-    this->Disconnect(m_menuItem83->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnDVOpenFolder), NULL, this);
-    this->Disconnect(m_menuItem87->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnFillWith500Entries), NULL, this);
-    this->Disconnect(m_menuItem89->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnDVDeleteAllItems), NULL, this);
-    this->Disconnect(m_menuItem147->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnLineUp), NULL, this);
-    this->Disconnect(m_menuItem149->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnLineDown), NULL, this);
-    this->Disconnect(m_menuItem151->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnPgUp), NULL, this);
-    this->Disconnect(m_menuItem153->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnPgDown), NULL, this);
-    this->Disconnect(m_menuItemZebra->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnZebraColouring), NULL, this);
-    this->Disconnect(m_menuItemThemes->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnToggleTheme), NULL, this);
-    this->Disconnect(m_menuItemHideRoot->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnHideRoot), NULL, this);
-    this->Disconnect(m_menuItemSingleSelection->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnSingleSelection), NULL, this);
-    this->Disconnect(m_menuItemShowSBOnFocus->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnShowSBOnFocus), NULL, this);
-    this->Disconnect(m_menuItemHideHeaders->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnHideHeaders), NULL, this);
-    this->Disconnect(m_menuItemNativeHeader->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnNativeHeader), NULL, this);
-    this->Disconnect(m_menuItemSupportSearch->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnMenuitemsupportsearchMenuSelected), NULL, this);
-    this->Disconnect(m_menuItem155->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnHideScrollbars), NULL, this);
-    this->Disconnect(m_menuItem165->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnCaptionBarToggleMenuButton), NULL, this);
-    this->Disconnect(m_menuItem167->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnCaptionBarToggleCloseButton), NULL, this);
-    this->Disconnect(m_menuItem169->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnShowMaximizeButton), NULL, this);
-    this->Disconnect(m_menuItem171->GetId(), wxEVT_COMMAND_MENU_SELECTED,
-                     wxCommandEventHandler(MainFrameBaseClass::OnShowMinimizeButton), NULL, this);
+    this->Unbind(wxEVT_UPDATE_UI, &MainFrameBaseClass::OnColoursUI, this, wxID_COLOURS);
+    m_buttonOne->Unbind(wxEVT_UPDATE_UI, &MainFrameBaseClass::OnCloseFolderUI, this);
+    m_buttonOne->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBaseClass::OnButtonCloseFolder, this);
+    m_buttonTwo->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBaseClass::OnButtonClicked, this);
+    m_choice->Unbind(wxEVT_COMMAND_CHOICE_SELECTED, &MainFrameBaseClass::OnChoice, this);
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnOpenFolder, this, m_menuItem13->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnExpandAll, this, m_menuItemExpandAll->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnCollapseAll, this, m_menuItemCollapseAll->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnFirstVisible, this,
+                 m_menuItemFirstVisible->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnNextVisible, this,
+                 m_menuItemNextVisibleItem->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnEnsureItemVisible, this,
+                 m_menuItemEnsureVisible->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnSelectChildren, this,
+                 m_menuItemSelectChildren->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnNextSibling, this, m_menuItemNextSibling->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnPrevSibling, this, m_menuItemPrevSibling->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnDeleteAllItems, this,
+                 m_menuItemDeleteAllItems->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnTreeFind, this, m_menuItemFind->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnSetTreeColWidth, this,
+                 m_menuItemSetWidth->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnExit, this, m_menuItemExit->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnDVOpenFolder, this, m_menuItem83->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnFillWith500Entries, this, m_menuItem87->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnDVDeleteAllItems, this, m_menuItem89->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnLineUp, this, m_menuItem147->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnLineDown, this, m_menuItem149->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnPgUp, this, m_menuItem151->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnPgDown, this, m_menuItem153->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnZebraColouring, this, m_menuItemZebra->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnToggleTheme, this, m_menuItemThemes->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnHideRoot, this, m_menuItemHideRoot->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnSingleSelection, this,
+                 m_menuItemSingleSelection->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnShowSBOnFocus, this,
+                 m_menuItemShowSBOnFocus->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnHideHeaders, this, m_menuItemHideHeaders->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnNativeHeader, this,
+                 m_menuItemNativeHeader->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnMenuitemsupportsearchMenuSelected, this,
+                 m_menuItemSupportSearch->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnHideScrollbars, this, m_menuItem155->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnCaptionBarToggleMenuButton, this,
+                 m_menuItem165->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnCaptionBarToggleCloseButton, this,
+                 m_menuItem167->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnShowMaximizeButton, this, m_menuItem169->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBaseClass::OnShowMinimizeButton, this, m_menuItem171->GetId());
 }
 
 MyImages::MyImages()
