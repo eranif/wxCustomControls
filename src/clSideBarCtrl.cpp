@@ -29,6 +29,7 @@ protected:
     wxPoint m_dragStartPos;
     bool m_dragging = false;
     wxWindow* m_linkedPage = nullptr;
+    wxString m_label;
 
 protected:
     void DoDrop()
@@ -232,6 +233,8 @@ public:
 
     void SetSeleced(bool b) { m_selected = b; }
     bool IsSeleced() const { return m_selected; }
+    void SetPageLabel(const wxString& label) { this->m_label = label; }
+    const wxString& GetButtonLabel() const { return m_label; }
 };
 
 clSideBarButtonCtrl::clSideBarButtonCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size,
@@ -384,7 +387,7 @@ wxWindow* clSideBarButtonCtrl::DoChangeSelection(int pos, bool notify)
     return button->GetLinkedPage();
 }
 
-size_t clSideBarButtonCtrl::GetItemCount() const { return m_mainSizer->GetItemCount(); }
+size_t clSideBarButtonCtrl::GetButtonCount() const { return m_mainSizer->GetItemCount(); }
 
 wxWindow* clSideBarButtonCtrl::GetSelectionLinkedPage() const
 {
@@ -484,7 +487,20 @@ void clSideBarCtrl::SetSelection(size_t pos)
     }
 }
 
-size_t clSideBarCtrl::GetPageCount() const { return m_buttons->GetItemCount(); }
+void clSideBarCtrl::ChangeSelection(size_t pos)
+{
+    // Set the selection in the buttons bar and return the linked page
+    wxWindow* page = m_buttons->ChangeSelection(pos);
+    CHECK_POINTER_RETURN(page, );
+
+    // Locate the linked page index in the book and select it
+    int index = SimpleBookGetPageIndex(page);
+    if(index != wxNOT_FOUND) {
+        m_book->ChangeSelection(index);
+    }
+}
+
+size_t clSideBarCtrl::GetPageCount() const { return m_buttons->GetButtonCount(); }
 
 wxWindow* clSideBarCtrl::GetPage(size_t pos) const
 {
@@ -493,6 +509,17 @@ wxWindow* clSideBarCtrl::GetPage(size_t pos) const
     CHECK_POINTER_RETURN(button, nullptr);
 
     return button->GetLinkedPage();
+}
+
+wxWindow* clSideBarCtrl::GetPage(const wxString& label) const
+{
+    // the index is managed by the buttons bar
+    for(size_t i = 0; i < m_buttons->GetButtonCount(); ++i) {
+        if(m_buttons->GetButton(i)->GetButtonLabel() == label) {
+            return m_buttons->GetButton(i)->GetLinkedPage();
+        }
+    }
+    return nullptr;
 }
 
 int clSideBarCtrl::SimpleBookGetPageIndex(wxWindow* page) const
@@ -504,3 +531,5 @@ int clSideBarCtrl::SimpleBookGetPageIndex(wxWindow* page) const
     }
     return wxNOT_FOUND;
 }
+
+int clSideBarCtrl::GetSelection() const { return m_buttons->GetSelection(); }

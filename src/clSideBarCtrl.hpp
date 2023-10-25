@@ -55,7 +55,7 @@ public:
     wxWindow* ChangeSelection(int pos);
 
     /// How many buttons do we have in this control?
-    size_t GetItemCount() const;
+    size_t GetButtonCount() const;
 
     /// Return the page position
     int GetPageIndex(wxWindow* page) const;
@@ -84,17 +84,30 @@ public:
 
     /// Book API
     void AddPage(wxWindow* page, const wxString& label, const wxBitmap& bmp, bool selected = false);
+
     /// reutrn the number of pages in the control
     size_t GetPageCount() const;
+
     /// return page by index
     wxWindow* GetPage(size_t pos) const;
+
+    /// return page by its label
+    wxWindow* GetPage(const wxString& label) const;
+
     /// Remove page (this does not delete it)
     void RemovePage(size_t pos);
+
     /// Delete page
     void DeletePage(size_t pos);
+
     /// Change selection and fire an event
     void SetSelection(size_t pos);
-    wxWindow* GetParentForPages() { return m_book; }
+
+    /// Change selection - no event is fired
+    void ChangeSelection(size_t pos);
+
+    /// return the current selection
+    int GetSelection() const;
 };
 
 wxDECLARE_EXPORTED_EVENT(WXDLLIMPEXP_SDK, wxEVT_SIDEBAR_SELECTION_CHANGED, wxCommandEvent);
