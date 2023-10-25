@@ -4,17 +4,30 @@
 #include "wx/log.h"
 #include <wx/sizer.h>
 
-thread_local clSideBarCtrl::ButtonId BUTTON_ID = 0;
+thread_local int BUTTON_ID = 0;
+
+wxDEFINE_EVENT(wxEVT_SIDEBAR_SELECTION_CHANGED, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_SIDEBAR_CONTEXT_MENU, wxContextMenuEvent);
+
+#define CHECK_POINTER_RETURN(ptr, WHAT) \
+    if(!ptr)                            \
+        return WHAT;
+
+#define CHECK_POSITION_RETURN(pos, WHAT)             \
+    if((size_t)pos >= m_mainSizer->GetItemCount()) { \
+        return WHAT;                                 \
+    }
 
 class SideBarButton : public wxControl
 {
 protected:
-    clSideBarCtrl* m_sidebar = nullptr;
+    clSideBarButtonCtrl* m_sidebar = nullptr;
     wxBitmap m_bmp;
     bool m_selected = false;
     wxDateTime m_dragStartTime;
     wxPoint m_dragStartPos;
     bool m_dragging = false;
+    wxWindow* m_linkedPage = nullptr;
 
 protected:
     void DoDrop()
@@ -22,8 +35,9 @@ protected:
         wxPoint pt = ::wxGetMousePosition();
         SideBarButton* target_button = nullptr;
         bool move_after = false;
-        for(auto [id, tab] : m_sidebar->m_button_id_map) {
-            auto target_tab_rect = tab->GetScreenRect();
+        auto all_buttons = m_sidebar->GetAllButtons();
+        for(auto button : all_buttons) {
+            auto target_tab_rect = button->GetScreenRect();
 
             auto target_tab_upper_rect = target_tab_rect;
             target_tab_upper_rect.SetHeight(target_tab_rect.GetHeight() / 2);
@@ -34,15 +48,15 @@ protected:
 
             if(target_tab_upper_rect.Contains(pt)) {
                 // this is our target tab
-                if(tab != this) {
-                    target_button = tab;
+                if(button != this) {
+                    target_button = static_cast<SideBarButton*>(button);
                     move_after = false;
                 }
                 break;
             } else if(target_tab_lower_rect.Contains(pt)) {
                 // this is our target tab
-                if(tab != this) {
-                    target_button = tab;
+                if(button != this) {
+                    target_button = static_cast<SideBarButton*>(button);
                     move_after = true;
                 }
                 break;
@@ -51,9 +65,9 @@ protected:
 
         if(target_button) {
             if(move_after) {
-                m_sidebar->CallAfter(&clSideBarCtrl::MoveAfter, this, target_button);
+                m_sidebar->CallAfter(&clSideBarButtonCtrl::MoveAfter, this, target_button);
             } else {
-                m_sidebar->CallAfter(&clSideBarCtrl::MoveBefore, this, target_button);
+                m_sidebar->CallAfter(&clSideBarButtonCtrl::MoveBefore, this, target_button);
             }
         }
     }
@@ -80,44 +94,11 @@ protected:
         CaptureMouse();
         m_dragging = true;
     }
-
-public:
-    explicit SideBarButton(clSideBarCtrl* parent, const wxBitmap& bmp)
-        : wxControl(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE)
-        , m_sidebar(parent)
-        , m_bmp(bmp)
-    {
-        m_dragStartTime = (time_t)-1;
-        SetBackgroundStyle(wxBG_STYLE_PAINT);
-        SetCursor(wxCURSOR_HAND);
-
-        wxRect rr = m_bmp.GetScaledSize();
-        rr.Inflate(10);
-        SetSizeHints(rr.GetWidth(), rr.GetHeight());
-        SetSize(rr.GetWidth(), rr.GetHeight());
-
-        Bind(wxEVT_PAINT, &SideBarButton::OnPaint, this);
-        Bind(wxEVT_ERASE_BACKGROUND, &SideBarButton::OnEraseBg, this);
-        Bind(wxEVT_LEFT_DOWN, &SideBarButton::OnLeftDown, this);
-        Bind(wxEVT_MOTION, &SideBarButton::OnMotion, this);
-        Bind(wxEVT_LEFT_UP, &SideBarButton::OnLeftUp, this);
-    }
-
-    virtual ~SideBarButton()
-    {
-        Unbind(wxEVT_PAINT, &SideBarButton::OnPaint, this);
-        Unbind(wxEVT_ERASE_BACKGROUND, &SideBarButton::OnEraseBg, this);
-        Unbind(wxEVT_LEFT_DOWN, &SideBarButton::OnLeftDown, this);
-        Unbind(wxEVT_MOTION, &SideBarButton::OnMotion, this);
-        Unbind(wxEVT_LEFT_UP, &SideBarButton::OnLeftUp, this);
-    }
-
     void OnMotion(wxMouseEvent& event)
     {
         event.Skip();
         if(m_dragStartTime.IsValid() && event.LeftIsDown() &&
            !m_dragging) { // If we're tugging on the tab, consider starting D'n'D
-            wxLogMessage("Moving");
             wxTimeSpan diff = wxDateTime::UNow() - m_dragStartTime;
             if(diff.GetMilliseconds() > 100 && // We need to check both x and y distances as tabs may be vertical
                ((abs(m_dragStartPos.x - event.GetX()) > 5) || (abs(m_dragStartPos.y - event.GetY()) > 5))) {
@@ -138,19 +119,23 @@ public:
     {
         event.Skip();
         if(!IsSeleced()) {
-            for(auto [id, button] : m_sidebar->m_button_id_map) {
-                wxUnusedVar(id);
-                if(button->IsSeleced()) {
-                    if(button == this) {
-                        return;
-                    }
-                    button->SetSeleced(false);
-                    button->Refresh();
-                    break;
-                }
+            int this_index = m_sidebar->GetButtonIndex(this);
+            if(this_index == wxNOT_FOUND) {
+                return;
             }
-            SetSeleced(true);
-            Refresh();
+            int selection_index = m_sidebar->GetSelection();
+            if(selection_index == wxNOT_FOUND) {
+                return;
+            }
+
+            if(selection_index == this_index) {
+                // current button is already selected
+                return;
+            }
+
+            // this will trigger an event + refresh
+            static_cast<clSideBarCtrl*>(m_sidebar->GetParent())->SetSelection(this_index);
+
         } else {
             // Prepare to DnDclTreeCtrl_DnD
             if(event.LeftIsDown()) {
@@ -158,7 +143,6 @@ public:
                 m_dragStartPos = wxPoint(event.GetX(), event.GetY());
             }
         }
-        // TODO: fire event for selection changed
     }
 
     void OnPaint(wxPaintEvent& event)
@@ -200,46 +184,102 @@ public:
 
     void OnEraseBg(wxEraseEvent& event) { wxUnusedVar(event); }
 
+    void OnContextMenu(wxContextMenuEvent& event)
+    {
+        wxUnusedVar(event);
+        wxContextMenuEvent menu_event{ wxEVT_SIDEBAR_CONTEXT_MENU };
+        menu_event.SetInt(m_sidebar->GetButtonIndex(this));
+        menu_event.SetEventObject(m_sidebar->GetParent());
+        m_sidebar->GetParent()->GetEventHandler()->AddPendingEvent(menu_event);
+    }
+
+public:
+    explicit SideBarButton(clSideBarButtonCtrl* parent, const wxBitmap& bmp)
+        : wxControl(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE)
+        , m_sidebar(parent)
+        , m_bmp(bmp)
+    {
+        m_dragStartTime = (time_t)-1;
+        SetBackgroundStyle(wxBG_STYLE_PAINT);
+        SetCursor(wxCURSOR_HAND);
+
+        wxRect rr = m_bmp.GetScaledSize();
+        rr.Inflate(10);
+        SetSizeHints(rr.GetWidth(), rr.GetHeight());
+        SetSize(rr.GetWidth(), rr.GetHeight());
+
+        Bind(wxEVT_PAINT, &SideBarButton::OnPaint, this);
+        Bind(wxEVT_ERASE_BACKGROUND, &SideBarButton::OnEraseBg, this);
+        Bind(wxEVT_LEFT_DOWN, &SideBarButton::OnLeftDown, this);
+        Bind(wxEVT_MOTION, &SideBarButton::OnMotion, this);
+        Bind(wxEVT_LEFT_UP, &SideBarButton::OnLeftUp, this);
+        Bind(wxEVT_CONTEXT_MENU, &SideBarButton::OnContextMenu, this);
+    }
+
+    virtual ~SideBarButton()
+    {
+        Unbind(wxEVT_PAINT, &SideBarButton::OnPaint, this);
+        Unbind(wxEVT_ERASE_BACKGROUND, &SideBarButton::OnEraseBg, this);
+        Unbind(wxEVT_LEFT_DOWN, &SideBarButton::OnLeftDown, this);
+        Unbind(wxEVT_MOTION, &SideBarButton::OnMotion, this);
+        Unbind(wxEVT_LEFT_UP, &SideBarButton::OnLeftUp, this);
+        Unbind(wxEVT_CONTEXT_MENU, &SideBarButton::OnContextMenu, this);
+    }
+
+    void SetLinkedPage(wxWindow* win) { m_linkedPage = win; }
+    wxWindow* GetLinkedPage() const { return m_linkedPage; }
+
     void SetSeleced(bool b) { m_selected = b; }
     bool IsSeleced() const { return m_selected; }
 };
 
-clSideBarCtrl::clSideBarCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
+clSideBarButtonCtrl::clSideBarButtonCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size,
+                                         long style)
     : wxControl(parent, id, pos, size, style | wxBORDER_NONE)
 {
+    m_mainSizer = new wxBoxSizer(wxHORIZONTAL);
+    SetSizer(m_mainSizer);
+
     m_mainSizer = new wxBoxSizer(wxVERTICAL);
     SetSizer(m_mainSizer);
 }
 
-clSideBarCtrl::~clSideBarCtrl() {}
+clSideBarButtonCtrl::~clSideBarButtonCtrl() {}
 
-clSideBarCtrl::ButtonId clSideBarCtrl::AddButton(const wxBitmap& bmp, bool select, const wxString& tooltip)
+int clSideBarButtonCtrl::AddButton(const wxBitmap& bmp, const wxString& label, wxWindow* linked_page, bool select)
 {
     SideBarButton* btn = new SideBarButton(this, bmp);
     btn->SetSeleced(select);
-    btn->SetToolTip(tooltip);
+    btn->SetToolTip(label);
+    btn->SetLinkedPage(linked_page);
     m_mainSizer->Add(btn, wxSizerFlags().CenterHorizontal());
-    auto button_id = ++BUTTON_ID;
-    m_button_id_map.insert({ button_id, btn });
 
     SetSizeHints(btn->GetSize().GetWidth(), wxNOT_FOUND);
     SetSize(btn->GetSize().GetWidth(), wxNOT_FOUND);
     GetParent()->GetSizer()->Layout();
-    return button_id;
+    return GetButtonIndex(btn);
 }
 
-void clSideBarCtrl::DeleteButton(clSideBarCtrl::ButtonId button_id)
+wxWindow* clSideBarButtonCtrl::RemoveButton(int pos)
 {
-    if(m_button_id_map.count(button_id) == 0) {
-        return;
-    }
-    auto button = m_button_id_map[button_id];
-    m_mainSizer->Detach(button);
+    CHECK_POSITION_RETURN(pos, nullptr);
+
+    auto button = static_cast<SideBarButton*>(m_mainSizer->GetItem(pos)->GetWindow());
+    auto linked_page = button->GetLinkedPage();
+    m_mainSizer->Detach(pos);
     button->Destroy();
     m_mainSizer->Layout();
+
+    if(m_mainSizer->GetItemCount() == 0) {
+        return linked_page;
+    }
+
+    // select the first item
+    SetSelection(0);
+    return linked_page;
 }
 
-void clSideBarCtrl::MoveAfter(SideBarButton* src, SideBarButton* target)
+void clSideBarButtonCtrl::MoveAfter(SideBarButton* src, SideBarButton* target)
 {
     if(src == target) {
         return;
@@ -266,25 +306,199 @@ void clSideBarCtrl::MoveAfter(SideBarButton* src, SideBarButton* target)
     m_mainSizer->Layout();
 }
 
-void clSideBarCtrl::MoveBefore(SideBarButton* src, SideBarButton* target)
+void clSideBarButtonCtrl::MoveBefore(SideBarButton* src, SideBarButton* target)
 {
     if(src == target) {
         return;
     }
     m_mainSizer->Detach(src);
     // find the target button index
-    size_t target_index = wxString::npos;
-    for(size_t i = 0; i < m_mainSizer->GetItemCount(); ++i) {
-        if(m_mainSizer->GetItem(i)->GetWindow() == target) {
-            target_index = i;
-            break;
-        }
-    }
-
+    size_t target_index = GetButtonIndex(target);
     if(target_index == wxString::npos) {
         return;
     }
 
     m_mainSizer->Insert(target_index, src);
     m_mainSizer->Layout();
+}
+
+int clSideBarButtonCtrl::GetButtonIndex(SideBarButton* btn) const
+{
+    for(size_t i = 0; i < m_mainSizer->GetItemCount(); ++i) {
+        if(m_mainSizer->GetItem(i)->GetWindow() == btn) {
+            return i;
+        }
+    }
+    return wxNOT_FOUND;
+}
+
+std::vector<wxWindow*> clSideBarButtonCtrl::GetAllButtons()
+{
+    std::vector<wxWindow*> buttons;
+    buttons.reserve(m_mainSizer->GetItemCount());
+    for(size_t i = 0; i < m_mainSizer->GetItemCount(); ++i) {
+        buttons.push_back(m_mainSizer->GetItem(i)->GetWindow());
+    }
+    return buttons;
+}
+
+int clSideBarButtonCtrl::GetSelection() const
+{
+    for(size_t i = 0; i < m_mainSizer->GetItemCount(); ++i) {
+        auto button = static_cast<SideBarButton*>(m_mainSizer->GetItem(i)->GetWindow());
+        if(button->IsSeleced()) {
+            return i;
+        }
+    }
+    return wxNOT_FOUND;
+}
+
+wxWindow* clSideBarButtonCtrl::SetSelection(int pos) { return DoChangeSelection(pos, true); }
+
+wxWindow* clSideBarButtonCtrl::ChangeSelection(int pos) { return DoChangeSelection(pos, false); }
+
+wxWindow* clSideBarButtonCtrl::DoChangeSelection(int pos, bool notify)
+{
+    CHECK_POSITION_RETURN(pos, nullptr);
+
+    SideBarButton* button = dynamic_cast<SideBarButton*>(m_mainSizer->GetItem((size_t)pos)->GetWindow());
+    CHECK_POINTER_RETURN(button, nullptr);
+
+    auto old_selection = GetButton(GetSelection());
+    if(old_selection) {
+        old_selection->SetSeleced(false);
+        old_selection->Refresh();
+    }
+    button->SetSeleced(true);
+    button->Refresh();
+    Refresh();
+
+    if(notify) {
+        wxCommandEvent selection_changed(wxEVT_SIDEBAR_SELECTION_CHANGED);
+        selection_changed.SetEventObject(GetParent());
+        selection_changed.SetInt(pos);
+        AddPendingEvent(selection_changed);
+    }
+    return button->GetLinkedPage();
+}
+
+size_t clSideBarButtonCtrl::GetItemCount() const { return m_mainSizer->GetItemCount(); }
+
+wxWindow* clSideBarButtonCtrl::GetSelectionLinkedPage() const
+{
+    for(size_t i = 0; i < m_mainSizer->GetItemCount(); ++i) {
+        SideBarButton* button = static_cast<SideBarButton*>(m_mainSizer->GetItem(i)->GetWindow());
+        if(button->IsSeleced()) {
+            return button->GetLinkedPage();
+        }
+    }
+    return nullptr;
+}
+
+SideBarButton* clSideBarButtonCtrl::GetButton(size_t pos) const
+{
+    CHECK_POSITION_RETURN(pos, nullptr);
+    return static_cast<SideBarButton*>(m_mainSizer->GetItem(pos)->GetWindow());
+}
+
+int clSideBarButtonCtrl::GetPageIndex(wxWindow* page) const
+{
+    for(size_t i = 0; i < m_mainSizer->GetItemCount(); ++i) {
+        SideBarButton* button = static_cast<SideBarButton*>(m_mainSizer->GetItem(i)->GetWindow());
+        if(button->GetLinkedPage() == page) {
+            return i;
+        }
+    }
+    return wxNOT_FOUND;
+}
+
+// -----------------------
+// SideBar control
+// -----------------------
+
+clSideBarCtrl::clSideBarCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
+    : wxPanel(parent, id, pos, size, wxBORDER_NONE)
+{
+    SetSizer(new wxBoxSizer(wxHORIZONTAL));
+    m_buttons = new clSideBarButtonCtrl(this);
+    m_book = new wxSimplebook(this);
+    if(style & wxBK_RIGHT) {
+        GetSizer()->Add(m_book, 1, wxEXPAND);
+        GetSizer()->Add(m_buttons, 0, wxEXPAND);
+    } else {
+        GetSizer()->Add(m_buttons, 0, wxEXPAND);
+        GetSizer()->Add(m_book, 1, wxEXPAND);
+    }
+    GetSizer()->Layout();
+    GetSizer()->Fit(this);
+}
+
+clSideBarCtrl::~clSideBarCtrl() {}
+
+void clSideBarCtrl::AddPage(wxWindow* page, const wxString& label, const wxBitmap& bmp, bool selected)
+{
+    page->Reparent(m_book);
+    m_book->AddPage(page, label, selected);
+    m_buttons->AddButton(bmp, label, page, selected);
+}
+
+void clSideBarCtrl::DoRemovePage(size_t pos, bool delete_it)
+{
+    // remove the button and return the associated page
+    auto page = m_buttons->RemoveButton(pos);
+    if(!page) {
+        return;
+    }
+
+    // locate the page in the book and remove it
+    int pos_in_book = SimpleBookGetPageIndex(page);
+    if(pos_in_book == wxNOT_FOUND) {
+        return;
+    }
+    if(delete_it) {
+        m_book->DeletePage(pos_in_book);
+    } else {
+        m_book->RemovePage(pos_in_book);
+    }
+
+    // sync the selection between the book and the button bar
+    m_book->SetSelection(m_buttons->GetSelection());
+}
+
+void clSideBarCtrl::RemovePage(size_t pos) { DoRemovePage(pos, false); }
+
+void clSideBarCtrl::DeletePage(size_t pos) { DoRemovePage(pos, true); }
+
+void clSideBarCtrl::SetSelection(size_t pos)
+{
+    // Set the selection in the buttons bar and return the linked page
+    wxWindow* page = m_buttons->SetSelection(pos);
+    CHECK_POINTER_RETURN(page, );
+
+    // Locate the linked page index in the book and select it
+    int index = SimpleBookGetPageIndex(page);
+    if(index != wxNOT_FOUND) {
+        m_book->SetSelection(index);
+    }
+}
+
+size_t clSideBarCtrl::GetPageCount() const { return m_buttons->GetItemCount(); }
+
+wxWindow* clSideBarCtrl::GetPage(size_t pos) const
+{
+    // the index is managed by the buttons bar
+    auto button = m_buttons->GetButton(pos);
+    CHECK_POINTER_RETURN(button, nullptr);
+
+    return button->GetLinkedPage();
+}
+
+int clSideBarCtrl::SimpleBookGetPageIndex(wxWindow* page) const
+{
+    for(size_t i = 0; i < m_book->GetPageCount(); ++i) {
+        if(m_book->GetPage(i) == page) {
+            return i;
+        }
+    }
+    return wxNOT_FOUND;
 }

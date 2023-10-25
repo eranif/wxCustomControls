@@ -81,7 +81,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     m_sidebar = new clSideBarCtrl(m_panelControls, wxID_ANY, wxDefaultPosition,
                                   wxDLG_UNIT(m_panelControls, wxSize(-1, -1)), wxTAB_TRAVERSAL);
 
-    boxSizer71->Add(m_sidebar, 0, 0, WXC_FROM_DIP(5));
+    boxSizer71->Add(m_sidebar, 0, wxEXPAND, WXC_FROM_DIP(5));
 
     m_dataView = new clDataViewListCtrl(m_panelControls, wxID_ANY, wxDefaultPosition,
                                         wxDLG_UNIT(m_panelControls, wxSize(-1, 300)), wxDV_ROW_LINES | wxDV_SINGLE);

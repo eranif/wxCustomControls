@@ -7,38 +7,96 @@
 #include <unordered_map>
 #include <wx/bitmap.h>
 #include <wx/control.h>
+#include <wx/simplebook.h>
 
 class SideBarButton;
-class WXDLLIMPEXP_SDK clSideBarCtrl : public wxControl
+class WXDLLIMPEXP_SDK clSideBarButtonCtrl : public wxControl
 {
     friend class SideBarButton;
 
-public:
-    typedef size_t ButtonId;
-
 protected:
     wxSizer* m_mainSizer = nullptr;
-    std::unordered_map<size_t, SideBarButton*> m_button_id_map;
     wxDirection m_orientation = wxLEFT;
 
 protected:
     void MoveAfter(SideBarButton* src, SideBarButton* target);
     void MoveBefore(SideBarButton* src, SideBarButton* target);
+    int GetButtonIndex(SideBarButton* btn) const;
+    std::vector<wxWindow*> GetAllButtons();
+    wxWindow* DoChangeSelection(int pos, bool notify);
+
+public:
+    clSideBarButtonCtrl(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
+                        const wxSize& size = wxDefaultSize, long style = 0);
+    virtual ~clSideBarButtonCtrl();
+
+    /// Does the control placed on the left or right?
+    void SetOrientationOnTheRight(bool b) { m_orientation = b ? wxRIGHT : wxLEFT; }
+    bool IsOrientationOnTheRight() const { return m_orientation == wxRIGHT; }
+
+    /// Add new button at the end, returns its index
+    /// Note that the `label` property is used as the tooltip
+    /// It is here for convenience: it can be used to fetch
+    int AddButton(const wxBitmap& bmp, const wxString& label, wxWindow* linked_page, bool select = false);
+
+    /// Remove a button by index
+    /// return the removed button linked page
+    wxWindow* RemoveButton(int pos);
+
+    /// Return the current selection
+    int GetSelection() const;
+
+    /// Change selection -> this call fires an event
+    /// return the new selection linked page
+    wxWindow* SetSelection(int pos);
+
+    /// Change selection -> no event is fired
+    /// return the new selection linked page
+    wxWindow* ChangeSelection(int pos);
+
+    /// How many buttons do we have in this control?
+    size_t GetItemCount() const;
+
+    /// Return the page position
+    int GetPageIndex(wxWindow* page) const;
+
+    /// return the linked page for the current selection
+    wxWindow* GetSelectionLinkedPage() const;
+
+    /// Return the button at position `pos`
+    SideBarButton* GetButton(size_t pos) const;
+};
+
+class WXDLLIMPEXP_SDK clSideBarCtrl : public wxPanel
+{
+    clSideBarButtonCtrl* m_buttons = nullptr;
+    wxSimplebook* m_book = nullptr;
+
+protected:
+    /// Return the page position
+    int SimpleBookGetPageIndex(wxWindow* page) const;
+    void DoRemovePage(size_t pos, bool delete_it);
 
 public:
     clSideBarCtrl(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
                   const wxSize& size = wxDefaultSize, long style = 0);
     virtual ~clSideBarCtrl();
 
-    /// Does the control placed on the left or right?
-    void SetOrientationOnTheRight(bool b) { m_orientation = b ? wxRIGHT : wxLEFT; }
-    bool IsOrientationOnTheRight() const { return m_orientation == wxRIGHT; }
-
-    /// Add new button at the end, returns its unique ID
-    ButtonId AddButton(const wxBitmap& bmp, bool select = false, const wxString& tooltip = wxEmptyString);
-
-    /// Remove a button by ID
-    void DeleteButton(ButtonId button_id);
+    /// Book API
+    void AddPage(wxWindow* page, const wxString& label, const wxBitmap& bmp, bool selected = false);
+    /// reutrn the number of pages in the control
+    size_t GetPageCount() const;
+    /// return page by index
+    wxWindow* GetPage(size_t pos) const;
+    /// Remove page (this does not delete it)
+    void RemovePage(size_t pos);
+    /// Delete page
+    void DeletePage(size_t pos);
+    /// Change selection and fire an event
+    void SetSelection(size_t pos);
+    wxWindow* GetParentForPages() { return m_book; }
 };
 
+wxDECLARE_EXPORTED_EVENT(WXDLLIMPEXP_SDK, wxEVT_SIDEBAR_SELECTION_CHANGED, wxCommandEvent);
+wxDECLARE_EXPORTED_EVENT(WXDLLIMPEXP_SDK, wxEVT_SIDEBAR_CONTEXT_MENU, wxContextMenuEvent);
 #endif // CLSIDEBARCTRL_HPP

@@ -423,11 +423,25 @@ MainFrame::MainFrame(wxWindow* parent)
     m_bottomToolBar->Realize();
     GetSizer()->Add(m_bottomToolBar, 0, wxEXPAND);
 
-    m_sidebar->AddButton(LoadSVG("workspace-button"), true, _("Workspace"));
-    m_sidebar->AddButton(LoadSVG("cmake-button"), false, _("CMake Help"));
-    m_sidebar->AddButton(LoadSVG("dbexplorer-button"));
-    m_sidebar->AddButton(LoadSVG("file-explorer-button"));
-    m_sidebar->AddButton(LoadSVG("zoom-button"));
+    m_sidebar->AddPage(new wxTextCtrl(m_sidebar, wxID_ANY, "Workspace"), _("Workspace"), LoadSVG("workspace-button"),
+                       true);
+    m_sidebar->AddPage(new wxTextCtrl(m_sidebar, wxID_ANY, "CMake Help"), _("CMake Help"), LoadSVG("cmake-button"));
+    m_sidebar->AddPage(new wxTextCtrl(m_sidebar, wxID_ANY, "Database Explorer"), _("Database Explorer"),
+                       LoadSVG("dbexplorer-button"));
+    m_sidebar->AddPage(new wxTextCtrl(m_sidebar, wxID_ANY, "File Explorer"), _("File Explorer"),
+                       LoadSVG("file-explorer-button"));
+    m_sidebar->AddPage(new wxTextCtrl(m_sidebar, wxID_ANY, "Zoom Navigator"), _("Zoom Navigator"),
+                       LoadSVG("zoom-button"));
+    m_sidebar->Bind(wxEVT_SIDEBAR_SELECTION_CHANGED, [](wxCommandEvent& event) {
+        wxString message;
+        message << "Sidebar control selection changed: new selection is " << event.GetSelection();
+        wxLogMessage(message);
+    });
+    m_sidebar->Bind(wxEVT_SIDEBAR_CONTEXT_MENU, [](wxContextMenuEvent& event) {
+        wxString message;
+        message << "Sidebar context menu on button: " << event.GetSelection();
+        wxLogMessage(message);
+    });
 }
 
 MainFrame::~MainFrame() {}
