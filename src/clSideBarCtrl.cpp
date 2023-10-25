@@ -1,8 +1,9 @@
 #include "clSideBarCtrl.hpp"
-#include "wx/anybutton.h"
-#include "wx/dcbuffer.h"
-#include "wx/log.h"
+#include <wx/anybutton.h>
+#include <wx/dcbuffer.h>
+#include <wx/log.h>
 #include <wx/sizer.h>
+#include <wx/tooltip.h>
 
 thread_local int BUTTON_ID = 0;
 
@@ -251,6 +252,7 @@ int clSideBarButtonCtrl::AddButton(const wxBitmap& bmp, const wxString& label, w
     SideBarButton* btn = new SideBarButton(this, bmp);
     btn->SetSeleced(select);
     btn->SetToolTip(label);
+
     btn->SetLinkedPage(linked_page);
     m_mainSizer->Add(btn, wxSizerFlags().CenterHorizontal());
 

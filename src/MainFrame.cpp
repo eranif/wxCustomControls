@@ -21,6 +21,7 @@
 #include <wx/stdpaths.h>
 #include <wx/stopwatch.h>
 #include <wx/textdlg.h>
+#include <wx/tooltip.h>
 #include <wx/utils.h>
 
 #ifdef __WXMSW__
@@ -100,11 +101,12 @@ public:
 
 wxBitmap LoadSVG(const wxString& name)
 {
+    bool dark_theme = wxSystemSettings::GetAppearance().IsDark();
     wxFileName svg_file{ wxStandardPaths::Get().GetExecutablePath() };
     svg_file.RemoveLastDir();
     svg_file.RemoveLastDir();
     svg_file.AppendDir("bitmaps");
-    svg_file.AppendDir("svgs");
+    svg_file.AppendDir(dark_theme ? "dark" : "light");
     svg_file.SetName(name);
     svg_file.SetExt("svg");
     return wxBitmapBundle::FromSVGFile(svg_file.GetFullPath(), wxSize(16, 16)).GetBitmap(wxSize(32, 32));
@@ -115,6 +117,9 @@ wxBitmap LoadSVG(const wxString& name)
 MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
 {
+    wxToolTip::SetDelay(1000);
+    wxToolTip::SetReshow(1000);
+
     MyImages images;
     m_menuBar = new clMenuBar(this, 0, nullptr, nullptr);
     m_menuBar->FromMenuBar(GetMenuBar());

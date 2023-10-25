@@ -14,6 +14,7 @@ public:
     virtual bool OnInit()
     {
 #ifdef __WXMSW__
+        MSWEnableDarkMode(wxApp::DarkMode_Always);
         typedef BOOL WINAPI (*SetProcessDPIAwareFunc)();
         HINSTANCE user32Dll = LoadLibrary(L"User32.dll");
         if(user32Dll) {
