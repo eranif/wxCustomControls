@@ -437,10 +437,13 @@ MainFrame::MainFrame(wxWindow* parent)
                        LoadSVG("file-explorer-button"));
     m_sidebar->AddPage(new wxTextCtrl(m_sidebar, wxID_ANY, "Zoom Navigator"), _("Zoom Navigator"),
                        LoadSVG("zoom-button"));
-    m_sidebar->Bind(wxEVT_SIDEBAR_SELECTION_CHANGED, [](wxCommandEvent& event) {
+    m_sidebar->Bind(wxEVT_SIDEBAR_SELECTION_CHANGED, [this](wxCommandEvent& event) {
         wxString message;
-        message << "Sidebar control selection changed: new selection is " << event.GetSelection();
+        message << "Sidebar control selection changed: new selection is: " << event.GetSelection() << ". "
+                << m_sidebar->GetPageText(event.GetSelection());
         wxLogMessage(message);
+
+        message.clear();
     });
     m_sidebar->Bind(wxEVT_SIDEBAR_CONTEXT_MENU, [](wxContextMenuEvent& event) {
         wxString message;

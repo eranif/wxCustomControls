@@ -255,7 +255,7 @@ int clSideBarButtonCtrl::AddButton(const wxBitmap& bmp, const wxString& label, w
     SideBarButton* btn = new SideBarButton(this, bmp);
     btn->SetSeleced(select);
     btn->SetToolTip(label);
-
+    btn->SetPageLabel(label);
     btn->SetLinkedPage(linked_page);
     m_mainSizer->Add(btn, wxSizerFlags().CenterHorizontal());
 
@@ -509,6 +509,14 @@ wxWindow* clSideBarCtrl::GetPage(size_t pos) const
     CHECK_POINTER_RETURN(button, nullptr);
 
     return button->GetLinkedPage();
+}
+
+wxString clSideBarCtrl::GetPageText(size_t pos) const
+{
+    auto button = m_buttons->GetButton(pos);
+    CHECK_POINTER_RETURN(button, wxEmptyString);
+
+    return button->GetButtonLabel();
 }
 
 wxWindow* clSideBarCtrl::GetPage(const wxString& label) const

@@ -93,7 +93,10 @@ public:
 
     /// return page by its label
     wxWindow* GetPage(const wxString& label) const;
-
+    
+    /// return page label
+    wxString GetPageText(size_t pos) const;
+    
     /// Remove page (this does not delete it)
     void RemovePage(size_t pos);
 
