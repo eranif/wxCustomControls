@@ -179,8 +179,7 @@ protected:
 
             // draw small marker on the left or right side of the active tab
 #ifdef __WXMSW__
-            wxColour marker = is_dark ? wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOXHIGHLIGHTTEXT)
-                                      : wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION);
+            wxColour marker = is_dark ? wxColour("GOLD") : wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION);
 #else
             wxColour marker = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT);
 #endif
@@ -191,6 +190,10 @@ protected:
             } else {
                 dc.DrawLine(frame_rect.GetTopRight(), frame_rect.GetBottomRight());
             }
+
+            dc.SetPen(is_dark ? base_colour.ChangeLightness(120) : wxSystemSettings::GetColour(wxSYS_COLOUR_3DSHADOW));
+            dc.DrawLine(client_rect.GetTopLeft(), client_rect.GetTopRight());
+            dc.DrawLine(client_rect.GetBottomLeft(), client_rect.GetBottomRight());
         }
 
         wxRect bmp_rect = wxRect(m_bmp.GetSize()).CenterIn(client_rect);
