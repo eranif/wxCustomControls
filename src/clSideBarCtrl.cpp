@@ -1,4 +1,5 @@
 #include "clSideBarCtrl.hpp"
+
 #include <wx/anybutton.h>
 #include <wx/dcbuffer.h>
 #include <wx/log.h>
@@ -154,29 +155,41 @@ protected:
 
         wxRect client_rect = GetClientRect();
 
-        wxColour colour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE);
-        bool is_dark = DrawingUtils::IsDark(colour);
-        if(IsSeleced()) {
-            if(is_dark) {
-                colour = colour.ChangeLightness(50);
-            } else {
-                colour = colour.ChangeLightness(160);
-            }
-        }
-        dc.SetBrush(colour);
-        dc.SetPen(colour);
+        // first, fill the entire client rect
+        wxColour base_colour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE);
+        dc.SetBrush(base_colour);
+        dc.SetPen(base_colour);
         dc.DrawRectangle(client_rect);
 
         if(IsSeleced()) {
-            auto pen_colour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DSHADOW);
-            dc.SetPen(pen_colour);
-            dc.DrawLine(client_rect.GetTopLeft(), client_rect.GetTopRight());
-            dc.DrawLine(client_rect.GetBottomLeft(), client_rect.GetBottomRight());
+            // draw the selected item using different background colour
+            wxRect frame_rect = client_rect;
+            constexpr double RADIUS_SIZE = 0.0;
 
-            if(m_sidebar->IsOrientationOnTheRight()) {
-                dc.DrawLine(client_rect.GetTopRight(), client_rect.GetBottomRight());
+            wxColour colour = base_colour;
+            bool is_dark = DrawingUtils::IsDark(colour);
+            if(is_dark) {
+                colour = colour.ChangeLightness(110);
             } else {
-                dc.DrawLine(client_rect.GetTopLeft(), client_rect.GetBottomLeft());
+                colour = colour.ChangeLightness(170);
+            }
+            dc.SetBrush(colour);
+            dc.SetPen(colour);
+            dc.DrawRoundedRectangle(frame_rect, RADIUS_SIZE);
+
+            // draw small marker on the left or right side of the active tab
+#ifdef __WXMSW__
+            wxColour marker = is_dark ? wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOXHIGHLIGHTTEXT)
+                                      : wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION);
+#else
+            wxColour marker = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT);
+#endif
+
+            dc.SetPen(wxPen(marker, 3));
+            if(m_sidebar->IsOrientationOnTheRight()) {
+                dc.DrawLine(frame_rect.GetTopLeft(), frame_rect.GetBottomLeft());
+            } else {
+                dc.DrawLine(frame_rect.GetTopRight(), frame_rect.GetBottomRight());
             }
         }
 
@@ -235,6 +248,7 @@ public:
     bool IsSeleced() const { return m_selected; }
     void SetPageLabel(const wxString& label) { this->m_label = label; }
     const wxString& GetButtonLabel() const { return m_label; }
+    const wxBitmap& GetButtonBitmap() const { return m_bmp; }
 };
 
 clSideBarButtonCtrl::clSideBarButtonCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size,
@@ -250,9 +264,18 @@ clSideBarButtonCtrl::clSideBarButtonCtrl(wxWindow* parent, wxWindowID id, const 
 
 clSideBarButtonCtrl::~clSideBarButtonCtrl() {}
 
+void clSideBarButtonCtrl::SetOrientationOnTheRight(bool b) { m_orientation = b ? wxRIGHT : wxLEFT; }
+
 int clSideBarButtonCtrl::AddButton(const wxBitmap& bmp, const wxString& label, wxWindow* linked_page, bool select)
 {
     SideBarButton* btn = new SideBarButton(this, bmp);
+    if(select) {
+        // unselect the old button
+        int old_selection = GetSelection();
+        if(old_selection != wxNOT_FOUND) {
+            GetButton(old_selection)->SetSeleced(false);
+        }
+    }
     btn->SetSeleced(select);
     btn->SetToolTip(label);
     btn->SetPageLabel(label);
@@ -263,6 +286,14 @@ int clSideBarButtonCtrl::AddButton(const wxBitmap& bmp, const wxString& label, w
     SetSize(btn->GetSize().GetWidth(), wxNOT_FOUND);
     GetParent()->GetSizer()->Layout();
     return GetButtonIndex(btn);
+}
+
+void clSideBarButtonCtrl::Clear()
+{
+    while(m_mainSizer->GetItemCount()) {
+        m_mainSizer->Detach(0);
+    }
+    m_mainSizer->Layout();
 }
 
 wxWindow* clSideBarButtonCtrl::RemoveButton(int pos)
@@ -406,6 +437,17 @@ SideBarButton* clSideBarButtonCtrl::GetButton(size_t pos) const
     return static_cast<SideBarButton*>(m_mainSizer->GetItem(pos)->GetWindow());
 }
 
+int clSideBarButtonCtrl::GetPageIndex(const wxString& label) const
+{
+    for(size_t i = 0; i < m_mainSizer->GetItemCount(); ++i) {
+        SideBarButton* button = static_cast<SideBarButton*>(m_mainSizer->GetItem(i)->GetWindow());
+        if(button->GetButtonLabel() == label) {
+            return i;
+        }
+    }
+    return wxNOT_FOUND;
+}
+
 int clSideBarButtonCtrl::GetPageIndex(wxWindow* page) const
 {
     for(size_t i = 0; i < m_mainSizer->GetItemCount(); ++i) {
@@ -427,7 +469,18 @@ clSideBarCtrl::clSideBarCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos
     SetSizer(new wxBoxSizer(wxHORIZONTAL));
     m_buttons = new clSideBarButtonCtrl(this);
     m_book = new wxSimplebook(this);
-    if(style & wxBK_RIGHT) {
+    m_buttons->SetOrientationOnTheRight(style & wxBK_RIGHT);
+    PlaceButtons();
+}
+
+clSideBarCtrl::~clSideBarCtrl() {}
+
+void clSideBarCtrl::PlaceButtons()
+{
+    GetSizer()->Detach(m_book);
+    GetSizer()->Detach(m_buttons);
+
+    if(m_buttons->IsOrientationOnTheRight()) {
         GetSizer()->Add(m_book, 1, wxEXPAND);
         GetSizer()->Add(m_buttons, 0, wxEXPAND);
     } else {
@@ -438,13 +491,14 @@ clSideBarCtrl::clSideBarCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos
     GetSizer()->Fit(this);
 }
 
-clSideBarCtrl::~clSideBarCtrl() {}
-
 void clSideBarCtrl::AddPage(wxWindow* page, const wxString& label, const wxBitmap& bmp, bool selected)
 {
     page->Reparent(m_book);
     m_book->AddPage(page, label, selected);
-    m_buttons->AddButton(bmp, label, page, selected);
+    m_buttons->AddButton(bmp, label, page, selected || m_buttons->GetButtonCount() == 0);
+
+    // sync the selection between the book and the button bar
+    m_book->SetSelection(m_buttons->GetSelection());
 }
 
 void clSideBarCtrl::DoRemovePage(size_t pos, bool delete_it)
@@ -471,6 +525,7 @@ void clSideBarCtrl::DoRemovePage(size_t pos, bool delete_it)
 }
 
 void clSideBarCtrl::RemovePage(size_t pos) { DoRemovePage(pos, false); }
+void clSideBarCtrl::RemoveAll() { m_buttons->Clear(); }
 
 void clSideBarCtrl::DeletePage(size_t pos) { DoRemovePage(pos, true); }
 
@@ -511,6 +566,13 @@ wxWindow* clSideBarCtrl::GetPage(size_t pos) const
     return button->GetLinkedPage();
 }
 
+wxBitmap clSideBarCtrl::GetPageBitmap(size_t pos) const
+{
+    auto button = m_buttons->GetButton(pos);
+    CHECK_POINTER_RETURN(button, wxNullBitmap);
+    return button->GetButtonBitmap();
+}
+
 wxString clSideBarCtrl::GetPageText(size_t pos) const
 {
     auto button = m_buttons->GetButton(pos);
@@ -541,3 +603,13 @@ int clSideBarCtrl::SimpleBookGetPageIndex(wxWindow* page) const
 }
 
 int clSideBarCtrl::GetSelection() const { return m_buttons->GetSelection(); }
+
+int clSideBarCtrl::GetPageIndex(wxWindow* page) const { return m_buttons->GetPageIndex(page); }
+
+int clSideBarCtrl::GetPageIndex(const wxString& label) const { return m_buttons->GetPageIndex(label); }
+
+void clSideBarCtrl::SetOrientationOnTheRight(bool b)
+{
+    m_buttons->SetOrientationOnTheRight(b);
+    PlaceButtons();
+}

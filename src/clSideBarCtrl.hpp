@@ -31,7 +31,7 @@ public:
     virtual ~clSideBarButtonCtrl();
 
     /// Does the control placed on the left or right?
-    void SetOrientationOnTheRight(bool b) { m_orientation = b ? wxRIGHT : wxLEFT; }
+    void SetOrientationOnTheRight(bool b);
     bool IsOrientationOnTheRight() const { return m_orientation == wxRIGHT; }
 
     /// Add new button at the end, returns its index
@@ -60,11 +60,17 @@ public:
     /// Return the page position
     int GetPageIndex(wxWindow* page) const;
 
+    /// Return the page position
+    int GetPageIndex(const wxString& label) const;
+
     /// return the linked page for the current selection
     wxWindow* GetSelectionLinkedPage() const;
 
     /// Return the button at position `pos`
     SideBarButton* GetButton(size_t pos) const;
+    
+    /// Remove all buttons
+    void Clear();
 };
 
 class WXDLLIMPEXP_SDK clSideBarCtrl : public wxPanel
@@ -76,6 +82,7 @@ protected:
     /// Return the page position
     int SimpleBookGetPageIndex(wxWindow* page) const;
     void DoRemovePage(size_t pos, bool delete_it);
+    void PlaceButtons();
 
 public:
     clSideBarCtrl(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
@@ -93,12 +100,18 @@ public:
 
     /// return page by its label
     wxWindow* GetPage(const wxString& label) const;
-    
+
     /// return page label
     wxString GetPageText(size_t pos) const;
-    
+
+    /// return the page bitmap
+    wxBitmap GetPageBitmap(size_t pos) const;
+
     /// Remove page (this does not delete it)
     void RemovePage(size_t pos);
+
+    /// Remove all pages, do not destroy them
+    void RemoveAll();
 
     /// Delete page
     void DeletePage(size_t pos);
@@ -111,6 +124,15 @@ public:
 
     /// return the current selection
     int GetSelection() const;
+
+    /// Return the page position
+    int GetPageIndex(wxWindow* page) const;
+
+    /// Return the page position
+    int GetPageIndex(const wxString& label) const;
+
+    /// place the buttons on the RIGHT side (false for LEFT)
+    void SetOrientationOnTheRight(bool b);
 };
 
 wxDECLARE_EXPORTED_EVENT(WXDLLIMPEXP_SDK, wxEVT_SIDEBAR_SELECTION_CHANGED, wxCommandEvent);
